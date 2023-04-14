@@ -5,9 +5,9 @@ import {map, of, switchMap} from "rxjs";
 
 describe('file store', () => {
     runStoreTests(() =>
-        of(`${process.cwd()}/pistol-db`).pipe(
+        of(`${process.cwd()}/endgame-db`).pipe(
             switchMap(path => rm(path, {recursive: true, force: true})),
-            map(() =>  newFileStore('pistol-db'))
+            map(() =>  newFileStore('endgame-db'))
         )
     );
 });

@@ -66,6 +66,6 @@ describe('endgame', () => {
                 tap(({value}) => expect(value).to.equal(10))
             ))
         )
-    })
+    });
 });
 

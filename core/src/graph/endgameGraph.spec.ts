@@ -7,7 +7,7 @@ type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
 } : T;
 
-describe.skip('pistol graph', function () {
+describe.skip('endgame graph', function () {
     this.timeout(10_000);
 
     // it('should verify the sig when a value is stored', (done) => {

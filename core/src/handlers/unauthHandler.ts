@@ -6,9 +6,9 @@ import {getTestKeys} from "../test/testUtils.js";
 export const unauthHandler = () => {
     const subject = new Subject<ChainProps<'auth'>>();
     const observer = subject.asObservable().pipe(
-        switchMap(({pistol, password, userPath, username}) => getTestKeys().pipe(
-            map(keys => ({...pistol, keys, username} satisfies AuthenticatedEndgame as AuthenticatedEndgame)),
-            map(pistol => ({pistol: endgame, password, userPath, username}))
+        switchMap(({endgame, password, userPath, username}) => getTestKeys().pipe(
+            map(keys => ({...endgame, keys, username} satisfies AuthenticatedEndgame as AuthenticatedEndgame)),
+            map(endgame => ({endgame, password, userPath, username}))
         ))
     ) as unknown as ChainPair<ChainProps<'auth'>>;
 
