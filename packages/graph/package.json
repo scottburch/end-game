@@ -1,0 +1,77 @@
+{
+  "name": "@end-game/graph",
+  "version": "1.0.23",
+  "license": "MIT",
+  "type": "module",
+  "private": false,
+  "main": "./lib/index-browser.js",
+  "exports": {
+    ".": {
+      "node": "./lib/index.js",
+      "default": "./lib/index-browser.js"
+    }
+  },
+  "dependencies": {
+    "@end-game/react-graph": "^1.0.23",
+    "@end-game/utils": "^1.0.23",
+    "@types/base-64": "^1.0.0",
+    "@types/chai": "^4.3.4",
+    "@types/ip": "^1.1.0",
+    "@types/lodash": "^4.14.191",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.11.15",
+    "@types/ws": "^8.5.3",
+    "abstract-level": "^1.0.3",
+    "add": "^2.0.6",
+    "base-64": "^1.0.0",
+    "bech32": "^2.0.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
+    "curve25519-js": "^0.0.4",
+    "cypher.js": "^1.0.0-beta.6",
+    "ip": "^1.1.8",
+    "isomorphic-ws": "^5.0.0",
+    "js-crypto-key-utils": "^1.0.4",
+    "level": "^8.0.0",
+    "lodash": "^4.17.21",
+    "memory-level": "^1.0.0",
+    "process": "^0.11.10",
+    "rxjs": "^7.8.1",
+    "short-unique-id": "^4.4.4",
+    "stream-browserify": "^3.0.0",
+    "ts-loader": "^9.4.2",
+    "tsdef": "^0.0.14",
+    "typescript": "^5.0.4",
+    "webpack": "^5.80.0",
+    "ws": "^8.11.0",
+    "yarn": "^1.22.19"
+  },
+  "engines": {
+    "node": ">=19"
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "loader": "ts-node/esm",
+    "experimental-specifier-resolution": "node",
+    "bail": true
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@protobuf-ts/protoc": "^2.8.2",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.9.1",
+    "ts-proto": "^1.136.0",
+    "zx": "^7.1.1"
+  },
+  "scripts": {
+    "build": "rm -rf lib && webpack",
+    "build-watch": "yarn build --watch",
+    "test": "mocha ./src/**/*.spec.ts",
+    "publishIt": "cd bundle && ../../old/core/node_modules/.bin/yarn publish --no-git-tag-version"
+  },
+  "gitHead": "a01ca1e84d2758a3f85629f5dac3f4d3c0afd984"
+}
