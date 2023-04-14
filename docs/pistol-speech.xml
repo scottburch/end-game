@@ -1,0 +1,96 @@
+<speak>
+    <!-- slide 1 -->
+    <p>
+        Introducing Pistol DDS.  Pistol DDS makes creating peer to peer as well as traditional REST or RPC applications simple
+    </p>
+    <p>
+        This is because all application code is client side.  No longer will you need to write code for the client side
+        <break/>and<break/>  duplicate effort writing code for the server <break/>allowing for faster updates which is
+        perfect for agile development.
+    </p>
+
+    <!-- slide 2-->
+
+        <p>
+            In this short video, we will demonstrate some of the additional benefits of <break time="70ms"/> Pistol DDS <break time="70ms"/>including:
+            <break/>
+            The pistol security layer,
+            <break/>
+            How pistol provides built in data redundancy,
+            <break/>
+            How to setup pistol DDS for the level of control, security, and privacy  you want.
+            And.
+            How pistol DDS provides sensorship resistance for your social app.
+        </p>
+
+    <!-- slide 3 -->
+    <p>
+        Pistol DDS allows you to write peer-to-peer apps without worrying about servers or databases.
+        You can write mobile, web or desktop applications as well as services using Javascript or Typescript with your
+        favorite frameworks.
+        Currently, Pistol comes with a library for React.
+    </p>
+
+    <!-- slide 4 -->
+
+    All of this means that you can write your applications, faster and easier,
+    with less time troubleshooting, or worrying about deploying your application, which, reduces the overall cost.
+
+    Also, end-to-end testing becomes easier since there is no server or database to worry about.
+
+    <!-- slide 5 -->
+    To accomplish this, Pistol treats everything as a peer on the network.  Mobile devices, computers and service nodes
+    are all equal peers on the network.  Peers can pull data from other peers on the network.  After they do, they
+    can share data on the network with other peers.  This provides data redundancy for data that people care about.
+
+
+    <!-- slide 6 -->
+    You might be asking at this point, if everything is a peer, how do we ensure data integrity and security?
+
+    <!-- slide 7 -->
+    <p>
+        There are four security models for a piece of data.  Public<break time="250ms"/> write-only<break time="250ms"/> Owner writable while others can read<break time="250ms"/>,
+        and, Data that is private to the owner.
+    </p>
+    <p>
+        Each one of these models uses a single or a combination of encryption or verification methods that were borrowed
+        from blockchain technology.
+    </p>
+
+    <!-- slide 8 -->
+    With pistol, redundancy is automatic for the reasons stated before.
+
+    <!-- slide 9 -->
+    When an application requires a peace of data, it will ask the network for that data.  If someone else has that
+    data, they can provide it on demand.
+
+    <!-- slide 10 -->
+    When another application asks for that same peace of data, multiple peers will be able to provide it.
+
+    <!-- slide 11 -->
+    A design consideration for Pistol was maximum flexibility for the users, and application developers.
+    Pistol does not dictate which security model you use, or what services you can provide.  That is up to you.
+
+    You can run anything from a fully moderated forum to a fully decentralized uncontrolled video site.  You are the boss.
+
+    <!-- slide 12 -->
+    Here are three examples of possible network configurations.  One with a service connected into the DDS network,
+    one with a blockchain, and one where the end user applications are traditional REST or RPC endpoints.
+
+    As you can see, DDS can provide redundancy for third party services for your end users as well.
+
+    There are too many possible configurations to list here, but hopefully you get the idea.
+
+    <!-- slide 13 -->
+    Because Pistol is peer-to-peer first, censorship resistance becomes a side-effect.  As long as multiple other
+    devices have the data that you want, you can always retrieve it.
+
+    <!-- slide 14 -->
+    To summarize, Pistol DDS makes development easy, provides redundancy and censorship resistance, all while giving you
+    full control of your application and data.
+
+    <!-- slide 15 -->
+    Thank you for watching.  And, to get started, follow the instructions in the “Getting Started”
+    menu to install the Pistol DDS starter kit.
+
+</speak>

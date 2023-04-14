@@ -1,0 +1,65 @@
+version: "3.9"
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /tmp/reach/certs:/etc/nginx/certs
+      - ./docker/vhost:/etc/nginx/vhost.d
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /tmp/reach/html:/usr/share/nginx/html
+    depends_on:
+      - reach
+      - testnet
+
+  proxy-acme:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /tmp/reach/acme:/etc/acme.sh
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    depends_on:
+      - nginx-proxy
+
+  reach:
+    build:
+      context: .
+      dockerfile: docker/reach.dockerfile
+    container_name: reach
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    environment:
+      - VIRTUAL_PORT=3000
+      - VIRTUAL_HOST=reach.pistoldds.net
+      - LETSENCRYPT_HOST=reach.pistoldds.net
+
+  testnet:
+    build:
+      context: .
+      dockerfile: docker/network.dockerfile
+    container_name: testnet
+    ports:
+      - "11110:11110"
+#      - "11111:11111"
+    expose:
+      - "11110"
+    volumes:
+      - testnet0:/testnet0
+      - testnet1:/testnet1
+    environment:
+      - VIRTUAL_PORT=11110
+      - VIRTUAL_HOST=testnet0.pistoldds.net
+      - LETSENCRYPT_HOST=testnet0.pistoldds.net
+
+volumes:
+  testnet0:
+  testnet1:

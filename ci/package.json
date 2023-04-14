@@ -1,0 +1,17 @@
+{
+  "name": "ci",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@types/node": "^18.13.0",
+    "rxjs": "^7.8.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5",
+    "zx": "^7.1.1"
+  },
+  "scripts": {
+    "test-create-dds-app": "node --require=ts-node/register --loader=ts-node/esm --experimental-specifier-resolution=node scripts/test-create-dds-app.ts"
+  }
+}

@@ -1,0 +1,12 @@
+
+Flags to make compile work
+
+--require=ts-node/register   --loader=ts-node/esm    --experimental-specifier-resolution=node
+
+TODO - in a different file setup
+    * graphql querying
+    * network adapter
+    * a routing table
+    so that the pub/sub stuff talks to the local pistol just like any remote pistol
+
+    for now maybe we just have a multicast network

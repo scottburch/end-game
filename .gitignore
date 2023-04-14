@@ -1,0 +1,9 @@
+node_modules/
+.parcel-cache
+core/dist
+lib-browser
+lib
+bundle
+~*
+.~*
+pistol-db
