@@ -1,7 +1,7 @@
 import {startTestNetwork} from "../test/testUtils.js";
 import {count, delay, filter, map, mergeMap, range, scan, switchMap, takeUntil, tap, timer} from "rxjs";
 import {expect} from "chai";
-import {pistolPut} from "../app/pistol.js";
+import {endgamePut} from "../app/endgame.js";
 
 
 describe.skip('p2p performance', function () {
@@ -17,16 +17,16 @@ describe.skip('p2p performance', function () {
         startTestNetwork(peers).pipe(
             delay(100),
             tap(() => start = Date.now()),
-            switchMap(pistols => range(0, peers.length).pipe(
+            switchMap(endgames => range(0, peers.length).pipe(
                     mergeMap((nodeNum) => range(1, iterations).pipe(
-                        tap(n => pistolPut(pistols[nodeNum], `node${nodeNum}.foo-${n}`, 'xx').subscribe())
+                        tap(n => endgamePut(endgames[nodeNum], `node${nodeNum}.foo-${n}`, 'xx').subscribe())
                     )),
-                    map(() => pistols)
+                    map(() => endgames)
                 )
             ),
-            switchMap(pistols =>
-                pistols[0].config.chains.peerIn.pipe(
-                    map(({msg, pistol}) => ({nodeId: pistol.id, msg}))),
+            switchMap(endgames =>
+                endgames[0].config.chains.peerIn.pipe(
+                    map(({msg, endgame}) => ({nodeId: endgame.id, msg}))),
             ),
             filter(({msg, nodeId}) => nodeId !== msg.from),
             filter(({msg}) => msg.cmd === 'put'),
@@ -53,14 +53,14 @@ describe.skip('p2p performance', function () {
     //     return firstValueFrom(startTestNetwork(peers).pipe(
     //         delay(100),
     //         tap(() => start = Date.now()),
-    //         tap(pistols => range(0, peers.length).pipe(
+    //         tap(endgames => range(0, peers.length).pipe(
     //                 mergeMap((nodeNum) => range(1, iterations).pipe(
-    //                     mergeMap(n => pistolPut(pistols[nodeNum], `base.${nodeNum}-${n}`, 'xx'))
+    //                     mergeMap(n => endgamePut(endgames[nodeNum], `base.${nodeNum}-${n}`, 'xx'))
     //                 )),
-    //                 map(() => pistols)
+    //                 map(() => endgames)
     //             ).subscribe()
     //         ),
-    //         switchMap(pistols => pistolKeys(pistols[0], 'base')),
+    //         switchMap(endgames => endgameKeys(endgames[0], 'base')),
     //         takeWhile(({keys}) => keys.length < 40),
     //         last(),
     //         map(() => Date.now() - start),

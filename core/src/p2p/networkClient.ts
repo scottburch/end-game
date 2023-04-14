@@ -1,7 +1,7 @@
 import WebSocket from "isomorphic-ws";
 import WS from "isomorphic-ws";
 import {concatMap, fromEvent, merge, Observable, Subscription, switchMap, tap} from "rxjs";
-import {Pistol} from "../app/pistol.js";
+import {Endgame} from "../app/endgame.js";
 import {handleMessageReceived} from "./dialer.js";
 import {connectionFactory, PeerConnection} from "./connectionManager.js";
 
@@ -9,7 +9,7 @@ export type DialPeerOpts = {
     redialInterval?: number
 }
 
-export const dialPeer = (pistol: Pistol, url: string, opts: DialPeerOpts = {redialInterval: 1}) => new Observable<Pistol>(observer => {
+export const dialPeer = (endgame: Endgame, url: string, opts: DialPeerOpts = {redialInterval: 1}) => new Observable<Endgame>(observer => {
     const redialInterval = opts.redialInterval || 30;
     setTimeout(() => dial());
     let ws: WebSocket;
@@ -22,13 +22,13 @@ export const dialPeer = (pistol: Pistol, url: string, opts: DialPeerOpts = {redi
 
         clientSub = merge(
             fromEvent(ws, 'open').pipe(
-                concatMap(() => connectionFactory(pistol, ws, closeConn, 'client')),
+                concatMap(() => connectionFactory(endgame, ws, closeConn, 'client')),
                 concatMap(conn => startPeerMessageListener(conn)),
-                tap(conn => conn.pistol.config.chains.peerConnect.next({pistol, peerId: '0-0'})),
-                tap(conn => observer.next(conn.pistol))
+                tap(conn => conn.endgame.config.chains.peerConnect.next({endgame, peerId: '0-0'})),
+                tap(conn => observer.next(conn.endgame))
             ),
             fromEvent<WS.ErrorEvent>(ws, 'error').pipe(
-                tap(ev => pistol.config.chains.log.next({
+                tap(ev => endgame.config.chains.log.next({
                     module: 'networkClient',
                     level: 'error',
                     time: new Date().toISOString(),

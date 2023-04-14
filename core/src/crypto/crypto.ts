@@ -1,11 +1,11 @@
 import {combineLatest, filter, from, map, of, switchMap, throwError} from "rxjs";
 import {bech32} from "bech32";
 import {bytesToHex, hexToBytes, textToBytes} from "../utils/byteUtils.js";
-import {AuthenticatedPistol} from "../app/pistol.js";
+import {AuthenticatedEndgame} from "../app/endgame.js";
 import Base64 from 'base-64'
 
 import {PeerPutMsg} from "../p2p/peerMsg.js";
-import {PistolGraphBundle, PistolGraphValue} from "../graph/pistolGraph.js";
+import {EndgameGraphBundle, EndgameGraphValue} from "../graph/endgameGraph.js";
 
 export const subtle = crypto.subtle;
 
@@ -167,7 +167,7 @@ export const getId = (pubKey: CryptoKey) =>
     from(subtle.exportKey('raw', pubKey)).pipe(
         map(pubKeyRaw => new Uint8Array(pubKeyRaw).slice(0, 32)),
         map(pubKeySlice => bech32.toWords(pubKeySlice)),
-        map(words => bech32.encode('pistol', words)),
+        map(words => bech32.encode('endgame', words)),
     );
 
 // ************ END NEW ***************
@@ -177,10 +177,10 @@ const signData = (hash: Uint8Array, privKey: CryptoKey) =>
         map(sig => bytesToHex(new Uint8Array(sig)))
     );
 
-export const signMsg = <T extends PistolGraphValue>(pistol: AuthenticatedPistol, msg: PistolGraphBundle<T>) => {
+export const signMsg = <T extends EndgameGraphValue>(pistol: AuthenticatedEndgame, msg: EndgameGraphBundle<T>) => {
     return pistol.config.isTrusted ? of(mixinSig(msg, '')) : doSignMsg(pistol, msg);
 
-    function doSignMsg(pistol: AuthenticatedPistol, msg: PistolGraphBundle<T>) {
+    function doSignMsg(pistol: AuthenticatedEndgame, msg: EndgameGraphBundle<T>) {
         return of(msg).pipe(
             switchMap(msg => hashMsg(msg)),
             switchMap(hex => signData(hex, pistol.keys.privKey)),
@@ -188,7 +188,7 @@ export const signMsg = <T extends PistolGraphValue>(pistol: AuthenticatedPistol,
         )
     }
 
-    function mixinSig(msg: PistolGraphBundle<T>, sig: string) {
+    function mixinSig(msg: EndgameGraphBundle<T>, sig: string) {
         return ({
             ...msg,
             meta: {

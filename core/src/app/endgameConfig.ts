@@ -1,28 +1,28 @@
 import {Observable, Subject} from "rxjs";
-import {AuthenticatedPistol, Pistol, PistolLogEntry} from "./pistol.js";
+import {AuthenticatedEndgame, Endgame, LogEntry} from "./endgame.js";
 import {PeerMsg} from "../p2p/peerMsg.js";
-import {getNetworkTime, PistolGraphBundle, PistolGraphValue} from "../graph/pistolGraph.js";
+import {getNetworkTime, EndgameGraphBundle, EndgameGraphValue} from "../graph/endgameGraph.js";
 
 export type ChainPair<T> = Observable<T> & {next: (v: T) => void, props: T}
-export type ChainProps<T extends keyof PistolConfig['chains']> = PistolConfig['chains'][T]['props']
+export type ChainProps<T extends keyof EndgameConfig['chains']> = EndgameConfig['chains'][T]['props']
 
-export type PistolConfig = {
+export type EndgameConfig = {
     name: string
     port: number
     isTrusted: boolean
     chains: {
-        log: ChainPair<PistolLogEntry<any>>
-        peerConnect: ChainPair<{pistol: Pistol, peerId: string}>
-        auth: ChainPair<{pistol: Pistol, username: string, password: string, userPath: string}>
-        unauth: ChainPair<{pistol: Pistol}>
-        peersOut: ChainPair<{pistol: Pistol, msg: PeerMsg<any, any>}>
-        peerIn: ChainPair<{pistol: Pistol, msg: PeerMsg<any, any>}>
-        put: ChainPair<PistolGraphBundle<any> & {pistol: AuthenticatedPistol}>
-        get: ChainPair<{ path: string, value?: PistolGraphValue, pistol: Pistol }>
+        log: ChainPair<LogEntry<any>>
+        peerConnect: ChainPair<{endgame: Endgame, peerId: string}>
+        auth: ChainPair<{endgame: Endgame, username: string, password: string, userPath: string}>
+        unauth: ChainPair<{endgame: Endgame}>
+        peersOut: ChainPair<{endgame: Endgame, msg: PeerMsg<any, any>}>
+        peerIn: ChainPair<{endgame: Endgame, msg: PeerMsg<any, any>}>
+        put: ChainPair<EndgameGraphBundle<any> & {endgame: AuthenticatedEndgame}>
+        get: ChainPair<{ path: string, value?: EndgameGraphValue, endgame: Endgame }>
     }
 }
 
-export const newPistolConfig = (config: Partial<PistolConfig>) => ({
+export const newEndgameConfig = (config: Partial<EndgameConfig>) => ({
     isTrusted: config.isTrusted ?? false,
     name: config.name || `node-${getNetworkTime()}`,
     port: config.port || 11110,
@@ -37,7 +37,7 @@ export const newPistolConfig = (config: Partial<PistolConfig>) => ({
         get: config.chains?.get || newChainPair<ChainProps<'get'>>(),
     }
 
-} satisfies PistolConfig as PistolConfig)
+} satisfies EndgameConfig as EndgameConfig)
 
 export const newChainPair = <T>() => {
     const subject = new Subject<T>();

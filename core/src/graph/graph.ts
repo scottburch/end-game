@@ -1,5 +1,5 @@
 import {map, Observable, of, switchMap} from "rxjs";
-import {PistolGraphValue} from "./pistolGraph.js";
+import {EndgameGraphValue} from "./endgameGraph.js";
 import {AbstractKeyIteratorOptions, AbstractLevel} from 'abstract-level'
 import {getStoreKeys, storePut, storeRead} from "../stores/storeFunctions.js";
 
@@ -7,7 +7,7 @@ export type GraphStore = {
     db: AbstractLevel<any, any, any>
 };
 
-export const graphReadValue = (store: GraphStore, path: string): Observable<{store: GraphStore, value: PistolGraphValue}> =>
+export const graphReadValue = (store: GraphStore, path: string): Observable<{store: GraphStore, value: EndgameGraphValue}> =>
     storeRead(store, path).pipe(
         map(result => result?.d),
         map((value) => ({store, value})),

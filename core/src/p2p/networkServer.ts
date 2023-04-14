@@ -1,22 +1,22 @@
 import {fromEvent, map, mergeMap, Observable, of, switchMap, tap} from "rxjs";
 import WS from "isomorphic-ws";
-import {Pistol} from "../app/pistol.js";
+import {Endgame} from "../app/endgame.js";
 import {handleMessageReceived} from "./dialer.js";
 import {connectionFactory, PeerConnection} from "./connectionManager.js";
 
 
 
-export const startPeersServer = (pistol: Pistol) => new Observable<Pistol>(sub => {
-    const wss = new WS.WebSocketServer({port: pistol.config.port});
+export const startPeersServer = (endgame: Endgame) => new Observable<Endgame>(sub => {
+    const wss = new WS.WebSocketServer({port: endgame.config.port});
     const serverSub = of(wss).pipe(
         switchMap(wss => fromEvent(wss, 'listening').pipe(map(() => wss))),
-        tap(() => sub.next(pistol)),
+        tap(() => sub.next(endgame)),
         // observe when a client connects
         switchMap(wss => fromEvent(wss, 'connection').pipe(
             map(x => (x as [WS.WebSocket])[0]),
-            map(conn => ({pistol, conn}))
+            map(conn => ({ endgame, conn}))
         )),
-        mergeMap(({pistol, conn}) => connectionFactory(pistol, conn, closeConn, 'server')),
+        mergeMap(({endgame, conn}) => connectionFactory(endgame, conn, closeConn, 'server')),
         mergeMap(conn => startPeerMessageListener(conn)),
     ).subscribe();
 

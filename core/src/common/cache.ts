@@ -1,12 +1,12 @@
-import {PistolGraphValue} from "../graph/pistolGraph.js";
+import {EndgameGraphValue} from "../graph/endgameGraph.js";
 
-export type Cache<T extends PistolGraphValue> = Map<string, {value: T, timestamp: number}>;
-export const newCache = <T extends PistolGraphValue>() => new Map<string, {value: T, timestamp: number}>();
+export type Cache<T extends EndgameGraphValue> = Map<string, {value: T, timestamp: number}>;
+export const newCache = <T extends EndgameGraphValue>() => new Map<string, {value: T, timestamp: number}>();
 
-export const cacheSet = <T extends PistolGraphValue>(cache: Cache<T>, key: string, value: T) =>
+export const cacheSet = <T extends EndgameGraphValue>(cache: Cache<T>, key: string, value: T) =>
     cache.set(key, {value, timestamp: Date.now()})
 
-export const cacheGet = <T extends PistolGraphValue>(cache: Cache<T>, key: string) => ({
+export const cacheGet = <T extends EndgameGraphValue>(cache: Cache<T>, key: string) => ({
     value: cache.get(key)?.value,
     cache
 });

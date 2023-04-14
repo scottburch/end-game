@@ -11,18 +11,18 @@ import {
     tap,
     toArray
 } from "rxjs";
-import {PistolKeysOptions} from "../graph/pistolGraph.js";
+import {EndgameKeysOptions} from "../graph/endgameGraph.js";
 
-export const getStoreKeys = (store: GraphStore, base: string, options: PistolKeysOptions = {}) => {
+export const getStoreKeys = (store: GraphStore, base: string, options: EndgameKeysOptions = {}) => {
     return of(options).pipe(
-        map(opts => opts.gt ? {...opts, gt: `${base}.${opts.gt}`} satisfies PistolKeysOptions : opts),
-        map(opts => opts.lt ? {...opts, lt: `${base}.${opts.lt}`} satisfies PistolKeysOptions : opts),
-        map(opts => opts.gte ? {...opts, gte: `${base}.${opts.gte}`} satisfies PistolKeysOptions : opts),
-        map(opts => opts.lte ? {...opts, lte: `${base}.${opts.lte}`} satisfies PistolKeysOptions : opts),
+        map(opts => opts.gt ? {...opts, gt: `${base}.${opts.gt}`} satisfies EndgameKeysOptions : opts),
+        map(opts => opts.lt ? {...opts, lt: `${base}.${opts.lt}`} satisfies EndgameKeysOptions : opts),
+        map(opts => opts.gte ? {...opts, gte: `${base}.${opts.gte}`} satisfies EndgameKeysOptions : opts),
+        map(opts => opts.lte ? {...opts, lte: `${base}.${opts.lte}`} satisfies EndgameKeysOptions : opts),
         switchMap(opts => iterateThroughKeys(store, opts))
     );
 
-    function iterateThroughKeys(store: GraphStore, opts: PistolKeysOptions) {
+    function iterateThroughKeys(store: GraphStore, opts: EndgameKeysOptions) {
         return of(store).pipe(
             map(store => ({store, iterator: store.db.keys({...opts, limit: Number.MAX_SAFE_INTEGER})})),
             switchMap(({store, iterator}) => range(1, 10000).pipe(

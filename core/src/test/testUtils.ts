@@ -1,10 +1,10 @@
 import {bufferCount,  from, map, mergeMap, Observable, of, Subject, switchMap, timer} from "rxjs";
-import {AuthenticatedPistol, newPistol, pistolAuth, PistolOpts} from "../app/pistol.js";
+import {AuthenticatedEndgame, newEndgame, endgameAuth, EndgameOpts} from "../app/endgame.js";
 import {dialPeer} from "../p2p/networkClient.js";
 import {floodRouter} from "../p2p/floodRouter.js";
 import {Parcel} from '@parcel/core';
 import {deserializeKeys} from "../crypto/crypto.js";
-import {ChainPair, ChainProps, newPistolConfig, PistolConfig} from "../app/pistolConfig.js";
+import {ChainPair, ChainProps, newEndgameConfig, EndgameConfig} from "../app/endgameConfig.js";
 
 /**
  * Starts a test network.  Peers are in the form of an array of nodes with the inner array being the node number of the peer
@@ -13,11 +13,11 @@ import {ChainPair, ChainProps, newPistolConfig, PistolConfig} from "../app/pisto
  * the second node is paired with the third
  * the third node is paired with the first
  */
-export type StartTestNetworkOpts = PistolConfig & {
+export type StartTestNetworkOpts = EndgameConfig & {
     username: string
 }
 
-export const testChains = (chains: Partial<PistolConfig['chains']>) => ({
+export const testChains = (chains: Partial<EndgameConfig['chains']>) => ({
     log: testDummyHandler<'log'>(),
     auth: testDummyHandler<'auth'>(),
     unauth: testDummyHandler<'unauth'>(),
@@ -27,14 +27,14 @@ export const testChains = (chains: Partial<PistolConfig['chains']>) => ({
     put: testDummyHandler<'put'>(),
     get: testDummyHandler<'get'>(),
     ...chains
-} satisfies PistolConfig['chains'] as PistolConfig['chains'])
+} satisfies EndgameConfig['chains'] as EndgameConfig['chains'])
 
 export const testAuthHandler = () => {
     const subject = new Subject<ChainProps<'auth'>>();
     const observer = subject.asObservable().pipe(
-        switchMap(({pistol, password, userPath, username}) => getTestKeys().pipe(
-            map(keys => ({...pistol, keys, username} satisfies AuthenticatedPistol as AuthenticatedPistol)),
-            map(pistol => ({pistol, password, userPath, username}))
+        switchMap(({endgame, password, userPath, username}) => getTestKeys().pipe(
+            map(keys => ({...endgame, keys, username} satisfies AuthenticatedEndgame as AuthenticatedEndgame)),
+            map(endgame => ({endgame, password, userPath, username}))
         ))
     ) as unknown as ChainPair<ChainProps<'auth'>>;
 
@@ -42,7 +42,7 @@ export const testAuthHandler = () => {
     return observer
 };
 
-export const testDummyHandler = <T extends keyof PistolConfig['chains']>(fn?: (v: ChainProps<T>) => ChainProps<T>) => {
+export const testDummyHandler = <T extends keyof EndgameConfig['chains']>(fn?: (v: ChainProps<T>) => ChainProps<T>) => {
     const subject = new Subject<ChainProps<T>>();
     const observer = subject.pipe(
         map((x: ChainProps<T>) => fn ? fn(x) : x)
@@ -63,56 +63,56 @@ export const testDummyHandler = <T extends keyof PistolConfig['chains']>(fn?: (v
 
 
 
-export const newTestPistol = (config: Partial<PistolConfig> = {}) =>
+export const newTestEndgame = (config: Partial<EndgameConfig> = {}) =>
     of(config).pipe(
-        map(config => newPistolConfig(config)),
-        switchMap(config => newPistol({config: config}))
+        map(config => newEndgameConfig(config)),
+        switchMap(config => newEndgame({config: config}))
 );
 
 
 export const startTestNetwork = (nodeList: number[][] = [], opts: Partial<StartTestNetworkOpts> = {}) => from(nodeList).pipe(
     map((peers, n) => ({
-        pistolConfig: {
+        endgameConfig: {
             name: `node-${n}`,
             port: 11110 + n,
             ...opts
-        } satisfies Partial<PistolConfig>,
+        } satisfies Partial<EndgameConfig>,
         peers
     })),
-    switchMap(({pistolConfig, peers}) => of(newPistolConfig(pistolConfig)).pipe(
-        map(pistolConfig => ({pistolConfig, peers})),
+    switchMap(({endgameConfig, peers}) => of(newEndgameConfig(endgameConfig)).pipe(
+        map(endgameConfig => ({endgameConfig, peers})),
     )),
-    mergeMap(({pistolConfig, peers}, idx) => timer(idx * 100).pipe(
-        switchMap(() => newTestPistol(pistolConfig)),
+    mergeMap(({endgameConfig, peers}, idx) => timer(idx * 100).pipe(
+        switchMap(() => newTestEndgame(endgameConfig)),
         switchMap(floodRouter),
-        map(pistol => ({pistol, peers}))
+        map(endgame => ({endgame, peers}))
     )),
-    mergeMap(({pistol, peers}, n) => pistolAuth(pistol, opts.username || `username-${n}`, 'password', 'my.user').pipe(
-        map(({pistol}) => ({pistol, peers}))
+    mergeMap(({endgame, peers}, n) => endgameAuth(endgame, opts.username || `username-${n}`, 'password', 'my.user').pipe(
+        map(({endgame}) => ({endgame, peers}))
     )),
-    mergeMap(({pistol, peers}) => peers.length ? from(peers).pipe(
-        mergeMap(peerNo => dialPeer(pistol, `ws://localhost:${11110 + peerNo}`, {redialInterval: 1})),
+    mergeMap(({endgame, peers}) => peers.length ? from(peers).pipe(
+        mergeMap(peerNo => dialPeer(endgame, `ws://localhost:${11110 + peerNo}`, {redialInterval: 1})),
         bufferCount(peers.length),
-        map(() => pistol)
-    ) : of(pistol)),
+        map(() => endgame)
+    ) : of(endgame)),
     bufferCount(nodeList.length),
-    map(pistols => pistols.sort((a, b) => a.config.name < b.config.name ? -1 : 1))
+    map(endgames => endgames.sort((a, b) => a.config.name < b.config.name ? -1 : 1))
 );
 
-export const startTestNode = (n: number = 0, peers: number[] = [], config: Partial<PistolOpts> = {}) => of(config satisfies Omit<PistolOpts, 'config'>).pipe(
-    switchMap(config => of(newPistolConfig({})).pipe(
-        map(baseApp => ({...config, config: baseApp} satisfies PistolOpts))
+export const startTestNode = (n: number = 0, peers: number[] = [], config: Partial<EndgameOpts> = {}) => of(config satisfies Omit<EndgameOpts, 'config'>).pipe(
+    switchMap(config => of(newEndgameConfig({})).pipe(
+        map(baseApp => ({...config, config: baseApp} satisfies EndgameOpts))
     )),
-    switchMap(config => newPistol(config)),
+    switchMap(config => newEndgame(config)),
     switchMap(floodRouter),
-    switchMap(pistol => peers.length ? from(peers).pipe(
-        map(peerNo => ({pistol, peerNo})),
-        mergeMap(({pistol, peerNo}) => dialPeer(pistol, `ws:localhost:${11110 + peerNo}`, {
+    switchMap(endgame => peers.length ? from(peers).pipe(
+        map(peerNo => ({endgame, peerNo})),
+        mergeMap(({endgame, peerNo}) => dialPeer(endgame, `ws:localhost:${11110 + peerNo}`, {
             redialInterval: 1
         })),
         bufferCount(peers.length),
-        map(([pistol]) => pistol)
-    ) : of(pistol))
+        map(([endgame]) => endgame)
+    ) : of(endgame))
 );
 
 export const compileBrowserCode = (src: string) =>

@@ -2,12 +2,12 @@ import {delay, first, merge, switchMap, take, tap, toArray, firstValueFrom, comb
 import {Page} from 'playwright'
 import {compileBrowserCode, startTestNode} from "../test/testUtils.js";
 import {expect} from 'chai';
-import {pistolAuth, pistolPut} from "../app/pistol.js";
+import {endgameAuth, endgamePut} from "../app/endgame.js";
 import {newBrowser} from "../test/e2e/e2eTestUtils.js";
 import {generateNewAccount} from "../crypto/crypto.js";
 
 
-describe.skip('pistol browser tests', function () {
+describe.skip('endgame browser tests', function () {
     this.timeout(30_000);
 
 
@@ -19,7 +19,7 @@ describe.skip('pistol browser tests', function () {
                     // @ts-ignore
                     renderReadComponent('my.path').pipe(
                         // @ts-ignore
-                        rxjs.switchMap(() => putPistolValue('my.path', 'my new value'))
+                        rxjs.switchMap(() => putEndgameValue('my.path', 'my new value'))
                     ).subscribe();
                 }
             ).then(() => page)),
@@ -30,24 +30,24 @@ describe.skip('pistol browser tests', function () {
         ).subscribe(() => done())
     );
 
-    it('should allow pistol to logout', () =>
+    it('should allow endgame to logout', () =>
         firstValueFrom(compileBrowserCode('src/react/react-test-functions.html').pipe(
             switchMap(() => newBrowser()),
             switchMap((page: Page) => page.evaluate(() => {
                 // @ts-ignore
-                return rxjs.firstValueFrom(startPistolReact().pipe(
+                return rxjs.firstValueFrom(startEndgameReact().pipe(
                     // @ts-ignore
-                    rxjs.switchMap(() => pistolLogin('username', 'password')),
+                    rxjs.switchMap(() => endgameLogin('username', 'password')),
                     // @ts-ignore
-                    rxjs.map(() => ({authed: getPistol()})),
+                    rxjs.map(() => ({authed: getEndgame()})),
                     // @ts-ignore
-                    rxjs.switchMap(ctx => pistolLogout().pipe(rxjs.map(() => ctx))),
+                    rxjs.switchMap(ctx => endgameLogout().pipe(rxjs.map(() => ctx))),
                     // @ts-ignore
-                    rxjs.map(ctx => ({...ctx, unauthed: getPistol()}))
+                    rxjs.map(ctx => ({...ctx, unauthed: getEndgame()}))
                 ))
             })),
             tap(({authed, unauthed}) => {
-                expect(authed.id).to.match(/^pistol/);
+                expect(authed.id).to.match(/^endgame/);
                 expect(unauthed.id).to.match(/^0-[0-9]*$/);
                 expect(unauthed.pubKey).to.be.undefined;
                 expect(unauthed.privKey).to.be.undefined;
@@ -57,12 +57,12 @@ describe.skip('pistol browser tests', function () {
     );
 
 
-    it('should display previous value for usePistolValue()', (done) =>
+    it('should display previous value for useEndgameValue()', (done) =>
         compileBrowserCode('src/react/react-test-functions.html').pipe(
             switchMap(() => startTestNode(0, [])),
-            switchMap(pistol => generateNewAccount().pipe(map(keys => ({pistol, keys})))),
-            switchMap(({pistol, keys}) => pistolAuth(pistol, 'me', 'password', 'my.user')),
-            switchMap(({pistol}) => pistolPut(pistol, 'my.path', 'xx')),
+            switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame: endgame, keys})))),
+            switchMap(({endgame, keys}) => endgameAuth(endgame, 'me', 'password', 'my.user')),
+            switchMap(({endgame}) => endgamePut(endgame, 'my.path', 'xx')),
             switchMap(() => newBrowser()),
             switchMap((page: Page) => page.evaluate(
                 () => {
@@ -85,18 +85,18 @@ describe.skip('pistol browser tests', function () {
     it('should update react component for keys using search criteria', () =>
         firstValueFrom(compileBrowserCode('src/react/react-test-functions.html').pipe(
             switchMap(() => startTestNode(0, [])),
-            switchMap(pistol => generateNewAccount().pipe(map(keys => ({pistol, keys})))),
-            switchMap(({pistol, keys}) => pistolAuth(pistol, 'me', 'password', 'my.user')),
-            switchMap(({pistol}) => pistolPut(pistol, 'my.path.a', 'xx')),
+            switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame: endgame, keys})))),
+            switchMap(({endgame, keys}) => endgameAuth(endgame, 'me', 'password', 'my.user')),
+            switchMap(({endgame}) => endgamePut(endgame, 'my.path.a', 'xx')),
             switchMap(() => newBrowser()),
             switchMap((page: Page) => page.evaluate(() =>
                 new Promise(resolve =>
                     // @ts-ignore
                     renderKeysComponent({gt: 'a'}).pipe(
                         // @ts-ignore
-                        rxjs.switchMap(() => putPistolValue('my.path.b', 'xx')),
+                        rxjs.switchMap(() => putEndgameValue('my.path.b', 'xx')),
                         // @ts-ignore
-                        rxjs.switchMap(() => putPistolValue('my.path.c', 'xx'))
+                        rxjs.switchMap(() => putEndgameValue('my.path.c', 'xx'))
                     ).subscribe(resolve)
                 )
             ).then(() => page)),
@@ -133,18 +133,18 @@ describe.skip('pistol browser tests', function () {
     it('should update react component for keys', (done) =>
         compileBrowserCode('src/react/react-test-functions.html').pipe(
             switchMap(() => startTestNode(0, [])),
-            switchMap(pistol => generateNewAccount().pipe(map(keys => ({pistol, keys})))),
-            switchMap(({pistol, keys}) => pistolAuth(pistol, 'me', 'password', 'my.user')),
-            switchMap(({pistol}) => pistolPut(pistol, 'my.path.a', 'xx')),
+            switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame: endgame, keys})))),
+            switchMap(({endgame, keys}) => endgameAuth(endgame, 'me', 'password', 'my.user')),
+            switchMap(({endgame}) => endgamePut(endgame, 'my.path.a', 'xx')),
             switchMap(() => newBrowser()),
             switchMap((page: Page) => page.evaluate(() =>
                 new Promise(resolve =>
                     // @ts-ignore
                     renderKeysComponent().pipe(
                         // @ts-ignore
-                        rxjs.switchMap(() => putPistolValue('my.path.b', 'xx')),
+                        rxjs.switchMap(() => putEndgameValue('my.path.b', 'xx')),
                         // @ts-ignore
-                        rxjs.switchMap(() => putPistolValue('my.path.c', 'xx'))
+                        rxjs.switchMap(() => putEndgameValue('my.path.c', 'xx'))
                     ).subscribe(resolve)
                 )
             ).then(() => page)),

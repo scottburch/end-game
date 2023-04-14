@@ -1,8 +1,8 @@
-import {PistolGraphMeta, PistolGraphValue} from "../graph/pistolGraph.js";
+import {EndgameGraphMeta, EndgameGraphValue} from "../graph/endgameGraph.js";
 import {AbstractKeyIteratorOptions} from "abstract-level";
-import {Pistol} from "../app/pistol.js";
+import {Endgame} from "../app/endgame.js";
 
-export const newPeerMsg = <T extends PeerMsg<any, any>>(pistol: Pistol, msg: Omit<T, 'from'>) => ({
+export const newPeerMsg = <T extends PeerMsg<any, any>>(pistol: Endgame, msg: Omit<T, 'from'>) => ({
     from: pistol.id,
     ...msg
 } satisfies PeerMsg<T['cmd'], T['payload']>);
@@ -18,8 +18,8 @@ export type PeerMsg<Cmd, T> = {
 
 export type PeerPutMsg = PeerMsg<'put', {
     path: string,
-    value: PistolGraphValue,
-    meta: PistolGraphMeta,
+    value: EndgameGraphValue,
+    meta: EndgameGraphMeta,
 }>;
 
 export type PeerReadMsg = PeerMsg<'read', {

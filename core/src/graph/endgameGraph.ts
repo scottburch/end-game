@@ -3,15 +3,15 @@ import {AbstractKeyIteratorOptions} from "abstract-level";
 
 type PubKey = string;
 
-export type PistolGraphValue = number | string | boolean;
-export type PistolKeysOptions = AbstractKeyIteratorOptions<string>;
-export type PistolGraphBundle<T extends PistolGraphValue> = {
+export type EndgameGraphValue = number | string | boolean;
+export type EndgameKeysOptions = AbstractKeyIteratorOptions<string>;
+export type EndgameGraphBundle<T extends EndgameGraphValue> = {
     path: string
     value: T
-    meta: PistolGraphMeta
+    meta: EndgameGraphMeta
 }
 
-export type PistolGraphMeta = {
+export type EndgameGraphMeta = {
     sig: string
     owner: PubKey
     perms: number   // unix style permissions

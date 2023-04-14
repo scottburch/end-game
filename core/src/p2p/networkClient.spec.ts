@@ -19,9 +19,9 @@ import {
 } from "rxjs";
 import {dialPeer} from "./networkClient.js";
 import {
-    AuthenticatedPistol, Pistol,
-    pistolAuth, pistolGet, pistolPut
-} from "../app/pistol.js";
+    AuthenticatedEndgame, Endgame,
+    endgameAuth, endgameGet, endgamePut
+} from "../app/endgame.js";
 
 import {PeerMsg} from "./peerMsg.js";
 import {expect} from "chai";
@@ -33,28 +33,28 @@ describe.skip('network client', function () {
 
     it('should send a message that is updated to the same value as before', () => {
         return firstValueFrom(startTestNetwork([[1], []]).pipe(
-            switchMap(pistols => merge(
+            switchMap(endgames => merge(
                 (
-                    of(pistols[0]).pipe(
-                        switchMap(pistol => generateNewAccount().pipe(map(keys => ({pistol, keys})))),
-                        switchMap(({pistol, keys}) => pistolAuth(pistol, 'username', 'password', 'my.user')),
-                        switchMap(({pistol}) => pistolPut(pistol, 'my.path', 1)),
+                    of(endgames[0]).pipe(
+                        switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame, keys})))),
+                        switchMap(({endgame, keys}) => endgameAuth(endgame, 'username', 'password', 'my.user')),
+                        switchMap(({endgame}) => endgamePut(endgame, 'my.path', 1)),
                         delay(20),
-                        switchMap(({pistol}) => pistolPut(pistol, 'my.path', 2)),
+                        switchMap(({endgame}) => endgamePut(endgame, 'my.path', 2)),
                         delay(20),
-                        switchMap(({pistol}) => pistolPut(pistol, 'my.path', 1)),
+                        switchMap(({endgame}) => endgamePut(endgame, 'my.path', 1)),
                         delay(20),
-                        switchMap(({pistol}) => pistolPut(pistol, 'my.path', 2)),
+                        switchMap(({endgame}) => endgamePut(endgame, 'my.path', 2)),
                         delay(20),
-                        switchMap(({pistol}) => pistolPut(pistol, 'my.path', 1)),
+                        switchMap(({endgame}) => endgamePut(endgame, 'my.path', 1)),
                         delay(20),
-                        switchMap(({pistol}) => pistolPut(pistol, 'my.path', 2)),
+                        switchMap(({endgame}) => endgamePut(endgame, 'my.path', 2)),
                         delay(100)
                     )
                 ),
                 (
-                    of(pistols[1]).pipe(
-                        switchMap(pistol => pistolGet(pistol, 'my.path')),
+                    of(endgames[1]).pipe(
+                        switchMap(endgame => endgameGet(endgame, 'my.path')),
                         map(({value}) => value as number),
                         filter(value => value === 2),
                         bufferCount(3),
@@ -73,9 +73,9 @@ describe.skip('network client', function () {
             forward: true
         } satisfies PeerMsg<'testing', {}>;
         startTestNetwork([[1], []]).pipe(
-            tap(pistols => setTimeout(() => pistols[0].config.chains.peersOut.next({pistol: pistols[0], msg: peerMsg}))),
-            tap(pistols => setTimeout(() => pistols[0].config.chains.peersOut.next({pistol: pistols[0], msg: peerMsg}))),
-            switchMap(pistols => pistols[0].config.chains.peerIn),
+            tap(endgames => setTimeout(() => endgames[0].config.chains.peersOut.next({endgame: endgames[0], msg: peerMsg}))),
+            tap(endgames => setTimeout(() => endgames[0].config.chains.peersOut.next({endgame: endgames[0], msg: peerMsg}))),
+            switchMap(endgames => endgames[0].config.chains.peerIn),
             filter(({msg}) => msg.cmd !== 'announce'),
             takeUntil(timer(2000)),
             count(),
@@ -85,26 +85,26 @@ describe.skip('network client', function () {
 
     it('should reject duplicate connections to/from the same node', () =>
         firstValueFrom(startTestNetwork([[1], []]).pipe(
-            switchMap(pistols => of(pistols).pipe(
+            switchMap(endgames => of(endgames).pipe(
                 tap(() => firstValueFrom(timer(1000).pipe(
-                    switchMap(() => dialPeer(pistols[1], 'ws://localhost:11110')),
+                    switchMap(() => dialPeer(endgames[1], 'ws://localhost:11110')),
                     delay(5000)
                 ))),
                 switchMap(() => merge(
-                    pistols[0].config.chains.log,
-                    pistols[1].config.chains.log,
+                    endgames[0].config.chains.log,
+                    endgames[1].config.chains.log,
                 )),
                 filter((entry) =>
                     entry.code === 'DUPLICATE_CONNECTION'
                 ),
                 tap(() =>
                     firstValueFrom(timer(100).pipe(
-                        switchMap(() => pistolPut(pistols[0], 'foo.bar', 10))
+                        switchMap(() => endgamePut(endgames[0], 'foo.bar', 10))
                     ))
                 ),
                 scan(c => c + 1, 0),
                 tap(c => expect(c).to.equal(1)),
-                switchMap(() => pistols[0].config.chains.peerIn),
+                switchMap(() => endgames[0].config.chains.peerIn),
                 filter(({msg}) => msg.cmd === 'put'),
                 takeUntil(timer(4000)),
                 count(),
@@ -117,33 +117,33 @@ describe.skip('network client', function () {
     it.skip('should redial until it gets a connection', (done) => {
         let sub: Subscription;
         startTestNode(0, []).pipe(
-            tap(pistol => sub = dialPeer(pistol, 'ws://localhost:11111', {redialInterval: 1}).subscribe()),
-            switchMap(pistol => pistol.config.chains.log),
+            tap(endgame => sub = dialPeer(endgame, 'ws://localhost:11111', {redialInterval: 1}).subscribe()),
+            switchMap(endgame => endgame.config.chains.log),
             filter((entry) => entry.data?.text.includes('ECONNREFUSED')),
             bufferCount(3),
             switchMap(() => startTestNode(1, [])),
-            switchMap(pistol => pistol.config.chains.peerConnect),
+            switchMap(endgame => endgame.config.chains.peerConnect),
             first(),
             tap(() => sub.unsubscribe())
         ).subscribe(() => done())
     });
 
     it('should redial if a connection is lost', (done) => {
-        let node1: Pistol;
-        let node0: AuthenticatedPistol;
+        let node1: Endgame;
+        let node0: AuthenticatedEndgame;
 
         // start node 1
-        let node1Sub = startTestNode(1).subscribe(pistol => node1 = pistol);
+        let node1Sub = startTestNode(1).subscribe(endgame => node1 = endgame);
 
         // start node 0
         startTestNode(0, [1]).pipe(
-            switchMap(pistol => generateNewAccount().pipe(map(keys => ({pistol, keys})))),
-            switchMap(({keys, pistol}) => pistolAuth(pistol, 'username', 'password', 'my.user')),
-            tap(({pistol}) => node0 = pistol),
+            switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame: endgame, keys})))),
+            switchMap(({keys, endgame}) => endgameAuth(endgame, 'username', 'password', 'my.user')),
+            tap(({endgame}) => node0 = endgame),
 
             // Write a value to node 0 and read it on node 1
-            switchMap(() => pistolPut(node0, 'my.thing', 10)),
-            switchMap(() => pistolGet(node1, 'my.thing')),
+            switchMap(() => endgamePut(node0, 'my.thing', 10)),
+            switchMap(() => endgameGet(node1, 'my.thing')),
             filter(({value}) => value === 10),
 
             // stop node 1
@@ -154,7 +154,7 @@ describe.skip('network client', function () {
             switchMap(() => startTestNode(1)),
 
             // read the value on the new node 1 proving that node0 connected
-            switchMap(pistol => pistolGet(pistol, 'my.thing')),
+            switchMap(endgame => endgameGet(endgame, 'my.thing')),
             filter(({value}) => value === 10),
 
             take(1)
@@ -165,18 +165,18 @@ describe.skip('network client', function () {
         const count = 50;
 
         return firstValueFrom(startTestNetwork([[1], []]).pipe(
-            switchMap(pistols => merge(
+            switchMap(endgames => merge(
                 (
-                    of(pistols[0]).pipe(
-                        switchMap(pistol => generateNewAccount().pipe(map(keys => ({pistol, keys})))),
-                        switchMap(({pistol, keys}) => pistolAuth(pistol, 'username', 'password', 'my.user')),
-                        switchMap(({pistol}) => range(1, count).pipe(map(n => ({pistol, n})))),
-                        concatMap(({n, pistol}) => pistolPut(pistol, 'my.path', n % (count / 2)).pipe(delay(10))),
+                    of(endgames[0]).pipe(
+                        switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame: endgame, keys})))),
+                        switchMap(({endgame, keys}) => endgameAuth(endgame, 'username', 'password', 'my.user')),
+                        switchMap(({endgame}) => range(1, count).pipe(map(n => ({endgame: endgame, n})))),
+                        concatMap(({n, endgame}) => endgamePut(endgame, 'my.path', n % (count / 2)).pipe(delay(10))),
                         bufferCount(count)
                     )
                 ), (
-                    of(pistols[1]).pipe(
-                        switchMap(pistol => pistolGet(pistol, 'my.path')),
+                    of(endgames[1]).pipe(
+                        switchMap(endgame => endgameGet(endgame, 'my.path')),
                         map(({value}) => value),
                         bufferCount(count)
                     )

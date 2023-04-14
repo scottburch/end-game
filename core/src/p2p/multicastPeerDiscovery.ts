@@ -2,14 +2,14 @@ import {filter, interval, map, Observable, of, Subscription, tap} from "rxjs";
 import dgram from "dgram";
 import ip from 'ip'
 import {dialPeer} from "./networkClient.js";
-import {Pistol} from "../app/pistol.js";
+import {Endgame} from "../app/endgame.js";
 
 
 type MulticastPeerDiscoveryOpts = {
     redialInterval?: number
 }
 
-export const multicastPeerDiscovery = <P extends Pistol>(pistol: P, port: number, opts: MulticastPeerDiscoveryOpts = {}) => new Observable<P>(sub => {
+export const multicastPeerDiscovery = <P extends Endgame>(pistol: P, port: number, opts: MulticastPeerDiscoveryOpts = {}) => new Observable<P>(sub => {
     opts.redialInterval = opts.redialInterval || 30;
 
     const seenPeers = new Set<string>();

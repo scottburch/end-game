@@ -1,7 +1,7 @@
 import inspector from "node:inspector";
 import {startTestNetwork} from "./test/testUtils.js";
 import {interval, switchMap, tap} from "rxjs";
-import {pistolPut} from "./graph/pistolGraph.js";
+import {pistolPut} from "./graph/endgameGraph.js";
 import {graphPut} from "./graph/graph.js";
 
 

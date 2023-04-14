@@ -1,4 +1,4 @@
-import {getNetworkTime,} from "./pistolGraph.js";
+import {getNetworkTime,} from "./endgameGraph.js";
 import {PeerPutMsg} from "../p2p/peerMsg.js";
 
 const subtle = crypto.subtle;

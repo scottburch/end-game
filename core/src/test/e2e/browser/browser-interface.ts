@@ -1,14 +1,14 @@
 import {Page} from "playwright";
 import {from, map,  of} from "rxjs";
-import {PistolGraphValue, } from "../../../graph/pistolGraph.js";
+import {EndgameGraphValue, } from "../../../graph/endgameGraph.js";
 
 // Dummy functions to fix type errors below
 const w = {
     startPistol: () => of(true),
     auth: () => of(true),
     dialPeer: () => of(true),
-    pistolPut: (key: string, value: PistolGraphValue) => of(true),
-    pistolRead: (key: string, expectedValue: PistolGraphValue) => of(true),
+    pistolPut: (key: string, value: EndgameGraphValue) => of(true),
+    pistolRead: (key: string, expectedValue: EndgameGraphValue) => of(true),
     log: (text: string) => of(true)
 }
 
@@ -26,16 +26,16 @@ export const browserDialPeer = (page: Page) => from(page.evaluate(() =>
     new Promise(resolve => w.dialPeer().subscribe(resolve))
 )).pipe(map(() => page));
 
-export const browserPistolPut = (page: Page, key: string, value: PistolGraphValue) =>
+export const browserPistolPut = (page: Page, key: string, value: EndgameGraphValue) =>
     from(page.evaluate(([key, value]) =>
         new Promise(resolve => w.pistolPut(key, value).subscribe(resolve))
-    , [key, value] satisfies [string, PistolGraphValue])).pipe(map(() => page));
+    , [key, value] satisfies [string, EndgameGraphValue])).pipe(map(() => page));
 
-export const browserPistolRead = (page: Page, key: string, expectedValue: PistolGraphValue) =>
+export const browserPistolRead = (page: Page, key: string, expectedValue: EndgameGraphValue) =>
     from(page.evaluate(([key, expectedValue]) =>
         new Promise(resolve => w.pistolRead(key, expectedValue).subscribe(resolve))
-    , [key, expectedValue] satisfies [string, PistolGraphValue])).pipe(
-        map(response => ({value: (response as {value: PistolGraphValue}).value, page}))
+    , [key, expectedValue] satisfies [string, EndgameGraphValue])).pipe(
+        map(response => ({value: (response as {value: EndgameGraphValue}).value, page}))
     )
 
 export const browserLog = (page: Page, text: string) =>

@@ -58,7 +58,7 @@ base
         newPistol({isTrusted: opts.trusted, port: opts.port || 11110}).pipe(
             switchMap(pistol => opts.forward ? floodRouter(pistol) : of(pistol)),
             tap(pistol => console.log(`Pistol running... (port:${pistol.port})`)),
-            map(pistol => ({pistol})),
+            map(pistol => ({pistol: endgame})),
             map(ctx => ({...ctx, peers: getPeers()})),
             switchMap(({pistol, peers}) => dialPeers(pistol, peers))
         ).subscribe()

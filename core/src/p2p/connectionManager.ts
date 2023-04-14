@@ -1,7 +1,7 @@
 
 import {find, from, interval, map, Observable, of, switchMap, tap} from "rxjs";
 import WS from "isomorphic-ws";
-import {Pistol} from "../app/pistol.js";
+import {Endgame} from "../app/endgame.js";
 import {startPeerAnnouncer, startPeerMsgBroadcaster} from "./dialer.js";
 import {WebsocketWrapperSubject} from "./WebsocketWrapperSubject.js";
 import {cacheSet, newCache, Cache, cacheRemoveOld} from "../common/cache.js";
@@ -35,7 +35,7 @@ const getSessionIdFromPeerId = (peerId: string) => peerId.split('-')[1];
 
 export type PeerConnection = {
     id: number
-    pistol: Pistol
+    endgame: Endgame
     conn: WS.WebSocket
     dupCache: Cache<string>
     data: WebsocketWrapperSubject
@@ -44,13 +44,13 @@ export type PeerConnection = {
 }
 
 export const connectionFactory = (
-    pistol: PeerConnection['pistol'],
+    endgame: PeerConnection['endgame'],
     conn: PeerConnection['conn'],
     closeConn: PeerConnection['closeConn'],
     side: PeerConnection['side']
 ) => of<PeerConnection>({
     id: uniqId(),
-    pistol,
+    endgame,
     conn,
     closeConn,
     dupCache: newCache<string>(),

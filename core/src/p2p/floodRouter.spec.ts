@@ -1,7 +1,7 @@
 import {startTestNetwork} from "../test/testUtils.js";
 import {combineLatest, delay, firstValueFrom, skipWhile, switchMap, timer} from "rxjs";
 //import {pistolKeys} from "../graph/pistolGraph.js";
-import {pistolPut} from "../app/pistol.js";
+import {endgamePut} from "../app/endgame.js";
 
 describe.skip('flood router', () => {
     // it('should bounce updates off a node in the middle', () =>

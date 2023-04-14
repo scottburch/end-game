@@ -1,44 +1,43 @@
 import {
-    AnyPistol,
-    AuthenticatedPistol, pistolAuth, PistolOpts, pistolUnAuth,
-    newPistol, Pistol
-} from "../app/pistol.js";
-import {PistolGraphValue, pistolKeys, PistolKeysOptions, pistolPut, pistolRead} from "../graph/pistolGraph.js";
+    AuthenticatedEndgame, endgameAuth, EndgameOpts, endgameUnAuth,
+    newEndgame, Endgame
+} from "../app/endgame.js";
+import {EndgameGraphValue, endgameKeys, EndgameKeysOptions, endgamePut, endgameRead} from "../graph/endgameGraph.js";
 import {map, merge, tap} from "rxjs";
 import {useEffect, useState} from "react";
 import {dialPeer, DialPeerOpts} from "../p2p/networkClient.js";
-import {ChainAuthChange, pistolChainListen} from "../app/pistolChains.js";
 
 
 
-const w = window as unknown as {pistol: AnyPistol<any>};
+
+const w = window as unknown as {endgame: Endgame};
 
 
-export const getPistol = () => w.pistol;
+export const getEndgame = () => w.endgame;
 
-export const startPistolReact = (opts: PistolOpts = {}) => newPistol({
+export const startEndgameReact = (opts: EndgameOpts = {config: {}}) => newEndgame({
     ...opts,
 }).pipe(
-    tap(p => w.pistol = p)
+    tap(p => w.endgame = p)
 );
 
 
-export const usePistolValue = <T extends PistolGraphValue>(path: string, defaultValue: T | undefined = undefined) => {
+export const usePistolValue = <T extends EndgameGraphValue>(path: string, defaultValue: T | undefined = undefined) => {
     const [value, setValue] = useState<T | undefined>(defaultValue);
 
     useEffect(() => {
-        const sub = pistolRead<T>(w.pistol, path).pipe(
+        const sub = endgameRead<T>(w.endgame, path).pipe(
             map(({value}) => value)
         ).subscribe(v => setValue(v));
         return () => sub.unsubscribe();
     }, []);
     return value;
 }
-export const usePistolKeys = (base: string, options: PistolKeysOptions = {}) => {
+export const usePistolKeys = (base: string, options: EndgameKeysOptions = {}) => {
     const [keys, setKeys] = useState<string[]>([]);
 
     useEffect(() => {
-        const sub = pistolKeys(w.pistol, base, options).pipe(
+        const sub = endgameKeys(w.endgame, base, options).pipe(
             map(({keys}) => keys)
         ).subscribe(keys => setKeys(keys))
         return () => sub.unsubscribe();
@@ -49,20 +48,20 @@ export const usePistolKeys = (base: string, options: PistolKeysOptions = {}) => 
 
 
 export const usePistolAuth = () => {
-    const id = (w.pistol as AuthenticatedPistol).id.split('-')[0];
+    const id = (w.endgame as AuthenticatedEndgame).id.split('-')[0];
 
-    const [auth, setAuth] = useState<Pick<AuthenticatedPistol, 'keys' | 'username' | 'id'>>({
-        keys: (w.pistol as AuthenticatedPistol).keys,
-        username: (w.pistol as AuthenticatedPistol).username,
+    const [auth, setAuth] = useState<Pick<AuthenticatedEndgame, 'keys' | 'username' | 'id'>>({
+        keys: (w.endgame as AuthenticatedEndgame).keys,
+        username: (w.endgame as AuthenticatedEndgame).username,
         id: id === '0' ? '' : id
     });
 
     useEffect(() => {
         const sub = merge(
-            (w.pistol as Pistol).config.chains.auth,
-            (w.pistol as Pistol).config.chains.unauth,
+            (w.endgame as Endgame).config.chains.auth,
+            (w.endgame as Endgame).config.chains.unauth,
         ).pipe(
-            map(({pistol}) => pistol as AuthenticatedPistol),
+            map(({endgame}) => endgame as AuthenticatedEndgame),
             tap(setAuth)
         ).subscribe();
         return () => sub.unsubscribe();
@@ -71,16 +70,16 @@ export const usePistolAuth = () => {
 };
 
 
-export const putPistolValue = (path: string, value: any) => pistolPut(w.pistol as AuthenticatedPistol, path, value);
+export const putPistolValue = (path: string, value: any) => endgamePut(w.endgame as AuthenticatedEndgame, path, value);
 
-export const pistolLogin = (username: string, password: string) => pistolAuth(w.pistol, username, password).pipe(
-    tap(p => w.pistol = p),
+export const endgameLogin = (username: string, password: string) => endgameAuth(w.endgame, username, password).pipe(
+    tap(p => w.endgame = p),
 );
 
-export const pistolLogout = () => pistolUnAuth(w.pistol as AuthenticatedPistol).pipe(
-    tap(p => w.pistol = p)
+export const endgameLogout = () => endgameUnAuth(w.endgame as AuthenticatedEndgame).pipe(
+    tap(p => w.endgame = p)
 );
 
 export const dialPeerConnection = (url: string, opts: DialPeerOpts) =>
-    dialPeer(w.pistol, url, ({...opts, redialInterval: opts.redialInterval || 1}));
+    dialPeer(w.endgame, url, ({...opts, redialInterval: opts.redialInterval || 1}));
 

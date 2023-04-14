@@ -17,12 +17,12 @@ import {
     tap
 } from "rxjs";
 import {expect} from 'chai';
-import {pistolAuth} from "../app/pistol.js";
+import {endgameAuth} from "../app/endgame.js";
 import {PeerPutMsg} from "../p2p/peerMsg.js";
-import {getNetworkTime} from "../graph/pistolGraph.js";
+import {getNetworkTime} from "../graph/endgameGraph.js";
 import {sign} from "./crypto.js";
 import {bytesToText, textToBytes} from "../utils/byteUtils.js";
-import {getTestKeys, newTestPistol, testAuthHandler, testChains} from "../test/testUtils.js";
+import {getTestKeys, newTestEndgame, testAuthHandler, testChains} from "../test/testUtils.js";
 
 
 
@@ -132,8 +132,8 @@ describe('crypto', function () {
                 firstValueFrom(generateNewAccount().pipe(
                     switchMap(({pubKey}) => getId(pubKey)),
                     tap(id => {
-                        expect(id).to.match(/^pistol/);
-                        expect(id).to.have.length(65);
+                        expect(id).to.match(/^endgame/);
+                        expect(id).to.have.length(66);
                     })
                 ))
             )
@@ -142,12 +142,12 @@ describe('crypto', function () {
 
     describe('signing messages', () => {
         it('should sign quickly', () =>
-            firstValueFrom(newTestPistol({chains: testChains({auth: testAuthHandler()})}).pipe(
-                switchMap(pistol => getTestKeys().pipe(map(keys => ({keys, pistol})))),
-                switchMap(({keys, pistol}) => pistolAuth(pistol, 'username', 'password', 'my.user')),
-                switchMap(({pistol}) => serializePubKey(pistol.keys.pubKey).pipe(map(serPubKey => ({pistol, serPubKey})))),
-                switchMap(({pistol, serPubKey}) => range(1, 500).pipe(
-                    mergeMap(() => signMsg(pistol, {
+            firstValueFrom(newTestEndgame({chains: testChains({auth: testAuthHandler()})}).pipe(
+                switchMap(endgame => getTestKeys().pipe(map(keys => ({keys, endgame})))),
+                switchMap(({keys, endgame}) => endgameAuth(endgame, 'username', 'password', 'my.user')),
+                switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
+                switchMap(({endgame, serPubKey}) => range(1, 500).pipe(
+                    mergeMap(() => signMsg(endgame, {
                         path: 'xx.yy',
                         meta: {owner: serPubKey, perms: 0o700, sig: '', timestamp: getNetworkTime()},
                         value: 'x'.repeat(200)
@@ -158,13 +158,13 @@ describe('crypto', function () {
             ))
         );
 
-        it('should sign a msg if pistol is setup in untrusted mode', () =>
-            firstValueFrom(newTestPistol({chains: testChains({auth: testAuthHandler()})}).pipe(
-                switchMap(pistol => getTestKeys().pipe(map(keys => ({pistol, keys})))),
-                switchMap(({pistol, keys}) => pistolAuth(pistol, 'my-username', 'password', 'my.user')),
-                switchMap(({pistol}) => serializePubKey(pistol.keys.pubKey).pipe(map(serPubKey => ({pistol, serPubKey})))),
-                map(({pistol, serPubKey}) => ({
-                    pistol, msg: {
+        it('should sign a msg if endgame is setup in untrusted mode', () =>
+            firstValueFrom(newTestEndgame({chains: testChains({auth: testAuthHandler()})}).pipe(
+                switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
+                switchMap(({endgame, keys}) => endgameAuth(endgame, 'my-username', 'password', 'my.user')),
+                switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
+                map(({endgame, serPubKey}) => ({
+                    endgame, msg: {
                         graphId: 'my-graph',
                         path: 'my-path',
                         value: 10,
@@ -176,18 +176,18 @@ describe('crypto', function () {
                         }
                     } as PeerPutMsg['payload']
                 })),
-                switchMap(({pistol, msg}) => signMsg(pistol, msg)),
+                switchMap(({endgame, msg}) => signMsg(endgame, msg)),
                 tap(msg => expect(msg.meta.sig).to.have.length(128))
             ))
         );
 
         it('should allow a trusted node', () =>
-            firstValueFrom(newTestPistol({isTrusted: true, chains: testChains({auth: testAuthHandler()})}).pipe(
-                switchMap(pistol => getTestKeys().pipe(map(keys => ({pistol, keys})))),
-                switchMap(({pistol, keys}) => pistolAuth(pistol, 'my-username', 'password', 'my.user')),
-                switchMap(({pistol}) => serializePubKey(pistol.keys.pubKey).pipe(map(serPubKey => ({pistol, serPubKey})))),
-                map(({pistol, serPubKey}) => ({
-                    pistol, msg: {
+            firstValueFrom(newTestEndgame({isTrusted: true, chains: testChains({auth: testAuthHandler()})}).pipe(
+                switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
+                switchMap(({endgame, keys}) => endgameAuth(endgame, 'my-username', 'password', 'my.user')),
+                switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
+                map(({endgame, serPubKey}) => ({
+                    endgame, msg: {
                         graphId: 'my-graph',
                         path: 'my-path',
                         value: 10,
@@ -199,7 +199,7 @@ describe('crypto', function () {
                         }
                     } as PeerPutMsg['payload']
                 })),
-                switchMap(({pistol, msg}) => signMsg(pistol, msg)),
+                switchMap(({endgame, msg}) => signMsg(endgame, msg)),
                 tap(msg => expect(msg.meta.sig).to.equal('')),
                 switchMap(msg => verifyMsgSig(msg)),
                 tap(valid => expect(valid).to.be.true)
@@ -207,12 +207,12 @@ describe('crypto', function () {
         );
 
         it('should sign and verify a message', () =>
-            firstValueFrom(newTestPistol({isTrusted: true, chains: testChains({auth: testAuthHandler()})}).pipe(
-                switchMap(pistol => getTestKeys().pipe(map(keys => ({pistol, keys})))),
-                switchMap(({pistol, keys}) => pistolAuth(pistol, 'my-username', 'password', 'my.user')),
-                switchMap(({pistol}) => serializePubKey(pistol.keys.pubKey).pipe(map(serPubKey => ({pistol, serPubKey})))),
-                map(({pistol, serPubKey}) => ({
-                    pistol, msg: {
+            firstValueFrom(newTestEndgame({isTrusted: true, chains: testChains({auth: testAuthHandler()})}).pipe(
+                switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
+                switchMap(({endgame, keys}) => endgameAuth(endgame, 'my-username', 'password', 'my.user')),
+                switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
+                map(({endgame, serPubKey}) => ({
+                    endgame, msg: {
                         graphId: 'my-graph',
                         path: 'my-path',
                         value: 10,
@@ -224,7 +224,7 @@ describe('crypto', function () {
                         }
                     } as PeerPutMsg['payload']
                 })),
-                switchMap(({pistol, msg}) => signMsg(pistol, msg)),
+                switchMap(({endgame, msg}) => signMsg(endgame, msg)),
                 switchMap(msg => verifyMsgSig(msg)),
                 tap(valid => expect(valid).to.be.true)
             ))
