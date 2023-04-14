@@ -1,0 +1,1 @@
+export {absPath} from './absPath.js'

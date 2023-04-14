@@ -1,0 +1,48 @@
+{
+  "name": "name-here",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@end-game/dtg-scripts": "*",
+    "@end-game/react-graph": "^1.0.2",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "scripts": {
+    "dev": "dtg-scripts dev",
+    "build": "dtg-scripts build",
+    "serve": "dtg-scripts serve",
+    "test": "dtg-scripts test"
+  },
+  "engines": {
+    "node": ">=19"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "loader": "ts-node/esm",
+    "experimental-specifier-resolution": "node",
+    "bail": true,
+    "timeout": 100000
+  },
+  "devDependencies": {
+    "@parcel/transformer-webmanifest": "2.8.3"
+  }
+}
