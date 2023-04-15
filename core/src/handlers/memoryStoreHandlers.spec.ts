@@ -5,9 +5,9 @@ import {memoryStoreGetHandler, memoryStoreGetMetaHandler, memoryStorePutHandler}
 import {
     bufferCount,
     combineLatest,
-    concatMap, first,
+    concatMap, delay, first,
     firstValueFrom, map,
-    mergeMap,
+    mergeMap, of,
     range,
     skip,
     switchMap, take,
@@ -67,7 +67,6 @@ describe('memory store handlers', () => {
                     })
                 })
             }).pipe(
-                tap(() => (global as any).start = Date.now()),
                 switchMap(egame => endgameAuth(egame, 'username', 'password', 'my.user')),
                 switchMap(({endgame}) => range(1,5).pipe(
                     mergeMap(n => endgamePut(endgame, `my.path${n}`, n)),
@@ -79,7 +78,6 @@ describe('memory store handlers', () => {
                 take(5),
                 map(({value}) => value),
                 toArray(),
-                tap(() => console.log(Date.now() - (global as any).start)),
                 tap(values => expect(values).to.deep.equal([1,2,3,4,5]))
             ))
 
