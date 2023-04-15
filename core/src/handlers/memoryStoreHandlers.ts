@@ -1,48 +1,30 @@
-import {map, of, Subject, switchMap} from "rxjs";
-import {ChainPair, ChainProps} from "../app/endgameConfig.js";
+import {map, of, switchMap} from "rxjs";
 import {MemoryLevel} from "memory-level";
 import {Endgame} from "../app/endgame.js";
+import {handler} from "./handler.js";
 
 const stores: Record<string, MemoryLevel> = {};
 
 const getStore = (endgame: Endgame) => stores[endgame.id] = stores[endgame.id] || new MemoryLevel();
 
-export const memoryStoreGetHandler = () => {
-    const subject = new Subject<ChainProps<'get'>>();
-    const observer = subject.asObservable().pipe(
-        switchMap(({endgame, path}) => of(getStore(endgame)).pipe(
-            switchMap(store => store.get(path)),
-            map(value => ({endgame, path, value: JSON.parse(value).d}))
-        ))
-    ) as unknown as ChainPair<ChainProps<'get'>>;
 
-    observer.next = (v: ChainProps<'get'>) => subject.next(v);
-    return observer
-};
+export const memoryStoreGetHandler = () =>
+    handler<'get'>(({endgame, path}) => of(getStore(endgame)).pipe(
+        switchMap(store => store.get(path)),
+        map(value => ({endgame, path, value: JSON.parse(value).d}))
+    ));
 
-export const memoryStorePutHandler = () => {
-    const subject = new Subject<ChainProps<'put'>>();
-    const observer = subject.asObservable().pipe(
-        switchMap(({endgame, path, value, meta}) => of(getStore(endgame)).pipe(
-            switchMap(store => store.put(path, JSON.stringify({d: value, m: meta}))),
-            map(() => ({endgame, value, path, meta}))
-        ))
-    ) as unknown as ChainPair<ChainProps<'put'>>;
+export const memoryStorePutHandler = () =>
+    handler<'put'>(({endgame, path, value, meta}) => of(getStore(endgame)).pipe(
+        switchMap(store => store.put(path, JSON.stringify({d: value, m: meta}))),
+        map(() => ({endgame, value, path, meta}))
+    ));
 
-    observer.next = (v: ChainProps<'put'>) => subject.next(v);
-    return observer
-};
+export const memoryStoreGetMetaHandler = () =>
+    handler<'getMeta'>(({endgame, path}) => of(getStore(endgame)).pipe(
+        switchMap(store => store.get(path)),
+        map(value => ({endgame, path, meta: JSON.parse(value).m}))
+    ));
 
-export const memoryStoreGetMetaHandler = () => {
-    const subject = new Subject<ChainProps<'getMeta'>>();
-    const observer = subject.asObservable().pipe(
-        switchMap(({endgame, path}) => of(getStore(endgame)).pipe(
-            switchMap(store => store.get(path)),
-            map(value => ({endgame, path, meta: JSON.parse(value).m}))
-        ))
-    ) as unknown as ChainPair<ChainProps<'getMeta'>>;
 
-    observer.next = (v: ChainProps<'getMeta'>) => subject.next(v);
-    return observer
-};
 
