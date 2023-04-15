@@ -32,3 +32,17 @@ export const memoryStorePutHandler = () => {
     observer.next = (v: ChainProps<'put'>) => subject.next(v);
     return observer
 };
+
+export const memoryStoreGetMetaHandler = () => {
+    const subject = new Subject<ChainProps<'getMeta'>>();
+    const observer = subject.asObservable().pipe(
+        switchMap(({endgame, path}) => of(getStore(endgame)).pipe(
+            switchMap(store => store.get(path)),
+            map(value => ({endgame, path, meta: JSON.parse(value).m}))
+        ))
+    ) as unknown as ChainPair<ChainProps<'getMeta'>>;
+
+    observer.next = (v: ChainProps<'getMeta'>) => subject.next(v);
+    return observer
+};
+

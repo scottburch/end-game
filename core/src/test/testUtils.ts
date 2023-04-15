@@ -26,6 +26,7 @@ export const testChains = (chains: Partial<EndgameConfig['chains']>) => ({
     peerIn: testDummyHandler<'peerIn'>(),
     put: testDummyHandler<'put'>(),
     get: testDummyHandler<'get'>(),
+    getMeta: testDummyHandler<'getMeta'>(),
     ...chains
 } satisfies EndgameConfig['chains'] as EndgameConfig['chains'])
 

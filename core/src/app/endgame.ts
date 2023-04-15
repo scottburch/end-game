@@ -57,7 +57,8 @@ export const endgameUnAuth = (endgame: AuthenticatedEndgame) => {
 export const endgamePut = <T extends EndgameGraphValue, P extends string = string>(endgame: AuthenticatedEndgame, path: P, value: T) =>
     serializePubKey(endgame.keys.pubKey).pipe(
         map(owner => ({
-            path, value,
+            path,
+            value,
             meta: {owner, sig: '', timestamp: getNetworkTime(), perms: 0o744} satisfies EndgameGraphMeta
         } satisfies EndgameGraphBundle<T>)),
         switchMap(msg => signMsg(endgame, msg)),
@@ -76,6 +77,14 @@ export const endgameGet = <T extends EndgameGraphValue, P extends string = strin
         map(({endgame, value, path}) => ({endgame, value: value as T, path}))
     )
 };
+
+export const endgameGetMeta = (endgame: Endgame, path: string) => {
+    setTimeout(() => endgame.config.chains.getMeta.next({endgame, path}));
+    return endgame.config.chains.getMeta.pipe(
+        filter(payload => payload.path === path),
+        map(({endgame, meta, path}) => ({endgame, path, meta}))
+    )
+}
 
 
 
