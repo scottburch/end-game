@@ -2,12 +2,36 @@ import {endgameAuth, endgameGet, endgameGetMeta, endgamePut, newEndgame} from ".
 import {newEndgameConfig} from "../app/endgameConfig.js";
 import {testAuthHandler, testChains} from "../test/testUtils.js";
 import {memoryStoreGetHandler, memoryStoreGetMetaHandler, memoryStorePutHandler} from "./memoryStoreHandlers.js";
-import {firstValueFrom, switchMap, tap} from "rxjs";
+import {
+    bufferCount,
+    combineLatest,
+    concatMap, first,
+    firstValueFrom, map,
+    mergeMap,
+    range,
+    skip,
+    switchMap, take,
+    tap,
+    toArray
+} from "rxjs";
 import {expect} from "chai";
 import {getNetworkTime} from "../graph/endgameGraph.js";
 
 describe('memory store handlers', () => {
     describe('get', () => {
+        it('should return undefined if value does not exist', () =>
+            firstValueFrom(newEndgame({
+                config: newEndgameConfig({
+                    chains: testChains({
+                        get: memoryStoreGetHandler()
+                    })
+                })
+            }).pipe(
+                switchMap(endgame => endgameGet(endgame, 'my.path')),
+                tap(({value}) => expect(value).to.be.undefined)
+            ))
+        );
+
         it('should get a value from the memory store', () =>
             firstValueFrom(newEndgame({
                 config: newEndgameConfig({
@@ -31,6 +55,77 @@ describe('memory store handlers', () => {
                     expect(meta?.timestamp).to.be.closeTo(getNetworkTime(), 1000)
                 })
             ))
+        );
+
+        it('should handle multiple values in parallel', () =>
+            firstValueFrom(newEndgame({
+                config: newEndgameConfig({
+                    chains: testChains({
+                        auth: testAuthHandler(),
+                        get: memoryStoreGetHandler(),
+                        put: memoryStorePutHandler(),
+                    })
+                })
+            }).pipe(
+                tap(() => (global as any).start = Date.now()),
+                switchMap(egame => endgameAuth(egame, 'username', 'password', 'my.user')),
+                switchMap(({endgame}) => range(1,5).pipe(
+                    mergeMap(n => endgamePut(endgame, `my.path${n}`, n)),
+                )),
+                skip(4),
+                switchMap(({endgame}) => range(1, 5).pipe(
+                    concatMap(n => endgameGet(endgame, `my.path${n}`).pipe(first())),
+                )),
+                take(5),
+                map(({value}) => value),
+                toArray(),
+                tap(() => console.log(Date.now() - (global as any).start)),
+                tap(values => expect(values).to.deep.equal([1,2,3,4,5]))
+            ))
+
         )
+
+        it('should handle multiple pistol instances', () => {
+            const config1 = {
+                config: newEndgameConfig({
+                    chains: testChains({
+                        auth: testAuthHandler(),
+                        get: memoryStoreGetHandler(),
+                        put: memoryStorePutHandler(),
+                        getMeta: memoryStoreGetMetaHandler()
+                    })
+                })
+            }
+            const config2 = {
+                config: newEndgameConfig({
+                    port: 11111,
+                    chains: testChains({
+                        auth: testAuthHandler(),
+                        get: memoryStoreGetHandler(),
+                        put: memoryStorePutHandler(),
+                        getMeta: memoryStoreGetMetaHandler()
+                    })
+                })
+            }
+
+            return firstValueFrom(combineLatest([
+                newEndgame(config1).pipe(
+                    tap(e => console.log(e.id)),
+                    switchMap(egame => endgameAuth(egame, 'username', 'password', 'my.user')),
+                    switchMap(({endgame}) => endgamePut(endgame, 'my.path', 1)),
+                    switchMap(({endgame}) => endgameGet<number>(endgame, 'my.path')),
+                ),
+                newEndgame(config2).pipe(
+                    tap(e => console.log(e.id)),
+                    switchMap(egame => endgameAuth(egame, 'username', 'password', 'my.user')),
+                    switchMap(({endgame}) => endgamePut(endgame, 'my.path', 2)),
+                    switchMap(({endgame}) => endgameGet<number>(endgame, 'my.path')),
+                )
+            ]).pipe(
+                tap(values => {
+                    expect(values[0].value + values[1].value).to.equal(3)
+                })
+            ))
+        })
     })
 })
