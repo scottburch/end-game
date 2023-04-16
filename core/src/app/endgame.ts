@@ -4,7 +4,7 @@ import {newPeerMsg, PeerMsg} from "../p2p/peerMsg.js";
 
 import {KeyBundle, serializePubKey, signMsg} from "../crypto/crypto.js";
 import {getNetworkTime, EndgameGraphBundle, EndgameGraphMeta, EndgameGraphValue} from "../graph/endgameGraph.js";
-import {EndgameConfig} from "./endgameConfig.js";
+import {EndgameConfig, newEndgameConfig} from "./endgameConfig.js";
 
 
 export type Endgame = {
@@ -26,8 +26,8 @@ export type LogEntry<T extends Object | undefined> = {
 }
 
 
-export const newEndgame = (config: EndgameConfig) =>
-    of(config).pipe(
+export const newEndgame = (config: Partial<EndgameConfig>) =>
+    of(newEndgameConfig(config)).pipe(
         map(config => ({
             config,
             id: config.id || Math.random().toFixed(10).replace('0.', ''),

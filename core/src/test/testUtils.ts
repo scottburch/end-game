@@ -4,7 +4,7 @@ import {dialPeer} from "../p2p/networkClient.js";
 import {floodRouter} from "../p2p/floodRouter.js";
 import {Parcel} from '@parcel/core';
 import {deserializeKeys} from "../crypto/crypto.js";
-import {newEndgameConfig, EndgameConfig} from "../app/endgameConfig.js";
+import {EndgameConfig} from "../app/endgameConfig.js";
 import {handlers, nullHandler} from "../handlers/handlers.js";
 
 /**
@@ -55,7 +55,6 @@ export const testAuthHandler = () =>
 
 export const newTestEndgame = (config: Partial<EndgameConfig> = {}) =>
     of(config).pipe(
-        map(config => newEndgameConfig(config)),
         switchMap(config => newEndgame(config))
 );
 
@@ -69,9 +68,6 @@ export const startTestNetwork = (nodeList: number[][] = [], opts: Partial<StartT
         } satisfies Partial<EndgameConfig>,
         peers
     })),
-    switchMap(({endgameConfig, peers}) => of(newEndgameConfig(endgameConfig)).pipe(
-        map(endgameConfig => ({endgameConfig, peers})),
-    )),
     mergeMap(({endgameConfig, peers}, idx) => timer(idx * 100).pipe(
         switchMap(() => newTestEndgame(endgameConfig)),
         switchMap(floodRouter),
@@ -90,7 +86,7 @@ export const startTestNetwork = (nodeList: number[][] = [], opts: Partial<StartT
 );
 
 export const startTestNode = (n: number = 0, peers: number[] = [], config: Partial<EndgameConfig> = {}) => of(config).pipe(
-    switchMap(config => newEndgame(newEndgameConfig(config))),
+    switchMap(config => newEndgame(config)),
     switchMap(floodRouter),
     switchMap(endgame => peers.length ? from(peers).pipe(
         map(peerNo => ({endgame, peerNo})),

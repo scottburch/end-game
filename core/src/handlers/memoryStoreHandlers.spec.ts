@@ -1,5 +1,4 @@
 import {endgameAuth, endgameGet, endgameGetMeta, endgamePut, newEndgame} from "../app/endgame.js";
-import {newEndgameConfig} from "../app/endgameConfig.js";
 import {testAuthHandler, testChains} from "../test/testUtils.js";
 import {memoryStoreGetHandler, memoryStoreGetMetaHandler, memoryStorePutHandler} from "./memoryStoreHandlers.js";
 import {combineLatest, first, firstValueFrom, map, mergeMap, range, skip, switchMap, take, tap, toArray} from "rxjs";
@@ -9,29 +8,25 @@ import {getNetworkTime} from "../graph/endgameGraph.js";
 describe('memory store handlers', () => {
     describe('get', () => {
         it('should return undefined if value does not exist', () =>
-            firstValueFrom(newEndgame(
-                newEndgameConfig({
+            firstValueFrom(newEndgame({
                     chains: testChains({
                         get: memoryStoreGetHandler()
                     })
-                })
-            ).pipe(
+            }).pipe(
                 switchMap(endgame => endgameGet(endgame, 'my.path')),
                 tap(({value}) => expect(value).to.be.undefined)
             ))
         );
 
         it('should get a value from the memory store', () =>
-            firstValueFrom(newEndgame(
-                newEndgameConfig({
+            firstValueFrom(newEndgame({
                     chains: testChains({
                         auth: testAuthHandler(),
                         get: memoryStoreGetHandler(),
                         put: memoryStorePutHandler(),
                         getMeta: memoryStoreGetMetaHandler()
                     })
-                })
-            ).pipe(
+            }).pipe(
                 switchMap(egame => endgameAuth(egame, 'username', 'password', 'my.user')),
                 switchMap(({endgame}) => endgamePut(endgame, 'my.path', 10)),
                 switchMap(({endgame}) => endgameGet(endgame, 'my.path')),
@@ -47,15 +42,13 @@ describe('memory store handlers', () => {
         );
 
         it('should handle multiple values in parallel', () =>
-            firstValueFrom(newEndgame(
-                newEndgameConfig({
-                    chains: testChains({
-                        auth: testAuthHandler(),
-                        get: memoryStoreGetHandler(),
-                        put: memoryStorePutHandler(),
-                    })
+            firstValueFrom(newEndgame({
+                chains: testChains({
+                    auth: testAuthHandler(),
+                    get: memoryStoreGetHandler(),
+                    put: memoryStorePutHandler(),
                 })
-            ).pipe(
+            }).pipe(
                 switchMap(egame => endgameAuth(egame, 'username', 'password', 'my.user')),
                 switchMap(({endgame}) => range(1, 5).pipe(
                     mergeMap(n => endgamePut(endgame, `my.path${n}`, n)),
@@ -72,16 +65,16 @@ describe('memory store handlers', () => {
         )
 
         it('should handle multiple pistol instances', () => {
-            const config1 = newEndgameConfig({
+            const config1 = {
                 chains: testChains({
                     auth: testAuthHandler(),
                     get: memoryStoreGetHandler(),
                     put: memoryStorePutHandler(),
                     getMeta: memoryStoreGetMetaHandler()
                 })
-            });
+            };
 
-            const config2 = newEndgameConfig({
+            const config2 = {
                 port: 11111,
                 chains: testChains({
                     auth: testAuthHandler(),
@@ -89,7 +82,7 @@ describe('memory store handlers', () => {
                     put: memoryStorePutHandler(),
                     getMeta: memoryStoreGetMetaHandler()
                 })
-            });
+            };
 
 
             return firstValueFrom(combineLatest([
