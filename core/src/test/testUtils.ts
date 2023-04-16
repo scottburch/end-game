@@ -5,6 +5,7 @@ import {floodRouter} from "../p2p/floodRouter.js";
 import {Parcel} from '@parcel/core';
 import {deserializeKeys} from "../crypto/crypto.js";
 import {ChainPair, ChainProps, newEndgameConfig, EndgameConfig} from "../app/endgameConfig.js";
+import {handler} from "../handlers/handler.js";
 
 /**
  * Starts a test network.  Peers are in the form of an array of nodes with the inner array being the node number of the peer
@@ -30,18 +31,14 @@ export const testChains = (chains: Partial<EndgameConfig['chains']>) => ({
     ...chains
 } satisfies EndgameConfig['chains'] as EndgameConfig['chains'])
 
-export const testAuthHandler = () => {
-    const subject = new Subject<ChainProps<'auth'>>();
-    const observer = subject.asObservable().pipe(
-        switchMap(({endgame, password, userPath, username}) => getTestKeys().pipe(
+export const testAuthHandler = () =>
+    handler<'auth'>([
+        ({endgame, password, userPath, username}) => getTestKeys().pipe(
             map(keys => ({...endgame, keys, username} satisfies AuthenticatedEndgame as AuthenticatedEndgame)),
             map(endgame => ({endgame, password, userPath, username}))
-        ))
-    ) as unknown as ChainPair<ChainProps<'auth'>>;
+        )
+    ])
 
-    observer.next = (v: ChainProps<'auth'>) => subject.next(v);
-    return observer
-};
 
 export const testDummyHandler = <T extends keyof EndgameConfig['chains']>(fn?: (v: ChainProps<T>) => ChainProps<T>) => {
     const subject = new Subject<ChainProps<T>>();
