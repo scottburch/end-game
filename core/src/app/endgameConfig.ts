@@ -28,20 +28,20 @@ export const newEndgameConfig = (config: Partial<EndgameConfig>) => ({
     name: config.name || `node-${getNetworkTime()}`,
     port: config.port || 11110,
     chains: {
-        log: config.chains?.log || newChainPair<ChainProps<'log'>>(),
-        peerConnect: config.chains?.peerConnect || newChainPair<ChainProps<'peerConnect'>>(),
-        auth: config.chains?.auth || newChainPair<ChainProps<'auth'>>(),
-        unauth: config.chains?.unauth || newChainPair<ChainProps<'unauth'>>(),
-        peersOut: config.chains?.peersOut || newChainPair<ChainProps<'peersOut'>>(),
-        peerIn: config.chains?.peerIn || newChainPair<ChainProps<'peerIn'>>(),
-        put: config.chains?.put || newChainPair<ChainProps<'put'>>(),
-        get: config.chains?.get || newChainPair<ChainProps<'get'>>(),
-        getMeta: config.chains?.getMeta || newChainPair<ChainProps<'getMeta'>>()
+        log: config.chains?.log || nullChainPair<ChainProps<'log'>>(),
+        peerConnect: config.chains?.peerConnect || nullChainPair<ChainProps<'peerConnect'>>(),
+        auth: config.chains?.auth || nullChainPair<ChainProps<'auth'>>(),
+        unauth: config.chains?.unauth || nullChainPair<ChainProps<'unauth'>>(),
+        peersOut: config.chains?.peersOut || nullChainPair<ChainProps<'peersOut'>>(),
+        peerIn: config.chains?.peerIn || nullChainPair<ChainProps<'peerIn'>>(),
+        put: config.chains?.put || nullChainPair<ChainProps<'put'>>(),
+        get: config.chains?.get || nullChainPair<ChainProps<'get'>>(),
+        getMeta: config.chains?.getMeta || nullChainPair<ChainProps<'getMeta'>>()
     }
 
 } satisfies EndgameConfig as EndgameConfig)
 
-export const newChainPair = <T>() => {
+export const nullChainPair = <T>() => {
     const subject = new Subject<T>();
     const observable = subject.asObservable() as ChainPair<T>;
     observable.next = (v: T) => subject.next(v);
