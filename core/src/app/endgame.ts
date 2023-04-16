@@ -6,6 +6,7 @@ import {KeyBundle, serializePubKey, signMsg} from "../crypto/crypto.js";
 import {getNetworkTime, EndgameGraphBundle, EndgameGraphMeta, EndgameGraphValue} from "../graph/endgameGraph.js";
 import {EndgameConfig} from "./endgameConfig.js";
 import {nullHandler} from "../handlers/handlers.js";
+import {DeepPartial} from "tsdef";
 
 
 export type Endgame = {
@@ -27,7 +28,7 @@ export type LogEntry<T extends Object | undefined> = {
 }
 
 
-export const newEndgame = (config: Partial<EndgameConfig>) =>
+export const newEndgame = (config: DeepPartial<EndgameConfig>) =>
     of(newEndgameConfig(config)).pipe(
         map(config => ({
             config,
@@ -131,19 +132,19 @@ export const trafficLogger = (() => {
     }
 })();
 
-const newEndgameConfig = (config: Partial<EndgameConfig>) => ({
+const newEndgameConfig = (config: DeepPartial<EndgameConfig>) => ({
     isTrusted: config.isTrusted ?? false,
     name: config.name || `node-${getNetworkTime()}`,
     port: config.port || 11110,
     handlers: {
-        log: config.handlers?.log || nullHandler<'log'>(),
-        peerConnect: config.handlers?.peerConnect || nullHandler<'peerConnect'>(),
-        auth: config.handlers?.auth || nullHandler<'auth'>(),
-        unauth: config.handlers?.unauth || nullHandler<'unauth'>(),
-        peersOut: config.handlers?.peersOut || nullHandler<'peersOut'>(),
-        peerIn: config.handlers?.peerIn || nullHandler<'peerIn'>(),
-        put: config.handlers?.put || nullHandler<'put'>(),
-        get: config.handlers?.get || nullHandler<'get'>(),
-        getMeta: config.handlers?.getMeta || nullHandler<'getMeta'>()
+        log: config.handlers?.log as EndgameConfig['handlers']['log'] || nullHandler<'log'>(),
+        peerConnect: config.handlers?.peerConnect  as EndgameConfig['handlers']['peerConnect'] || nullHandler<'peerConnect'>(),
+        auth: config.handlers?.auth as EndgameConfig['handlers']['auth'] || nullHandler<'auth'>(),
+        unauth: config.handlers?.unauth as EndgameConfig['handlers']['unauth'] || nullHandler<'unauth'>(),
+        peersOut: config.handlers?.peersOut as EndgameConfig['handlers']['peersOut'] || nullHandler<'peersOut'>(),
+        peerIn: config.handlers?.peerIn as EndgameConfig['handlers']['peerIn'] || nullHandler<'peerIn'>(),
+        put: config.handlers?.put as EndgameConfig['handlers']['put'] || nullHandler<'put'>(),
+        get: config.handlers?.get as EndgameConfig['handlers']['get'] || nullHandler<'get'>(),
+        getMeta: config.handlers?.getMeta as EndgameConfig['handlers']['getMeta'] || nullHandler<'getMeta'>()
     }
 } satisfies EndgameConfig as EndgameConfig)
