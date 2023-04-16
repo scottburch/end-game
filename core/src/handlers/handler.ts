@@ -1,5 +1,5 @@
 import {ChainPair, ChainProps, EndgameConfig, handlerFn} from "../app/endgameConfig.js";
-import {mergeMap, Subject} from "rxjs";
+import {mergeMap, of, Subject} from "rxjs";
 
 export const handler = <T extends keyof EndgameConfig['chains']>(fns: handlerFn<T>[]) => {
     const subject = new Subject<ChainProps<T>>();
@@ -10,4 +10,7 @@ export const handler = <T extends keyof EndgameConfig['chains']>(fns: handlerFn<
     },subject.asObservable()) as unknown as ChainPair<ChainProps<T>>
     observer.next = (v: ChainProps<T>) => subject.next(v);
     return observer
+};
+export const nullHandler = <T extends keyof EndgameConfig['chains']>() => {
+    return handler<T>([(x: ChainProps<T>) => of(x)]);
 };

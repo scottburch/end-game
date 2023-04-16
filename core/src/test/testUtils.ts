@@ -4,8 +4,8 @@ import {dialPeer} from "../p2p/networkClient.js";
 import {floodRouter} from "../p2p/floodRouter.js";
 import {Parcel} from '@parcel/core';
 import {deserializeKeys} from "../crypto/crypto.js";
-import {newEndgameConfig, EndgameConfig, nullHandler} from "../app/endgameConfig.js";
-import {handler} from "../handlers/handler.js";
+import {newEndgameConfig, EndgameConfig} from "../app/endgameConfig.js";
+import {handler, nullHandler} from "../handlers/handler.js";
 
 /**
  * Starts a test network.  Peers are in the form of an array of nodes with the inner array being the node number of the peer
