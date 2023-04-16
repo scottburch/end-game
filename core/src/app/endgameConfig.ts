@@ -7,7 +7,7 @@ import {nullHandler} from "../handlers/handler.js";
 export type ChainPair<T> = Observable<T> & {next: (v: T) => void, props: T};
 export type ChainProps<T extends keyof EndgameConfig['chains']> = EndgameConfig['chains'][T]['props'];
 
-export type handlerFn<T extends keyof EndgameConfig['chains']> = (p: ChainProps<T>) => Observable<ChainProps<T>>;
+export type HandlerFn<T extends keyof EndgameConfig['chains']> = (p: ChainProps<T>) => Observable<ChainProps<T>>;
 
 export type EndgameConfig = {
     name: string
