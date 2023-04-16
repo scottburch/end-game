@@ -2,7 +2,7 @@ import {Observable} from "rxjs";
 import {AuthenticatedEndgame, Endgame, LogEntry} from "./endgame.js";
 import {PeerMsg} from "../p2p/peerMsg.js";
 import {EndgameGraphBundle, EndgameGraphMeta, EndgameGraphValue, getNetworkTime} from "../graph/endgameGraph.js";
-import {nullHandler} from "../handlers/handler.js";
+import {nullHandler} from "../handlers/handlers.js";
 
 export type ChainNames = keyof EndgameConfig['chains']
 export type ChainPair<T> = Observable<T> & {next: (v: T) => void, props: T};

@@ -5,7 +5,7 @@ import {floodRouter} from "../p2p/floodRouter.js";
 import {Parcel} from '@parcel/core';
 import {deserializeKeys} from "../crypto/crypto.js";
 import {newEndgameConfig, EndgameConfig} from "../app/endgameConfig.js";
-import {handler, nullHandler} from "../handlers/handler.js";
+import {handlers, nullHandler} from "../handlers/handlers.js";
 
 /**
  * Starts a test network.  Peers are in the form of an array of nodes with the inner array being the node number of the peer
@@ -32,7 +32,7 @@ export const testChains = (chains: Partial<EndgameConfig['chains']>) => ({
 } satisfies EndgameConfig['chains'] as EndgameConfig['chains'])
 
 export const testAuthHandler = () =>
-    handler<'auth'>([
+    handlers<'auth'>([
         ({endgame, password, userPath, username}) => getTestKeys().pipe(
             map(keys => ({...endgame, keys, username} satisfies AuthenticatedEndgame as AuthenticatedEndgame)),
             map(endgame => ({endgame, password, userPath, username}))

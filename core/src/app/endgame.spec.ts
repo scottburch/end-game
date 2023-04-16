@@ -4,7 +4,7 @@ import {expect} from 'chai';
 import {getTestKeys, newTestEndgame, testAuthHandler, testChains} from "../test/testUtils.js";
 import {generateNewAccount} from "../crypto/crypto.js";
 import {EndgameGraphMeta} from "../graph/endgameGraph.js";
-import {handler} from "../handlers/handler.js";
+import {handlers} from "../handlers/handlers.js";
 
 
 describe('endgame', () => {
@@ -46,7 +46,7 @@ describe('endgame', () => {
         it('should send a message down the endgame-put chain', () =>
             firstValueFrom(newTestEndgame({chains: testChains({
                     auth: testAuthHandler(),
-                    put: handler<'put'>([({endgame, path, value}) => of({endgame, path, value: value + 1, meta: {} as EndgameGraphMeta})])
+                    put: handlers<'put'>([({endgame, path, value}) => of({endgame, path, value: value + 1, meta: {} as EndgameGraphMeta})])
             })}).pipe(
                 switchMap(endgame => generateNewAccount().pipe(map(keys => ({keys, endgame})))),
                 switchMap(({endgame, keys}) => endgameAuth(endgame, 'my-username', 'password', 'my.user')),
@@ -61,7 +61,7 @@ describe('endgame', () => {
     describe('endgameGet()', () => {
         it('should send a message down the endgame-get chain', () =>
             firstValueFrom(newTestEndgame({chains: testChains({
-                    get: handler<'get'>([({endgame, path}) => of({endgame, path, value: 10})])
+                    get: handlers<'get'>([({endgame, path}) => of({endgame, path, value: 10})])
                 })}).pipe(
                 switchMap(endgame => endgameGet<number>(endgame, 'my-key')),
                 tap(({value}) => expect(value).to.equal(10))
