@@ -1,11 +1,11 @@
-import {bufferCount,  from, map, mergeMap, Observable, of, switchMap, timer} from "rxjs";
+import {bufferCount, from, map, mergeMap, Observable, of, switchMap, timer} from "rxjs";
 import {AuthenticatedEndgame, newEndgame, endgameLogin} from "../app/endgame.js";
 import {dialPeer} from "../p2p/networkClient.js";
 import {floodRouter} from "../p2p/floodRouter.js";
 import {Parcel} from '@parcel/core';
 import {deserializeKeys} from "../crypto/crypto.js";
-import {EndgameConfig} from "../app/endgameConfig.js";
-import {handlers, nullHandler} from "../handlers/handlers.js";
+import {EndgameConfig, HandlerFn} from "../app/endgameConfig.js";
+import {DeepPartial} from "tsdef";
 
 /**
  * Starts a test network.  Peers are in the form of an array of nodes with the inner array being the node number of the peer
@@ -18,45 +18,17 @@ export type StartTestNetworkOpts = EndgameConfig & {
     username: string
 }
 
-export const testHandlers = (handlers: Partial<EndgameConfig['handlers']>) => ({
-    log: nullHandler<'log'>(),
-    auth: nullHandler<'auth'>(),
-    unauth: nullHandler<'unauth'>(),
-    peerConnect: nullHandler<'peerConnect'>(),
-    peersOut: nullHandler<'peersOut'>(),
-    peerIn: nullHandler<'peerIn'>(),
-    put: nullHandler<'put'>(),
-    get: nullHandler<'get'>(),
-    getMeta: nullHandler<'getMeta'>(),
-    ...handlers
-} satisfies EndgameConfig['handlers'] as EndgameConfig['handlers'])
-
-export const testAuthHandler = () =>
-    handlers<'auth'>([
-        ({endgame, password, userPath, username}) => getTestKeys().pipe(
-            map(keys => ({...endgame, keys, username} satisfies AuthenticatedEndgame as AuthenticatedEndgame)),
-            map(endgame => ({endgame, password, userPath, username}))
-        )
-    ])
-
- 
+export const testAuthHandler: HandlerFn<'auth'> =
+    ({endgame, password, userPath, username}) => getTestKeys().pipe(
+        map(keys => ({...endgame, keys, username} satisfies AuthenticatedEndgame as AuthenticatedEndgame)),
+        map(endgame => ({endgame, password, userPath, username}))
+    )
 
 
-
-
-
-
-
-
-
-
-
-
-
-export const newTestEndgame = (config: Partial<EndgameConfig> = {}) =>
+export const newTestEndgame = (config: DeepPartial<EndgameConfig> = {}) =>
     of(config).pipe(
         switchMap(config => newEndgame(config))
-);
+    );
 
 
 export const startTestNetwork = (nodeList: number[][] = [], opts: Partial<StartTestNetworkOpts> = {}) => from(nodeList).pipe(
@@ -73,7 +45,10 @@ export const startTestNetwork = (nodeList: number[][] = [], opts: Partial<StartT
         switchMap(floodRouter),
         map(endgame => ({endgame, peers}))
     )),
-    mergeMap(({endgame, peers}, n) => endgameLogin(endgame, opts.username || `username-${n}`, 'password', 'my.user').pipe(
+    mergeMap(({
+                  endgame,
+                  peers
+              }, n) => endgameLogin(endgame, opts.username || `username-${n}`, 'password', 'my.user').pipe(
         map(({endgame}) => ({endgame, peers}))
     )),
     mergeMap(({endgame, peers}) => peers.length ? from(peers).pipe(

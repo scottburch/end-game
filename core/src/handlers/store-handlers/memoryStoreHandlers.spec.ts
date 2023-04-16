@@ -1,5 +1,5 @@
 import {endgameLogin, endgameGet, endgameGetMeta, endgamePut, newEndgame} from "../../app/endgame.js";
-import {testAuthHandler, testHandlers} from "../../test/testUtils.js";
+import {testAuthHandler} from "../../test/testUtils.js";
 import {memoryStoreGetHandler, memoryStoreGetMetaHandler, memoryStorePutHandler} from "./memoryStoreHandlers.js";
 import {combineLatest, first, firstValueFrom, map, mergeMap, range, skip, switchMap, take, tap, toArray} from "rxjs";
 import {expect} from "chai";
@@ -10,9 +10,9 @@ describe('memory store handlers', () => {
     describe('get', () => {
         it('should return undefined if value does not exist', () =>
             firstValueFrom(newEndgame({
-                handlers: testHandlers({
+                handlers: {
                     get: handlers([memoryStoreGetHandler])
-                })
+                }
             }).pipe(
                 switchMap(endgame => endgameGet(endgame, 'my.path')),
                 tap(({value}) => expect(value).to.be.undefined)
@@ -21,12 +21,12 @@ describe('memory store handlers', () => {
 
         it('should get a value from the memory store', () =>
             firstValueFrom(newEndgame({
-                handlers: testHandlers({
-                    auth: testAuthHandler(),
+                handlers: {
+                    auth: handlers([testAuthHandler]),
                     get: handlers([memoryStoreGetHandler]),
                     put: handlers([memoryStorePutHandler]),
                     getMeta: handlers([memoryStoreGetMetaHandler])
-                })
+                }
             }).pipe(
                 switchMap(egame => endgameLogin(egame, 'username', 'password', 'my.user')),
                 switchMap(({endgame}) => endgamePut(endgame, 'my.path', 10)),
@@ -44,11 +44,11 @@ describe('memory store handlers', () => {
 
         it('should handle multiple values in parallel', () =>
             firstValueFrom(newEndgame({
-                handlers: testHandlers({
-                    auth: testAuthHandler(),
+                handlers: {
+                    auth: handlers([testAuthHandler]),
                     get: handlers([memoryStoreGetHandler]),
                     put: handlers([memoryStorePutHandler]),
-                })
+                }
             }).pipe(
                 switchMap(egame => endgameLogin(egame, 'username', 'password', 'my.user')),
                 switchMap(({endgame}) => range(1, 5).pipe(
@@ -67,22 +67,22 @@ describe('memory store handlers', () => {
 
         it('should handle multiple pistol instances', () => {
             const config1 = {
-                handlers: testHandlers({
-                    auth: testAuthHandler(),
+                handlers: {
+                    auth: handlers([testAuthHandler]),
                     get: handlers([memoryStoreGetHandler]),
                     put: handlers([memoryStorePutHandler]),
                     getMeta: handlers([memoryStoreGetMetaHandler])
-                })
+                }
             };
 
             const config2 = {
                 port: 11111,
-                handlers: testHandlers({
-                    auth: testAuthHandler(),
+                handlers: {
+                    auth: handlers([testAuthHandler]),
                     get: handlers([memoryStoreGetHandler]),
                     put: handlers([memoryStorePutHandler]),
                     getMeta: handlers([memoryStoreGetMetaHandler])
-                })
+                }
             };
 
 

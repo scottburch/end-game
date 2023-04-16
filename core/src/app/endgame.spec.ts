@@ -1,7 +1,7 @@
 import {AuthenticatedEndgame, endgameLogin, endgameGet, endgamePut, endgameLogout, sendMsg} from "./endgame.js";
 import {catchError, firstValueFrom, map, of, switchMap, tap, timeout} from "rxjs";
 import {expect} from 'chai';
-import {getTestKeys, newTestEndgame, testAuthHandler, testHandlers} from "../test/testUtils.js";
+import {getTestKeys, newTestEndgame, testAuthHandler} from "../test/testUtils.js";
 import {generateNewAccount} from "../crypto/crypto.js";
 import {EndgameGraphMeta} from "../graph/endgameGraph.js";
 import {handlers} from "../handlers/handlers.js";
@@ -10,7 +10,7 @@ import {handlers} from "../handlers/handlers.js";
 describe('endgame', () => {
 
     it('should be able to login after endgame is started', () =>
-        firstValueFrom(newTestEndgame({handlers: testHandlers({auth: testAuthHandler()})}).pipe(
+        firstValueFrom(newTestEndgame({handlers: {auth: handlers([testAuthHandler])}}).pipe(
             switchMap(endgame => endgameLogin(endgame, 'username', 'password', 'my.user')),
             tap(({endgame}) => expect(endgame.keys).not.to.be.undefined),
         ))
@@ -44,10 +44,10 @@ describe('endgame', () => {
 
     describe('endgamePut()', () => {
         it('should send a message down the endgame-put handlers', () =>
-            firstValueFrom(newTestEndgame({handlers: testHandlers({
-                    auth: testAuthHandler(),
+            firstValueFrom(newTestEndgame({handlers: {
+                    auth: handlers([testAuthHandler]),
                     put: handlers<'put'>([({endgame, path, value}) => of({endgame, path, value: value + 1, meta: {} as EndgameGraphMeta})])
-            })}).pipe(
+            }}).pipe(
                 switchMap(endgame => generateNewAccount().pipe(map(keys => ({keys, endgame})))),
                 switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
                 switchMap(({endgame}) =>
@@ -60,9 +60,9 @@ describe('endgame', () => {
 
     describe('endgameGet()', () => {
         it('should send a message down the endgame-get handlers', () =>
-            firstValueFrom(newTestEndgame({handlers: testHandlers({
+            firstValueFrom(newTestEndgame({handlers: {
                     get: handlers<'get'>([({endgame, path}) => of({endgame, path, value: 10})])
-                })}).pipe(
+                }}).pipe(
                 switchMap(endgame => endgameGet<number>(endgame, 'my-key')),
                 tap(({value}) => expect(value).to.equal(10))
             ))
