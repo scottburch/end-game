@@ -1,10 +1,10 @@
-import {bufferCount,  from, map, mergeMap, Observable, of, Subject, switchMap, timer} from "rxjs";
+import {bufferCount,  from, map, mergeMap, Observable, of, switchMap, timer} from "rxjs";
 import {AuthenticatedEndgame, newEndgame, endgameAuth, EndgameOpts} from "../app/endgame.js";
 import {dialPeer} from "../p2p/networkClient.js";
 import {floodRouter} from "../p2p/floodRouter.js";
 import {Parcel} from '@parcel/core';
 import {deserializeKeys} from "../crypto/crypto.js";
-import {ChainPair, ChainProps, newEndgameConfig, EndgameConfig} from "../app/endgameConfig.js";
+import {newEndgameConfig, EndgameConfig, nullHandler} from "../app/endgameConfig.js";
 import {handler} from "../handlers/handler.js";
 
 /**
@@ -19,15 +19,15 @@ export type StartTestNetworkOpts = EndgameConfig & {
 }
 
 export const testChains = (chains: Partial<EndgameConfig['chains']>) => ({
-    log: testDummyHandler<'log'>(),
-    auth: testDummyHandler<'auth'>(),
-    unauth: testDummyHandler<'unauth'>(),
-    peerConnect: testDummyHandler<'peerConnect'>(),
-    peersOut: testDummyHandler<'peersOut'>(),
-    peerIn: testDummyHandler<'peerIn'>(),
-    put: testDummyHandler<'put'>(),
-    get: testDummyHandler<'get'>(),
-    getMeta: testDummyHandler<'getMeta'>(),
+    log: nullHandler<'log'>(),
+    auth: nullHandler<'auth'>(),
+    unauth: nullHandler<'unauth'>(),
+    peerConnect: nullHandler<'peerConnect'>(),
+    peersOut: nullHandler<'peersOut'>(),
+    peerIn: nullHandler<'peerIn'>(),
+    put: nullHandler<'put'>(),
+    get: nullHandler<'get'>(),
+    getMeta: nullHandler<'getMeta'>(),
     ...chains
 } satisfies EndgameConfig['chains'] as EndgameConfig['chains'])
 
@@ -39,16 +39,8 @@ export const testAuthHandler = () =>
         )
     ])
 
+ 
 
-export const testDummyHandler = <T extends keyof EndgameConfig['chains']>(fn?: (v: ChainProps<T>) => ChainProps<T>) => {
-    const subject = new Subject<ChainProps<T>>();
-    const observer = subject.pipe(
-        map((x: ChainProps<T>) => fn ? fn(x) : x)
-    ) as unknown as ChainPair<ChainProps<T>>;
-
-    observer.next = (v: ChainProps<T>) => subject.next(v);
-    return observer
-}
 
 
 
