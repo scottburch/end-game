@@ -1,7 +1,7 @@
 import {map, Subject, switchMap} from "rxjs";
-import {Handler, HandlerProps} from "../app/endgameConfig.js";
-import {AuthenticatedEndgame} from "../app/endgame.js";
-import {getTestKeys} from "../test/testUtils.js";
+import {Handler, HandlerProps} from "../../app/endgameConfig.js";
+import {AuthenticatedEndgame} from "../../app/endgame.js";
+import {getTestKeys} from "../../test/testUtils.js";
 
 export const unauthHandler = () => {
     const subject = new Subject<HandlerProps<'auth'>>();

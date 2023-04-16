@@ -1,9 +1,9 @@
-import {endgameAuth, endgameGet, endgameGetMeta, endgamePut, newEndgame} from "../app/endgame.js";
-import {testAuthHandler, testHandlers} from "../test/testUtils.js";
+import {endgameAuth, endgameGet, endgameGetMeta, endgamePut, newEndgame} from "../../app/endgame.js";
+import {testAuthHandler, testHandlers} from "../../test/testUtils.js";
 import {memoryStoreGetHandler, memoryStoreGetMetaHandler, memoryStorePutHandler} from "./memoryStoreHandlers.js";
 import {combineLatest, first, firstValueFrom, map, mergeMap, range, skip, switchMap, take, tap, toArray} from "rxjs";
 import {expect} from "chai";
-import {getNetworkTime} from "../graph/endgameGraph.js";
+import {getNetworkTime} from "../../graph/endgameGraph.js";
 
 describe('memory store handlers', () => {
     describe('get', () => {

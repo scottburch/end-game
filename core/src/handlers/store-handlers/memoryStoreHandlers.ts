@@ -1,7 +1,7 @@
 import {catchError, map, mergeMap, of, switchMap, throwError} from "rxjs";
 import {MemoryLevel} from "memory-level";
-import {Endgame} from "../app/endgame.js";
-import {handlers} from "./handlers.js";
+import {Endgame} from "../../app/endgame.js";
+import {handlers} from "../handlers.js";
 
 const stores: Record<string, MemoryLevel> = {};
 
