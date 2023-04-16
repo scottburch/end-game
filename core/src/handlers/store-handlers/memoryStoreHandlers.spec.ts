@@ -4,14 +4,15 @@ import {memoryStoreGetHandler, memoryStoreGetMetaHandler, memoryStorePutHandler}
 import {combineLatest, first, firstValueFrom, map, mergeMap, range, skip, switchMap, take, tap, toArray} from "rxjs";
 import {expect} from "chai";
 import {getNetworkTime} from "../../graph/endgameGraph.js";
+import {handlers} from "../handlers.js";
 
 describe('memory store handlers', () => {
     describe('get', () => {
         it('should return undefined if value does not exist', () =>
             firstValueFrom(newEndgame({
-                    handlers: testHandlers({
-                        get: memoryStoreGetHandler()
-                    })
+                handlers: testHandlers({
+                    get: handlers([memoryStoreGetHandler])
+                })
             }).pipe(
                 switchMap(endgame => endgameGet(endgame, 'my.path')),
                 tap(({value}) => expect(value).to.be.undefined)
@@ -20,12 +21,12 @@ describe('memory store handlers', () => {
 
         it('should get a value from the memory store', () =>
             firstValueFrom(newEndgame({
-                    handlers: testHandlers({
-                        auth: testAuthHandler(),
-                        get: memoryStoreGetHandler(),
-                        put: memoryStorePutHandler(),
-                        getMeta: memoryStoreGetMetaHandler()
-                    })
+                handlers: testHandlers({
+                    auth: testAuthHandler(),
+                    get: handlers([memoryStoreGetHandler]),
+                    put: handlers([memoryStorePutHandler]),
+                    getMeta: handlers([memoryStoreGetMetaHandler])
+                })
             }).pipe(
                 switchMap(egame => endgameAuth(egame, 'username', 'password', 'my.user')),
                 switchMap(({endgame}) => endgamePut(endgame, 'my.path', 10)),
@@ -45,8 +46,8 @@ describe('memory store handlers', () => {
             firstValueFrom(newEndgame({
                 handlers: testHandlers({
                     auth: testAuthHandler(),
-                    get: memoryStoreGetHandler(),
-                    put: memoryStorePutHandler(),
+                    get: handlers([memoryStoreGetHandler]),
+                    put: handlers([memoryStorePutHandler]),
                 })
             }).pipe(
                 switchMap(egame => endgameAuth(egame, 'username', 'password', 'my.user')),
@@ -68,9 +69,9 @@ describe('memory store handlers', () => {
             const config1 = {
                 handlers: testHandlers({
                     auth: testAuthHandler(),
-                    get: memoryStoreGetHandler(),
-                    put: memoryStorePutHandler(),
-                    getMeta: memoryStoreGetMetaHandler()
+                    get: handlers([memoryStoreGetHandler]),
+                    put: handlers([memoryStorePutHandler]),
+                    getMeta: handlers([memoryStoreGetMetaHandler])
                 })
             };
 
@@ -78,9 +79,9 @@ describe('memory store handlers', () => {
                 port: 11111,
                 handlers: testHandlers({
                     auth: testAuthHandler(),
-                    get: memoryStoreGetHandler(),
-                    put: memoryStorePutHandler(),
-                    getMeta: memoryStoreGetMetaHandler()
+                    get: handlers([memoryStoreGetHandler]),
+                    put: handlers([memoryStorePutHandler]),
+                    getMeta: handlers([memoryStoreGetMetaHandler])
                 })
             };
 
