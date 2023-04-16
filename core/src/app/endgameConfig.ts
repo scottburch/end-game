@@ -4,10 +4,12 @@ import {PeerMsg} from "../p2p/peerMsg.js";
 import {EndgameGraphBundle, EndgameGraphMeta, EndgameGraphValue, getNetworkTime} from "../graph/endgameGraph.js";
 import {nullHandler} from "../handlers/handler.js";
 
+export type ChainNames = keyof EndgameConfig['chains']
 export type ChainPair<T> = Observable<T> & {next: (v: T) => void, props: T};
-export type ChainProps<T extends keyof EndgameConfig['chains']> = EndgameConfig['chains'][T]['props'];
+export type ChainProps<T extends ChainNames> = EndgameConfig['chains'][T]['props'];
 
-export type HandlerFn<T extends keyof EndgameConfig['chains']> = (p: ChainProps<T>) => Observable<ChainProps<T>>;
+
+export type HandlerFn<T extends ChainNames> = (p: ChainProps<T>) => Observable<ChainProps<T>>;
 
 export type EndgameConfig = {
     name: string
