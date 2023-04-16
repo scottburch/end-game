@@ -17,9 +17,9 @@ describe.skip('p2p network', function()  {
             forward: true
         } satisfies PeerMsg<'testing', {}>;
         startTestNetwork([[1], []]).pipe(
-            tap(pistols => setTimeout(() => pistols[1].config.chains.peersOut.next({endgame: pistols[1], msg: peerMsg}) )),
-            tap(pistols => setTimeout(() => pistols[1].config.chains.peersOut.next({endgame: pistols[1], msg: peerMsg}))),
-            switchMap(pistols => pistols[0].config.chains.peerIn),
+            tap(pistols => setTimeout(() => pistols[1].config.handlers.peersOut.next({endgame: pistols[1], msg: peerMsg}) )),
+            tap(pistols => setTimeout(() => pistols[1].config.handlers.peersOut.next({endgame: pistols[1], msg: peerMsg}))),
+            switchMap(pistols => pistols[0].config.handlers.peerIn),
             filter(({msg}) => msg.cmd === 'testing'),
             takeUntil(timer(2000)),
             count(),
@@ -39,7 +39,7 @@ describe.skip('p2p network', function()  {
         ).subscribe(() => done());
     });
 
-    it('should forward messages down a peer chain', (done) => {
+    it('should forward messages down a peer handlers', (done) => {
         startTestNetwork([[1], [2], [3], []]).pipe(
             switchMap(pistols => sendAndTestMsg('my-message', pistols[0], pistols[3], pistols)),
             first()
@@ -49,10 +49,10 @@ describe.skip('p2p network', function()  {
 
 const sendAndTestMsg = (cmd: string, outPistol: Endgame, inPistol: Endgame, pistols: Endgame[]) => {
     setTimeout(() => {
-        outPistol.config.chains.peersOut.next({endgame: outPistol, msg: newPeerMsg(outPistol, {cmd: cmd, payload: '', forward: true})})
+        outPistol.config.handlers.peersOut.next({endgame: outPistol, msg: newPeerMsg(outPistol, {cmd: cmd, payload: '', forward: true})})
     });
 
-    return inPistol.config.chains.peerIn.pipe(
+    return inPistol.config.handlers.peerIn.pipe(
         filter(({msg}) => msg.cmd === cmd),
         map(() => pistols),
         delay(1),

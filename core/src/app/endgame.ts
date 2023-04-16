@@ -42,15 +42,15 @@ export const newEndgame = (config: Partial<EndgameConfig>) =>
 export const getAuthId = (endgame: Endgame) => endgame.id.split('-')[0];
 
 export const endgameAuth = (endgame: Endgame, username: string, password: string, userPath: string) => {
-    setTimeout(() => endgame.config.chains.auth.next({endgame, username, password, userPath}))
-    return endgame.config.chains.auth.pipe(
+    setTimeout(() => endgame.config.handlers.auth.next({endgame, username, password, userPath}))
+    return endgame.config.handlers.auth.pipe(
         map(({endgame}) => ({endgame: endgame as AuthenticatedEndgame}))
     )
 }
 
 export const endgameUnAuth = (endgame: AuthenticatedEndgame) => {
-    setTimeout(() => endgame.config.chains.unauth.next({endgame}));
-    return endgame.config.chains.unauth
+    setTimeout(() => endgame.config.handlers.unauth.next({endgame}));
+    return endgame.config.handlers.unauth
 }
 
 export const endgamePut = <T extends EndgameGraphValue, P extends string = string>(endgame: AuthenticatedEndgame, path: P, value: T) =>
@@ -62,24 +62,24 @@ export const endgamePut = <T extends EndgameGraphValue, P extends string = strin
         } satisfies EndgameGraphBundle<T>)),
         switchMap(msg => signMsg(endgame, msg)),
         tap(msg =>
-            setTimeout(() => endgame.config.chains.put.next({...msg, endgame}))
+            setTimeout(() => endgame.config.handlers.put.next({...msg, endgame}))
         ),
-        switchMap(() => endgame.config.chains.put),
+        switchMap(() => endgame.config.handlers.put),
         skipWhile(msg => msg.path !== path),
         first()
     );
 
 export const endgameGet = <T extends EndgameGraphValue, P extends string = string>(endgame: Endgame, path: string) => {
-    setTimeout(() =>endgame.config.chains.get.next({path, endgame}));
-    return endgame.config.chains.get.pipe(
+    setTimeout(() =>endgame.config.handlers.get.next({path, endgame}));
+    return endgame.config.handlers.get.pipe(
         filter(payload => payload.path === path),
         map(({endgame, value, path}) => ({endgame, value: value as T, path}))
     )
 };
 
 export const endgameGetMeta = (endgame: Endgame, path: string) => {
-    setTimeout(() => endgame.config.chains.getMeta.next({endgame, path}));
-    return endgame.config.chains.getMeta.pipe(
+    setTimeout(() => endgame.config.handlers.getMeta.next({endgame, path}));
+    return endgame.config.handlers.getMeta.pipe(
         filter(payload => payload.path === path),
         map(({endgame, meta, path}) => ({endgame, path, meta}))
     )
@@ -101,7 +101,7 @@ export const sendMsg = <T extends PeerMsg<any, any>>(endgame: Endgame, cmd: T['c
     })).pipe(
         delay(1),
         filter(() => !(opts.local ?? false)),
-        tap(msg => endgame.config.chains.peersOut.next({endgame, msg}))
+        tap(msg => endgame.config.handlers.peersOut.next({endgame, msg}))
     );
 
 export const trafficLogger = (() => {
@@ -110,11 +110,11 @@ export const trafficLogger = (() => {
     return (endgame: Endgame) => of(endgame).pipe(
         tap(() => endgames.push(endgame)),
         switchMap(endgame => merge(
-            endgame.config.chains.peersOut.pipe(map(msg => ({
+            endgame.config.handlers.peersOut.pipe(map(msg => ({
                 type: 'peers-out',
                 msg
             }))),
-            endgame.config.chains.peerIn.pipe(
+            endgame.config.handlers.peerIn.pipe(
                 map(msg => ({type: 'peer-in', msg}))
             )
         )),

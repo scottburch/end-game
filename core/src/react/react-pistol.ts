@@ -58,8 +58,8 @@ export const usePistolAuth = () => {
 
     useEffect(() => {
         const sub = merge(
-            (w.endgame as Endgame).config.chains.auth,
-            (w.endgame as Endgame).config.chains.unauth,
+            (w.endgame as Endgame).config.handlers.auth,
+            (w.endgame as Endgame).config.handlers.unauth,
         ).pipe(
             map(({endgame}) => endgame as AuthenticatedEndgame),
             tap(setAuth)

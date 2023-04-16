@@ -9,11 +9,11 @@ export const floodRouter = (endgame: Endgame) => new Observable<Endgame>(subscri
     const cacheSub = peerMsgCacheInvalidator(peerMsgCacheFilter).subscribe()
 
     const sub = of(endgame).pipe(
-        switchMap(endgame => endgame.config.chains.peerIn),
+        switchMap(endgame => endgame.config.handlers.peerIn),
         filter(({msg}) => msg.forward),
         mergeMap(({msg}) => checkPeerMsgCache(peerMsgCacheFilter, msg)),
         delay(1),
-        tap(({msg}) =>endgame.config.chains.peersOut.next({endgame, msg})),
+        tap(({msg}) =>endgame.config.handlers.peersOut.next({endgame, msg})),
         map(() => endgame)
     ).subscribe();
     subscriber.next(endgame);

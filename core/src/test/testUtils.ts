@@ -18,7 +18,7 @@ export type StartTestNetworkOpts = EndgameConfig & {
     username: string
 }
 
-export const testChains = (chains: Partial<EndgameConfig['chains']>) => ({
+export const testHandlers = (handlers: Partial<EndgameConfig['handlers']>) => ({
     log: nullHandler<'log'>(),
     auth: nullHandler<'auth'>(),
     unauth: nullHandler<'unauth'>(),
@@ -28,8 +28,8 @@ export const testChains = (chains: Partial<EndgameConfig['chains']>) => ({
     put: nullHandler<'put'>(),
     get: nullHandler<'get'>(),
     getMeta: nullHandler<'getMeta'>(),
-    ...chains
-} satisfies EndgameConfig['chains'] as EndgameConfig['chains'])
+    ...handlers
+} satisfies EndgameConfig['handlers'] as EndgameConfig['handlers'])
 
 export const testAuthHandler = () =>
     handlers<'auth'>([

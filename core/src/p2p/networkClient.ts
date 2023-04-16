@@ -24,11 +24,11 @@ export const dialPeer = (endgame: Endgame, url: string, opts: DialPeerOpts = {re
             fromEvent(ws, 'open').pipe(
                 concatMap(() => connectionFactory(endgame, ws, closeConn, 'client')),
                 concatMap(conn => startPeerMessageListener(conn)),
-                tap(conn => conn.endgame.config.chains.peerConnect.next({endgame, peerId: '0-0'})),
+                tap(conn => conn.endgame.config.handlers.peerConnect.next({endgame, peerId: '0-0'})),
                 tap(conn => observer.next(conn.endgame))
             ),
             fromEvent<WS.ErrorEvent>(ws, 'error').pipe(
-                tap(ev => endgame.config.chains.log.next({
+                tap(ev => endgame.config.handlers.log.next({
                     module: 'networkClient',
                     level: 'error',
                     time: new Date().toISOString(),

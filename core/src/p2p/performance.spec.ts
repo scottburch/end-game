@@ -25,7 +25,7 @@ describe.skip('p2p performance', function () {
                 )
             ),
             switchMap(endgames =>
-                endgames[0].config.chains.peerIn.pipe(
+                endgames[0].config.handlers.peerIn.pipe(
                     map(({msg, endgame}) => ({nodeId: endgame.id, msg}))),
             ),
             filter(({msg, nodeId}) => nodeId !== msg.from),

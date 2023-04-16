@@ -1,7 +1,7 @@
 import {AuthenticatedEndgame, endgameAuth, endgameGet, endgamePut, endgameUnAuth, sendMsg} from "./endgame.js";
 import {catchError, firstValueFrom, map, of, switchMap, tap, timeout} from "rxjs";
 import {expect} from 'chai';
-import {getTestKeys, newTestEndgame, testAuthHandler, testChains} from "../test/testUtils.js";
+import {getTestKeys, newTestEndgame, testAuthHandler, testHandlers} from "../test/testUtils.js";
 import {generateNewAccount} from "../crypto/crypto.js";
 import {EndgameGraphMeta} from "../graph/endgameGraph.js";
 import {handlers} from "../handlers/handlers.js";
@@ -10,7 +10,7 @@ import {handlers} from "../handlers/handlers.js";
 describe('endgame', () => {
 
     it('should be able to login after endgame is started', () =>
-        firstValueFrom(newTestEndgame({chains: testChains({auth: testAuthHandler()})}).pipe(
+        firstValueFrom(newTestEndgame({handlers: testHandlers({auth: testAuthHandler()})}).pipe(
             switchMap(endgame => endgameAuth(endgame, 'username', 'password', 'my.user')),
             tap(({endgame}) => expect(endgame.keys).not.to.be.undefined),
         ))
@@ -33,7 +33,7 @@ describe('endgame', () => {
         it('should only send a peer-in-event if msg is marked local', (done) => {
             newTestEndgame().pipe(
                 tap(endgame => firstValueFrom(sendMsg(endgame, 'mine', {}, {forward: false, local: true}))),
-                switchMap(endgame => endgame.config.chains.peersOut),
+                switchMap(endgame => endgame.config.handlers.peersOut),
                 tap(() => done('peers-out-event called when it should not be')),
                 timeout(1000),
                 catchError(err => err.name === 'TimeoutError' ? of(done()) : of(done(err.message)))
@@ -43,8 +43,8 @@ describe('endgame', () => {
 
 
     describe('endgamePut()', () => {
-        it('should send a message down the endgame-put chain', () =>
-            firstValueFrom(newTestEndgame({chains: testChains({
+        it('should send a message down the endgame-put handlers', () =>
+            firstValueFrom(newTestEndgame({handlers: testHandlers({
                     auth: testAuthHandler(),
                     put: handlers<'put'>([({endgame, path, value}) => of({endgame, path, value: value + 1, meta: {} as EndgameGraphMeta})])
             })}).pipe(
@@ -59,8 +59,8 @@ describe('endgame', () => {
     });
 
     describe('endgameGet()', () => {
-        it('should send a message down the endgame-get chain', () =>
-            firstValueFrom(newTestEndgame({chains: testChains({
+        it('should send a message down the endgame-get handlers', () =>
+            firstValueFrom(newTestEndgame({handlers: testHandlers({
                     get: handlers<'get'>([({endgame, path}) => of({endgame, path, value: 10})])
                 })}).pipe(
                 switchMap(endgame => endgameGet<number>(endgame, 'my-key')),

@@ -19,7 +19,7 @@ const checkForDuplicateConnection = (peerConn: PeerConnection, msg: PeerAnnounce
             payload: {},
         })).subscribe()
     ) : peerConn.closeConn(peerConn.conn)),
-    tap(() => peerConn.endgame.config.chains.log.next({
+    tap(() => peerConn.endgame.config.handlers.log.next({
         module: 'dialer',
         level: 'info',
         code: 'DUPLICATE_CONNECTION',
@@ -36,7 +36,7 @@ export const checkForDuplicateConnectionNotification = (peerConn: PeerConnection
 export const handleMessageReceived = (peerConn: PeerConnection, msg: string) => of(msg).pipe(
     tap(json => cacheSet(peerConn.dupCache, json, '')),
     map(json => JSON.parse(json) as PeerMsg<any, any>),
-    tap(msg => peerConn.endgame.config.chains.peerIn.next({endgame: peerConn.endgame, msg})),
+    tap(msg => peerConn.endgame.config.handlers.peerIn.next({endgame: peerConn.endgame, msg})),
     tap(msg => checkForDuplicateConnection(peerConn, msg).subscribe()),
     tap(msg => checkForDuplicateConnectionNotification(peerConn, msg).subscribe())
 );
@@ -69,7 +69,7 @@ const sendToPeer = <T extends PeerMsg<any, any>>(peerConn: PeerConnection, msg: 
     )
 
 export const startPeerMsgBroadcaster = (peerConn: PeerConnection) => new Observable<PeerConnection>(observer => {
-    const sub = peerConn.endgame.config.chains.peersOut.pipe(
+    const sub = peerConn.endgame.config.handlers.peersOut.pipe(
         map(msg => JSON.stringify(msg)),
         filter((json) => !peerConn.dupCache.has(json)),
         tap(json => cacheSet(peerConn.dupCache, json, '')),

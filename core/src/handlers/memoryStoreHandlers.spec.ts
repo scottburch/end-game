@@ -1,5 +1,5 @@
 import {endgameAuth, endgameGet, endgameGetMeta, endgamePut, newEndgame} from "../app/endgame.js";
-import {testAuthHandler, testChains} from "../test/testUtils.js";
+import {testAuthHandler, testHandlers} from "../test/testUtils.js";
 import {memoryStoreGetHandler, memoryStoreGetMetaHandler, memoryStorePutHandler} from "./memoryStoreHandlers.js";
 import {combineLatest, first, firstValueFrom, map, mergeMap, range, skip, switchMap, take, tap, toArray} from "rxjs";
 import {expect} from "chai";
@@ -9,7 +9,7 @@ describe('memory store handlers', () => {
     describe('get', () => {
         it('should return undefined if value does not exist', () =>
             firstValueFrom(newEndgame({
-                    chains: testChains({
+                    handlers: testHandlers({
                         get: memoryStoreGetHandler()
                     })
             }).pipe(
@@ -20,7 +20,7 @@ describe('memory store handlers', () => {
 
         it('should get a value from the memory store', () =>
             firstValueFrom(newEndgame({
-                    chains: testChains({
+                    handlers: testHandlers({
                         auth: testAuthHandler(),
                         get: memoryStoreGetHandler(),
                         put: memoryStorePutHandler(),
@@ -43,7 +43,7 @@ describe('memory store handlers', () => {
 
         it('should handle multiple values in parallel', () =>
             firstValueFrom(newEndgame({
-                chains: testChains({
+                handlers: testHandlers({
                     auth: testAuthHandler(),
                     get: memoryStoreGetHandler(),
                     put: memoryStorePutHandler(),
@@ -66,7 +66,7 @@ describe('memory store handlers', () => {
 
         it('should handle multiple pistol instances', () => {
             const config1 = {
-                chains: testChains({
+                handlers: testHandlers({
                     auth: testAuthHandler(),
                     get: memoryStoreGetHandler(),
                     put: memoryStorePutHandler(),
@@ -76,7 +76,7 @@ describe('memory store handlers', () => {
 
             const config2 = {
                 port: 11111,
-                chains: testChains({
+                handlers: testHandlers({
                     auth: testAuthHandler(),
                     get: memoryStoreGetHandler(),
                     put: memoryStorePutHandler(),

@@ -73,9 +73,9 @@ describe.skip('network client', function () {
             forward: true
         } satisfies PeerMsg<'testing', {}>;
         startTestNetwork([[1], []]).pipe(
-            tap(endgames => setTimeout(() => endgames[0].config.chains.peersOut.next({endgame: endgames[0], msg: peerMsg}))),
-            tap(endgames => setTimeout(() => endgames[0].config.chains.peersOut.next({endgame: endgames[0], msg: peerMsg}))),
-            switchMap(endgames => endgames[0].config.chains.peerIn),
+            tap(endgames => setTimeout(() => endgames[0].config.handlers.peersOut.next({endgame: endgames[0], msg: peerMsg}))),
+            tap(endgames => setTimeout(() => endgames[0].config.handlers.peersOut.next({endgame: endgames[0], msg: peerMsg}))),
+            switchMap(endgames => endgames[0].config.handlers.peerIn),
             filter(({msg}) => msg.cmd !== 'announce'),
             takeUntil(timer(2000)),
             count(),
@@ -91,8 +91,8 @@ describe.skip('network client', function () {
                     delay(5000)
                 ))),
                 switchMap(() => merge(
-                    endgames[0].config.chains.log,
-                    endgames[1].config.chains.log,
+                    endgames[0].config.handlers.log,
+                    endgames[1].config.handlers.log,
                 )),
                 filter((entry) =>
                     entry.code === 'DUPLICATE_CONNECTION'
@@ -104,7 +104,7 @@ describe.skip('network client', function () {
                 ),
                 scan(c => c + 1, 0),
                 tap(c => expect(c).to.equal(1)),
-                switchMap(() => endgames[0].config.chains.peerIn),
+                switchMap(() => endgames[0].config.handlers.peerIn),
                 filter(({msg}) => msg.cmd === 'put'),
                 takeUntil(timer(4000)),
                 count(),
@@ -118,11 +118,11 @@ describe.skip('network client', function () {
         let sub: Subscription;
         startTestNode(0, []).pipe(
             tap(endgame => sub = dialPeer(endgame, 'ws://localhost:11111', {redialInterval: 1}).subscribe()),
-            switchMap(endgame => endgame.config.chains.log),
+            switchMap(endgame => endgame.config.handlers.log),
             filter((entry) => entry.data?.text.includes('ECONNREFUSED')),
             bufferCount(3),
             switchMap(() => startTestNode(1, [])),
-            switchMap(endgame => endgame.config.chains.peerConnect),
+            switchMap(endgame => endgame.config.handlers.peerConnect),
             first(),
             tap(() => sub.unsubscribe())
         ).subscribe(() => done())
