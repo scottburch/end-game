@@ -27,10 +27,10 @@ export type LogEntry<T extends Object | undefined> = {
 
 
 export const newEndgame = (config: EndgameConfig) =>
-    of({opts: config, uid: Math.random().toFixed(10).replace('0.', '')}).pipe(
-        map(({opts, uid}) => ({
-            config: opts,
-            id: opts.id || uid,
+    of(config).pipe(
+        map(config => ({
+            config,
+            id: config.id || Math.random().toFixed(10).replace('0.', ''),
         } satisfies Endgame)),
         map(opts => opts as Endgame),
         // TODO: Move this to handlers maybe.. Somewhere out of here
