@@ -56,7 +56,7 @@ export const testAuthHandler = () =>
 export const newTestEndgame = (config: Partial<EndgameConfig> = {}) =>
     of(config).pipe(
         map(config => newEndgameConfig(config)),
-        switchMap(config => newEndgame({config: config}))
+        switchMap(config => newEndgame(config))
 );
 
 
@@ -89,9 +89,9 @@ export const startTestNetwork = (nodeList: number[][] = [], opts: Partial<StartT
     map(endgames => endgames.sort((a, b) => a.config.name < b.config.name ? -1 : 1))
 );
 
-export const startTestNode = (n: number = 0, peers: number[] = [], config: Partial<EndgameOpts> = {}) => of(config satisfies Omit<EndgameOpts, 'config'>).pipe(
+export const startTestNode = (n: number = 0, peers: number[] = [], config: Partial<EndgameOpts> = {}) => of(config).pipe(
     switchMap(config => of(newEndgameConfig({})).pipe(
-        map(baseApp => ({...config, config: baseApp} satisfies EndgameOpts))
+        map(partial => ({...config, ...partial} satisfies EndgameOpts))
     )),
     switchMap(config => newEndgame(config)),
     switchMap(floodRouter),

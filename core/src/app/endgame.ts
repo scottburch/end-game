@@ -26,12 +26,12 @@ export type LogEntry<T extends Object | undefined> = {
 }
 
 
-export type EndgameOpts = Partial<Endgame> & Pick<Endgame, 'config'>;
+export type EndgameOpts = EndgameConfig & {id?: string};
 
 export const newEndgame = (opts: EndgameOpts) =>
     of({opts, uid: Math.random().toFixed(10).replace('0.', '')}).pipe(
         map(({opts, uid}) => ({
-            ...opts,
+            config: opts,
             id: opts.id || uid,
         } satisfies Endgame)),
         map(opts => opts as Endgame),

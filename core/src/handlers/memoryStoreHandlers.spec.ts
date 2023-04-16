@@ -9,21 +9,21 @@ import {getNetworkTime} from "../graph/endgameGraph.js";
 describe('memory store handlers', () => {
     describe('get', () => {
         it('should return undefined if value does not exist', () =>
-            firstValueFrom(newEndgame({
-                config: newEndgameConfig({
+            firstValueFrom(newEndgame(
+                newEndgameConfig({
                     chains: testChains({
                         get: memoryStoreGetHandler()
                     })
                 })
-            }).pipe(
+            ).pipe(
                 switchMap(endgame => endgameGet(endgame, 'my.path')),
                 tap(({value}) => expect(value).to.be.undefined)
             ))
         );
 
         it('should get a value from the memory store', () =>
-            firstValueFrom(newEndgame({
-                config: newEndgameConfig({
+            firstValueFrom(newEndgame(
+                newEndgameConfig({
                     chains: testChains({
                         auth: testAuthHandler(),
                         get: memoryStoreGetHandler(),
@@ -31,7 +31,7 @@ describe('memory store handlers', () => {
                         getMeta: memoryStoreGetMetaHandler()
                     })
                 })
-            }).pipe(
+            ).pipe(
                 switchMap(egame => endgameAuth(egame, 'username', 'password', 'my.user')),
                 switchMap(({endgame}) => endgamePut(endgame, 'my.path', 10)),
                 switchMap(({endgame}) => endgameGet(endgame, 'my.path')),
@@ -47,17 +47,17 @@ describe('memory store handlers', () => {
         );
 
         it('should handle multiple values in parallel', () =>
-            firstValueFrom(newEndgame({
-                config: newEndgameConfig({
+            firstValueFrom(newEndgame(
+                newEndgameConfig({
                     chains: testChains({
                         auth: testAuthHandler(),
                         get: memoryStoreGetHandler(),
                         put: memoryStorePutHandler(),
                     })
                 })
-            }).pipe(
+            ).pipe(
                 switchMap(egame => endgameAuth(egame, 'username', 'password', 'my.user')),
-                switchMap(({endgame}) => range(1,5).pipe(
+                switchMap(({endgame}) => range(1, 5).pipe(
                     mergeMap(n => endgamePut(endgame, `my.path${n}`, n)),
                 )),
                 skip(4),
@@ -67,33 +67,30 @@ describe('memory store handlers', () => {
                 take(5),
                 map(({value}) => value),
                 toArray(),
-                tap(values => expect(values).to.deep.equal([1,2,3,4,5]))
+                tap(values => expect(values).to.deep.equal([1, 2, 3, 4, 5]))
             ))
-
         )
 
         it('should handle multiple pistol instances', () => {
-            const config1 = {
-                config: newEndgameConfig({
-                    chains: testChains({
-                        auth: testAuthHandler(),
-                        get: memoryStoreGetHandler(),
-                        put: memoryStorePutHandler(),
-                        getMeta: memoryStoreGetMetaHandler()
-                    })
+            const config1 = newEndgameConfig({
+                chains: testChains({
+                    auth: testAuthHandler(),
+                    get: memoryStoreGetHandler(),
+                    put: memoryStorePutHandler(),
+                    getMeta: memoryStoreGetMetaHandler()
                 })
-            }
-            const config2 = {
-                config: newEndgameConfig({
-                    port: 11111,
-                    chains: testChains({
-                        auth: testAuthHandler(),
-                        get: memoryStoreGetHandler(),
-                        put: memoryStorePutHandler(),
-                        getMeta: memoryStoreGetMetaHandler()
-                    })
+            });
+
+            const config2 = newEndgameConfig({
+                port: 11111,
+                chains: testChains({
+                    auth: testAuthHandler(),
+                    get: memoryStoreGetHandler(),
+                    put: memoryStorePutHandler(),
+                    getMeta: memoryStoreGetMetaHandler()
                 })
-            }
+            });
+
 
             return firstValueFrom(combineLatest([
                 newEndgame(config1).pipe(
