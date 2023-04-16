@@ -20,7 +20,7 @@ import {
 import {dialPeer} from "./networkClient.js";
 import {
     AuthenticatedEndgame, Endgame,
-    endgameAuth, endgameGet, endgamePut
+    endgameLogin, endgameGet, endgamePut
 } from "../app/endgame.js";
 
 import {PeerMsg} from "./peerMsg.js";
@@ -37,7 +37,7 @@ describe.skip('network client', function () {
                 (
                     of(endgames[0]).pipe(
                         switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame, keys})))),
-                        switchMap(({endgame, keys}) => endgameAuth(endgame, 'username', 'password', 'my.user')),
+                        switchMap(({endgame, keys}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
                         switchMap(({endgame}) => endgamePut(endgame, 'my.path', 1)),
                         delay(20),
                         switchMap(({endgame}) => endgamePut(endgame, 'my.path', 2)),
@@ -138,7 +138,7 @@ describe.skip('network client', function () {
         // start node 0
         startTestNode(0, [1]).pipe(
             switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame: endgame, keys})))),
-            switchMap(({keys, endgame}) => endgameAuth(endgame, 'username', 'password', 'my.user')),
+            switchMap(({keys, endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
             tap(({endgame}) => node0 = endgame),
 
             // Write a value to node 0 and read it on node 1
@@ -169,7 +169,7 @@ describe.skip('network client', function () {
                 (
                     of(endgames[0]).pipe(
                         switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame: endgame, keys})))),
-                        switchMap(({endgame, keys}) => endgameAuth(endgame, 'username', 'password', 'my.user')),
+                        switchMap(({endgame, keys}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
                         switchMap(({endgame}) => range(1, count).pipe(map(n => ({endgame: endgame, n})))),
                         concatMap(({n, endgame}) => endgamePut(endgame, 'my.path', n % (count / 2)).pipe(delay(10))),
                         bufferCount(count)

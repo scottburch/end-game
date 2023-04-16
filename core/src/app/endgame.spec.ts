@@ -1,4 +1,4 @@
-import {AuthenticatedEndgame, endgameAuth, endgameGet, endgamePut, endgameUnAuth, sendMsg} from "./endgame.js";
+import {AuthenticatedEndgame, endgameLogin, endgameGet, endgamePut, endgameLogout, sendMsg} from "./endgame.js";
 import {catchError, firstValueFrom, map, of, switchMap, tap, timeout} from "rxjs";
 import {expect} from 'chai';
 import {getTestKeys, newTestEndgame, testAuthHandler, testHandlers} from "../test/testUtils.js";
@@ -11,7 +11,7 @@ describe('endgame', () => {
 
     it('should be able to login after endgame is started', () =>
         firstValueFrom(newTestEndgame({handlers: testHandlers({auth: testAuthHandler()})}).pipe(
-            switchMap(endgame => endgameAuth(endgame, 'username', 'password', 'my.user')),
+            switchMap(endgame => endgameLogin(endgame, 'username', 'password', 'my.user')),
             tap(({endgame}) => expect(endgame.keys).not.to.be.undefined),
         ))
     );
@@ -19,8 +19,8 @@ describe('endgame', () => {
     it('should be able to logout', () =>
         firstValueFrom(newTestEndgame().pipe(
             switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
-            switchMap(({endgame, keys}) => endgameAuth(endgame, 'username', 'password', 'my.user')),
-            switchMap(({endgame}) => endgameUnAuth(endgame)),
+            switchMap(({endgame, keys}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
+            switchMap(({endgame}) => endgameLogout(endgame)),
             tap(({endgame}) => {
                 expect((endgame as AuthenticatedEndgame).keys).to.be.undefined;
                 expect((endgame as AuthenticatedEndgame).username).to.be.undefined;
@@ -49,7 +49,7 @@ describe('endgame', () => {
                     put: handlers<'put'>([({endgame, path, value}) => of({endgame, path, value: value + 1, meta: {} as EndgameGraphMeta})])
             })}).pipe(
                 switchMap(endgame => generateNewAccount().pipe(map(keys => ({keys, endgame})))),
-                switchMap(({endgame, keys}) => endgameAuth(endgame, 'my-username', 'password', 'my.user')),
+                switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
                 switchMap(({endgame}) =>
                     endgamePut<number>(endgame, 'my-key', 10)
                 ),

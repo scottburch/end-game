@@ -4,7 +4,8 @@ import {newPeerMsg, PeerMsg} from "../p2p/peerMsg.js";
 
 import {KeyBundle, serializePubKey, signMsg} from "../crypto/crypto.js";
 import {getNetworkTime, EndgameGraphBundle, EndgameGraphMeta, EndgameGraphValue} from "../graph/endgameGraph.js";
-import {EndgameConfig, newEndgameConfig} from "./endgameConfig.js";
+import {EndgameConfig} from "./endgameConfig.js";
+import {nullHandler} from "../handlers/handlers.js";
 
 
 export type Endgame = {
@@ -41,14 +42,14 @@ export const newEndgame = (config: Partial<EndgameConfig>) =>
 
 export const getAuthId = (endgame: Endgame) => endgame.id.split('-')[0];
 
-export const endgameAuth = (endgame: Endgame, username: string, password: string, userPath: string) => {
+export const endgameLogin = (endgame: Endgame, username: string, password: string, userPath: string) => {
     setTimeout(() => endgame.config.handlers.auth.next({endgame, username, password, userPath}))
     return endgame.config.handlers.auth.pipe(
         map(({endgame}) => ({endgame: endgame as AuthenticatedEndgame}))
     )
 }
 
-export const endgameUnAuth = (endgame: AuthenticatedEndgame) => {
+export const endgameLogout = (endgame: AuthenticatedEndgame) => {
     setTimeout(() => endgame.config.handlers.unauth.next({endgame}));
     return endgame.config.handlers.unauth
 }
@@ -130,3 +131,19 @@ export const trafficLogger = (() => {
     }
 })();
 
+const newEndgameConfig = (config: Partial<EndgameConfig>) => ({
+    isTrusted: config.isTrusted ?? false,
+    name: config.name || `node-${getNetworkTime()}`,
+    port: config.port || 11110,
+    handlers: {
+        log: config.handlers?.log || nullHandler<'log'>(),
+        peerConnect: config.handlers?.peerConnect || nullHandler<'peerConnect'>(),
+        auth: config.handlers?.auth || nullHandler<'auth'>(),
+        unauth: config.handlers?.unauth || nullHandler<'unauth'>(),
+        peersOut: config.handlers?.peersOut || nullHandler<'peersOut'>(),
+        peerIn: config.handlers?.peerIn || nullHandler<'peerIn'>(),
+        put: config.handlers?.put || nullHandler<'put'>(),
+        get: config.handlers?.get || nullHandler<'get'>(),
+        getMeta: config.handlers?.getMeta || nullHandler<'getMeta'>()
+    }
+} satisfies EndgameConfig as EndgameConfig)

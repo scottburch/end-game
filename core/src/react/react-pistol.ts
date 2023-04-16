@@ -1,5 +1,5 @@
 import {
-    AuthenticatedEndgame, endgameAuth, EndgameOpts, endgameUnAuth,
+    AuthenticatedEndgame, endgameLogin, EndgameOpts, endgameLogout,
     newEndgame, Endgame
 } from "../app/endgame.js";
 import {EndgameGraphValue, endgameKeys, EndgameKeysOptions, endgamePut, endgameRead} from "../graph/endgameGraph.js";
@@ -72,11 +72,11 @@ export const usePistolAuth = () => {
 
 export const putPistolValue = (path: string, value: any) => endgamePut(w.endgame as AuthenticatedEndgame, path, value);
 
-export const endgameLogin = (username: string, password: string) => endgameAuth(w.endgame, username, password).pipe(
+export const endgameLogin = (username: string, password: string) => endgameLogin(w.endgame, username, password).pipe(
     tap(p => w.endgame = p),
 );
 
-export const endgameLogout = () => endgameUnAuth(w.endgame as AuthenticatedEndgame).pipe(
+export const endgameLogout = () => endgameLogout(w.endgame as AuthenticatedEndgame).pipe(
     tap(p => w.endgame = p)
 );
 

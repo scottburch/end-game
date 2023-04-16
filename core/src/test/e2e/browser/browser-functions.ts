@@ -1,6 +1,6 @@
 import * as rxjs from "rxjs";
 import {first, skipWhile, tap} from "rxjs";
-import {endgameAuth, newEndgame} from "../../../app/endgame.js";
+import {endgameLogin, newEndgame} from "../../../app/endgame.js";
 import {dialPeer} from "../../../p2p/networkClient.js";
 import {EndgameGraphValue, pistolPut, pistolRead} from "../../../graph/endgameGraph.js";
 
@@ -19,7 +19,7 @@ type AuthProps = {
 }
 
 w.auth = (config: AuthProps = {}) =>
-    endgameAuth(w.pistol, config.username ?? 'username', config.password ?? 'password').pipe(
+    endgameLogin(w.pistol, config.username ?? 'username', config.password ?? 'password').pipe(
         tap(pistol => w.pistol = pistol)
     );
 

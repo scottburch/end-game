@@ -1,5 +1,5 @@
 import {bufferCount,  from, map, mergeMap, Observable, of, switchMap, timer} from "rxjs";
-import {AuthenticatedEndgame, newEndgame, endgameAuth} from "../app/endgame.js";
+import {AuthenticatedEndgame, newEndgame, endgameLogin} from "../app/endgame.js";
 import {dialPeer} from "../p2p/networkClient.js";
 import {floodRouter} from "../p2p/floodRouter.js";
 import {Parcel} from '@parcel/core';
@@ -73,7 +73,7 @@ export const startTestNetwork = (nodeList: number[][] = [], opts: Partial<StartT
         switchMap(floodRouter),
         map(endgame => ({endgame, peers}))
     )),
-    mergeMap(({endgame, peers}, n) => endgameAuth(endgame, opts.username || `username-${n}`, 'password', 'my.user').pipe(
+    mergeMap(({endgame, peers}, n) => endgameLogin(endgame, opts.username || `username-${n}`, 'password', 'my.user').pipe(
         map(({endgame}) => ({endgame, peers}))
     )),
     mergeMap(({endgame, peers}) => peers.length ? from(peers).pipe(

@@ -1,11 +1,16 @@
 import {Endgame} from "./endgame.js";
-import {newEndgameConfig} from "./endgameConfig.js";
+import {EndgameConfig} from "./endgameConfig.js";
 import {firstValueFrom, map, merge, of, switchMap, take, tap, toArray} from 'rxjs'
 import {expect} from "chai";
+import {nullHandler} from "../handlers/handlers.js";
 
 describe('endgameConfig', () => {
     it('should allow handlers to have multiple listeners', () =>
-        firstValueFrom(of(newEndgameConfig({})).pipe(
+        firstValueFrom(of({
+            handlers: {
+                unauth: nullHandler()
+            }
+        } as EndgameConfig).pipe(
             tap(config => setTimeout(() => config.handlers.unauth.next({endgame: {config: {name: 'my-endgame'}} as Endgame}))),
             switchMap(config => merge(
                 config.handlers.unauth,
