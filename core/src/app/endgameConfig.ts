@@ -39,10 +39,9 @@ export const newEndgameConfig = (config: Partial<EndgameConfig>) => ({
         get: config.chains?.get || nullHandler<'get'>(),
         getMeta: config.chains?.getMeta || nullHandler<'getMeta'>()
     }
-
 } satisfies EndgameConfig as EndgameConfig)
 
 export const nullHandler = <T extends keyof EndgameConfig['chains']>() => {
-    return handler<T>((x: ChainProps<T>) => of(x));
+    return handler<T>([(x: ChainProps<T>) => of(x)]);
 };
 
