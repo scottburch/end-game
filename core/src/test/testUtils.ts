@@ -90,10 +90,7 @@ export const startTestNetwork = (nodeList: number[][] = [], opts: Partial<StartT
 );
 
 export const startTestNode = (n: number = 0, peers: number[] = [], config: Partial<EndgameConfig> = {}) => of(config).pipe(
-    switchMap(config => of(newEndgameConfig({})).pipe(
-        map(partial => ({...config, ...partial} satisfies EndgameConfig))
-    )),
-    switchMap(config => newEndgame(config)),
+    switchMap(config => newEndgame(newEndgameConfig(config))),
     switchMap(floodRouter),
     switchMap(endgame => peers.length ? from(peers).pipe(
         map(peerNo => ({endgame, peerNo})),
