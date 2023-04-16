@@ -1,4 +1,4 @@
-import {delay, filter, first, merge, of, skipWhile, tap, switchMap, map, mergeMap} from "rxjs";
+import {delay, filter, first, merge, of, skipWhile, tap, switchMap, map} from "rxjs";
 import {startPeersServer} from "../p2p/networkServer.js";
 import {newPeerMsg, PeerMsg} from "../p2p/peerMsg.js";
 
@@ -26,15 +26,14 @@ export type LogEntry<T extends Object | undefined> = {
 }
 
 
-export type EndgameOpts = EndgameConfig & {id?: string};
-
-export const newEndgame = (opts: EndgameOpts) =>
-    of({opts, uid: Math.random().toFixed(10).replace('0.', '')}).pipe(
+export const newEndgame = (config: EndgameConfig) =>
+    of({opts: config, uid: Math.random().toFixed(10).replace('0.', '')}).pipe(
         map(({opts, uid}) => ({
             config: opts,
             id: opts.id || uid,
         } satisfies Endgame)),
         map(opts => opts as Endgame),
+        // TODO: Move this to handlers maybe.. Somewhere out of here
         switchMap(endgame => typeof window === 'undefined' ? startPeersServer(endgame) : of(endgame))
     );
 

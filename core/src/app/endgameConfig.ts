@@ -12,6 +12,7 @@ export type ChainProps<T extends ChainNames> = EndgameConfig['chains'][T]['props
 export type HandlerFn<T extends ChainNames> = (p: ChainProps<T>) => Observable<ChainProps<T>>;
 
 export type EndgameConfig = {
+    id?: string
     name: string
     port: number
     isTrusted: boolean
