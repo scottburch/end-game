@@ -46,20 +46,21 @@ export const getAuthId = (endgame: Endgame) => endgame.id.split('-')[0];
 export const endgameLogin = (endgame: Endgame, username: string, password: string, userPath: string) => {
     setTimeout(() => endgame.config.handlers.login.next({endgame, username, password, userPath}))
     return endgame.config.handlers.login.pipe(
-        map(({endgame}) => ({endgame: endgame as AuthenticatedEndgame}))
+        first()
     )
 };
 
 export const endgameCreateUser = (endgame: Endgame, username: string, password: string, userPath: string) => {
     setTimeout(() => endgame.config.handlers.createUser.next({endgame, username, password, userPath}));
     return endgame.config.handlers.createUser.pipe(
-        map(({endgame}) => ({endgame: endgame as AuthenticatedEndgame}))
+        map(({endgame}) => ({endgame: endgame as AuthenticatedEndgame})),
+        first()
     )
 }
 
 export const endgameLogout = (endgame: AuthenticatedEndgame) => {
     setTimeout(() => endgame.config.handlers.logout.next({endgame}));
-    return endgame.config.handlers.logout
+    return endgame.config.handlers.logout.pipe(first())
 }
 
 export const endgamePut = <T extends EndgameGraphValue, P extends string = string>(endgame: AuthenticatedEndgame, path: P, value: T) =>
@@ -90,7 +91,8 @@ export const endgameGetMeta = (endgame: Endgame, path: string) => {
     setTimeout(() => endgame.config.handlers.getMeta.next({endgame, path}));
     return endgame.config.handlers.getMeta.pipe(
         filter(payload => payload.path === path),
-        map(({endgame, meta, path}) => ({endgame, path, meta}))
+        map(({endgame, meta, path}) => ({endgame, path, meta})),
+        first()
     )
 }
 

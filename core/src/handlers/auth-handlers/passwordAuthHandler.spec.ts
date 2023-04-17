@@ -1,4 +1,4 @@
-import {combineLatest, firstValueFrom, map, of, switchMap, tap} from "rxjs";
+import {combineLatest, delay, firstValueFrom, map, of, switchMap, tap} from "rxjs";
 import {
     AuthenticatedEndgame,
     Endgame,
@@ -26,7 +26,7 @@ describe('auth handlers', () => {
         } as DeepPartial<EndgameConfig>).pipe(
             switchMap(newEndgame),
             switchMap(endgame => endgameLogin(endgame, 'username', 'password', 'my.user')),
-            tap(({endgame}) => expect(endgame.keys).to.be.undefined)
+            tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).to.be.undefined)
         ))
      );
 
@@ -44,7 +44,7 @@ describe('auth handlers', () => {
             map(props1 => ({props1, endgame: {id: props1.endgame.id, config: props1.endgame.config} as Endgame})),
             switchMap(({props1, endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user').pipe(
                 switchMap(({endgame}) => combineLatest([
-                    serializePubKey(endgame.keys.pubKey),
+                    serializePubKey((endgame as AuthenticatedEndgame).keys.pubKey),
                     serializePubKey(props1.endgame.keys.pubKey)
                 ]))
             )),
@@ -69,7 +69,7 @@ describe('auth handlers', () => {
              switchMap(({endgame}) => endgameLogin(endgame, 'username', 'password', 'fake.user')),
              tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).to.be.undefined),
              switchMap(({endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
-             tap(({endgame}) => expect(endgame.keys).not.to.be.undefined)
+             tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).not.to.be.undefined)
          ))
      )
 });

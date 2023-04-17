@@ -12,7 +12,7 @@ describe('endgame', () => {
     it('should be able to login after endgame is started', () =>
         firstValueFrom(newTestEndgame({handlers: {login: handlers([testAuthHandler])}}).pipe(
             switchMap(endgame => endgameLogin(endgame, 'username', 'password', 'my.user')),
-            tap(({endgame}) => expect(endgame.keys).not.to.be.undefined),
+            tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).not.to.be.undefined),
         ))
     );
 
@@ -20,7 +20,7 @@ describe('endgame', () => {
         firstValueFrom(newTestEndgame().pipe(
             switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
             switchMap(({endgame, keys}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
-            switchMap(({endgame}) => endgameLogout(endgame)),
+            switchMap(({endgame}) => endgameLogout(endgame as AuthenticatedEndgame)),
             tap(({endgame}) => {
                 expect((endgame as AuthenticatedEndgame).keys).to.be.undefined;
                 expect((endgame as AuthenticatedEndgame).username).to.be.undefined;
@@ -51,7 +51,7 @@ describe('endgame', () => {
                 switchMap(endgame => generateNewAccount().pipe(map(keys => ({keys, endgame})))),
                 switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
                 switchMap(({endgame}) =>
-                    endgamePut<number>(endgame, 'my-key', 10)
+                    endgamePut<number>(endgame as AuthenticatedEndgame, 'my-key', 10)
                 ),
                 tap(({value}) => expect(value).to.equal(11))
             ))

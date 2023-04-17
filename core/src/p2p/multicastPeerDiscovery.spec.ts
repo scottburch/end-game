@@ -1,7 +1,7 @@
 import {startTestNetwork} from "../test/testUtils.js";
 import {bufferCount, delay, filter, first, map, merge, switchMap} from "rxjs";
 import {multicastPeerDiscovery} from "./multicastPeerDiscovery.js";
-import {endgameGet, endgamePut} from "../app/endgame.js";
+import {AuthenticatedEndgame, endgameGet, endgamePut} from "../app/endgame.js";
 
 describe.skip('multicast peer discovery', function()  {
     this.timeout(10_000);
@@ -13,7 +13,7 @@ describe.skip('multicast peer discovery', function()  {
             )),
             bufferCount(2),
             delay(5000),
-            switchMap(pistols => endgamePut(pistols[0], 'my.key', 'my-value').pipe(map(() => pistols))),
+            switchMap(pistols => endgamePut(pistols[0] as AuthenticatedEndgame, 'my.key', 'my-value').pipe(map(() => pistols))),
             delay(100),
             switchMap(pistols => endgameGet(pistols[1], 'my.key')),
             filter(({value}) => value === 'my-value'),

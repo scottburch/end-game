@@ -17,7 +17,7 @@ import {
     tap
 } from "rxjs";
 import {expect} from 'chai';
-import {endgameLogin} from "../app/endgame.js";
+import {AuthenticatedEndgame, endgameLogin} from "../app/endgame.js";
 import {PeerPutMsg} from "../p2p/peerMsg.js";
 import {getNetworkTime} from "../graph/endgameGraph.js";
 import {sign} from "./crypto.js";
@@ -146,9 +146,9 @@ describe('crypto', function () {
             firstValueFrom(newTestEndgame({handlers: {login: handlers([testAuthHandler])}}).pipe(
                 switchMap(endgame => getTestKeys().pipe(map(keys => ({keys, endgame})))),
                 switchMap(({keys, endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
-                switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
+                switchMap(({endgame}) => serializePubKey((endgame as AuthenticatedEndgame).keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
                 switchMap(({endgame, serPubKey}) => range(1, 500).pipe(
-                    mergeMap(() => signMsg(endgame, {
+                    mergeMap(() => signMsg((endgame as AuthenticatedEndgame), {
                         path: 'xx.yy',
                         meta: {owner: serPubKey, perms: 0o700, sig: '', timestamp: getNetworkTime()},
                         value: 'x'.repeat(200)
@@ -163,7 +163,7 @@ describe('crypto', function () {
             firstValueFrom(newTestEndgame({handlers: {login: handlers([testAuthHandler])}}).pipe(
                 switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
                 switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
-                switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
+                switchMap(({endgame}) => serializePubKey((endgame as AuthenticatedEndgame).keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
                 map(({endgame, serPubKey}) => ({
                     endgame, msg: {
                         graphId: 'my-graph',
@@ -177,7 +177,7 @@ describe('crypto', function () {
                         }
                     } as PeerPutMsg['payload']
                 })),
-                switchMap(({endgame, msg}) => signMsg(endgame, msg)),
+                switchMap(({endgame, msg}) => signMsg((endgame as AuthenticatedEndgame), msg)),
                 tap(msg => expect(msg.meta.sig).to.have.length(128))
             ))
         );
@@ -186,7 +186,7 @@ describe('crypto', function () {
             firstValueFrom(newTestEndgame({isTrusted: true, handlers: {login: handlers([testAuthHandler])}}).pipe(
                 switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
                 switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
-                switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
+                switchMap(({endgame}) => serializePubKey((endgame as AuthenticatedEndgame).keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
                 map(({endgame, serPubKey}) => ({
                     endgame, msg: {
                         graphId: 'my-graph',
@@ -200,7 +200,7 @@ describe('crypto', function () {
                         }
                     } as PeerPutMsg['payload']
                 })),
-                switchMap(({endgame, msg}) => signMsg(endgame, msg)),
+                switchMap(({endgame, msg}) => signMsg((endgame as AuthenticatedEndgame), msg)),
                 tap(msg => expect(msg.meta.sig).to.equal('')),
                 switchMap(msg => verifyMsgSig(msg)),
                 tap(valid => expect(valid).to.be.true)
@@ -211,7 +211,7 @@ describe('crypto', function () {
             firstValueFrom(newTestEndgame({isTrusted: true, handlers: {login: handlers([testAuthHandler])}}).pipe(
                 switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
                 switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
-                switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
+                switchMap(({endgame}) => serializePubKey((endgame as AuthenticatedEndgame).keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
                 map(({endgame, serPubKey}) => ({
                     endgame, msg: {
                         graphId: 'my-graph',
@@ -225,7 +225,7 @@ describe('crypto', function () {
                         }
                     } as PeerPutMsg['payload']
                 })),
-                switchMap(({endgame, msg}) => signMsg(endgame, msg)),
+                switchMap(({endgame, msg}) => signMsg((endgame as AuthenticatedEndgame), msg)),
                 switchMap(msg => verifyMsgSig(msg)),
                 tap(valid => expect(valid).to.be.true)
             ))

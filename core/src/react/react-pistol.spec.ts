@@ -2,7 +2,7 @@ import {delay, first, merge, switchMap, take, tap, toArray, firstValueFrom, comb
 import {Page} from 'playwright'
 import {compileBrowserCode, startTestNode} from "../test/testUtils.js";
 import {expect} from 'chai';
-import {endgameLogin, endgamePut} from "../app/endgame.js";
+import {AuthenticatedEndgame, endgameLogin, endgamePut} from "../app/endgame.js";
 import {newBrowser} from "../test/e2e/e2eTestUtils.js";
 import {generateNewAccount} from "../crypto/crypto.js";
 
@@ -62,7 +62,7 @@ describe.skip('endgame browser tests', function () {
             switchMap(() => startTestNode(0, [])),
             switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame: endgame, keys})))),
             switchMap(({endgame, keys}) => endgameLogin(endgame, 'me', 'password', 'my.user')),
-            switchMap(({endgame}) => endgamePut(endgame, 'my.path', 'xx')),
+            switchMap(({endgame}) => endgamePut(endgame as AuthenticatedEndgame, 'my.path', 'xx')),
             switchMap(() => newBrowser()),
             switchMap((page: Page) => page.evaluate(
                 () => {
@@ -87,7 +87,7 @@ describe.skip('endgame browser tests', function () {
             switchMap(() => startTestNode(0, [])),
             switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame: endgame, keys})))),
             switchMap(({endgame, keys}) => endgameLogin(endgame, 'me', 'password', 'my.user')),
-            switchMap(({endgame}) => endgamePut(endgame, 'my.path.a', 'xx')),
+            switchMap(({endgame}) => endgamePut(endgame as AuthenticatedEndgame, 'my.path.a', 'xx')),
             switchMap(() => newBrowser()),
             switchMap((page: Page) => page.evaluate(() =>
                 new Promise(resolve =>
@@ -135,7 +135,7 @@ describe.skip('endgame browser tests', function () {
             switchMap(() => startTestNode(0, [])),
             switchMap(endgame => generateNewAccount().pipe(map(keys => ({endgame: endgame, keys})))),
             switchMap(({endgame, keys}) => endgameLogin(endgame, 'me', 'password', 'my.user')),
-            switchMap(({endgame}) => endgamePut(endgame, 'my.path.a', 'xx')),
+            switchMap(({endgame}) => endgamePut(endgame as AuthenticatedEndgame, 'my.path.a', 'xx')),
             switchMap(() => newBrowser()),
             switchMap((page: Page) => page.evaluate(() =>
                 new Promise(resolve =>

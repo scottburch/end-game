@@ -1,6 +1,6 @@
 import {HandlerFn} from "../../app/endgameConfig.js";
-import {catchError, filter, map, of, switchMap, throwError, timeout} from "rxjs";
-import {endgameGet} from "../../app/endgame.js";
+import {catchError, filter, map, of, switchMap, tap, throwError, timeout} from "rxjs";
+import {AuthenticatedEndgame, endgameGet} from "../../app/endgame.js";
 import {deserializeKeys} from "../../crypto/crypto.js";
 
 export const passwordAuthHandler: HandlerFn<'login'> = ({endgame, username, password, userPath}) =>
@@ -9,7 +9,7 @@ export const passwordAuthHandler: HandlerFn<'login'> = ({endgame, username, pass
         timeout(endgame.config.remoteWaitTime),
         map(({value}) => JSON.parse(value)),
         switchMap(value => deserializeKeys(value.keys, password)),
-        map(keys => ({...endgame, keys, username})),
+        map(keys => ({...endgame, keys, username} as AuthenticatedEndgame)),
         map(endgame => ({endgame, username, password, userPath})),
-        catchError(err => err.name === 'TimeoutError' ? of({endgame, username, password, userPath}) : throwError(err))
+        catchError(err => err.name === 'TimeoutError' ? of({endgame, username, password, userPath}) : throwError(err)),
     );

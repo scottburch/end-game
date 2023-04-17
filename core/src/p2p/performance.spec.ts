@@ -1,7 +1,7 @@
 import {startTestNetwork} from "../test/testUtils.js";
 import {count, delay, filter, map, mergeMap, range, scan, switchMap, takeUntil, tap, timer} from "rxjs";
 import {expect} from "chai";
-import {endgamePut} from "../app/endgame.js";
+import {AuthenticatedEndgame, endgamePut} from "../app/endgame.js";
 
 
 describe.skip('p2p performance', function () {
@@ -19,7 +19,7 @@ describe.skip('p2p performance', function () {
             tap(() => start = Date.now()),
             switchMap(endgames => range(0, peers.length).pipe(
                     mergeMap((nodeNum) => range(1, iterations).pipe(
-                        tap(n => endgamePut(endgames[nodeNum], `node${nodeNum}.foo-${n}`, 'xx').subscribe())
+                        tap(n => endgamePut(endgames[nodeNum] as AuthenticatedEndgame, `node${nodeNum}.foo-${n}`, 'xx').subscribe())
                     )),
                     map(() => endgames)
                 )

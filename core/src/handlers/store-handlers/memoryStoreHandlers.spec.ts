@@ -1,4 +1,11 @@
-import {endgameLogin, endgameGet, endgameGetMeta, endgamePut, newEndgame} from "../../app/endgame.js";
+import {
+    endgameLogin,
+    endgameGet,
+    endgameGetMeta,
+    endgamePut,
+    newEndgame,
+    AuthenticatedEndgame
+} from "../../app/endgame.js";
 import {testAuthHandler} from "../../test/testUtils.js";
 import {memoryStoreGetHandler, memoryStoreGetMetaHandler, memoryStorePutHandler} from "./memoryStoreHandlers.js";
 import {combineLatest, first, firstValueFrom, map, mergeMap, range, skip, switchMap, take, tap, toArray} from "rxjs";
@@ -29,7 +36,7 @@ describe('memory store handlers', () => {
                 }
             }).pipe(
                 switchMap(egame => endgameLogin(egame, 'username', 'password', 'my.user')),
-                switchMap(({endgame}) => endgamePut(endgame, 'my.path', 10)),
+                switchMap(({endgame}) => endgamePut(endgame as AuthenticatedEndgame, 'my.path', 10)),
                 switchMap(({endgame}) => endgameGet(endgame, 'my.path')),
                 tap(({value}) => expect(value).to.equal(10)),
                 switchMap(({endgame}) => endgameGetMeta(endgame, 'my.path')),
@@ -52,7 +59,7 @@ describe('memory store handlers', () => {
             }).pipe(
                 switchMap(egame => endgameLogin(egame, 'username', 'password', 'my.user')),
                 switchMap(({endgame}) => range(1, 5).pipe(
-                    mergeMap(n => endgamePut(endgame, `my.path${n}`, n)),
+                    mergeMap(n => endgamePut(endgame as AuthenticatedEndgame, `my.path${n}`, n)),
                 )),
                 skip(4),
                 switchMap(({endgame}) => range(1, 5).pipe(
@@ -90,13 +97,13 @@ describe('memory store handlers', () => {
                 newEndgame(config1).pipe(
                     tap(e => console.log(e.id)),
                     switchMap(egame => endgameLogin(egame, 'username', 'password', 'my.user')),
-                    switchMap(({endgame}) => endgamePut(endgame, 'my.path', 1)),
+                    switchMap(({endgame}) => endgamePut(endgame as AuthenticatedEndgame, 'my.path', 1)),
                     switchMap(({endgame}) => endgameGet<number>(endgame, 'my.path')),
                 ),
                 newEndgame(config2).pipe(
                     tap(e => console.log(e.id)),
                     switchMap(egame => endgameLogin(egame, 'username', 'password', 'my.user')),
-                    switchMap(({endgame}) => endgamePut(endgame, 'my.path', 2)),
+                    switchMap(({endgame}) => endgamePut(endgame as AuthenticatedEndgame, 'my.path', 2)),
                     switchMap(({endgame}) => endgameGet<number>(endgame, 'my.path')),
                 )
             ]).pipe(
