@@ -10,7 +10,7 @@ import {handlers} from "../handlers/handlers.js";
 describe('endgame', () => {
 
     it('should be able to login after endgame is started', () =>
-        firstValueFrom(newTestEndgame({handlers: {auth: handlers([testAuthHandler])}}).pipe(
+        firstValueFrom(newTestEndgame({handlers: {login: handlers([testAuthHandler])}}).pipe(
             switchMap(endgame => endgameLogin(endgame, 'username', 'password', 'my.user')),
             tap(({endgame}) => expect(endgame.keys).not.to.be.undefined),
         ))
@@ -45,7 +45,7 @@ describe('endgame', () => {
     describe('endgamePut()', () => {
         it('should send a message down the endgame-put handlers', () =>
             firstValueFrom(newTestEndgame({handlers: {
-                    auth: handlers([testAuthHandler]),
+                    login: handlers([testAuthHandler]),
                     put: handlers<'put'>([({endgame, path, value}) => of({endgame, path, value: value + 1, meta: {} as EndgameGraphMeta})])
             }}).pipe(
                 switchMap(endgame => generateNewAccount().pipe(map(keys => ({keys, endgame})))),

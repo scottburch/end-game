@@ -143,7 +143,7 @@ describe('crypto', function () {
 
     describe('signing messages', () => {
         it('should sign quickly', () =>
-            firstValueFrom(newTestEndgame({handlers: {auth: handlers([testAuthHandler])}}).pipe(
+            firstValueFrom(newTestEndgame({handlers: {login: handlers([testAuthHandler])}}).pipe(
                 switchMap(endgame => getTestKeys().pipe(map(keys => ({keys, endgame})))),
                 switchMap(({keys, endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
                 switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
@@ -160,7 +160,7 @@ describe('crypto', function () {
         );
 
         it('should sign a msg if endgame is setup in untrusted mode', () =>
-            firstValueFrom(newTestEndgame({handlers: {auth: handlers([testAuthHandler])}}).pipe(
+            firstValueFrom(newTestEndgame({handlers: {login: handlers([testAuthHandler])}}).pipe(
                 switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
                 switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
                 switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
@@ -183,7 +183,7 @@ describe('crypto', function () {
         );
 
         it('should allow a trusted node', () =>
-            firstValueFrom(newTestEndgame({isTrusted: true, handlers: {auth: handlers([testAuthHandler])}}).pipe(
+            firstValueFrom(newTestEndgame({isTrusted: true, handlers: {login: handlers([testAuthHandler])}}).pipe(
                 switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
                 switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
                 switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
@@ -208,7 +208,7 @@ describe('crypto', function () {
         );
 
         it('should sign and verify a message', () =>
-            firstValueFrom(newTestEndgame({isTrusted: true, handlers: {auth: handlers([testAuthHandler])}}).pipe(
+            firstValueFrom(newTestEndgame({isTrusted: true, handlers: {login: handlers([testAuthHandler])}}).pipe(
                 switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
                 switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
                 switchMap(({endgame}) => serializePubKey(endgame.keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),

@@ -22,7 +22,7 @@ describe('memory store handlers', () => {
         it('should get a value from the memory store', () =>
             firstValueFrom(newEndgame({
                 handlers: {
-                    auth: handlers([testAuthHandler]),
+                    login: handlers([testAuthHandler]),
                     get: handlers([memoryStoreGetHandler]),
                     put: handlers([memoryStorePutHandler]),
                     getMeta: handlers([memoryStoreGetMetaHandler])
@@ -45,7 +45,7 @@ describe('memory store handlers', () => {
         it('should handle multiple values in parallel', () =>
             firstValueFrom(newEndgame({
                 handlers: {
-                    auth: handlers([testAuthHandler]),
+                    login: handlers([testAuthHandler]),
                     get: handlers([memoryStoreGetHandler]),
                     put: handlers([memoryStorePutHandler]),
                 }
@@ -68,7 +68,7 @@ describe('memory store handlers', () => {
         it('should handle multiple pistol instances', () => {
             const config1 = {
                 handlers: {
-                    auth: handlers([testAuthHandler]),
+                    login: handlers([testAuthHandler]),
                     get: handlers([memoryStoreGetHandler]),
                     put: handlers([memoryStorePutHandler]),
                     getMeta: handlers([memoryStoreGetMetaHandler])
@@ -78,7 +78,7 @@ describe('memory store handlers', () => {
             const config2 = {
                 port: 11111,
                 handlers: {
-                    auth: handlers([testAuthHandler]),
+                    login: handlers([testAuthHandler]),
                     get: handlers([memoryStoreGetHandler]),
                     put: handlers([memoryStorePutHandler]),
                     getMeta: handlers([memoryStoreGetMetaHandler])

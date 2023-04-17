@@ -10,7 +10,7 @@ describe('auth handlers', () => {
      it('should return a regular endgame object if user does not exist', () =>
         firstValueFrom(of({
              handlers: {
-                  auth: handlers([passwordAuthHandler])
+                  login: handlers([passwordAuthHandler])
              }
         } as DeepPartial<EndgameConfig>).pipe(
             switchMap(newEndgame),

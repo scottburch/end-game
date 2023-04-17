@@ -8,14 +8,14 @@ describe('endgameConfig', () => {
     it('should allow handlers to have multiple listeners', () =>
         firstValueFrom(of({
             handlers: {
-                unauth: nullHandler()
+                logout: nullHandler()
             }
         } as EndgameConfig).pipe(
-            tap(config => setTimeout(() => config.handlers.unauth.next({endgame: {config: {name: 'my-endgame'}} as Endgame}))),
+            tap(config => setTimeout(() => config.handlers.logout.next({endgame: {config: {name: 'my-endgame'}} as Endgame}))),
             switchMap(config => merge(
-                config.handlers.unauth,
-                config.handlers.unauth,
-                config.handlers.unauth
+                config.handlers.logout,
+                config.handlers.logout,
+                config.handlers.logout
             )),
             take(3),
             map(({endgame}) => endgame.config.name),

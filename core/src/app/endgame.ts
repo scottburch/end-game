@@ -44,15 +44,15 @@ export const newEndgame = (config: DeepPartial<EndgameConfig>) =>
 export const getAuthId = (endgame: Endgame) => endgame.id.split('-')[0];
 
 export const endgameLogin = (endgame: Endgame, username: string, password: string, userPath: string) => {
-    setTimeout(() => endgame.config.handlers.auth.next({endgame, username, password, userPath}))
-    return endgame.config.handlers.auth.pipe(
+    setTimeout(() => endgame.config.handlers.login.next({endgame, username, password, userPath}))
+    return endgame.config.handlers.login.pipe(
         map(({endgame}) => ({endgame: endgame as AuthenticatedEndgame}))
     )
 }
 
 export const endgameLogout = (endgame: AuthenticatedEndgame) => {
-    setTimeout(() => endgame.config.handlers.unauth.next({endgame}));
-    return endgame.config.handlers.unauth
+    setTimeout(() => endgame.config.handlers.logout.next({endgame}));
+    return endgame.config.handlers.logout
 }
 
 export const endgamePut = <T extends EndgameGraphValue, P extends string = string>(endgame: AuthenticatedEndgame, path: P, value: T) =>
@@ -139,8 +139,8 @@ const newEndgameConfig = (config: DeepPartial<EndgameConfig>) => ({
     handlers: {
         log: config.handlers?.log as EndgameConfig['handlers']['log'] || nullHandler<'log'>(),
         peerConnect: config.handlers?.peerConnect  as EndgameConfig['handlers']['peerConnect'] || nullHandler<'peerConnect'>(),
-        auth: config.handlers?.auth as EndgameConfig['handlers']['auth'] || nullHandler<'auth'>(),
-        unauth: config.handlers?.unauth as EndgameConfig['handlers']['unauth'] || nullHandler<'unauth'>(),
+        login: config.handlers?.login as EndgameConfig['handlers']['login'] || nullHandler<'login'>(),
+        logout: config.handlers?.logout as EndgameConfig['handlers']['logout'] || nullHandler<'logout'>(),
         peersOut: config.handlers?.peersOut as EndgameConfig['handlers']['peersOut'] || nullHandler<'peersOut'>(),
         peerIn: config.handlers?.peerIn as EndgameConfig['handlers']['peerIn'] || nullHandler<'peerIn'>(),
         put: config.handlers?.put as EndgameConfig['handlers']['put'] || nullHandler<'put'>(),
