@@ -136,11 +136,13 @@ const newEndgameConfig = (config: DeepPartial<EndgameConfig>) => ({
     isTrusted: config.isTrusted ?? false,
     name: config.name || `node-${getNetworkTime()}`,
     port: config.port || 11110,
+    remoteWaitTime: 2000,
     handlers: {
         log: config.handlers?.log as EndgameConfig['handlers']['log'] || nullHandler<'log'>(),
         peerConnect: config.handlers?.peerConnect  as EndgameConfig['handlers']['peerConnect'] || nullHandler<'peerConnect'>(),
         login: config.handlers?.login as EndgameConfig['handlers']['login'] || nullHandler<'login'>(),
         logout: config.handlers?.logout as EndgameConfig['handlers']['logout'] || nullHandler<'logout'>(),
+        createUser: config.handlers?.createUser as EndgameConfig['handlers']['createUser'] || nullHandler<'createUser'>(),
         peersOut: config.handlers?.peersOut as EndgameConfig['handlers']['peersOut'] || nullHandler<'peersOut'>(),
         peerIn: config.handlers?.peerIn as EndgameConfig['handlers']['peerIn'] || nullHandler<'peerIn'>(),
         put: config.handlers?.put as EndgameConfig['handlers']['put'] || nullHandler<'put'>(),

@@ -5,7 +5,7 @@ import {endgameGet} from "../../app/endgame.js";
 export const passwordAuthHandler: HandlerFn<'login'> = ({endgame, username, password, userPath}) =>
     endgameGet(endgame, userPath).pipe(
         filter(({value}) => value !== undefined),
-        timeout(2000),
+        timeout(endgame.config.remoteWaitTime),
         map(() => ({endgame, username, password, userPath})),
         catchError(err => err.name === 'TimeoutError' ? of({endgame, username, password, userPath}) : throwError(err))
     )

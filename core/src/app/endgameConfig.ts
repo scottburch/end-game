@@ -14,11 +14,13 @@ export type EndgameConfig = {
     name: string
     port: number
     isTrusted: boolean
+    remoteWaitTime: number
     handlers: {
         log: Handler<LogEntry<any>>
         peerConnect: Handler<{endgame: Endgame, peerId: string}>
         login: Handler<{endgame: Endgame, username: string, password: string, userPath: string}>
         logout: Handler<{endgame: Endgame}>
+        createUser: Handler<{endgame: Endgame, username: string, password: string, userPath: string}>
         peersOut: Handler<{endgame: Endgame, msg: PeerMsg<any, any>}>
         peerIn: Handler<{endgame: Endgame, msg: PeerMsg<any, any>}>
         put: Handler<EndgameGraphBundle<any> & {endgame: AuthenticatedEndgame}>
