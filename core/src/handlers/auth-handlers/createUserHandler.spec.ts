@@ -1,4 +1,4 @@
-import {filter, firstValueFrom, map, of, switchMap, tap} from "rxjs";
+import {firstValueFrom, map, of, switchMap, tap} from "rxjs";
 import {handlers} from "../handlers.js";
 import {DeepPartial} from "tsdef";
 import {EndgameConfig} from "../../app/endgameConfig.js";
@@ -26,6 +26,5 @@ describe('createUserHandler()', () => {
                 expect(keys.priv).not.to.be.undefined;
             }),
         ))
-
     )
 });
