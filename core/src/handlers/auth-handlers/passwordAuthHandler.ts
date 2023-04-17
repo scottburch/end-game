@@ -8,4 +8,4 @@ export const passwordAuthHandler: HandlerFn<'login'> = ({endgame, username, pass
         timeout(endgame.config.remoteWaitTime),
         map(() => ({endgame, username, password, userPath})),
         catchError(err => err.name === 'TimeoutError' ? of({endgame, username, password, userPath}) : throwError(err))
-    )
+    );

@@ -48,6 +48,13 @@ export const endgameLogin = (endgame: Endgame, username: string, password: strin
     return endgame.config.handlers.login.pipe(
         map(({endgame}) => ({endgame: endgame as AuthenticatedEndgame}))
     )
+};
+
+export const endgameCreateUser = (endgame: Endgame, username: string, password: string, userPath: string) => {
+    setTimeout(() => endgame.config.handlers.createUser.next({endgame, username, password, userPath}));
+    return endgame.config.handlers.createUser.pipe(
+        map(({endgame}) => ({endgame: endgame as AuthenticatedEndgame}))
+    )
 }
 
 export const endgameLogout = (endgame: AuthenticatedEndgame) => {

@@ -1,7 +1,7 @@
 import {firstValueFrom, of, switchMap, tap} from "rxjs";
 import {endgameLogin, newEndgame} from "../../app/endgame.js";
 import {EndgameConfig} from "../../app/endgameConfig.js";
-import {passwordAuthHandler} from "./authHandler.js";
+import {passwordAuthHandler} from "./passwordAuthHandler.js";
 import {DeepPartial} from "tsdef";
 import {handlers} from "../handlers.js";
 import {expect} from "chai";
