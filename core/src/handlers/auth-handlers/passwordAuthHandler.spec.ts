@@ -1,5 +1,12 @@
-import {combineLatest, firstValueFrom, map, merge, of, switchMap, tap} from "rxjs";
-import {Endgame, endgameCreateUser, endgameLogin, newEndgame} from "../../app/endgame.js";
+import {combineLatest, firstValueFrom, map, of, switchMap, tap} from "rxjs";
+import {
+    AuthenticatedEndgame,
+    Endgame,
+    endgameCreateUser,
+    endgameLogin,
+    endgameLogout,
+    newEndgame
+} from "../../app/endgame.js";
 import {EndgameConfig} from "../../app/endgameConfig.js";
 import {passwordAuthHandler} from "./passwordAuthHandler.js";
 import {DeepPartial} from "tsdef";
@@ -7,7 +14,8 @@ import {handlers} from "../handlers.js";
 import {expect} from "chai";
 import {createUserHandler} from "./createUserHandler.js";
 import {memoryStoreGetHandler, memoryStorePutHandler} from "../store-handlers/memoryStoreHandlers.js";
-import {serializeKeys, serializePubKey} from "../../crypto/crypto.js";
+import {serializePubKey} from "../../crypto/crypto.js";
+import {logoutHandler} from "./logoutHandler.js";
 
 describe('auth handlers', () => {
      it('should return a regular endgame object if user does not exist', () =>
@@ -40,7 +48,28 @@ describe('auth handlers', () => {
                     serializePubKey(props1.endgame.keys.pubKey)
                 ]))
             )),
-            tap(keys => expect(keys[0]).to.equal(keys[1]))
+            tap(([loginKey, createKey]) => expect(createKey).to.equal(loginKey))
         ))
+     );
+
+     it('should allow me to login after a failed login', () =>
+         firstValueFrom(of({
+             handlers: {
+                 login: handlers([passwordAuthHandler]),
+                 logout: handlers([logoutHandler]),
+                 createUser: handlers([createUserHandler]),
+                 put: handlers([memoryStorePutHandler]),
+                 get: handlers([memoryStoreGetHandler])
+             }
+         } as DeepPartial<EndgameConfig>).pipe(
+             switchMap(newEndgame),
+             switchMap(endgame => endgameCreateUser(endgame, 'username', 'password', 'my.user')),
+             switchMap(({endgame}) => endgameLogout(endgame)),
+             tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).to.be.undefined),
+             switchMap(({endgame}) => endgameLogin(endgame, 'username', 'password', 'fake.user')),
+             tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).to.be.undefined),
+             switchMap(({endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
+             tap(({endgame}) => expect(endgame.keys).not.to.be.undefined)
+         ))
      )
 });
