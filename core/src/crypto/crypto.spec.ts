@@ -11,7 +11,7 @@ import {
     combineLatest,
     firstValueFrom, last,
     map,
-    mergeMap,
+    mergeMap, of,
     range,
     switchMap,
     tap
@@ -22,8 +22,8 @@ import {PeerPutMsg} from "../p2p/peerMsg.js";
 import {getNetworkTime} from "../graph/endgameGraph.js";
 import {sign} from "./crypto.js";
 import {bytesToText, textToBytes} from "../utils/byteUtils.js";
-import {getTestKeys, testAuthHandler} from "../test/testUtils.js";
 import {handlers} from "../handlers/handlers.js";
+import {HandlerFn} from "../app/endgameConfig.js";
 
 
 
@@ -233,3 +233,18 @@ describe('crypto', function () {
     });
 
 });
+
+export const testAuthHandler: HandlerFn<'login'> =
+    ({endgame, password, userPath, username}) => getTestKeys().pipe(
+        map(keys => ({...endgame, keys, username, userPath} satisfies AuthenticatedEndgame as AuthenticatedEndgame)),
+        map(endgame => ({endgame, password, userPath, username}))
+    )
+
+export const getTestKeys = () =>of({
+    "pub": "MDRhY2ZhZTJhNDBkMzQxN2E4MDVlNWE2YWRmYzMzZGI5YTA3N2IzNGI0YmNkYTNkMmYxYWVhNDFmMjg0YWQzYTc3ZWIzYTZjNzgxZTE2OGFjNmE3YTI0YTVkMTdhZGFiM2I4YzU5MmQ1N2M0NWM4YmNmMjk0OGQ0MWU2YjBlNGNhMg==",
+    "priv": "NmNkMzUzZGQwMmE1NTIyOTcwMDA5MWNkYzY3NWY5YzNkZGY3OTdlYmFhZDJjN2U1YzVkZjk0ODM3YzRhNjg0MTgzODM5M2QzZjE4YjUyYzZjYjQ5MzMwNzk4M2RhMGRkYTEyZTFmZjA0NzI4YWUwYTA3MjE2ZjI4ZjQ2MGY5OGJkZTc0MGM5MjI5ZDEzYTY3NGEwYzQ5MWUzMWNmODQ2ZDNjMjk4N2QzMGE2YmYzZWE0OWE5YzE4MTdlZjhjY2MwZmUwNDk3MzE1ZDIzYjVlNTlkMjA5ZjZhNzcyOGUxZmJmYWRjZmQ4YTViZDNjZDVmNDJlMWRjNGQ5OGY1NWM4NTVhNDRhNGYyNmU0MDQ5ZDJlYzkwZjk3MzM5ZGZlNTNi",
+    "enc": "OTY3OWZlNDVmNWYxYjE3ZWRmYzM5OWU2NmYwNzUzZWZiMzA3NmE4MDBkZDBkYzE2NTBhNTFkYmI2ZjQ0ZmE5MjZmNTEyNjNkMDgwMzg5NDMzOTkwODI3MTBmM2ExODBk",
+    "salt": "NjQzMDM4Mzg2NjY0NjUzNjM1MzgzMTYxMzQzODMxNjQ="
+}).pipe(
+    switchMap(serKeys => deserializeKeys(serKeys, 'my-pass'))
+);
