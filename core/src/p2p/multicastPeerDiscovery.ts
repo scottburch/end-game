@@ -1,6 +1,6 @@
 import {filter, interval, map, Observable, of, Subscription, tap} from "rxjs";
 import dgram from "dgram";
-import ip from 'ip'
+
 import {dialPeer} from "./networkClient.js";
 import {Endgame} from "../app/endgame.js";
 
@@ -27,11 +27,11 @@ export const multicastPeerDiscovery = <P extends Endgame>(pistol: P, port: numbe
 
 
         // check to see if broadcast is mine
-        filter(peerInfo =>
-            peerInfo.nodeId !== pistol.id ||
-            ip.address('public') !== peerInfo.ip ||
-            pistol.config.port !== peerInfo.port
-        ),
+        // filter(peerInfo =>
+        //     peerInfo.nodeId !== pistol.id ||
+        //     ip.address('public') !== peerInfo.ip ||
+        //     pistol.config.port !== peerInfo.port
+        // ),
 
         // TODO: This should probably be smarter, just add to a list for now to check
         filter(({ip, port}) => !seenPeers.has(ip + port)),
@@ -43,11 +43,11 @@ export const multicastPeerDiscovery = <P extends Endgame>(pistol: P, port: numbe
 
     const timerSub = interval(5000).pipe(
         tap(() => {
-            socket.send(JSON.stringify({
-                nodeId: pistol.id,
-                ip: ip.address('public', ),
-                port: pistol.config.port
-            }), port,  '224.0.0.1')
+            // socket.send(JSON.stringify({
+            //     nodeId: pistol.id,
+            //     ip: ip.address('public', ),
+            //     port: pistol.config.port
+            // }), port,  '224.0.0.1')
         })
     ).subscribe()
 

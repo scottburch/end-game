@@ -14,6 +14,7 @@ import {
     memoryStorePutHandler
 } from "../handlers/store-handlers/memoryStoreHandlers.js";
 import {logoutHandler} from "../handlers/auth-handlers/logoutHandler.js";
+import {DeepPartial} from "tsdef";
 
 
 /**
@@ -37,7 +38,6 @@ export const startTestNetwork = (nodeList: number[][] = [], opts: Partial<StartT
     map((peers, n) => ({
         endgameConfig: {
             name: `node-${n}`,
-            port: 11110 + n,
             ...opts
         } satisfies Partial<EndgameConfig>,
         peers
@@ -115,14 +115,8 @@ export const getTestKeys = () => getSerializedTestKeys().pipe(
 )
 
 
-export const testLocalAuthedEndgame = () =>
-    testLocalEndgame().pipe(
-        switchMap(endgame => endgameCreateUser(endgame, 'username', 'password', 'my.user')),
-        switchMap(({endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
-        map(({endgame}) => endgame as AuthenticatedEndgame)
-    );
 
-export const testLocalEndgame = () =>
+export const testLocalEndgame = (partialConfig: DeepPartial<EndgameConfig> = {}) =>
     newEndgame({
         handlers: {
             createUser: handlers([createUserHandler]),
@@ -130,6 +124,14 @@ export const testLocalEndgame = () =>
             logout: handlers([logoutHandler]),
             get: handlers([memoryStoreGetHandler]),
             put: handlers([memoryStorePutHandler]),
-            getMeta: handlers([memoryStoreGetMetaHandler])
-        }
+            getMeta: handlers([memoryStoreGetMetaHandler]),
+            ...partialConfig.handlers
+        },
+        ...partialConfig
     });
+export const testLocalAuthedEndgame = (partialConfig: DeepPartial<EndgameConfig & {username?: string, password: string, userPath: string}> = {}) =>
+    testLocalEndgame(partialConfig).pipe(
+        switchMap(endgame => endgameCreateUser(endgame, partialConfig.username || 'username', partialConfig.password || 'password', partialConfig.userPath || 'my.user')),
+        switchMap(({endgame}) => endgameLogin(endgame, partialConfig.username || 'username', partialConfig.password || 'password', partialConfig.userPath || 'my.user')),
+        map(({endgame}) => endgame as AuthenticatedEndgame)
+    );

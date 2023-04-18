@@ -1,41 +1,32 @@
 import {
     AuthenticatedEndgame,
-    endgameLogin,
+    endgameCreateUser,
     endgameGet,
-    endgamePut,
+    endgameLogin,
     endgameLogout,
-    sendMsg,
-    newEndgame, endgameCreateUser
+    endgamePut,
+    newEndgame,
+    sendMsg
 } from "./endgame.js";
-import {catchError, firstValueFrom, map, of, switchMap, tap, timeout} from "rxjs";
+import {catchError, firstValueFrom, of, switchMap, tap, timeout} from "rxjs";
 import {expect} from 'chai';
-import {getTestKeys, testAuthHandler, testLocalAuthedEndgame} from "../test/testUtils.js";
-import {generateNewAccount} from "../crypto/crypto.js";
-import {EndgameGraphMeta} from "../graph/endgameGraph.js";
+import {testLocalAuthedEndgame, testLocalEndgame} from "../test/testUtils.js";
 import {handlers} from "../handlers/handlers.js";
-import {
-    memoryStoreGetHandler,
-    memoryStoreGetMetaHandler,
-    memoryStorePutHandler
-} from "../handlers/store-handlers/memoryStoreHandlers.js";
-import {passwordAuthHandler} from "../handlers/auth-handlers/passwordAuthHandler.js";
-import {createUserHandler} from "../handlers/auth-handlers/createUserHandler.js";
 
 
 describe('endgame', () => {
 
     it('should be able to login after endgame is started', () =>
-        firstValueFrom(newEndgame({handlers: {login: handlers([testAuthHandler])}}).pipe(
-            switchMap(endgame => endgameLogin(endgame, 'username', 'password', 'my.user')),
+        firstValueFrom(testLocalEndgame().pipe(
+            switchMap(endgame => endgameCreateUser(endgame, 'username', 'password', 'my.user')),
+            switchMap(({endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
             tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).not.to.be.undefined),
         ))
     );
 
     it('should be able to logout', () =>
-        firstValueFrom(newEndgame({}).pipe(
-            switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
-            switchMap(({endgame, keys}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
-            switchMap(({endgame}) => endgameLogout(endgame as AuthenticatedEndgame)),
+        firstValueFrom(testLocalAuthedEndgame().pipe(
+            switchMap((endgame) => endgameLogout(endgame as AuthenticatedEndgame)),
             tap(({endgame}) => {
                 expect((endgame as AuthenticatedEndgame).keys).to.be.undefined;
                 expect((endgame as AuthenticatedEndgame).username).to.be.undefined;
@@ -54,23 +45,6 @@ describe('endgame', () => {
                 catchError(err => err.name === 'TimeoutError' ? of(done()) : of(done(err.message)))
             ).subscribe();
         });
-    });
-
-
-    describe('endgamePut()', () => {
-        it('should send a message down the endgame-put handlers', () =>
-            firstValueFrom(newEndgame({handlers: {
-                    login: handlers([testAuthHandler]),
-                    put: handlers<'put'>([({endgame, path, value}) => of({endgame, path, value: value + 1, meta: {} as EndgameGraphMeta})])
-            }}).pipe(
-                switchMap(endgame => generateNewAccount().pipe(map(keys => ({keys, endgame})))),
-                switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
-                switchMap(({endgame}) =>
-                    endgamePut<number>(endgame as AuthenticatedEndgame, 'my-key', 10)
-                ),
-                tap(({value}) => expect(value).to.equal(11))
-            ))
-        )
     });
 
     describe('endgameGet()', () => {

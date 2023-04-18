@@ -1,5 +1,4 @@
 import {delay, filter, first, merge, of, skipWhile, tap, switchMap, map} from "rxjs";
-import {startPeersServer} from "../p2p/networkServer.js";
 import {newPeerMsg, PeerMsg} from "../p2p/peerMsg.js";
 
 import {KeyBundle, serializePubKey, signMsg} from "../crypto/crypto.js";
@@ -37,7 +36,7 @@ export const newEndgame = (config: DeepPartial<EndgameConfig>) =>
         } satisfies Endgame)),
         map(opts => opts as Endgame),
         // TODO: Move this to handlers maybe.. Somewhere out of here
-        switchMap(endgame => typeof window === 'undefined' ? startPeersServer(endgame) : of(endgame))
+        //switchMap(endgame => typeof window === 'undefined' ? startPeersServer(endgame) : of(endgame))
     );
 
 
@@ -145,7 +144,6 @@ export const trafficLogger = (() => {
 const newEndgameConfig = (config: DeepPartial<EndgameConfig>) => ({
     isTrusted: config.isTrusted ?? false,
     name: config.name || `node-${getNetworkTime()}`,
-    port: config.port || 11110,
     remoteWaitTime: 2000,
     handlers: {
         log: config.handlers?.log as EndgameConfig['handlers']['log'] || nullHandler<'log'>(),

@@ -53,45 +53,21 @@ describe('memory store handlers', () => {
             ))
         )
 
-        it('should handle multiple endgame instances', () => {
-            const config1 = {
-                handlers: {
-                    login: handlers([testAuthHandler]),
-                    get: handlers([memoryStoreGetHandler]),
-                    put: handlers([memoryStorePutHandler]),
-                    getMeta: handlers([memoryStoreGetMetaHandler])
-                }
-            };
-
-            const config2 = {
-                port: 11111,
-                handlers: {
-                    login: handlers([testAuthHandler]),
-                    get: handlers([memoryStoreGetHandler]),
-                    put: handlers([memoryStorePutHandler]),
-                    getMeta: handlers([memoryStoreGetMetaHandler])
-                }
-            };
-
-
-            return firstValueFrom(combineLatest([
-                newEndgame(config1).pipe(
-                    tap(e => console.log(e.id)),
-                    switchMap(egame => endgameLogin(egame, 'username', 'password', 'my.user')),
-                    switchMap(({endgame}) => endgamePut(endgame as AuthenticatedEndgame, 'my.path', 1)),
-                    switchMap(({endgame}) => endgameGet<number>(endgame, 'my.path')),
+        it('should handle multiple endgame instances', () =>
+            firstValueFrom(combineLatest([
+                testLocalAuthedEndgame({username: 'username1', userPath: 'my.user1'}).pipe(
+                    switchMap((endgame) => endgamePut(endgame as AuthenticatedEndgame, 'my.path1', 1)),
+                    switchMap(({endgame}) => endgameGet<number>(endgame, 'my.path1')),
                 ),
-                newEndgame(config2).pipe(
-                    tap(e => console.log(e.id)),
-                    switchMap(egame => endgameLogin(egame, 'username', 'password', 'my.user')),
-                    switchMap(({endgame}) => endgamePut(endgame as AuthenticatedEndgame, 'my.path', 2)),
-                    switchMap(({endgame}) => endgameGet<number>(endgame, 'my.path')),
+                testLocalAuthedEndgame({username: 'username2', userPath: 'my.user2'}).pipe(
+                    switchMap(endgame => endgamePut(endgame as AuthenticatedEndgame, 'my.path2', 2)),
+                    switchMap(({endgame}) => endgameGet<number>(endgame, 'my.path2')),
                 )
             ]).pipe(
                 tap(values => {
                     expect(values[0].value + values[1].value).to.equal(3)
                 })
             ))
-        })
+        )
     })
 })

@@ -12,7 +12,6 @@ export type HandlerFn<T extends HandlerNames> = (p: HandlerProps<T>) => Observab
 export type EndgameConfig = {
     id?: string
     name: string
-    port: number
     isTrusted: boolean
     remoteWaitTime: number
     handlers: {
