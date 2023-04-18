@@ -16,30 +16,18 @@ import {createUserHandler} from "./createUserHandler.js";
 import {memoryStoreGetHandler, memoryStorePutHandler} from "../store-handlers/memoryStoreHandlers.js";
 import {serializePubKey} from "../../crypto/crypto.js";
 import {logoutHandler} from "./logoutHandler.js";
+import {testLocalEndgame} from "../../test/testUtils.js";
 
 describe('auth handlers', () => {
      it('should return a regular endgame object if user does not exist', () =>
-        firstValueFrom(of({
-             handlers: {
-                  login: handlers([passwordAuthHandler])
-             }
-        } as DeepPartial<EndgameConfig>).pipe(
-            switchMap(newEndgame),
+        firstValueFrom(testLocalEndgame().pipe(
             switchMap(endgame => endgameLogin(endgame, 'username', 'password', 'my.user')),
             tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).to.be.undefined)
         ))
      );
 
      it('should return an authenticated endgame object if the user does exist', () =>
-        firstValueFrom(of({
-            handlers: {
-                login: handlers([passwordAuthHandler]),
-                createUser: handlers([createUserHandler]),
-                put: handlers([memoryStorePutHandler]),
-                get: handlers([memoryStoreGetHandler])
-            }
-        } as DeepPartial<EndgameConfig>).pipe(
-            switchMap(newEndgame),
+        firstValueFrom(testLocalEndgame().pipe(
             switchMap(endgame => endgameCreateUser(endgame, 'username', 'password', 'my.user')),
             map(props1 => ({props1, endgame: {id: props1.endgame.id, config: props1.endgame.config} as Endgame})),
             switchMap(({props1, endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user').pipe(
@@ -53,16 +41,7 @@ describe('auth handlers', () => {
      );
 
      it('should allow me to login after a failed login', () =>
-         firstValueFrom(of({
-             handlers: {
-                 login: handlers([passwordAuthHandler]),
-                 logout: handlers([logoutHandler]),
-                 createUser: handlers([createUserHandler]),
-                 put: handlers([memoryStorePutHandler]),
-                 get: handlers([memoryStoreGetHandler])
-             }
-         } as DeepPartial<EndgameConfig>).pipe(
-             switchMap(newEndgame),
+         firstValueFrom(testLocalEndgame().pipe(
              switchMap(endgame => endgameCreateUser(endgame, 'username', 'password', 'my.user')),
              switchMap(({endgame}) => endgameLogout(endgame)),
              tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).to.be.undefined),

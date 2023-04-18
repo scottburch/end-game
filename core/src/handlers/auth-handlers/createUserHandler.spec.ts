@@ -1,22 +1,11 @@
-import {firstValueFrom, map, of, switchMap, tap} from "rxjs";
-import {handlers} from "../handlers.js";
-import {DeepPartial} from "tsdef";
-import {EndgameConfig} from "../../app/endgameConfig.js";
+import {firstValueFrom, map, switchMap, tap} from "rxjs";
 import {endgameCreateUser, endgameGet, newEndgame} from "../../app/endgame.js";
 import {expect} from "chai";
-import {createUserHandler} from "./createUserHandler.js";
-import {memoryStoreGetHandler, memoryStorePutHandler} from "../store-handlers/memoryStoreHandlers.js";
+import {testLocalEndgame} from "../../test/testUtils.js";
 
 describe('createUserHandler()', () => {
     it('should create a user object in the store', () =>
-        firstValueFrom(of({
-            handlers: {
-                createUser: handlers([createUserHandler]),
-                put: handlers([memoryStorePutHandler]),
-                get: handlers([memoryStoreGetHandler])
-            }
-        } as DeepPartial<EndgameConfig>).pipe(
-            switchMap(newEndgame),
+        firstValueFrom(testLocalEndgame().pipe(
             switchMap(endgame => endgameCreateUser(endgame, 'my-username', 'password', 'my.user')),
             switchMap(({endgame}) => endgameGet<string>(endgame, 'my.user')),
             map(({value}) => JSON.parse(value)),

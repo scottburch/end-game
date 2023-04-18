@@ -13,6 +13,7 @@ import {
     memoryStoreGetMetaHandler,
     memoryStorePutHandler
 } from "../handlers/store-handlers/memoryStoreHandlers.js";
+import {logoutHandler} from "../handlers/auth-handlers/logoutHandler.js";
 
 
 /**
@@ -115,16 +116,20 @@ export const getTestKeys = () => getSerializedTestKeys().pipe(
 
 
 export const testLocalAuthedEndgame = () =>
-    newEndgame({
-        handlers: {
-            createUser: handlers([createUserHandler]),
-            login: handlers([passwordAuthHandler]),
-            get: handlers([memoryStoreGetHandler]),
-            put: handlers([memoryStorePutHandler]),
-            getMeta: handlers([memoryStoreGetMetaHandler])
-        }
-    }).pipe(
+    testLocalEndgame().pipe(
         switchMap(endgame => endgameCreateUser(endgame, 'username', 'password', 'my.user')),
         switchMap(({endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
         map(({endgame}) => endgame as AuthenticatedEndgame)
     );
+
+export const testLocalEndgame = () =>
+    newEndgame({
+        handlers: {
+            createUser: handlers([createUserHandler]),
+            login: handlers([passwordAuthHandler]),
+            logout: handlers([logoutHandler]),
+            get: handlers([memoryStoreGetHandler]),
+            put: handlers([memoryStorePutHandler]),
+            getMeta: handlers([memoryStoreGetMetaHandler])
+        }
+    });

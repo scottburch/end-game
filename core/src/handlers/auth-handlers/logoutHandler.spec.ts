@@ -8,19 +8,11 @@ import {DeepPartial} from "tsdef";
 import {EndgameConfig} from "../../app/endgameConfig.js";
 import {AuthenticatedEndgame, endgameCreateUser, endgameLogout, newEndgame} from "../../app/endgame.js";
 import {expect} from "chai";
+import {testLocalEndgame} from "../../test/testUtils.js";
 
 describe('logout handler', () => {
     it('should allow me to login after a failed login', () =>
-        firstValueFrom(of({
-            handlers: {
-                login: handlers([passwordAuthHandler]),
-                logout: handlers([logoutHandler]),
-                createUser: handlers([createUserHandler]),
-                put: handlers([memoryStorePutHandler]),
-                get: handlers([memoryStoreGetHandler])
-            }
-        } as DeepPartial<EndgameConfig>).pipe(
-            switchMap(newEndgame),
+        firstValueFrom(testLocalEndgame().pipe(
             switchMap(endgame => endgameCreateUser(endgame, 'username', 'password', 'my.user')),
             switchMap(({endgame}) => endgameLogout(endgame)),
             tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).to.be.undefined)
