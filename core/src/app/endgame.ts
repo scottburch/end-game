@@ -17,6 +17,7 @@ export type Endgame = {
 export type AuthenticatedEndgame = Endgame & {
     username: string
     keys: KeyBundle
+    userPath: string
 }
 
 export type LogEntry<T extends Object | undefined> = {

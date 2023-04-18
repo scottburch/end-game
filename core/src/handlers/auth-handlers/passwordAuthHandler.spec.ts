@@ -69,7 +69,11 @@ describe('auth handlers', () => {
              switchMap(({endgame}) => endgameLogin(endgame, 'username', 'password', 'fake.user')),
              tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).to.be.undefined),
              switchMap(({endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
-             tap(({endgame}) => expect((endgame as AuthenticatedEndgame).keys).not.to.be.undefined)
+             tap(({endgame}) => {
+                 expect((endgame as AuthenticatedEndgame).keys).not.to.be.undefined;
+                 expect((endgame as AuthenticatedEndgame).userPath).to.equal('my.user');
+                 expect((endgame as AuthenticatedEndgame).username).to.equal('username');
+             })
          ))
      )
 });

@@ -20,7 +20,7 @@ export type StartTestNetworkOpts = EndgameConfig & {
 
 export const testAuthHandler: HandlerFn<'login'> =
     ({endgame, password, userPath, username}) => getTestKeys().pipe(
-        map(keys => ({...endgame, keys, username} satisfies AuthenticatedEndgame as AuthenticatedEndgame)),
+        map(keys => ({...endgame, keys, username, userPath} satisfies AuthenticatedEndgame as AuthenticatedEndgame)),
         map(endgame => ({endgame, password, userPath, username}))
     )
 

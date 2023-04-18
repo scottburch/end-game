@@ -9,7 +9,7 @@ export const passwordAuthHandler: HandlerFn<'login'> = ({endgame, username, pass
         timeout(endgame.config.remoteWaitTime),
         map(({value}) => JSON.parse(value)),
         switchMap(value => deserializeKeys(value.keys, password)),
-        map(keys => ({...endgame, keys, username} as AuthenticatedEndgame)),
+        map(keys => ({...endgame, keys, username, userPath} as AuthenticatedEndgame)),
         map(endgame => ({endgame, username, password, userPath})),
         catchError(err => err.name === 'TimeoutError' ? of({endgame, username, password, userPath}) : throwError(err)),
     );
