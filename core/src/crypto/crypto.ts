@@ -177,13 +177,13 @@ const signData = (hash: Uint8Array, privKey: CryptoKey) =>
         map(sig => bytesToHex(new Uint8Array(sig)))
     );
 
-export const signMsg = <T extends EndgameGraphValue>(pistol: AuthenticatedEndgame, msg: EndgameGraphBundle<T>) => {
-    return pistol.config.isTrusted ? of(mixinSig(msg, '')) : doSignMsg(pistol, msg);
+export const signMsg = <T extends EndgameGraphValue>(endgame: AuthenticatedEndgame, msg: EndgameGraphBundle<T>) => {
+    return endgame.config.isTrusted ? of(mixinSig(msg, '')) : doSignMsg(endgame, msg);
 
-    function doSignMsg(pistol: AuthenticatedEndgame, msg: EndgameGraphBundle<T>) {
+    function doSignMsg(endgame: AuthenticatedEndgame, msg: EndgameGraphBundle<T>) {
         return of(msg).pipe(
             switchMap(msg => hashMsg(msg)),
-            switchMap(hex => signData(hex, pistol.keys.privKey)),
+            switchMap(hex => signData(hex, endgame.keys.privKey)),
             map(sig => mixinSig(msg, sig))
         )
     }
