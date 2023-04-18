@@ -1,4 +1,4 @@
-import {compileBrowserCode, newTestEndgame} from "../../testUtils.js";
+import {compileBrowserCode} from "../../testUtils.js";
 import {combineLatest, filter, firstValueFrom, of, skipWhile, switchMap, tap} from "rxjs";
 import {newBrowser} from "../e2eTestUtils.js";
 import {
@@ -8,7 +8,7 @@ import {
     browserPistolRead,
     browserStartPistol
 } from "./browser-interface.js";
-import {endgameGet} from "../../../app/endgame.js";
+import {endgameGet, newEndgame} from "../../../app/endgame.js";
 
 import {expect} from "chai";
 
@@ -16,7 +16,7 @@ describe.skip('browser e2e tests', () => {
 
     it('should write from a browser to a node and back to a browser', () =>
         firstValueFrom(compileBrowserCode('src/test/e2e/browser/browser-tests.html').pipe(
-            switchMap(() => combineLatest([newTestEndgame(), newBrowser(), newBrowser()])),
+            switchMap(() => combineLatest([newEndgame({}), newBrowser(), newBrowser()])),
             switchMap(([pistol, page1, page2]) => of(true).pipe(
                 switchMap(() => browserStartPistol(page1)),
                 switchMap(() => browserStartPistol(page2)),

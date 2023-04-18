@@ -1,11 +1,19 @@
 import {bufferCount, from, map, mergeMap, Observable, of, switchMap, timer} from "rxjs";
-import {AuthenticatedEndgame, newEndgame, endgameLogin} from "../app/endgame.js";
+import {AuthenticatedEndgame, newEndgame, endgameLogin, endgameCreateUser} from "../app/endgame.js";
 import {dialPeer} from "../p2p/networkClient.js";
 import {floodRouter} from "../p2p/floodRouter.js";
 import {Parcel} from '@parcel/core';
 import {deserializeKeys} from "../crypto/crypto.js";
 import {EndgameConfig, HandlerFn} from "../app/endgameConfig.js";
-import {DeepPartial} from "tsdef";
+import {handlers} from "../handlers/handlers.js";
+import {createUserHandler} from "../handlers/auth-handlers/createUserHandler.js";
+import {passwordAuthHandler} from "../handlers/auth-handlers/passwordAuthHandler.js";
+import {
+    memoryStoreGetHandler,
+    memoryStoreGetMetaHandler,
+    memoryStorePutHandler
+} from "../handlers/store-handlers/memoryStoreHandlers.js";
+
 
 /**
  * Starts a test network.  Peers are in the form of an array of nodes with the inner array being the node number of the peer
@@ -24,13 +32,6 @@ export const testAuthHandler: HandlerFn<'login'> =
         map(endgame => ({endgame, password, userPath, username}))
     )
 
-
-export const newTestEndgame = (config: DeepPartial<EndgameConfig> = {}) =>
-    of(config).pipe(
-        switchMap(config => newEndgame(config))
-    );
-
-
 export const startTestNetwork = (nodeList: number[][] = [], opts: Partial<StartTestNetworkOpts> = {}) => from(nodeList).pipe(
     map((peers, n) => ({
         endgameConfig: {
@@ -41,7 +42,7 @@ export const startTestNetwork = (nodeList: number[][] = [], opts: Partial<StartT
         peers
     })),
     mergeMap(({endgameConfig, peers}, idx) => timer(idx * 100).pipe(
-        switchMap(() => newTestEndgame(endgameConfig)),
+        switchMap(() => newEndgame(endgameConfig)),
         switchMap(floodRouter),
         map(endgame => ({endgame, peers}))
     )),
@@ -113,3 +114,17 @@ export const getTestKeys = () => getSerializedTestKeys().pipe(
 )
 
 
+export const testLocalAuthedEndgame = () =>
+    newEndgame({
+        handlers: {
+            createUser: handlers([createUserHandler]),
+            login: handlers([passwordAuthHandler]),
+            get: handlers([memoryStoreGetHandler]),
+            put: handlers([memoryStorePutHandler]),
+            getMeta: handlers([memoryStoreGetMetaHandler])
+        }
+    }).pipe(
+        switchMap(endgame => endgameCreateUser(endgame, 'username', 'password', 'my.user')),
+        switchMap(({endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
+        map(({endgame}) => endgame as AuthenticatedEndgame)
+    );
