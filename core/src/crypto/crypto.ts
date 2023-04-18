@@ -199,16 +199,13 @@ export const signMsg = <T extends EndgameGraphValue>(endgame: AuthenticatedEndga
     }
 };
 
-export const verifyMsgSig = (msg: PeerPutMsg['payload']) => {
-    return msg.meta.sig ? doVerifyMsgSig(msg) : of(true);
+export const verifyMsgSig = (msg: PeerPutMsg['payload'], pubKey: CryptoKey) => {
+    return msg.meta.sig ? doVerifyMsgSig(msg, pubKey) : of(true);
 
-    function doVerifyMsgSig(msg: PeerPutMsg['payload']) {
+    function doVerifyMsgSig(msg: PeerPutMsg['payload'], pubKey: CryptoKey) {
         return of(msg).pipe(
             filter(msg => msg.meta.sig !== ''),
-            switchMap(msg =>
-                deserializePubKey(msg.meta.owner).pipe(map(pubKey => ({pubKey, msg})))
-            ),
-            switchMap(({pubKey, msg}) => hashMsg(msg).pipe(map(msgHash => ({pubKey, msg, msgHash})))),
+            switchMap(msg => hashMsg(msg).pipe(map(msgHash => ({pubKey, msg, msgHash})))),
             switchMap(({
                            pubKey,
                            msg,
@@ -223,7 +220,7 @@ export const verifyMsgSig = (msg: PeerPutMsg['payload']) => {
 };
 
 const hashMsg = (msg: PeerPutMsg['payload']) =>
-    sha256Hash(new TextEncoder().encode(JSON.stringify([msg.path, msg.value, msg.meta.owner, msg.meta.perms])));
+    sha256Hash(new TextEncoder().encode(JSON.stringify([msg.path, msg.value, msg.meta.rules, msg.meta.ownerPath])));
 
 const sha256Hash = (s: Uint8Array) =>
     from(subtle.digest('SHA-256', s)).pipe(

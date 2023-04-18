@@ -20,10 +20,9 @@ describe('memory store handlers', () => {
                 tap(({value}) => expect(value).to.equal(10)),
                 switchMap(({endgame}) => endgameGetMeta(endgame, 'my.path')),
                 tap(({meta}) => {
-                    expect(meta?.owner).to.have.length(176);
+                    expect(meta?.ownerPath).to.equal('my.user');
                     expect(meta?.sig).to.have.length(128);
-                    expect(meta?.perms).to.equal(484);
-                    expect(meta?.timestamp).to.be.closeTo(getNetworkTime(), 1000)
+                    expect(meta?.state).not.to.be.undefined
                 })
             ))
         );

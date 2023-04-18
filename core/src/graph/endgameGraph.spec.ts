@@ -1,8 +1,6 @@
 import {getNetworkTime,} from "./endgameGraph.js";
 import {PeerPutMsg} from "../p2p/peerMsg.js";
 
-const subtle = crypto.subtle;
-
 type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
 } : T;
@@ -583,18 +581,18 @@ describe.skip('endgame graph', function () {
 
 });
 
-const getBaseMsg = (msg: DeepPartial<PeerPutMsg['payload']>): PeerPutMsg['payload'] => ({
-    path: 'my-graph.my-path',
-    value: 20,
-    ...msg,
-    meta: {
-        owner: 'pubkey',
-        sig: '',
-        perms: 0o777,
-        timestamp: getNetworkTime(),
-        ...msg.meta
-    }
-});
+// const getBaseMsg = (msg: DeepPartial<PeerPutMsg['payload']>): PeerPutMsg['payload'] => ({
+//     path: 'my-graph.my-path',
+//     value: 20,
+//     ...msg,
+//     meta: {
+//         ownerPath: 'my.user',
+//         sig: '',
+//         state: getNetworkTime().toString(),
+//         rules: [],
+//         ...msg.meta
+//     }
+// });
 
 // const writeValue = <P extends Pistol>(pistol: P, {
 //     perms = 0o777,

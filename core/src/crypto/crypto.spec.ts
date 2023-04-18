@@ -146,11 +146,10 @@ describe('crypto', function () {
             firstValueFrom(newEndgame({handlers: {login: handlers([testAuthHandler])}}).pipe(
                 switchMap(endgame => getTestKeys().pipe(map(keys => ({keys, endgame})))),
                 switchMap(({keys, endgame}) => endgameLogin(endgame, 'username', 'password', 'my.user')),
-                switchMap(({endgame}) => serializePubKey((endgame as AuthenticatedEndgame).keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
-                switchMap(({endgame, serPubKey}) => range(1, 500).pipe(
+                switchMap(({endgame}) => range(1, 500).pipe(
                     mergeMap(() => signMsg((endgame as AuthenticatedEndgame), {
                         path: 'xx.yy',
-                        meta: {owner: serPubKey, perms: 0o700, sig: '', timestamp: getNetworkTime()},
+                        meta: {ownerPath: 'my.user' , sig: '', state: getNetworkTime().toString(), rules: []},
                         value: 'x'.repeat(200)
                     })),
 
@@ -170,10 +169,10 @@ describe('crypto', function () {
                         path: 'my-path',
                         value: 10,
                         meta: {
-                            timestamp: getNetworkTime(),
-                            owner: serPubKey,
-                            perms: 0o777,
-                            sig: ''
+                            state: getNetworkTime().toString(),
+                            ownerPath: 'my.user',
+                            sig: '',
+                            rules: []
                         }
                     } as PeerPutMsg['payload']
                 })),
@@ -184,49 +183,51 @@ describe('crypto', function () {
 
         it('should allow a trusted node', () =>
             firstValueFrom(newEndgame({isTrusted: true, handlers: {login: handlers([testAuthHandler])}}).pipe(
-                switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
-                switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
-                switchMap(({endgame}) => serializePubKey((endgame as AuthenticatedEndgame).keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
-                map(({endgame, serPubKey}) => ({
+                switchMap(endgame => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
+                map(({endgame}) => endgame as AuthenticatedEndgame),
+                map((endgame) => ({
                     endgame, msg: {
                         graphId: 'my-graph',
                         path: 'my-path',
                         value: 10,
                         meta: {
-                            timestamp: getNetworkTime(),
-                            owner: serPubKey,
-                            perms: 0o777,
-                            sig: ''
+                            state: getNetworkTime().toString(),
+                            ownerPath: 'my.user',
+                            sig: '',
+                            rules: []
                         }
                     } as PeerPutMsg['payload']
                 })),
-                switchMap(({endgame, msg}) => signMsg((endgame as AuthenticatedEndgame), msg)),
-                tap(msg => expect(msg.meta.sig).to.equal('')),
-                switchMap(msg => verifyMsgSig(msg)),
+                switchMap(({endgame, msg}) => signMsg((endgame as AuthenticatedEndgame), msg).pipe(
+                    map(msg => ({msg, endgame}))
+                )),
+                tap(({msg}) => expect(msg.meta.sig).to.equal('')),
+                switchMap(({msg, endgame}) => verifyMsgSig(msg, endgame.keys.pubKey)),
                 tap(valid => expect(valid).to.be.true)
             ))
         );
 
         it('should sign and verify a message', () =>
             firstValueFrom(newEndgame({isTrusted: true, handlers: {login: handlers([testAuthHandler])}}).pipe(
-                switchMap(endgame => getTestKeys().pipe(map(keys => ({endgame, keys})))),
-                switchMap(({endgame, keys}) => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
-                switchMap(({endgame}) => serializePubKey((endgame as AuthenticatedEndgame).keys.pubKey).pipe(map(serPubKey => ({endgame, serPubKey})))),
-                map(({endgame, serPubKey}) => ({
+                switchMap(endgame => endgameLogin(endgame, 'my-username', 'password', 'my.user')),
+                map(({endgame}) => endgame as AuthenticatedEndgame),
+                map(endgame => ({
                     endgame, msg: {
                         graphId: 'my-graph',
                         path: 'my-path',
                         value: 10,
                         meta: {
-                            timestamp: getNetworkTime(),
-                            owner: serPubKey,
-                            perms: 0o777,
-                            sig: ''
+                            state: getNetworkTime().toString(),
+                            ownerPath: 'my.path',
+                            sig: '',
+                            rules: []
                         }
                     } as PeerPutMsg['payload']
                 })),
-                switchMap(({endgame, msg}) => signMsg((endgame as AuthenticatedEndgame), msg)),
-                switchMap(msg => verifyMsgSig(msg)),
+                switchMap(({endgame, msg}) => signMsg((endgame as AuthenticatedEndgame), msg).pipe(
+                    map(msg => ({endgame, msg}))
+                )),
+                switchMap(({msg, endgame}) => verifyMsgSig(msg, endgame.keys.pubKey)),
                 tap(valid => expect(valid).to.be.true)
             ))
         );

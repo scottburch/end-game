@@ -64,12 +64,11 @@ export const endgameLogout = (endgame: AuthenticatedEndgame) => {
 }
 
 export const endgamePut = <T extends EndgameGraphValue, P extends string = string>(endgame: AuthenticatedEndgame, path: P, value: T) =>
-    serializePubKey(endgame.keys.pubKey).pipe(
-        map(owner => ({
+        of({
             path,
             value,
-            meta: {owner, sig: '', timestamp: getNetworkTime(), perms: 0o744} satisfies EndgameGraphMeta
-        } satisfies EndgameGraphBundle<T>)),
+            meta: {ownerPath: endgame.userPath, sig: '', state: getNetworkTime().toString(), rules: []} satisfies EndgameGraphMeta
+        } satisfies EndgameGraphBundle<T>).pipe(
         switchMap(msg => signMsg(endgame, msg)),
         tap(msg =>
             setTimeout(() => endgame.config.handlers.put.next({...msg, endgame}))

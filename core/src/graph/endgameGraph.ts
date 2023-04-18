@@ -13,9 +13,9 @@ export type EndgameGraphBundle<T extends EndgameGraphValue> = {
 
 export type EndgameGraphMeta = {
     sig: string
-    owner: PubKey
-    perms: number   // unix style permissions
-    timestamp: number
+    ownerPath: string
+    state: string
+    rules: string[]
 }
 
 
