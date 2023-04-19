@@ -13,12 +13,12 @@ import {
     catchError,
     concatMap,
     delay,
-    firstValueFrom,
+    firstValueFrom, last,
     map,
     mergeMap,
     of,
     range,
-    switchMap,
+    switchMap, take,
     tap,
     timeout
 } from "rxjs";
@@ -63,9 +63,11 @@ describe('endgame', () => {
 
     describe('endgameGet()', () => {
         it('should send a message down the endgame-get handlers', () =>
-            firstValueFrom(newEndgame({handlers: {
+            firstValueFrom(newEndgame({
+                handlers: {
                     get: handlers<'get'>([({endgame, path}) => of({endgame, path, value: 10})])
-                }}).pipe(
+                }
+            }).pipe(
                 switchMap(endgame => endgameGet<number>(endgame, 'my-key')),
                 tap(({value}) => expect(value).to.equal(10))
             ))
@@ -81,5 +83,22 @@ describe('endgame', () => {
             ))
         );
     });
+
+    it('should', () =>
+        firstValueFrom(testLocalAuthedEndgame().pipe(
+            tap(() => (global as any).start = Date.now()),
+            switchMap(endgame => range(1, 100).pipe(
+                mergeMap(n => endgamePut(endgame, 'my.path' + n, n)),
+            )),
+            take(100),
+            last(),
+            tap(() => console.log(Date.now() - (global as any).start)),
+            switchMap(({endgame}) => range(1, 100).pipe(
+                mergeMap(n => endgameGet(endgame, 'my.path' + n))
+            )),
+            bufferCount(100),
+            tap(() => console.log(Date.now() - (global as any).start)),
+        ))
+    )
 });
 

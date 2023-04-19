@@ -1,5 +1,5 @@
 import {HandlerFn} from "../../app/endgameConfig.js";
-import {catchError, filter, map, of, switchMap, tap, throwError, timeout} from "rxjs";
+import {catchError, filter, map, of, switchMap, throwError, timeout} from "rxjs";
 import {AuthenticatedEndgame, endgameGet} from "../../app/endgame.js";
 import {deserializeKeys} from "../../crypto/crypto.js";
 

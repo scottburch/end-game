@@ -1,4 +1,4 @@
-import {delay, filter, first, merge, of, skipWhile, tap, switchMap, map} from "rxjs";
+import {delay, filter, first, merge, of,  tap, switchMap, map} from "rxjs";
 import {newPeerMsg, PeerMsg} from "../p2p/peerMsg.js";
 
 import {KeyBundle, signMsg, signRule} from "../crypto/crypto.js";
@@ -44,25 +44,17 @@ export const newEndgame = (config: DeepPartial<EndgameConfig>) =>
 
 export const getAuthId = (endgame: Endgame) => endgame.id.split('-')[0];
 
-export const endgameLogin = (endgame: Endgame, username: string, password: string, userPath: string) => {
-    setTimeout(() => endgame.config.handlers.login.next({endgame, username, password, userPath}))
-    return endgame.config.handlers.login.pipe(
-        first()
-    )
-};
+export const endgameLogin = (endgame: Endgame, username: string, password: string, userPath: string) =>
+    endgame.config.handlers.login.next({endgame, username, password, userPath}).pipe(first())
 
-export const endgameCreateUser = (endgame: Endgame, username: string, password: string, userPath: string) => {
-    setTimeout(() => endgame.config.handlers.createUser.next({endgame, username, password, userPath}));
-    return endgame.config.handlers.createUser.pipe(
+export const endgameCreateUser = (endgame: Endgame, username: string, password: string, userPath: string) =>
+    endgame.config.handlers.createUser.next({endgame, username, password, userPath}).pipe(
         map(({endgame}) => ({endgame: endgame as AuthenticatedEndgame})),
         first()
     )
-}
 
-export const endgameLogout = (endgame: AuthenticatedEndgame) => {
-    setTimeout(() => endgame.config.handlers.logout.next({endgame}));
-    return endgame.config.handlers.logout.pipe(first())
-}
+export const endgameLogout = (endgame: AuthenticatedEndgame) =>
+    endgame.config.handlers.logout.next({endgame}).pipe(first());
 
 export const endgameRulePut = (endgame: AuthenticatedEndgame, reader: string, writer: string) =>
     of({
@@ -72,7 +64,7 @@ export const endgameRulePut = (endgame: AuthenticatedEndgame, reader: string, wr
         sig: ''
     } as Rule).pipe(
         switchMap(rule => signRule(rule, endgame.keys.privKey).pipe(
-
+// TODO: Finish here
         ))
     )
 
@@ -89,24 +81,18 @@ export const endgamePut = <T extends EndgameGraphValue, P extends string = strin
         first()
     );
 
-export const endgameGet = <T extends EndgameGraphValue, P extends string = string>(endgame: Endgame, path: string) => {
-    setTimeout(() =>endgame.config.handlers.get.next({path, endgame}));
-    return endgame.config.handlers.get.pipe(
+export const endgameGet = <T extends EndgameGraphValue, P extends string = string>(endgame: Endgame, path: string) =>
+    endgame.config.handlers.get.next({path, endgame}).pipe(
         filter(payload => payload.path === path),
-        map(({endgame, value, path}) => ({endgame, value: value as T, path}))
-    )
-};
+        map(({endgame, value, path}) => ({endgame, value: value as T, path})),
+    );
 
-export const endgameGetMeta = (endgame: Endgame, path: string) => {
-    setTimeout(() => endgame.config.handlers.getMeta.next({endgame, path}));
-    return endgame.config.handlers.getMeta.pipe(
+
+export const endgameGetMeta = (endgame: Endgame, path: string) =>
+    endgame.config.handlers.getMeta.next({endgame, path}).pipe(
         filter(payload => payload.path === path),
-        map(({endgame, meta, path}) => ({endgame, path, meta})),
-        first()
-    )
-}
-
-
+        map(({endgame, meta, path}) => ({endgame, path, meta}))
+    );
 
 export type SendMsgOpts = {
     forward?: boolean

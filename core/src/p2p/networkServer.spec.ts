@@ -17,8 +17,8 @@ describe.skip('p2p network', function()  {
             forward: true
         } satisfies PeerMsg<'testing', {}>;
         startTestNetwork([[1], []]).pipe(
-            tap(pistols => setTimeout(() => pistols[1].config.handlers.peersOut.next({endgame: pistols[1], msg: peerMsg}) )),
-            tap(pistols => setTimeout(() => pistols[1].config.handlers.peersOut.next({endgame: pistols[1], msg: peerMsg}))),
+            tap(pistols => pistols[1].config.handlers.peersOut.next({endgame: pistols[1], msg: peerMsg})),
+            tap(pistols => pistols[1].config.handlers.peersOut.next({endgame: pistols[1], msg: peerMsg})),
             switchMap(pistols => pistols[0].config.handlers.peerIn),
             filter(({msg}) => msg.cmd === 'testing'),
             takeUntil(timer(2000)),
