@@ -3,7 +3,7 @@ import {
     encrypt,
     generateNewAccount, getId,
     serializeKeys, serializePubKey,
-    signMsg, subtle,
+    signMsg, signRule, subtle,
     verify,
     verifyMsgSig
 } from "./crypto.js";
@@ -24,6 +24,8 @@ import {sign} from "./crypto.js";
 import {bytesToText, textToBytes} from "../utils/byteUtils.js";
 import {handlers} from "../handlers/handlers.js";
 import {HandlerFn} from "../app/endgameConfig.js";
+import {testLocalAuthedEndgame} from "../test/testUtils.js";
+import {Rule} from "../app/rules.js";
 
 
 
@@ -232,6 +234,26 @@ describe('crypto', function () {
             ))
         );
     });
+
+    describe('rules', () => {
+        it('should sign a rule', () =>
+            firstValueFrom(testLocalAuthedEndgame().pipe(
+                map(endgame => ({endgame, rule: {
+                    reader: 'reader',
+                        writer: 'writer',
+                        ownerPath: 'my.user',
+                        sig: ''
+                    } as Rule})),
+                switchMap(({rule, endgame}) => signRule(rule, endgame.keys.privKey)),
+                tap(rule => {
+                    expect(rule.reader).to.equal('reader');
+                    expect(rule.writer).to.equal('writer');
+                    expect(rule.ownerPath).to.equal('my.user');
+                    expect(rule.sig).to.have.length(128)
+                })
+            ))
+        )
+    })
 
 });
 

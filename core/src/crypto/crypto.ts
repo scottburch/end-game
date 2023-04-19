@@ -6,6 +6,7 @@ import Base64 from 'base-64'
 
 import {PeerPutMsg} from "../p2p/peerMsg.js";
 import {EndgameGraphBundle, EndgameGraphValue} from "../graph/endgameGraph.js";
+import {Rule} from "../app/rules.js";
 
 export const subtle = crypto.subtle;
 
@@ -175,6 +176,13 @@ export const getId = (pubKey: CryptoKey) =>
 const signData = (hash: Uint8Array, privKey: CryptoKey) =>
     from(subtle.sign({name: 'ECDSA', hash: 'SHA-256'}, privKey, hash)).pipe(
         map(sig => bytesToHex(new Uint8Array(sig)))
+    );
+
+export const signRule = (rule: Rule, privKey: CryptoKey) =>
+    of(rule).pipe(
+        switchMap(rule => sha256Hash(new TextEncoder().encode(JSON.stringify([rule.reader, rule.writer, rule.ownerPath])))),
+        switchMap(hex => signData(hex, privKey)),
+        map(sig => ({...rule, sig}))
     );
 
 export const signMsg = <T extends EndgameGraphValue>(endgame: AuthenticatedEndgame, msg: EndgameGraphBundle<T>) => {

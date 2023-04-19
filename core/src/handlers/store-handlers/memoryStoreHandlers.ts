@@ -1,4 +1,4 @@
-import {catchError, map, mergeMap, of, switchMap, throwError} from "rxjs";
+import {catchError, concatMap, map, mergeMap, of, switchMap, tap, throwError} from "rxjs";
 import {MemoryLevel} from "memory-level";
 import {Endgame} from "../../app/endgame.js";
 import {HandlerFn} from "../../app/endgameConfig.js";
@@ -11,7 +11,7 @@ const getStore = (endgame: Endgame) => stores[endgame.id] = stores[endgame.id] |
 
 export const memoryStoreGetHandler: HandlerFn<'get'> =
     ({endgame, path}) => of(getStore(endgame)).pipe(
-        switchMap(store => store.get(path)),
+        mergeMap(store => store.get(path)),
         map(value => ({endgame, path, value: JSON.parse(value).d})),
         catchError(err => err.notFound ? of({endgame, path, value: undefined}) : throwError(err))
     );
@@ -23,7 +23,7 @@ export const memoryStorePutHandler: HandlerFn<'put'> =
     );
 
 export const memoryStoreGetMetaHandler: HandlerFn<'getMeta'> = ({endgame, path}) => of(getStore(endgame)).pipe(
-        switchMap(store => store.get(path)),
+        mergeMap(store => store.get(path)),
         map(value => ({endgame, path, meta: JSON.parse(value).m}))
     );
 

@@ -1,8 +1,5 @@
 import {AbstractKeyIteratorOptions} from "abstract-level";
 
-
-type PubKey = string;
-
 export type EndgameGraphValue = number | string | boolean;
 export type EndgameKeysOptions = AbstractKeyIteratorOptions<string>;
 export type EndgameGraphBundle<T extends EndgameGraphValue> = {
@@ -14,7 +11,7 @@ export type EndgameGraphBundle<T extends EndgameGraphValue> = {
 export type EndgameGraphMeta = {
     sig: string
     ownerPath: string
-    state: string
+    state: string       // num.timestamp
     rules: string[]
 }
 

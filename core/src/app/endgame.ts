@@ -1,11 +1,12 @@
-import {delay, filter, first, merge, of, skipWhile, tap, switchMap, map} from "rxjs";
+import {delay, filter, first, merge, of, skipWhile, tap, switchMap, map, concatMap} from "rxjs";
 import {newPeerMsg, PeerMsg} from "../p2p/peerMsg.js";
 
-import {KeyBundle, serializePubKey, signMsg} from "../crypto/crypto.js";
+import {KeyBundle, signMsg, signRule} from "../crypto/crypto.js";
 import {getNetworkTime, EndgameGraphBundle, EndgameGraphMeta, EndgameGraphValue} from "../graph/endgameGraph.js";
 import {EndgameConfig} from "./endgameConfig.js";
 import {nullHandler} from "../handlers/handlers.js";
 import {DeepPartial} from "tsdef";
+import {Rule} from "./rules.js";
 
 
 export type Endgame = {
@@ -62,6 +63,20 @@ export const endgameLogout = (endgame: AuthenticatedEndgame) => {
     setTimeout(() => endgame.config.handlers.logout.next({endgame}));
     return endgame.config.handlers.logout.pipe(first())
 }
+
+export const endgameRulePut = (endgame: AuthenticatedEndgame, reader: string, writer: string) =>
+    of({
+        ownerPath: endgame.userPath,
+        reader,
+        writer,
+        sig: ''
+    } as Rule).pipe(
+        switchMap(rule => signRule(rule, endgame.keys.privKey).pipe(
+
+        ))
+    )
+
+export const asAuthenticatedEndgame = (endgame: Endgame | AuthenticatedEndgame) => endgame as AuthenticatedEndgame;
 
 export const endgamePut = <T extends EndgameGraphValue, P extends string = string>(endgame: AuthenticatedEndgame, path: P, value: T) =>
         of({
