@@ -1,8 +1,19 @@
 import {AuthenticatedEndgame, endgameGet, endgameGetMeta, endgamePut} from "../../app/endgame.js";
 import {testLocalAuthedEndgame, testLocalEndgame} from "../../test/testUtils.js";
-import {combineLatest, first, firstValueFrom, map, mergeMap, range, skip, switchMap, take, tap, toArray} from "rxjs";
+import {
+    combineLatest,
+    filter,
+    firstValueFrom,
+    map,
+    mergeMap,
+    range,
+    skip,
+    switchMap,
+    take,
+    tap,
+    toArray
+} from "rxjs";
 import {expect} from "chai";
-import {getNetworkTime} from "../../graph/endgameGraph.js";
 
 describe('memory store handlers', () => {
     describe('get', () => {
@@ -34,8 +45,9 @@ describe('memory store handlers', () => {
                 )),
                 skip(4),
                 switchMap(({endgame}) => range(1, 5).pipe(
-                    mergeMap(n => endgameGet(endgame, `my.path${n}`).pipe(first())),
+                    mergeMap(n => endgameGet(endgame, `my.path${n}`)),
                 )),
+                filter(({value}) => value !== undefined),
                 take(5),
                 map(({value}) => value),
                 toArray(),

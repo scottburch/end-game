@@ -1,5 +1,5 @@
 import {HandlerNames, Handler, HandlerProps, HandlerFn} from "../app/endgameConfig.js";
-import {mergeMap, of, share, Subject} from "rxjs";
+import {mergeMap, of, Subject} from "rxjs";
 
 export const handlers = <T extends HandlerNames>(fns: HandlerFn<T>[]) => {
 
@@ -8,7 +8,7 @@ export const handlers = <T extends HandlerNames>(fns: HandlerFn<T>[]) => {
         return o.pipe(
             mergeMap(fn)
         )
-    },subject.asObservable().pipe(share())) as Handler<HandlerProps<T>>
+    },subject.asObservable()) as Handler<HandlerProps<T>>
     observer.next = (v: HandlerProps<T>) => {
         setTimeout(() => subject.next(v));
         return observer;

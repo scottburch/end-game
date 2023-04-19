@@ -83,22 +83,5 @@ describe('endgame', () => {
             ))
         );
     });
-
-    it('should', () =>
-        firstValueFrom(testLocalAuthedEndgame().pipe(
-            tap(() => (global as any).start = Date.now()),
-            switchMap(endgame => range(1, 100).pipe(
-                mergeMap(n => endgamePut(endgame, 'my.path' + n, n)),
-            )),
-            take(100),
-            last(),
-            tap(() => console.log(Date.now() - (global as any).start)),
-            switchMap(({endgame}) => range(1, 100).pipe(
-                mergeMap(n => endgameGet(endgame, 'my.path' + n))
-            )),
-            bufferCount(100),
-            tap(() => console.log(Date.now() - (global as any).start)),
-        ))
-    )
 });
 
