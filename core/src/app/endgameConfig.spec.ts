@@ -1,6 +1,6 @@
 import {Endgame} from "./endgame.js";
 import {EndgameConfig} from "./endgameConfig.js";
-import {firstValueFrom, map, merge, of, switchMap, take, tap, toArray} from 'rxjs'
+import {bufferCount, firstValueFrom, map, merge, of, switchMap, take, tap, toArray} from 'rxjs'
 import {expect} from "chai";
 import {nullHandler} from "../handlers/handlers.js";
 
@@ -11,15 +11,13 @@ describe('endgameConfig', () => {
                 logout: nullHandler()
             }
         } as EndgameConfig).pipe(
-            tap(config => setTimeout(() => config.handlers.logout.next({endgame: {config: {name: 'my-endgame'}} as Endgame}))),
             switchMap(config => merge(
-                config.handlers.logout,
-                config.handlers.logout,
-                config.handlers.logout
+                config.handlers.logout.next({endgame: {config: {name: 'my-endgame'}} as Endgame}),
+                config.handlers.logout.next({endgame: {config: {name: 'my-endgame'}} as Endgame}),
+                config.handlers.logout.next({endgame: {config: {name: 'my-endgame'}} as Endgame}),
             )),
-            take(3),
             map(({endgame}) => endgame.config.name),
-            toArray(),
+            bufferCount(3),
             tap(names => expect(names).to.deep.equal(['my-endgame','my-endgame', 'my-endgame']))
         ))
     );

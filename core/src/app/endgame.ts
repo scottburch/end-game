@@ -1,4 +1,4 @@
-import {delay, filter, first, merge, of, skipWhile, tap, switchMap, map, concatMap} from "rxjs";
+import {delay, filter, first, merge, of, skipWhile, tap, switchMap, map} from "rxjs";
 import {newPeerMsg, PeerMsg} from "../p2p/peerMsg.js";
 
 import {KeyBundle, signMsg, signRule} from "../crypto/crypto.js";
@@ -85,11 +85,7 @@ export const endgamePut = <T extends EndgameGraphValue, P extends string = strin
             meta: {ownerPath: endgame.userPath, sig: '', state: getNetworkTime().toString(), rules: []} satisfies EndgameGraphMeta
         } satisfies EndgameGraphBundle<T>).pipe(
         switchMap(msg => signMsg(endgame, msg)),
-        tap(msg =>
-            setTimeout(() => endgame.config.handlers.put.next({...msg, endgame}))
-        ),
-        switchMap(() => endgame.config.handlers.put),
-        skipWhile(msg => msg.path !== path),
+        switchMap(msg => endgame.config.handlers.put.next({...msg, endgame})),
         first()
     );
 

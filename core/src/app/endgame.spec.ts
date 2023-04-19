@@ -25,6 +25,7 @@ import {
 import {expect} from 'chai';
 import {testLocalAuthedEndgame, testLocalEndgame} from "../test/testUtils.js";
 import {handlers} from "../handlers/handlers.js";
+import {EndgameGraphMeta} from "../graph/endgameGraph.js";
 
 
 describe('endgame', () => {

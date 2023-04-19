@@ -5,7 +5,7 @@ import {EndgameGraphBundle, EndgameGraphMeta, EndgameGraphValue} from "../graph/
 
 
 export type HandlerNames = keyof EndgameConfig['handlers']
-export type Handler<T> = Observable<T> & {next: (v: T) => void, props: T};
+export type Handler<T> = Observable<T> & {next: (v: T) => Observable<T>, props: T};
 export type HandlerProps<T extends HandlerNames> = EndgameConfig['handlers'][T]['props'];
 export type HandlerFn<T extends HandlerNames> = (p: HandlerProps<T>) => Observable<HandlerProps<T>>;
 
