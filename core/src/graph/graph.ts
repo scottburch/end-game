@@ -1,35 +1,58 @@
-import {map, Observable, of, switchMap} from "rxjs";
-import {EndgameGraphValue} from "./endgameGraph.js";
-import {AbstractKeyIteratorOptions, AbstractLevel} from 'abstract-level'
-import {getStoreKeys, storePut, storeRead} from "../stores/storeFunctions.js";
+import {first, map, Observable, of, switchMap, tap} from "rxjs";
+import {newUid} from "../utils/uid.js";
+import {nullHandler} from "../handlers/handlers.js";
+import {DeepPartial} from "tsdef";
 
-export type GraphStore = {
-    db: AbstractLevel<any, any, any>
-};
 
-export const graphReadValue = (store: GraphStore, path: string): Observable<{store: GraphStore, value: EndgameGraphValue}> =>
-    storeRead(store, path).pipe(
-        map(result => result?.d),
-        map((value) => ({store, value})),
-        switchMap(({store, value}) => typeof value === 'string' && /^@@[^@]/.test(value) ? graphReadValue(store, value.replace(/^@@/, '')) : of({store, value}))
-);
+type GraphNode<T extends Object> = {
+    nodeId: string
+    label: string
+    props: T
 
-export const graphKeys = (store: GraphStore, base: string, options: AbstractKeyIteratorOptions<string> = {}) =>
-    getStoreKeys(store, base, options).pipe(
-        map(keys => ({store, keys}))
+}
+
+export type Graph = {
+    graphId: string
+    handlers: {
+        putNode: Handler<{graph: Graph, node: GraphNode<Object>}>
+        getNode: Handler<{graph: Graph, query: GraphQuery, node?: GraphNode<Object>}>
+    }
+}
+
+export type HandlerNames = keyof Graph['handlers']
+export type Handler<T> = Observable<T> & {next: (v: T) => Observable<T>, props: T};
+export type HandlerProps<T extends HandlerNames> = Graph['handlers'][T]['props'];
+export type HandlerFn<T extends HandlerNames> = (p: HandlerProps<T>) => Observable<HandlerProps<T>>;
+
+
+type GraphQuery = {
+    nodeId: string
+}
+
+type GraphOpts = DeepPartial<Graph>
+
+
+export const graphOpen = (opts: GraphOpts) => of({
+    ...opts,
+    handlers: {
+        putNode: opts.handlers?.putNode || nullHandler<'putNode'>(),
+        getNode: opts.handlers?.getNode || nullHandler<'getNode'>()
+    }
+} as Graph);
+
+export const graphPut = <T extends Object>(graph: Graph, label: string, props: T) =>
+    of({
+        nodeId: newUid(),
+        label,
+        props
+    } satisfies GraphNode<T>).pipe(
+        switchMap(node => graph.handlers.putNode.next({graph, node})),
+        map(({node}) => ({graph, nodeId: node.nodeId})),
+        first()
+    )
+
+
+export const graphGet = <T extends Object>(graph: Graph, label: string, query: GraphQuery) =>
+    graph.handlers.getNode.next({graph, query}).pipe(
+        map(({node}) => ({graph, node: node as GraphNode<T>}))
     );
-
-export const graphReadMeta = (store: GraphStore, path: string) =>
-    storeRead(store, path).pipe(
-        map(result => ({store, meta: result?.m}))
-    )
-
-export const graphPut = <D, M>(store: GraphStore, path: string, data: D, meta: M ) =>
-    storePut(store, path, {
-        d: data,
-        m: meta
-    }).pipe(
-        map(() => ({store}))
-    )
-
-

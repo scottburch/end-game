@@ -1,4 +1,4 @@
-import {HandlerNames, Handler, HandlerProps, HandlerFn} from "../graph/graph.js";
+import {HandlerNames, Handler, HandlerProps, HandlerFn} from "../app/endgameConfig.js";
 import {mergeMap, of, Subject} from "rxjs";
 
 export const handlers = <T extends HandlerNames>(fns: HandlerFn<T>[]) => {

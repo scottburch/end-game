@@ -1,37 +1,39 @@
-import {
-    graphKeys,
-    graphPut,
-    graphReadValue,
-} from "./graph.js";
-import {firstValueFrom, map, mergeMap, of, range, switchMap, tap, toArray} from "rxjs";
-import {expect} from 'chai';
-import {newMemoryStore} from "../stores/memoryStore.js";
-
+import {first, firstValueFrom, switchMap, tap} from "rxjs";
+import {graphGet, graphPut, graphOpen} from "./graph.js";
+import {expect} from "chai";
+import {handlers} from "../handlers/handlers.js";
+import {memoryStoreGetNodeHandler, memoryStorePutNodeHandler} from "../handlers/store-handlers/memoryStoreHandler.js";
 
 describe('graph', () => {
+    it('should open a graph', () =>
+        firstValueFrom(graphOpen({graphId: 'my.graph'}).pipe(
+            tap(graph => expect(graph).not.to.be.undefined)
+        ))
+    );
 
-    describe('storing in a graph', function () {
-        this.timeout(10_000);
+    it('should put a value in a graph and assign an id', () =>
+        firstValueFrom(graphOpen({graphId: 'my.graph'}).pipe(
+            switchMap(graph => graphPut(graph, 'person', {name: 'scott'})),
+            tap(({graph, nodeId}) => expect(nodeId).to.have.length(12))
+        ))
+    );
 
-        it('should put a string in the db at a path', () =>
-            firstValueFrom(of(newMemoryStore()).pipe(
-                switchMap(store => graphPut(store, 'test-graph.a.b.c', 'my-data', 'my-meta')),
-                switchMap(({store}) => graphReadValue(store, 'test-graph.a.b.c')),
-                tap(({value}) => expect(value).to.equal('my-data'))
-            ))
-        );
-
-        it('should take search options for keys', () =>
-            firstValueFrom(of(newMemoryStore()).pipe(
-                switchMap(store => range(1, 10).pipe(
-                    mergeMap(n => graphPut(store, `test-graph.a.b.${n}`, n, 'my-meta')),
-                    toArray(),
-                    map(() => store)
-                )),
-                switchMap(store => graphKeys(store, 'test-graph.a.b', {gt: '2', limit: 4})),
-                tap(({keys}) => expect(keys).to.deep.equal(["3","4","5","6"]))
-            ))
-        )
-    });
+    it('should get an item from the graph by id', () =>
+        firstValueFrom(graphOpen({
+            graphId: 'my.graph', handlers: {
+                putNode: handlers([memoryStorePutNodeHandler]),
+                getNode: handlers([memoryStoreGetNodeHandler])
+            }
+        }).pipe(
+            switchMap(graph => graphPut(graph, 'person', {name: 'scott'})),
+            tap(({nodeId}) => console.log(nodeId)),
+            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph, 'person', {nodeId})),
+            tap(({node}) => expect(node.props.name).to.equal('scott')),
+            first(),
+            switchMap(({graph}) => graphPut(graph, 'person', {name: 'todd'})),
+            tap(({nodeId}) => console.log(nodeId)),
+            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph, 'person', {nodeId})),
+            tap(({node}) => expect(node.props.name).to.equal('todd')),
+        ))
+    );
 });
-
