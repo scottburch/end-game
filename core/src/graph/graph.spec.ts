@@ -1,8 +1,9 @@
-import {first, firstValueFrom, switchMap, tap} from "rxjs";
-import {graphGet, graphPut, graphOpen} from "./graph.js";
+import {bufferCount, combineLatest, first, firstValueFrom, from, map, merge, switchMap, tap, toArray} from "rxjs";
+import {graphGet, graphPut, graphOpen, graphPutEdge, graphGetEdge} from "./graph.js";
 import {expect} from "chai";
 import {handlers} from "../handlers/handlers.js";
 import {memoryStoreGetNodeHandler, memoryStorePutNodeHandler} from "../handlers/store-handlers/memoryStoreHandler.js";
+import {getAGraph} from "../test/testUtils.js";
 
 describe('graph', () => {
     it('should open a graph', () =>
@@ -19,21 +20,31 @@ describe('graph', () => {
     );
 
     it('should get an item from the graph by id', () =>
-        firstValueFrom(graphOpen({
-            graphId: 'my.graph', handlers: {
-                putNode: handlers([memoryStorePutNodeHandler]),
-                getNode: handlers([memoryStoreGetNodeHandler])
-            }
-        }).pipe(
+        firstValueFrom(getAGraph().pipe(
             switchMap(graph => graphPut(graph, 'person', {name: 'scott'})),
-            tap(({nodeId}) => console.log(nodeId)),
-            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph, 'person', {nodeId})),
+            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph,  nodeId)),
             tap(({node}) => expect(node.props.name).to.equal('scott')),
             first(),
             switchMap(({graph}) => graphPut(graph, 'person', {name: 'todd'})),
-            tap(({nodeId}) => console.log(nodeId)),
-            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph, 'person', {nodeId})),
+            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph,  nodeId)),
             tap(({node}) => expect(node.props.name).to.equal('todd')),
         ))
     );
+
+    it('should be able to add a relationship between two nodes', () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph => combineLatest([
+                graphPut(graph, 'person', {name: 'scott'}),
+                graphPut(graph, 'person', {name: 'todd'})
+            ]).pipe(
+                switchMap(arr => from(arr)),
+                map(({nodeId}) => nodeId),
+                toArray(),
+                switchMap(([n1, n2]) => graphPutEdge(graph, 'friend', n1, n2, {foo: 10})),
+                switchMap(({edge}) => graphGetEdge(graph, edge.edgeId)),
+                tap(x => x)
+                // TODO: Finish here
+            )),
+        ))
+    )
 });
