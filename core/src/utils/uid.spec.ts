@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {newUid, timestampFromUid} from "./uid.js";
-import {delay, firstValueFrom, map, of, tap} from "rxjs";
+import {firstValueFrom, map, of, tap} from "rxjs";
 
 describe('uid utility', () => {
     it('should generate a uid', () =>
