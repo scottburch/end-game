@@ -10,7 +10,7 @@ import {passwordAuthHandler} from "../handlers/auth-handlers/passwordAuthHandler
 import {
     memoryStoreGetHandler,
     memoryStoreGetMetaHandler,
-    memoryStorePutHandler
+    memoryStorePutHandler, memoryStoreRuleGetHandler, memoryStoreRulePutHandler
 } from "../handlers/store-handlers/memoryStoreHandlers.js";
 import {logoutHandler} from "../handlers/auth-handlers/logoutHandler.js";
 import {DeepPartial} from "tsdef";
@@ -25,6 +25,8 @@ export const testLocalEndgame = (partialConfig: DeepPartial<EndgameConfig> = {})
             get: handlers([memoryStoreGetHandler]),
             put: handlers([memoryStorePutHandler]),
             getMeta: handlers([memoryStoreGetMetaHandler]),
+            rulePut: handlers([memoryStoreRulePutHandler]),
+            ruleGet: handlers([memoryStoreRuleGetHandler]),
             ...partialConfig.handlers
         },
         ...partialConfig

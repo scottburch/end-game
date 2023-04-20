@@ -56,17 +56,19 @@ export const endgameCreateUser = (endgame: Endgame, username: string, password: 
 export const endgameLogout = (endgame: AuthenticatedEndgame) =>
     endgame.config.handlers.logout.next({endgame}).pipe(first());
 
-export const endgameRulePut = (endgame: AuthenticatedEndgame, reader: string, writer: string) =>
+export const endgameRulePut = (endgame: AuthenticatedEndgame, reader: string, writer: string, path: string) =>
     of({
         ownerPath: endgame.userPath,
         reader,
         writer,
         sig: ''
     } as Rule).pipe(
-        switchMap(rule => signRule(rule, endgame.keys.privKey).pipe(
-// TODO: Finish here
-        ))
-    )
+        switchMap(rule => signRule(rule, endgame.keys.privKey)),
+        switchMap(rule => endgame.config.handlers.rulePut.next({endgame, rule, path}))
+    );
+
+export const endgameRuleGet = (endgame: Endgame, path: string) =>
+    endgame.config.handlers.ruleGet.next({endgame, path})
 
 export const asAuthenticatedEndgame = (endgame: Endgame | AuthenticatedEndgame) => endgame as AuthenticatedEndgame;
 
@@ -151,6 +153,8 @@ const newEndgameConfig = (config: DeepPartial<EndgameConfig>) => ({
         peerIn: config.handlers?.peerIn as EndgameConfig['handlers']['peerIn'] || nullHandler<'peerIn'>(),
         put: config.handlers?.put as EndgameConfig['handlers']['put'] || nullHandler<'put'>(),
         get: config.handlers?.get as EndgameConfig['handlers']['get'] || nullHandler<'get'>(),
-        getMeta: config.handlers?.getMeta as EndgameConfig['handlers']['getMeta'] || nullHandler<'getMeta'>()
+        getMeta: config.handlers?.getMeta as EndgameConfig['handlers']['getMeta'] || nullHandler<'getMeta'>(),
+        rulePut: config.handlers?.rulePut as EndgameConfig['handlers']['rulePut'] || nullHandler<'rulePut'>(),
+        ruleGet: config.handlers?.ruleGet as EndgameConfig['handlers']['ruleGet'] || nullHandler<'ruleGet'>()
     }
 } satisfies EndgameConfig as EndgameConfig)

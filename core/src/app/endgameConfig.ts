@@ -2,6 +2,7 @@ import {Observable} from "rxjs";
 import {AuthenticatedEndgame, Endgame, LogEntry} from "./endgame.js";
 import {PeerMsg} from "../p2p/peerMsg.js";
 import {EndgameGraphBundle, EndgameGraphMeta, EndgameGraphValue} from "../graph/endgameGraph.js";
+import {Rule} from "./rules.js";
 
 
 export type HandlerNames = keyof EndgameConfig['handlers']
@@ -25,6 +26,8 @@ export type EndgameConfig = {
         put: Handler<EndgameGraphBundle<any> & {endgame: AuthenticatedEndgame}>
         get: Handler<{ path: string, value?: EndgameGraphValue, endgame: Endgame }>
         getMeta: Handler<{endgame: Endgame, path: string, meta?: EndgameGraphMeta}>
+        rulePut: Handler<{endgame: Endgame, rule: Rule, path: string}>
+        ruleGet: Handler<{endgame: Endgame, path: string, rule?: Rule}>
     }
 }
 
