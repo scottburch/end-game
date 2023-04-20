@@ -42,9 +42,15 @@ describe('graph', () => {
                 toArray(),
                 switchMap(([n1, n2]) => graphPutEdge(graph, 'friend', n1, n2, {foo: 10})),
                 switchMap(({edge}) => graphGetEdge(graph, edge.edgeId)),
-                tap(x => x)
-                // TODO: Finish here
+                tap(({edge}) => {
+                    expect(edge?.label).to.equal('friend');
+                    expect(edge?.edgeId).to.have.length(12);
+                    expect(edge?.props).to.deep.equal({foo: 10});
+                    expect(edge?.from).to.have.length(12);
+                    expect(edge?.to).to.have.length(12);
+                    expect(edge?.from).to.not.equal(edge?.to);
+                })
             )),
         ))
-    )
+    );
 });
