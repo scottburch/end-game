@@ -59,8 +59,7 @@ describe('graph', () => {
                     graphPut(graph, 'person', {name: 'scott'}),
                     graphPut(graph, 'person', {name: 'todd'})
                 ]).pipe(
-                    map(([{graph}]) => graph),
-                    switchMap(graph => graphSearch<{ name: string }>(graph, {label: 'person'})),
+                    switchMap(([{graph}]) => graphSearch<{ name: string }>(graph, {label: 'person'})),
                     switchMap(({nodes}) => from(nodes || [])),
                     map(node => node.props.name),
                     toArray()
