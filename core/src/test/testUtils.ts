@@ -1,18 +1,23 @@
-import {graphOpen} from "../graph/graph.js";
+import {graphOpen, GraphOpts} from "../graph/graph.js";
 import {handlers} from "../handlers/handlers.js";
 import {
     memoryStoreGetEdgeHandler,
-    memoryStoreGetNodeHandler,
+    memoryStoreGetNodeHandler, memoryStoreNodesByLabelHandler,
     memoryStorePutEdgeHandler,
     memoryStorePutNodeHandler
 } from "../handlers/store-handlers/memoryStoreHandler.js";
 
-export const getAGraph = () =>
+
+export const getAGraph = (opts: GraphOpts = {}) =>
     graphOpen({
-        graphId: 'my.graph', handlers: {
+        graphId: 'my.graph',
+        ...opts,
+        handlers: {
             putNode: handlers([memoryStorePutNodeHandler]),
             getNode: handlers([memoryStoreGetNodeHandler]),
             putEdge: handlers([memoryStorePutEdgeHandler]),
-            getEdge: handlers([memoryStoreGetEdgeHandler])
-        }
+            getEdge: handlers([memoryStoreGetEdgeHandler]),
+            nodesByLabel: handlers([memoryStoreNodesByLabelHandler]),
+            ...opts.handlers
+        },
     });

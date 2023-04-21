@@ -1,6 +1,17 @@
 import {MemoryLevel} from "memory-level";
-import {Graph, HandlerFn} from "../../graph/graph.js";
-import {catchError, map, merge, mergeMap, of, switchMap, throwError} from "rxjs";
+import {Graph, GraphNode, HandlerFn} from "../../graph/graph.js";
+import {
+    catchError,
+    concatMap,
+    map,
+    merge,
+    mergeMap,
+    of,
+    range,
+    switchMap,
+    takeWhile, tap,
+    throwError, toArray
+} from "rxjs";
 
 const stores: Record<string, MemoryLevel> = {};
 
@@ -35,4 +46,19 @@ export const memoryStoreGetEdgeHandler: HandlerFn<'getEdge'> =
         switchMap(store => store.get([graph.graphId, edgeId].join('.'))),
         map(json => JSON.parse(json)),
         map(edge => ({graph, edgeId, edge}))
+    );
+
+export const memoryStoreNodesByLabelHandler: HandlerFn<'nodesByLabel'> =
+    ({graph, label}) => of(getStore(graph)).pipe(
+        map(store => store.iterator({gt: [graph.graphId, label].join('.') + '.', lt: [graph.graphId, label].join('.') + '.zzzzzz'})),
+        switchMap(iterator => range(1, 1000).pipe(
+            concatMap(() => iterator.next()),
+            takeWhile(pair => !!pair?.[0]),
+            map(pair => pair?.[0].replace([graph.graphId, label].join('.') + '.', '')),
+            mergeMap(nodeId => memoryStoreGetNodeHandler({graph, nodeId: nodeId as string})),
+            map(({node}) => node as GraphNode<Object>),
+            toArray(),
+            tap(() => iterator.close())
+        )),
+        map(nodes => ({graph, label, nodes})),
     )

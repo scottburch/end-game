@@ -1,7 +1,8 @@
 import {combineLatest, first, firstValueFrom, from, map, switchMap, tap, toArray} from "rxjs";
-import {graphGet, graphGetEdge, graphOpen, graphPut, graphPutEdge} from "./graph.js";
+import {graphGet, graphGetEdge, graphOpen, graphPut, graphPutEdge, graphSearch} from "./graph.js";
 import {expect} from "chai";
 import {getAGraph} from "../test/testUtils.js";
+import {newUid} from "../utils/uid.js";
 
 describe('graph', () => {
     it('should open a graph', () =>
@@ -20,11 +21,11 @@ describe('graph', () => {
     it('should get an item from the graph by id', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => graphPut(graph, 'person', {name: 'scott'})),
-            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph,  nodeId)),
+            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph, nodeId)),
             tap(({node}) => expect(node.props.name).to.equal('scott')),
             first(),
             switchMap(({graph}) => graphPut(graph, 'person', {name: 'todd'})),
-            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph,  nodeId)),
+            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph, nodeId)),
             tap(({node}) => expect(node.props.name).to.equal('todd')),
         ))
     );
@@ -47,8 +48,29 @@ describe('graph', () => {
                     expect(edge?.from).to.have.length(12);
                     expect(edge?.to).to.have.length(12);
                     expect(edge?.from).to.not.equal(edge?.to);
-                })
+                }),
             )),
+        ))
+    );
+
+    it('should be able to find nodes with a given label', () =>
+        firstValueFrom(getAGraph({graphId: newUid()}).pipe(
+            switchMap(graph => combineLatest([
+                    graphPut(graph, 'person', {name: 'scott'}),
+                    graphPut(graph, 'person', {name: 'todd'})
+                ]).pipe(
+                    map(([{graph}]) => graph),
+                    switchMap(graph => graphSearch<{ name: string }>(graph, {label: 'person'})),
+                    switchMap(({nodes}) => from(nodes || [])),
+                    map(node => node.props.name),
+                    toArray()
+                )
+            ),
+            tap(names => {
+                 expect(names).to.have.length(2);
+                expect(names).to.include('scott');
+                expect(names).to.include('todd');
+            }),
         ))
     );
 });

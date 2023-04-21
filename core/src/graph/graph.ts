@@ -6,11 +6,10 @@ import {DeepPartial} from "tsdef";
 type NodeId = string
 type EdgeId = string
 
-type GraphNode<T extends Object> = {
+export type GraphNode<T extends Object> = {
     nodeId: string
     label: string
     props: T
-
 }
 
 type GraphEdge<T extends Object> = {
@@ -21,6 +20,10 @@ type GraphEdge<T extends Object> = {
     props: T
 }
 
+export type GraphQuery = {
+    label: string
+}
+
 export type Graph = {
     graphId: string
     handlers: {
@@ -28,6 +31,7 @@ export type Graph = {
         getNode: Handler<{graph: Graph, nodeId: NodeId, node?: GraphNode<Object>}>
         putEdge: Handler<{graph: Graph, edge: GraphEdge<Object>}>
         getEdge: Handler<{graph: Graph, edgeId: EdgeId, edge?: GraphEdge<Object>}>
+        nodesByLabel: Handler<{graph: Graph, label: string, nodes?: GraphNode<Object>[]}>
     }
 }
 
@@ -36,7 +40,7 @@ export type Handler<T> = Observable<T> & {next: (v: T) => Observable<T>, props: 
 export type HandlerProps<T extends HandlerNames> = Graph['handlers'][T]['props'];
 export type HandlerFn<T extends HandlerNames> = (p: HandlerProps<T>) => Observable<HandlerProps<T>>;
 
-type GraphOpts = DeepPartial<Graph>
+export type GraphOpts = DeepPartial<Graph>
 
 
 export const graphOpen = (opts: GraphOpts) => of({
@@ -45,7 +49,8 @@ export const graphOpen = (opts: GraphOpts) => of({
         putNode: opts.handlers?.putNode || nullHandler<'putNode'>(),
         getNode: opts.handlers?.getNode || nullHandler<'getNode'>(),
         putEdge: opts.handlers?.putEdge || nullHandler<'putEdge'>(),
-        getEdge: opts.handlers?.getEdge || nullHandler<'getEdge'>()
+        getEdge: opts.handlers?.getEdge || nullHandler<'getEdge'>(),
+        nodesByLabel: opts.handlers?.nodesByLabel || nullHandler<'nodesByLabel'>()
     }
 } as Graph);
 
@@ -80,3 +85,10 @@ export const graphGet = <T extends Object>(graph: Graph, nodeId: NodeId) =>
         filter(({node, nodeId}) =>  node === undefined || node.nodeId === nodeId),
         map(({node}) => ({graph, node: node as GraphNode<T>}))
     );
+
+export const graphSearch = <T extends Object>(graph: Graph, query: GraphQuery) =>
+    graph.handlers.nodesByLabel.next({graph, label: query.label}).pipe(
+        filter(({label}) => label === query.label),
+        map(({nodes}) => ({graph, nodes: nodes as GraphNode<T>[]})),
+        first()
+    )
