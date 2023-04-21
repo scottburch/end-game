@@ -28,7 +28,7 @@ export type Graph = {
         putEdge: Handler<{graph: Graph, edge: GraphEdge<Object>}>
         getEdge: Handler<{graph: Graph, edgeId: EdgeId, edge?: GraphEdge<Object>}>
         nodesByLabel: Handler<{graph: Graph, label: string, nodes?: GraphNode<Object>[]}>
-        getRelatedNodes: Handler<{graph: Graph, nodeId: NodeId, label: string, nodes?: GraphNode<Object>[]}>
+        getRelatedNodes: Handler<{graph: Graph, nodeId: NodeId, label: string, relationships?: {node: GraphNode<Object>, edgeId: string}[]}>
     }
 }
 
@@ -73,7 +73,8 @@ export const graphPutEdge = <T extends Object>(graph: Graph, label: string, from
 
 export const graphGetEdge = <T extends Object>(graph: Graph, edgeId: string) =>
     graph.handlers.getEdge.next({graph, edgeId}).pipe(
-        filter(({edge}) => edge === undefined || edge?.edgeId === edgeId)
+        filter(({edge}) => edge === undefined || edge?.edgeId === edgeId),
+        map(({edge, edgeId, graph}) => ({graph, edgeId, edge: edge as GraphEdge<T>}))
     );
 
 
@@ -94,5 +95,5 @@ export const nodesByLabel = <T extends Object>(graph: Graph, label: string) =>
 export const graphGetRelatedNodes = <T extends Object>(graph: Graph, nodeId: NodeId, label: string) =>
     graph.handlers.getRelatedNodes.next({graph, nodeId, label}).pipe(
         filter(({nodeId: nid, label: l}) => nid === nodeId && label === label),
-        map(({nodes}) => ({graph, nodes: nodes as GraphNode<T>[]}))
+        map(({relationships}) => ({graph, relationships: relationships as {node: GraphNode<T>, edgeId: string}[]}))
     );

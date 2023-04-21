@@ -28,7 +28,7 @@ export const memoryStorePutNodeHandler: HandlerFn<'putNode'> =
     ({graph, node}) => of(getStore(graph)).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, node.nodeId].join('.'), JSON.stringify(node)),
-            store.put([graph.graphId, node.label, node.nodeId].join('.'), '')
+            store.put([graph.graphId, node.label, node.nodeId].join('.'), '')   // label index
         )),
         map(() => ({graph, node}))
     );
@@ -37,7 +37,7 @@ export const memoryStorePutEdgeHandler: HandlerFn<'putEdge'> =
     ({graph, edge}) => of(getStore(graph)).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, edge.edgeId].join('.'), JSON.stringify(edge)),
-            store.put([graph.graphId, edge.from, edge.label, edge.to].join('.'), '')
+            store.put([graph.graphId, edge.from, edge.label, edge.to].join('.'), edge.edgeId) // edge label index
         )),
         map(() => ({graph, edge}))
     );
@@ -70,11 +70,12 @@ export const memoryStoreGetRelatedNodes: HandlerFn<'getRelatedNodes'> =
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
-            map(pair => pair?.[0].replace([graph.graphId, nodeId, label].join('.') + '.', '')),
-            mergeMap(nodeId => memoryStoreGetNodeHandler({graph, nodeId: nodeId as string})),
-            map(({node}) => node as GraphNode<Object>),
+            map(pair => [pair?.[0].replace([graph.graphId, nodeId, label].join('.') + '.', ''), pair?.[1]]),
+            mergeMap(([nodeId, edgeId]) => memoryStoreGetNodeHandler({graph, nodeId: nodeId as string}).pipe(
+                map(({node}) => ({node: node as GraphNode<Object>, edgeId: edgeId || ''})),
+            )),
             toArray(),
             tap(() => iterator.close())
         )),
-        map(nodes => ({graph, nodeId, label, nodes}))
+        map(relationships => ({graph, nodeId, label, relationships}))
     )
