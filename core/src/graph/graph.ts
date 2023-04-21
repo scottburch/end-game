@@ -2,9 +2,10 @@ import {filter, first, map, Observable, of, switchMap} from "rxjs";
 import {newUid} from "../utils/uid.js";
 import {nullHandler} from "../handlers/handlers.js";
 import {DeepPartial} from "tsdef";
+import {Relationship} from "./relationship.js";
 
-type NodeId = string
-type EdgeId = string
+export type NodeId = string
+export type EdgeId = string
 
 export type GraphNode<T extends Object> = {
     nodeId: string
@@ -28,7 +29,7 @@ export type Graph = {
         putEdge: Handler<{graph: Graph, edge: GraphEdge<Object>}>
         getEdge: Handler<{graph: Graph, edgeId: EdgeId, edge?: GraphEdge<Object>}>
         nodesByLabel: Handler<{graph: Graph, label: string, nodes?: GraphNode<Object>[]}>
-        getRelatedNodes: Handler<{graph: Graph, nodeId: NodeId, label: string, relationships?: {node: GraphNode<Object>, edgeId: string}[]}>
+        getRelationships: Handler<{graph: Graph, nodeId: NodeId, label: string, relationships?: Relationship[]}>
     }
 }
 
@@ -48,7 +49,7 @@ export const graphOpen = (opts: GraphOpts) => of({
         putEdge: opts.handlers?.putEdge || nullHandler<'putEdge'>(),
         getEdge: opts.handlers?.getEdge || nullHandler<'getEdge'>(),
         nodesByLabel: opts.handlers?.nodesByLabel || nullHandler<'nodesByLabel'>(),
-        getRelatedNodes: opts.handlers?.getRelatedNodes || nullHandler<'getRelatedNodes'>()
+        getRelationships: opts.handlers?.getRelationships || nullHandler<'getRelationships'>()
     }
 } as Graph);
 
@@ -92,8 +93,9 @@ export const nodesByLabel = <T extends Object>(graph: Graph, label: string) =>
         first()
     );
 
-export const graphGetRelatedNodes = <T extends Object>(graph: Graph, nodeId: NodeId, label: string) =>
-    graph.handlers.getRelatedNodes.next({graph, nodeId, label}).pipe(
+
+export const graphGetRelationships = (graph: Graph, nodeId: NodeId, label: string) =>
+    graph.handlers.getRelationships.next({graph, nodeId, label}).pipe(
         filter(({nodeId: nid, label: l}) => nid === nodeId && label === label),
-        map(({relationships}) => ({graph, relationships: relationships as {node: GraphNode<T>, edgeId: string}[]}))
-    );
+        map(({relationships}) => ({graph, relationships}))
+    )

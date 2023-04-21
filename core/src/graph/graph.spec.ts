@@ -1,8 +1,8 @@
-import {combineLatest, first, firstValueFrom, from, map, of, switchMap, tap, toArray} from "rxjs";
+import {combineLatest, first, firstValueFrom, from, map, switchMap, tap, toArray} from "rxjs";
 import {
     graphGet,
     graphGetEdge,
-    graphGetRelatedNodes,
+    graphGetRelationships,
     graphOpen,
     graphPut,
     graphPutEdge,
@@ -88,12 +88,11 @@ describe('graph', () => {
             switchMap(([{graph, nodeId: id1}, {nodeId: id2}]) =>
                 graphPutEdge(graph, 'friend', id1, id2, {rank: 5})
             ),
-            switchMap(({graph, edge}) => graphGetRelatedNodes<{name: string}>(graph, edge.from, 'friend')),
+            switchMap(({graph, edge}) => graphGetRelationships(graph, edge.from, 'friend')),
             tap(({relationships}) => {
                 expect(relationships).to.have.length(1);
-                expect(relationships?.[0].node.props.name).to.equal('todd');
             }),
-            switchMap(({graph, relationships}) => graphGetEdge<{rank: number}>(graph, relationships[0].edgeId)),
+            switchMap(({graph, relationships}) => graphGetEdge<{rank: number}>(graph, relationships?.[0].edgeId || '')),
             tap(({edge}) => {
                 expect(edge?.props.rank).to.equal(5)
             })

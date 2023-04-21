@@ -12,6 +12,7 @@ import {
     takeWhile, tap,
     throwError, toArray
 } from "rxjs";
+import {Relationship} from "../../graph/relationship.js";
 
 const stores: Record<string, MemoryLevel> = {};
 
@@ -64,18 +65,16 @@ export const memoryStoreNodesByLabelHandler: HandlerFn<'nodesByLabel'> =
         map(nodes => ({graph, label, nodes})),
     );
 
-export const memoryStoreGetRelatedNodes: HandlerFn<'getRelatedNodes'> =
+export const memoryStoreGetRelationships: HandlerFn<'getRelationships'> =
     ({graph, nodeId, label}) => of(getStore(graph)).pipe(
         map(store => store.iterator({gt: [graph.graphId, nodeId, label].join('.') + '.', lt: [graph.graphId, nodeId, label].join('.') + '.zzzzzz'})),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
             map(pair => [pair?.[0].replace([graph.graphId, nodeId, label].join('.') + '.', ''), pair?.[1]]),
-            mergeMap(([nodeId, edgeId]) => memoryStoreGetNodeHandler({graph, nodeId: nodeId as string}).pipe(
-                map(({node}) => ({node: node as GraphNode<Object>, edgeId: edgeId || ''})),
-            )),
+            map(([to, edgeId]) => ({edgeId: edgeId || '', to: to || '', from: nodeId}) satisfies Relationship),
             toArray(),
             tap(() => iterator.close())
         )),
-        map(relationships => ({graph, nodeId, label, relationships}))
+        map(relationships => ({graph, label, nodeId, to: '', from: '', relationships}))
     )
