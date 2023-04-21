@@ -72,8 +72,8 @@ const keySearchCriteria = (segments: string[]) => ({
 });
 
 export const memoryStoreGetRelationships: HandlerFn<'getRelationships'> =
-    ({graph, nodeId, label}) => of(getStore(graph)).pipe(
-        map(store => store.iterator(keySearchCriteria([graph.graphId, nodeId, label]))),
+    ({graph, nodeId, rel}) => of(getStore(graph)).pipe(
+        map(store => store.iterator(keySearchCriteria([graph.graphId, nodeId, rel]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
@@ -82,5 +82,5 @@ export const memoryStoreGetRelationships: HandlerFn<'getRelationships'> =
             toArray(),
             tap(() => iterator.close())
         )),
-        map(relationships => ({graph, label, nodeId, to: '', from: '', relationships}))
+        map(relationships => ({graph, rel, nodeId, to: '', from: '', relationships}))
     )

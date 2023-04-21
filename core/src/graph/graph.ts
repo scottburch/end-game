@@ -29,7 +29,7 @@ export type Graph = {
         putEdge: Handler<{graph: Graph, edge: GraphEdge<Object>}>
         getEdge: Handler<{graph: Graph, edgeId: EdgeId, edge?: GraphEdge<Object>}>
         nodesByLabel: Handler<{graph: Graph, label: string, nodes?: GraphNode<Object>[]}>
-        getRelationships: Handler<{graph: Graph, nodeId: NodeId, label: string, relationships?: Relationship[]}>
+        getRelationships: Handler<{graph: Graph, nodeId: NodeId, rel: string, relationships?: Relationship[]}>
     }
 }
 
@@ -93,9 +93,9 @@ export const nodesByLabel = <T extends Object>(graph: Graph, label: string) =>
         first()
     );
 
-export const graphGetRelationships = (graph: Graph, nodeId: NodeId, label: string) =>
-    graph.handlers.getRelationships.next({graph, nodeId, label}).pipe(
-        filter(({nodeId: nid, label: l}) => nid === nodeId && l === label),
+export const graphGetRelationships = (graph: Graph, nodeId: NodeId, rel: string) =>
+    graph.handlers.getRelationships.next({graph, nodeId, rel}).pipe(
+        filter(({nodeId: nid, rel: r}) => nid === nodeId && r === rel),
         map(({relationships}) => ({graph, relationships}))
     );
 
