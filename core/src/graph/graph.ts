@@ -7,13 +7,22 @@ import {Relationship} from "./relationship.js";
 export type NodeId = string
 export type EdgeId = string
 
-export type GraphNode<T extends Object> = {
+export type Props = Record<string, any>;
+
+export const IndexTypes = {
+    LABEL: '0',
+
+} as const
+
+
+
+export type GraphNode<T extends Props> = {
     nodeId: string
     label: string
     props: T
 }
 
-type GraphEdge<T extends Object> = {
+type GraphEdge<T extends Record<string, any>> = {
     edgeId: EdgeId
     rel: string
     from: NodeId
@@ -24,11 +33,11 @@ type GraphEdge<T extends Object> = {
 export type Graph = {
     graphId: string
     handlers: {
-        putNode: Handler<{graph: Graph, node: GraphNode<Object>}>
-        getNode: Handler<{graph: Graph, nodeId: NodeId, node?: GraphNode<Object>}>
-        putEdge: Handler<{graph: Graph, edge: GraphEdge<Object>}>
-        getEdge: Handler<{graph: Graph, edgeId: EdgeId, edge?: GraphEdge<Object>}>
-        nodesByLabel: Handler<{graph: Graph, label: string, nodes?: GraphNode<Object>[]}>
+        putNode: Handler<{graph: Graph, node: GraphNode<Props>}>
+        getNode: Handler<{graph: Graph, nodeId: NodeId, node?: GraphNode<Props>}>
+        putEdge: Handler<{graph: Graph, edge: GraphEdge<Props>}>
+        getEdge: Handler<{graph: Graph, edgeId: EdgeId, edge?: GraphEdge<Props>}>
+        nodesByLabel: Handler<{graph: Graph, label: string, nodes?: GraphNode<Props>[]}>
         getRelationships: Handler<{graph: Graph, nodeId: NodeId, rel: string, relationships?: Relationship[], reverse: boolean}>
     }
 }
@@ -53,7 +62,7 @@ export const graphOpen = (opts: GraphOpts) => of({
     }
 } as Graph);
 
-export const graphPut = <T extends Object>(graph: Graph, label: string, props: T) =>
+export const graphPut = <T extends Props>(graph: Graph, label: string, props: T) =>
     of({
         nodeId: newUid(),
         label,
@@ -66,13 +75,13 @@ export const graphPut = <T extends Object>(graph: Graph, label: string, props: T
         first()
     );
 
-export const graphPutEdge = <T extends Object>(graph: Graph, label: string, from: NodeId, to: NodeId, props: T) =>
+export const graphPutEdge = <T extends Props>(graph: Graph, label: string, from: NodeId, to: NodeId, props: T) =>
     of({edgeId: newUid(), rel: label, props, from, to } satisfies GraphEdge<T>).pipe(
         switchMap(edge => graph.handlers.putEdge.next({graph, edge})),
         first()
     );
 
-export const graphGetEdge = <T extends Object>(graph: Graph, edgeId: string) =>
+export const graphGetEdge = <T extends Props>(graph: Graph, edgeId: string) =>
     graph.handlers.getEdge.next({graph, edgeId}).pipe(
         filter(({edge}) => edge === undefined || edge?.edgeId === edgeId),
         map(({edge, edgeId, graph}) => ({graph, edgeId, edge: edge as GraphEdge<T>}))
@@ -80,13 +89,13 @@ export const graphGetEdge = <T extends Object>(graph: Graph, edgeId: string) =>
 
 
 
-export const graphGet = <T extends Object>(graph: Graph, nodeId: NodeId) =>
+export const graphGet = <T extends Props>(graph: Graph, nodeId: NodeId) =>
     graph.handlers.getNode.next({graph, nodeId}).pipe(
         filter(({node, nodeId}) =>  node === undefined || node.nodeId === nodeId),
         map(({node}) => ({graph, node: node as GraphNode<T>}))
     );
 
-export const nodesByLabel = <T extends Object>(graph: Graph, label: string) =>
+export const nodesByLabel = <T extends Props>(graph: Graph, label: string) =>
     graph.handlers.nodesByLabel.next({graph, label}).pipe(
         filter(({label: l}) => l === label),
         map(({nodes}) => ({graph, nodes: nodes as GraphNode<T>[]})),
