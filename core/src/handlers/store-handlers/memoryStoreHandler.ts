@@ -39,7 +39,7 @@ export const memoryStorePutEdgeHandler: HandlerFn<'putEdge'> =
         switchMap(store => merge(
             store.put([graph.graphId, edge.edgeId].join('.'), JSON.stringify(edge)),
             store.put([graph.graphId, edge.from, edge.rel, edge.to].join('.'), edge.edgeId), // edge from rel indexes
-            store.put([graph.graphId, edge.to, edge.rel, edge.from].join(''), edge.edgeId)   // edge to rel index
+            store.put([graph.graphId, edge.to, edge.rel, edge.from].join('.'), edge.edgeId)   // edge to rel index
         )),
         map(() => ({graph, edge}))
     );
@@ -72,15 +72,15 @@ const keySearchCriteria = (segments: string[]) => ({
 });
 
 export const memoryStoreGetRelationships: HandlerFn<'getRelationships'> =
-    ({graph, nodeId, rel}) => of(getStore(graph)).pipe(
+    ({graph, nodeId, rel, reverse}) => of(getStore(graph)).pipe(
         map(store => store.iterator(keySearchCriteria([graph.graphId, nodeId, rel]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
             map(pair => [pair?.[0].split('.')[3], pair?.[1]]),
-            map(([to, edgeId]) => ({edgeId: edgeId || '', to: to || '', from: nodeId}) satisfies Relationship),
+            map(([to, edgeId]) => ({edgeId: edgeId || '', to: reverse ? nodeId : (to || ''), from: reverse ? (to || '') : nodeId}) satisfies Relationship),
             toArray(),
             tap(() => iterator.close())
         )),
-        map(relationships => ({graph, rel, nodeId, to: '', from: '', relationships}))
+        map(relationships => ({graph, rel, nodeId, to: '', from: '', relationships, reverse}))
     )
