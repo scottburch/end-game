@@ -83,18 +83,24 @@ describe('graph', () => {
         firstValueFrom(getAGraph({graphId: newUid()}).pipe(
             switchMap(graph => combineLatest([
                 graphPut(graph, 'person', {name: 'scott'}),
-                graphPut(graph, 'person', {name: 'todd'})
+                graphPut(graph, 'person', {name: 'todd'}),
+                graphPut(graph, 'person', {name: 'joe'}),
             ])),
-            switchMap(([{graph, nodeId: id1}, {nodeId: id2}]) =>
-                graphPutEdge(graph, 'friend', id1, id2, {rank: 5})
-            ),
-            switchMap(({graph, edge}) => graphGetRelationships(graph, edge.from, 'friend')),
+            switchMap(([{graph, nodeId: id1}, {nodeId: id2}, {nodeId: id3}]) => combineLatest([
+                graphPutEdge(graph, 'friend', id1, id2, {rank: 5}),
+                graphPutEdge(graph, 'friend', id1, id3, {rank: 10})
+            ])),
+            switchMap(edges => graphGetRelationships(edges[0].graph, edges[0].edge.from, 'friend')),
             tap(({relationships}) => {
-                expect(relationships).to.have.length(1);
+                expect(relationships).to.have.length(2);
             }),
-            switchMap(({graph, relationships}) => graphGetEdge<{rank: number}>(graph, relationships?.[0].edgeId || '')),
-            tap(({edge}) => {
-                expect(edge?.props.rank).to.equal(5)
+            switchMap(({graph, relationships}) => combineLatest([
+                graphGetEdge<{rank: number}>(graph, relationships?.[0].edgeId || ''),
+                graphGetEdge<{rank: number}>(graph, relationships?.[1].edgeId || '')
+            ])),
+            tap(results => {
+                expect(results[0].edge.props.rank).to.equal(5);
+                expect(results[1].edge.props.rank).to.equal(10);
             })
         ))
     );
