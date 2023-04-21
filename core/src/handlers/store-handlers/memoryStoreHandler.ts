@@ -1,5 +1,5 @@
 import {MemoryLevel} from "memory-level";
-import {Graph, GraphNode, HandlerFn, IndexTypes} from "../../graph/graph.js";
+import {Graph, GraphNode, HandlerFn, IndexTypes, Props} from "../../graph/graph.js";
 import {
     catchError,
     concatMap, from,
@@ -31,7 +31,7 @@ export const memoryStorePutNodeHandler: HandlerFn<'putNode'> =
             store.put([graph.graphId, node.nodeId].join('.'), JSON.stringify(node)),
             store.put([graph.graphId, IndexTypes.LABEL, node.label, node.nodeId].join('.'), ''),   // label index
             from(Object.keys(node.props)).pipe(
-                 switchMap(key => store.put([graph.graphId, IndexTypes.PROP, node.label, key, JSON.stringify(node.props[key])].join('.'), ''))
+                 switchMap(key => store.put([graph.graphId, IndexTypes.PROP, node.label, key, JSON.stringify(node.props[key]), node.nodeId].join('.'), ''))
              )
         )),
         map(() => ({graph, node}))
@@ -62,12 +62,28 @@ export const memoryStoreNodesByLabelHandler: HandlerFn<'nodesByLabel'> =
             takeWhile(pair => !!pair?.[0]),
             map(pair => pair?.[0].split('.')[3]),
             mergeMap(nodeId => memoryStoreGetNodeHandler({graph, nodeId: nodeId as string})),
-            map(({node}) => node as GraphNode<Object>),
+            map(({node}) => node as GraphNode<Props>),
             toArray(),
             tap(() => iterator.close())
         )),
         map(nodes => ({graph, label, nodes})),
     );
+
+export const memoryStoreNodesByPropHandler: HandlerFn<'nodesByProp'> =
+    ({graph, label, key, value}) => of(getStore(graph)).pipe(
+        map(store => store.iterator(keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, JSON.stringify(value)]))),
+        switchMap(iterator => range(1, 1000).pipe(
+            concatMap(() => iterator.next()),
+            takeWhile(pair => !!pair?.[0]),
+            map(pair => pair?.[0].split('.')[5]),
+            mergeMap(nodeId => memoryStoreGetNodeHandler({graph, nodeId: nodeId as string})),
+            map(({node}) => node as GraphNode<Props>),
+            toArray(),
+            tap(() => iterator.close())
+        )),
+        map(nodes => ({graph, label, key, value, nodes}))
+    )
+
 
 const keySearchCriteria = (segments: string[]) => ({
     gt: segments.join('.') + '.',

@@ -1,4 +1,4 @@
-import {filter, first, map, Observable, of, switchMap} from "rxjs";
+import {filter, first, map, Observable, of, switchMap, tap} from "rxjs";
 import {newUid} from "../utils/uid.js";
 import {nullHandler} from "../handlers/handlers.js";
 import {DeepPartial} from "tsdef";
@@ -40,6 +40,7 @@ export type Graph = {
         putEdge: Handler<{graph: Graph, edge: GraphEdge<Props>}>
         getEdge: Handler<{graph: Graph, edgeId: EdgeId, edge?: GraphEdge<Props>}>
         nodesByLabel: Handler<{graph: Graph, label: string, nodes?: GraphNode<Props>[]}>
+        nodesByProp: Handler<{graph: Graph, label: string, key: string, value: any, nodes?: GraphNode<Props>[]}>
         getRelationships: Handler<{graph: Graph, nodeId: NodeId, rel: string, relationships?: Relationship[], reverse: boolean}>
     }
 }
@@ -60,6 +61,7 @@ export const graphOpen = (opts: GraphOpts) => of({
         putEdge: opts.handlers?.putEdge || nullHandler<'putEdge'>(),
         getEdge: opts.handlers?.getEdge || nullHandler<'getEdge'>(),
         nodesByLabel: opts.handlers?.nodesByLabel || nullHandler<'nodesByLabel'>(),
+        nodesByProp: opts.handlers?.nodesByProp || nullHandler<'nodesByProp'>(),
         getRelationships: opts.handlers?.getRelationships || nullHandler<'getRelationships'>()
     }
 } as Graph);
@@ -100,14 +102,20 @@ export const graphGet = <T extends Props>(graph: Graph, nodeId: NodeId) =>
 export const nodesByLabel = <T extends Props>(graph: Graph, label: string) =>
     graph.handlers.nodesByLabel.next({graph, label}).pipe(
         filter(({label: l}) => l === label),
-        map(({nodes}) => ({graph, nodes: nodes as GraphNode<T>[]})),
+        map(({nodes}) => ({graph, label, nodes: nodes as GraphNode<T>[]})),
         first()
+    );
+
+export const nodesByProp = <T extends Props>(graph: Graph, label: string, key: string, value: any) =>
+    graph.handlers.nodesByProp.next({graph, label, key, value}).pipe(
+        filter(({label: l, key: k, value: v}) => label === l && key === k && value === v ),
+        map(({nodes}) => ({graph, label, key, value, nodes}))
     );
 
 export const graphGetRelationships = (graph: Graph, nodeId: NodeId, rel: string, opts: {reverse?: boolean} = {}) =>
     graph.handlers.getRelationships.next({graph, nodeId, rel, reverse: !!opts.reverse}).pipe(
         filter(({nodeId: nid, rel: r}) => nid === nodeId && r === rel),
-        map(({relationships}) => ({graph, relationships}))
+        map(({relationships}) => ({graph, nodeId, rel, opts, relationships}))
     );
 
 

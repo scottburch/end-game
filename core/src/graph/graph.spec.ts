@@ -6,7 +6,7 @@ import {
     graphOpen,
     graphPut,
     graphPutEdge, IndexTypes,
-    nodesByLabel
+    nodesByLabel, nodesByProp
 } from "./graph.js";
 import {expect} from "chai";
 import {getAGraph} from "../test/testUtils.js";
@@ -14,13 +14,13 @@ import {newUid} from "../utils/uid.js";
 
 describe('graph', () => {
     it('should open a graph', () =>
-        firstValueFrom(graphOpen({graphId: 'my.graph'}).pipe(
+        firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
             tap(graph => expect(graph).not.to.be.undefined)
         ))
     );
 
     it('should put a value in a graph and assign an id', () =>
-        firstValueFrom(graphOpen({graphId: 'my.graph'}).pipe(
+        firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
             switchMap(graph => graphPut(graph, 'person', {name: 'scott'})),
             tap(({graph, nodeId}) => expect(nodeId).to.have.length(12))
         ))
@@ -112,6 +112,18 @@ describe('graph', () => {
                 expect(results[0].edge.props.rank + results[1].edge.props.rank).to.equal(15);
                 expect(results[2].edge.props.rank).to.equal(5);
             })
+        ))
+    );
+
+    it('should be able to find nodes with a given property value', () =>
+        firstValueFrom(getAGraph({graphId: newUid()}).pipe(
+            switchMap(graph => combineLatest([
+                graphPut(graph, 'person', {name: 'scott', age: 1}),
+                graphPut(graph, 'person', {name: 'todd', age: 1}),
+                graphPut(graph, 'person', {name: 'joe', age: 2}),
+            ])),
+            switchMap(([{graph}]) => nodesByProp(graph, 'person', 'name', 'scott')),
+            tap(({nodes}) => expect(nodes).to.have.length(1))
         ))
     );
 });
