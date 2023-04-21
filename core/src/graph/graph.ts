@@ -15,7 +15,7 @@ export type GraphNode<T extends Object> = {
 
 type GraphEdge<T extends Object> = {
     edgeId: EdgeId
-    label: string
+    rel: string
     from: NodeId
     to: NodeId
     props: T
@@ -67,7 +67,7 @@ export const graphPut = <T extends Object>(graph: Graph, label: string, props: T
     );
 
 export const graphPutEdge = <T extends Object>(graph: Graph, label: string, from: NodeId, to: NodeId, props: T) =>
-    of({edgeId: newUid(), label, props, from, to } satisfies GraphEdge<T>).pipe(
+    of({edgeId: newUid(), rel: label, props, from, to } satisfies GraphEdge<T>).pipe(
         switchMap(edge => graph.handlers.putEdge.next({graph, edge})),
         first()
     );
@@ -93,9 +93,10 @@ export const nodesByLabel = <T extends Object>(graph: Graph, label: string) =>
         first()
     );
 
-
 export const graphGetRelationships = (graph: Graph, nodeId: NodeId, label: string) =>
     graph.handlers.getRelationships.next({graph, nodeId, label}).pipe(
-        filter(({nodeId: nid, label: l}) => nid === nodeId && label === label),
+        filter(({nodeId: nid, label: l}) => nid === nodeId && l === label),
         map(({relationships}) => ({graph, relationships}))
-    )
+    );
+
+

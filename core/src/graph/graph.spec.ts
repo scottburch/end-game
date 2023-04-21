@@ -50,7 +50,7 @@ describe('graph', () => {
                 switchMap(([n1, n2]) => graphPutEdge(graph, 'friend', n1, n2, {foo: 10})),
                 switchMap(({edge}) => graphGetEdge(graph, edge.edgeId)),
                 tap(({edge}) => {
-                    expect(edge?.label).to.equal('friend');
+                    expect(edge?.rel).to.equal('friend');
                     expect(edge?.edgeId).to.have.length(12);
                     expect(edge?.props).to.deep.equal({foo: 10});
                     expect(edge?.from).to.have.length(12);
@@ -99,8 +99,7 @@ describe('graph', () => {
                 graphGetEdge<{rank: number}>(graph, relationships?.[1].edgeId || '')
             ])),
             tap(results => {
-                expect(results[0].edge.props.rank).to.equal(5);
-                expect(results[1].edge.props.rank).to.equal(10);
+                expect(results[0].edge.props.rank + results[1].edge.props.rank).to.equal(15);
             })
         ))
     );

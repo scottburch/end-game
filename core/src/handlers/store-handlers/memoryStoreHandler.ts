@@ -38,7 +38,8 @@ export const memoryStorePutEdgeHandler: HandlerFn<'putEdge'> =
     ({graph, edge}) => of(getStore(graph)).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, edge.edgeId].join('.'), JSON.stringify(edge)),
-            store.put([graph.graphId, edge.from, edge.label, edge.to].join('.'), edge.edgeId) // edge label index
+            store.put([graph.graphId, edge.from, edge.rel, edge.to].join('.'), edge.edgeId), // edge from rel indexes
+            store.put([graph.graphId, edge.to, edge.rel, edge.from].join(''), edge.edgeId)   // edge to rel index
         )),
         map(() => ({graph, edge}))
     );
@@ -52,7 +53,7 @@ export const memoryStoreGetEdgeHandler: HandlerFn<'getEdge'> =
 
 export const memoryStoreNodesByLabelHandler: HandlerFn<'nodesByLabel'> =
     ({graph, label}) => of(getStore(graph)).pipe(
-        map(store => store.iterator({gt: [graph.graphId, label].join('.') + '.', lt: [graph.graphId, label].join('.') + '.zzzzzz'})),
+        map(store => store.iterator(keySearchCriteria([graph.graphId, label]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
@@ -65,13 +66,18 @@ export const memoryStoreNodesByLabelHandler: HandlerFn<'nodesByLabel'> =
         map(nodes => ({graph, label, nodes})),
     );
 
+const keySearchCriteria = (segments: string[]) => ({
+    gt: segments.join('.') + '.',
+    lt: segments.join('.') + '.' + String.fromCharCode(255)
+});
+
 export const memoryStoreGetRelationships: HandlerFn<'getRelationships'> =
     ({graph, nodeId, label}) => of(getStore(graph)).pipe(
-        map(store => store.iterator({gt: [graph.graphId, nodeId, label].join('.') + '.', lt: [graph.graphId, nodeId, label].join('.') + '.zzzzzz'})),
+        map(store => store.iterator(keySearchCriteria([graph.graphId, nodeId, label]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
-            map(pair => [pair?.[0].replace([graph.graphId, nodeId, label].join('.') + '.', ''), pair?.[1]]),
+            map(pair => [pair?.[0].split('.')[3], pair?.[1]]),
             map(([to, edgeId]) => ({edgeId: edgeId || '', to: to || '', from: nodeId}) satisfies Relationship),
             toArray(),
             tap(() => iterator.close())
