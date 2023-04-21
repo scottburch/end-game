@@ -122,8 +122,18 @@ describe('graph', () => {
                 graphPut(graph, 'person', {name: 'todd', age: 1}),
                 graphPut(graph, 'person', {name: 'joe', age: 2}),
             ])),
-            switchMap(([{graph}]) => nodesByProp(graph, 'person', 'name', 'scott')),
-            tap(({nodes}) => expect(nodes).to.have.length(1))
+            switchMap(([{graph}]) => combineLatest([
+                nodesByProp(graph, 'person', 'name', 'scott'),
+                nodesByProp(graph, 'person', 'age', 1)
+            ])),
+            tap(([{nodes: n1}, {nodes: n2}]) => {
+                expect(n1).to.have.length(1);
+                expect(n1?.[0].props.name).to.equal('scott');
+
+                expect(n2).to.have.length(2);
+                expect(['todd', 'scott']).to.include(n2?.[0].props.name);
+                expect(['todd', 'scott']).to.include(n2?.[1].props.name);
+            })
         ))
     );
 });
