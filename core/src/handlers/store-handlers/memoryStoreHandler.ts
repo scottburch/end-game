@@ -37,6 +37,7 @@ export const memoryStorePutEdgeHandler: HandlerFn<'putEdge'> =
     ({graph, edge}) => of(getStore(graph)).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, edge.edgeId].join('.'), JSON.stringify(edge)),
+            store.put([graph.graphId, edge.from, edge.label, edge.to].join('.'), '')
         )),
         map(() => ({graph, edge}))
     );
@@ -61,4 +62,19 @@ export const memoryStoreNodesByLabelHandler: HandlerFn<'nodesByLabel'> =
             tap(() => iterator.close())
         )),
         map(nodes => ({graph, label, nodes})),
+    );
+
+export const memoryStoreGetRelatedNodes: HandlerFn<'getRelatedNodes'> =
+    ({graph, nodeId, label}) => of(getStore(graph)).pipe(
+        map(store => store.iterator({gt: [graph.graphId, nodeId, label].join('.') + '.', lt: [graph.graphId, nodeId, label].join('.') + '.zzzzzz'})),
+        switchMap(iterator => range(1, 1000).pipe(
+            concatMap(() => iterator.next()),
+            takeWhile(pair => !!pair?.[0]),
+            map(pair => pair?.[0].replace([graph.graphId, nodeId, label].join('.') + '.', '')),
+            mergeMap(nodeId => memoryStoreGetNodeHandler({graph, nodeId: nodeId as string})),
+            map(({node}) => node as GraphNode<Object>),
+            toArray(),
+            tap(() => iterator.close())
+        )),
+        map(nodes => ({graph, nodeId, label, nodes}))
     )

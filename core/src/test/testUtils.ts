@@ -2,7 +2,7 @@ import {graphOpen, GraphOpts} from "../graph/graph.js";
 import {handlers} from "../handlers/handlers.js";
 import {
     memoryStoreGetEdgeHandler,
-    memoryStoreGetNodeHandler, memoryStoreNodesByLabelHandler,
+    memoryStoreGetNodeHandler, memoryStoreGetRelatedNodes, memoryStoreNodesByLabelHandler,
     memoryStorePutEdgeHandler,
     memoryStorePutNodeHandler
 } from "../handlers/store-handlers/memoryStoreHandler.js";
@@ -18,6 +18,7 @@ export const getAGraph = (opts: GraphOpts = {}) =>
             putEdge: handlers([memoryStorePutEdgeHandler]),
             getEdge: handlers([memoryStoreGetEdgeHandler]),
             nodesByLabel: handlers([memoryStoreNodesByLabelHandler]),
+            getRelatedNodes: handlers([memoryStoreGetRelatedNodes]),
             ...opts.handlers
         },
     });

@@ -1,5 +1,13 @@
-import {combineLatest, first, firstValueFrom, from, map, switchMap, tap, toArray} from "rxjs";
-import {graphGet, graphGetEdge, graphOpen, graphPut, graphPutEdge, graphSearch} from "./graph.js";
+import {combineLatest, first, firstValueFrom, from, map, of, switchMap, tap, toArray} from "rxjs";
+import {
+    graphGet,
+    graphGetEdge,
+    graphGetRelatedNodes,
+    graphOpen,
+    graphPut,
+    graphPutEdge,
+    nodesByLabel
+} from "./graph.js";
 import {expect} from "chai";
 import {getAGraph} from "../test/testUtils.js";
 import {newUid} from "../utils/uid.js";
@@ -56,20 +64,36 @@ describe('graph', () => {
     it('should be able to find nodes with a given label', () =>
         firstValueFrom(getAGraph({graphId: newUid()}).pipe(
             switchMap(graph => combineLatest([
-                    graphPut(graph, 'person', {name: 'scott'}),
-                    graphPut(graph, 'person', {name: 'todd'})
-                ]).pipe(
-                    switchMap(([{graph}]) => graphSearch<{ name: string }>(graph, {label: 'person'})),
-                    switchMap(({nodes}) => from(nodes || [])),
-                    map(node => node.props.name),
-                    toArray()
-                )
-            ),
+                graphPut(graph, 'person', {name: 'scott'}),
+                graphPut(graph, 'person', {name: 'todd'})
+            ])),
+            switchMap(([{graph}]) => nodesByLabel<{ name: string }>(graph, 'person')),
+            switchMap(({nodes}) => from(nodes || [])),
+            map(node => node.props.name),
+            toArray(),
             tap(names => {
-                 expect(names).to.have.length(2);
+                expect(names).to.have.length(2);
                 expect(names).to.include('scott');
                 expect(names).to.include('todd');
             }),
+        ))
+    );
+
+    it('should be able to find nodes with a given relationship', () =>
+        firstValueFrom(getAGraph({graphId: newUid()}).pipe(
+            switchMap(graph => combineLatest([
+                graphPut(graph, 'person', {name: 'scott'}),
+                graphPut(graph, 'person', {name: 'todd'})
+            ])),
+            switchMap(([{graph, nodeId: id1}, {nodeId: id2}]) =>
+                graphPutEdge(graph, 'friend', id1, id2, {rank: 5})
+            ),
+            switchMap(({graph, edge}) => graphGet(graph, edge.from)),
+            switchMap(({graph, node}) => graphGetRelatedNodes<{name: string}>(graph, node.nodeId, 'friend')),
+            tap(({nodes}) => {
+                expect(nodes).to.have.length(1);
+                expect(nodes[0].props.name).to.equal('todd');
+            })
         ))
     );
 });

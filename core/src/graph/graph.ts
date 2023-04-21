@@ -20,10 +20,6 @@ type GraphEdge<T extends Object> = {
     props: T
 }
 
-export type GraphQuery = {
-    label: string
-}
-
 export type Graph = {
     graphId: string
     handlers: {
@@ -32,6 +28,7 @@ export type Graph = {
         putEdge: Handler<{graph: Graph, edge: GraphEdge<Object>}>
         getEdge: Handler<{graph: Graph, edgeId: EdgeId, edge?: GraphEdge<Object>}>
         nodesByLabel: Handler<{graph: Graph, label: string, nodes?: GraphNode<Object>[]}>
+        getRelatedNodes: Handler<{graph: Graph, nodeId: NodeId, label: string, nodes?: GraphNode<Object>[]}>
     }
 }
 
@@ -50,7 +47,8 @@ export const graphOpen = (opts: GraphOpts) => of({
         getNode: opts.handlers?.getNode || nullHandler<'getNode'>(),
         putEdge: opts.handlers?.putEdge || nullHandler<'putEdge'>(),
         getEdge: opts.handlers?.getEdge || nullHandler<'getEdge'>(),
-        nodesByLabel: opts.handlers?.nodesByLabel || nullHandler<'nodesByLabel'>()
+        nodesByLabel: opts.handlers?.nodesByLabel || nullHandler<'nodesByLabel'>(),
+        getRelatedNodes: opts.handlers?.getRelatedNodes || nullHandler<'getRelatedNodes'>()
     }
 } as Graph);
 
@@ -86,9 +84,15 @@ export const graphGet = <T extends Object>(graph: Graph, nodeId: NodeId) =>
         map(({node}) => ({graph, node: node as GraphNode<T>}))
     );
 
-export const graphSearch = <T extends Object>(graph: Graph, query: GraphQuery) =>
-    graph.handlers.nodesByLabel.next({graph, label: query.label}).pipe(
-        filter(({label}) => label === query.label),
+export const nodesByLabel = <T extends Object>(graph: Graph, label: string) =>
+    graph.handlers.nodesByLabel.next({graph, label}).pipe(
+        filter(({label: l}) => l === label),
         map(({nodes}) => ({graph, nodes: nodes as GraphNode<T>[]})),
         first()
-    )
+    );
+
+export const graphGetRelatedNodes = <T extends Object>(graph: Graph, nodeId: NodeId, label: string) =>
+    graph.handlers.getRelatedNodes.next({graph, nodeId, label}).pipe(
+        filter(({nodeId: nid, label: l}) => nid === nodeId && label === label),
+        map(({nodes}) => ({graph, nodes: nodes as GraphNode<T>[]}))
+    );
