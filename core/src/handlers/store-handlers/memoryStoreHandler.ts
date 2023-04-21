@@ -2,7 +2,7 @@ import {MemoryLevel} from "memory-level";
 import {Graph, GraphNode, HandlerFn, IndexTypes} from "../../graph/graph.js";
 import {
     catchError,
-    concatMap,
+    concatMap, from,
     map,
     merge,
     mergeMap,
@@ -30,9 +30,9 @@ export const memoryStorePutNodeHandler: HandlerFn<'putNode'> =
         switchMap(store => merge(
             store.put([graph.graphId, node.nodeId].join('.'), JSON.stringify(node)),
             store.put([graph.graphId, IndexTypes.LABEL, node.label, node.nodeId].join('.'), ''),   // label index
-            // from(Object.keys(node.props)).pipe(
-            //     switchMap(key => store.put([graph.graphId, node.label, key, JSON.stringify(node.props[key])].join('.'), ''))
-            // )
+            from(Object.keys(node.props)).pipe(
+                 switchMap(key => store.put([graph.graphId, IndexTypes.PROP, node.label, key, JSON.stringify(node.props[key])].join('.'), ''))
+             )
         )),
         map(() => ({graph, node}))
     );
@@ -60,7 +60,7 @@ export const memoryStoreNodesByLabelHandler: HandlerFn<'nodesByLabel'> =
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
-            map(pair => pair?.[0].replace([graph.graphId, IndexTypes.LABEL, label].join('.') + '.', '')),
+            map(pair => pair?.[0].split('.')[3]),
             mergeMap(nodeId => memoryStoreGetNodeHandler({graph, nodeId: nodeId as string})),
             map(({node}) => node as GraphNode<Object>),
             toArray(),

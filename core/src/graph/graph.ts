@@ -12,8 +12,8 @@ export type Props = Record<string, any>;
 export const IndexTypes = {
     LABEL: '0',
     FROM_REL: '1',
-    TO_REL: '2'
-
+    TO_REL: '2',
+    PROP: '3'
 } as const
 
 
