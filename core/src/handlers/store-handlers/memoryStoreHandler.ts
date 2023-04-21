@@ -41,8 +41,8 @@ export const memoryStorePutEdgeHandler: HandlerFn<'putEdge'> =
     ({graph, edge}) => of(getStore(graph)).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, edge.edgeId].join('.'), JSON.stringify(edge)),
-            store.put([graph.graphId, edge.from, edge.rel, edge.to].join('.'), edge.edgeId), // edge from rel indexes
-            store.put([graph.graphId, edge.to, edge.rel, edge.from].join('.'), edge.edgeId)   // edge to rel index
+            store.put([graph.graphId, IndexTypes.FROM_REL, edge.from, edge.rel, edge.to].join('.'), edge.edgeId), // edge from rel indexes
+            store.put([graph.graphId, IndexTypes.TO_REL, edge.to, edge.rel, edge.from].join('.'), edge.edgeId)   // edge to rel index
         )),
         map(() => ({graph, edge}))
     );
@@ -76,11 +76,11 @@ const keySearchCriteria = (segments: string[]) => ({
 
 export const memoryStoreGetRelationships: HandlerFn<'getRelationships'> =
     ({graph, nodeId, rel, reverse}) => of(getStore(graph)).pipe(
-        map(store => store.iterator(keySearchCriteria([graph.graphId, nodeId, rel]))),
+        map(store => store.iterator(keySearchCriteria([graph.graphId, reverse ? IndexTypes.TO_REL : IndexTypes.FROM_REL, nodeId, rel]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
-            map(pair => [pair?.[0].split('.')[3], pair?.[1]]),
+            map(pair => [pair?.[0].split('.')[4], pair?.[1]]),
             map(([to, edgeId]) => ({edgeId: edgeId || '', to: reverse ? nodeId : (to || ''), from: reverse ? (to || '') : nodeId}) satisfies Relationship),
             toArray(),
             tap(() => iterator.close())

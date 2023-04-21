@@ -5,7 +5,7 @@ import {
     graphGetRelationships,
     graphOpen,
     graphPut,
-    graphPutEdge,
+    graphPutEdge, IndexTypes,
     nodesByLabel
 } from "./graph.js";
 import {expect} from "chai";
