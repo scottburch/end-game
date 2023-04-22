@@ -79,7 +79,7 @@ describe('graph', () => {
     );
 
     it('should be able to find nodes with a given label', () =>
-        firstValueFrom(getAGraph({graphId: newUid()}).pipe(
+        firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
                 graphPut(graph, '', 'person', {name: 'scott'}),
                 graphPut(graph, '', 'person', {name: 'todd'})
@@ -97,7 +97,7 @@ describe('graph', () => {
     );
 
     it('should be able to find nodes with a given relationship', () =>
-        firstValueFrom(getAGraph({graphId: newUid()}).pipe(
+        firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
                 graphPut(graph, '', 'person', {name: 'scott'}),
                 graphPut(graph, '', 'person', {name: 'todd'}),
@@ -133,7 +133,7 @@ describe('graph', () => {
     );
 
     it('should be able to find nodes with a given property value', () =>
-        firstValueFrom(getAGraph({graphId: newUid()}).pipe(
+        firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
                 graphPut(graph, '', 'person', {name: 'scott', age: 1}),
                 graphPut(graph, '', 'person', {name: 'todd', age: 1}),
@@ -155,7 +155,7 @@ describe('graph', () => {
     );
 
     it('should update a listener when new state is updated', () =>
-        firstValueFrom(getAGraph({graphId: newUid()}).pipe(
+        firstValueFrom(getAGraph().pipe(
             switchMap(graph => graphPut(graph, '', 'person', {name: 'scott'})),
             tap(({graph}) => setTimeout(() => graphPut(graph, '', 'person', {name: 'todd'}))),
             switchMap(({graph}) => nodesByLabel(graph, 'person')),
