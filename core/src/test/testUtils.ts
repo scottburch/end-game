@@ -1,13 +1,13 @@
 import {graphOpen, GraphOpts} from "../graph/graph.js";
 import {handlers} from "../handlers/handlers.js";
 import {
-    memoryStoreGetEdgeHandler,
-    memoryStoreGetNodeHandler,
-    memoryStoreGetRelationshipsHandler,
-    memoryStoreNodesByLabelHandler, memoryStoreNodesByPropHandler,
-    memoryStorePutEdgeHandler,
-    memoryStorePutNodeHandler
-} from "../handlers/store-handlers/memoryStoreHandler.js";
+    levelStoreGetEdgeHandler,
+    levelStoreGetNodeHandler,
+    levelStoreGetRelationshipsHandler,
+    levelStoreNodesByLabelHandler, levelStoreNodesByPropHandler,
+    levelStorePutEdgeHandler,
+    levelStorePutNodeHandler
+} from "../handlers/store-handlers/levelStoreHandler.js";
 import {newUid} from "../utils/uid.js";
 
 
@@ -17,13 +17,13 @@ export const getAGraph = (opts: GraphOpts = {graphId: newUid()}) => {
     return graphOpen({
         ...opts,
         handlers: {
-            putNode: handlers([memoryStorePutNodeHandler(handlerOpts)]),
-            getNode: handlers([memoryStoreGetNodeHandler(handlerOpts)]),
-            putEdge: handlers([memoryStorePutEdgeHandler(handlerOpts)]),
-            getEdge: handlers([memoryStoreGetEdgeHandler(handlerOpts)]),
-            nodesByLabel: handlers([memoryStoreNodesByLabelHandler(handlerOpts)]),
-            nodesByProp: handlers([memoryStoreNodesByPropHandler(handlerOpts)]),
-            getRelationships: handlers([memoryStoreGetRelationshipsHandler(handlerOpts)]),
+            putNode: handlers([levelStorePutNodeHandler(handlerOpts)]),
+            getNode: handlers([levelStoreGetNodeHandler(handlerOpts)]),
+            putEdge: handlers([levelStorePutEdgeHandler(handlerOpts)]),
+            getEdge: handlers([levelStoreGetEdgeHandler(handlerOpts)]),
+            nodesByLabel: handlers([levelStoreNodesByLabelHandler(handlerOpts)]),
+            nodesByProp: handlers([levelStoreNodesByPropHandler(handlerOpts)]),
+            getRelationships: handlers([levelStoreGetRelationshipsHandler(handlerOpts)]),
             ...opts.handlers
         },
     });

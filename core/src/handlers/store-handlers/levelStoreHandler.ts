@@ -38,14 +38,14 @@ const storeIterator = (store: LevelStore, query: AbstractIteratorOptions<string,
 
 
 
-export const memoryStoreGetNodeHandler = (handlerOpts: HandlerOpts): HandlerFn<'getNode'> =>
+export const levelStoreGetNodeHandler = (handlerOpts: HandlerOpts): HandlerFn<'getNode'> =>
     ({graph, nodeId}) => getStore(graph, handlerOpts).pipe(
         mergeMap(store => store.get([graph.graphId, nodeId].join('.'))),
         map(json => ({graph, node: JSON.parse(json), nodeId})),
         catchError(err => err.notFound ? of({graph, nodeId}) : throwError(err))
     );
 
-export const memoryStorePutNodeHandler = (handlerOpts: HandlerOpts): HandlerFn<'putNode'> =>
+export const levelStorePutNodeHandler = (handlerOpts: HandlerOpts): HandlerFn<'putNode'> =>
     ({graph, node}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, node.nodeId].join('.'), JSON.stringify(node)),
@@ -60,7 +60,7 @@ const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode<
         switchMap(key => store.put([graph.graphId, IndexTypes.PROP, node.label, key, JSON.stringify(node.props[key]), node.nodeId].join('.'), ''))
     );
 
-export const memoryStorePutEdgeHandler = (handlerOpts: HandlerOpts): HandlerFn<'putEdge'> =>
+export const levelStorePutEdgeHandler = (handlerOpts: HandlerOpts): HandlerFn<'putEdge'> =>
     ({graph, edge}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, edge.edgeId].join('.'), JSON.stringify(edge)),
@@ -70,35 +70,35 @@ export const memoryStorePutEdgeHandler = (handlerOpts: HandlerOpts): HandlerFn<'
         map(() => ({graph, edge}))
     );
 
-export const memoryStoreGetEdgeHandler = (handlerOpts: HandlerOpts): HandlerFn<'getEdge'> =>
+export const levelStoreGetEdgeHandler = (handlerOpts: HandlerOpts): HandlerFn<'getEdge'> =>
     ({graph, edgeId}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => store.get([graph.graphId, edgeId].join('.'))),
         map(json => JSON.parse(json)),
         map(edge => ({graph, edgeId, edge}))
     );
 
-export const memoryStoreNodesByLabelHandler = (handlerOpts: HandlerOpts): HandlerFn<'nodesByLabel'> =>
+export const levelStoreNodesByLabelHandler = (handlerOpts: HandlerOpts): HandlerFn<'nodesByLabel'> =>
     ({graph, label}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.LABEL, label]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
             map(pair => pair?.[0].split('.')[3]),
-            switchMap(nodeId => memoryStoreGetNodeHandler(handlerOpts)({graph, nodeId: nodeId as string})),
+            switchMap(nodeId => levelStoreGetNodeHandler(handlerOpts)({graph, nodeId: nodeId as string})),
             map(({node}) => node as GraphNode<Props>),
             toArray()
         )),
         map(nodes => ({graph, label, nodes})),
     );
 
-export const memoryStoreNodesByPropHandler = (handlerOpts: HandlerOpts): HandlerFn<'nodesByProp'> =>
+export const levelStoreNodesByPropHandler = (handlerOpts: HandlerOpts): HandlerFn<'nodesByProp'> =>
     ({graph, label, key, value}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, JSON.stringify(value)]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
             map(pair => pair?.[0].split('.')[5]),
-            mergeMap(nodeId => memoryStoreGetNodeHandler(handlerOpts)({graph, nodeId: nodeId as string})),
+            mergeMap(nodeId => levelStoreGetNodeHandler(handlerOpts)({graph, nodeId: nodeId as string})),
             map(({node}) => node as GraphNode<Props>),
             toArray()
         )),
@@ -111,7 +111,7 @@ const keySearchCriteria = (segments: string[]) => ({
     lt: segments.join('.') + '.' + String.fromCharCode(255)
 });
 
-export const memoryStoreGetRelationshipsHandler = (handlerOpts: HandlerOpts): HandlerFn<'getRelationships'> =>
+export const levelStoreGetRelationshipsHandler = (handlerOpts: HandlerOpts): HandlerFn<'getRelationships'> =>
     ({graph, nodeId, rel, reverse}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, reverse ? IndexTypes.TO_REL : IndexTypes.FROM_REL, nodeId, rel]))),
         switchMap(iterator => range(1, 1000).pipe(
