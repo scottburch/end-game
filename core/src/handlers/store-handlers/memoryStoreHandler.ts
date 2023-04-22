@@ -9,34 +9,44 @@ import {
     of,
     range,
     switchMap,
-    takeWhile,
+    takeWhile, tap,
     throwError, toArray
 } from "rxjs";
 import {Relationship} from "../../graph/relationship.js";
 import {AbstractIteratorOptions, AbstractLevel} from "abstract-level";
 import {Iterator} from "level";
 
-type LevelStore = AbstractLevel<string>
+type LevelStore = AbstractLevel<string>;
+
+type HandlerOpts = {
+    file: string
+}
 
 const stores: Record<string, LevelStore> = {};
 
-const getStore = (graph: Graph) => stores[graph.graphId] = stores[graph.graphId] || new MemoryLevel();
+const getStore = (graph: Graph) => of(stores[graph.graphId]).pipe(
+    map(store => store || new MemoryLevel()),
+    tap(store => stores[graph.graphId] = store)
+);
+
 
 const storeIterator = (store: LevelStore, query: AbstractIteratorOptions<string, string>) => new Observable<Iterator<any, any, any>>(observer => {
     const iterator = store.iterator(query);
     observer.next(iterator);
     return () => iterator.close()
-})
+});
+
+
 
 export const memoryStoreGetNodeHandler = (): HandlerFn<'getNode'> =>
-    ({graph, nodeId}) => of(getStore(graph)).pipe(
+    ({graph, nodeId}) => getStore(graph).pipe(
         mergeMap(store => store.get([graph.graphId, nodeId].join('.'))),
         map(json => ({graph, node: JSON.parse(json), nodeId})),
         catchError(err => err.notFound ? of({graph, nodeId}) : throwError(err))
     );
 
 export const memoryStorePutNodeHandler = (): HandlerFn<'putNode'> =>
-    ({graph, node}) => of(getStore(graph)).pipe(
+    ({graph, node}) => getStore(graph).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, node.nodeId].join('.'), JSON.stringify(node)),
             store.put([graph.graphId, IndexTypes.LABEL, node.label, node.nodeId].join('.'), ''),
@@ -51,7 +61,7 @@ const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode<
     );
 
 export const memoryStorePutEdgeHandler = (): HandlerFn<'putEdge'> =>
-    ({graph, edge}) => of(getStore(graph)).pipe(
+    ({graph, edge}) => getStore(graph).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, edge.edgeId].join('.'), JSON.stringify(edge)),
             store.put([graph.graphId, IndexTypes.FROM_REL, edge.from, edge.rel, edge.to].join('.'), edge.edgeId), // edge from rel indexes
@@ -61,14 +71,14 @@ export const memoryStorePutEdgeHandler = (): HandlerFn<'putEdge'> =>
     );
 
 export const memoryStoreGetEdgeHandler = (): HandlerFn<'getEdge'> =>
-    ({graph, edgeId}) => of(getStore(graph)).pipe(
+    ({graph, edgeId}) => getStore(graph).pipe(
         switchMap(store => store.get([graph.graphId, edgeId].join('.'))),
         map(json => JSON.parse(json)),
         map(edge => ({graph, edgeId, edge}))
     );
 
 export const memoryStoreNodesByLabelHandler = (): HandlerFn<'nodesByLabel'> =>
-    ({graph, label}) => of(getStore(graph)).pipe(
+    ({graph, label}) => getStore(graph).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.LABEL, label]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
@@ -82,7 +92,7 @@ export const memoryStoreNodesByLabelHandler = (): HandlerFn<'nodesByLabel'> =>
     );
 
 export const memoryStoreNodesByPropHandler = (): HandlerFn<'nodesByProp'> =>
-    ({graph, label, key, value}) => of(getStore(graph)).pipe(
+    ({graph, label, key, value}) => getStore(graph).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, JSON.stringify(value)]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
@@ -102,7 +112,7 @@ const keySearchCriteria = (segments: string[]) => ({
 });
 
 export const memoryStoreGetRelationshipsHandler = (): HandlerFn<'getRelationships'> =>
-    ({graph, nodeId, rel, reverse}) => of(getStore(graph)).pipe(
+    ({graph, nodeId, rel, reverse}) => getStore(graph).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, reverse ? IndexTypes.TO_REL : IndexTypes.FROM_REL, nodeId, rel]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
