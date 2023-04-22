@@ -4,6 +4,7 @@ import {nullHandler} from "../handlers/handlers.js";
 import {DeepPartial} from "tsdef";
 import {Relationship} from "./relationship.js";
 
+
 export type NodeId = string
 export type EdgeId = string
 
@@ -40,7 +41,7 @@ export type Graph = {
         putEdge: Handler<{graph: Graph, edge: GraphEdge<Props>}>
         getEdge: Handler<{graph: Graph, edgeId: EdgeId, edge?: GraphEdge<Props>}>
         nodesByLabel: Handler<{graph: Graph, label: string, nodes?: GraphNode<Props>[]}>
-        nodesByProp: Handler<{graph: Graph, label: string, key: string, value: any, nodes?: GraphNode<Props>[]}>
+        nodesByProp: Handler<{graph: Graph, label: string, key: string, value: string, nodes?: GraphNode<Props>[]}>
         getRelationships: Handler<{graph: Graph, nodeId: NodeId, rel: string, relationships?: Relationship[], reverse: boolean}>
     }
 }
@@ -106,7 +107,7 @@ export const nodesByLabel = <T extends Props>(graph: Graph, label: string) =>
         first()
     );
 
-export const nodesByProp = <T extends Props>(graph: Graph, label: string, key: string, value: any) =>
+export const nodesByProp = <T extends Props>(graph: Graph, label: string, key: string, value: any ) =>
     graph.handlers.nodesByProp.next({graph, label, key, value}).pipe(
         filter(({label: l, key: k, value: v}) => label === l && key === k && value === v ),
         map(({nodes}) => ({graph, label, key, value, nodes}))

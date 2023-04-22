@@ -18,6 +18,7 @@ describe('graph', () => {
             tap(graph => expect(graph).not.to.be.undefined)
         ))
     );
+
     describe('storing a node', () => {
         it('should put a value in a graph and assign an id', () =>
             firstValueFrom(graphOpen({graphId: newUid()}).pipe(
@@ -152,6 +153,21 @@ describe('graph', () => {
                 expect(['todd', 'scott']).to.include(n2?.[0].props.name);
                 expect(['todd', 'scott']).to.include(n2?.[1].props.name);
             })
+        ))
+    );
+
+    it('should be able to search for a partial property label', () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph => combineLatest([
+                graphPut(graph, '', 'person', {name: 'scott'}),
+                graphPut(graph, '', 'person', {name: 'scooter'}),
+                graphPut(graph, '', 'person', {name: 'sam'}),
+            ])),
+            switchMap(([{graph}]) => nodesByProp(graph, 'person', 'name', 'sc*')),
+            tap(({nodes}) => expect(nodes).to.have.length(2)),
+            switchMap(({nodes}) => from(nodes || [])),
+            tap(({props}) => expect(['scooter','scott']).to.include(props.name)),
+            bufferCount(2)
         ))
     );
 

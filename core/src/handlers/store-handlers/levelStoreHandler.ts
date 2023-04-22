@@ -16,6 +16,7 @@ import {Relationship} from "../../graph/relationship.js";
 import {AbstractIteratorOptions, AbstractLevel} from "abstract-level";
 import {Iterator, Level} from "level";
 
+
 type LevelStore = AbstractLevel<string>;
 
 export type LevelHandlerOpts = {
@@ -37,7 +38,6 @@ const storeIterator = (store: LevelStore, query: AbstractIteratorOptions<string,
 });
 
 
-
 export const levelStoreGetNodeHandler = (handlerOpts: LevelHandlerOpts): HandlerFn<'getNode'> =>
     ({graph, nodeId}) => getStore(graph, handlerOpts).pipe(
         mergeMap(store => store.get([graph.graphId, nodeId].join('.'))),
@@ -57,7 +57,7 @@ export const levelStorePutNodeHandler = (handlerOpts: LevelHandlerOpts): Handler
 
 const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode<Props>) =>
     from(Object.keys(node.props)).pipe(
-        switchMap(key => store.put([graph.graphId, IndexTypes.PROP, node.label, key, JSON.stringify(node.props[key]), node.nodeId].join('.'), ''))
+        switchMap(key => store.put([graph.graphId, IndexTypes.PROP, node.label, key, node.props[key].toString(), node.nodeId].join('.'), ''))
     );
 
 export const levelStorePutEdgeHandler = (handlerOpts: LevelHandlerOpts): HandlerFn<'putEdge'> =>
@@ -93,7 +93,7 @@ export const levelStoreNodesByLabelHandler = (handlerOpts: LevelHandlerOpts): Ha
 
 export const levelStoreNodesByPropHandler = (handlerOpts: LevelHandlerOpts): HandlerFn<'nodesByProp'> =>
     ({graph, label, key, value}) => getStore(graph, handlerOpts).pipe(
-        switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, JSON.stringify(value)]))),
+        switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, value.toString()]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
@@ -106,10 +106,17 @@ export const levelStoreNodesByPropHandler = (handlerOpts: LevelHandlerOpts): Han
     )
 
 
-const keySearchCriteria = (segments: string[]) => ({
-    gt: segments.join('.') + '.',
-    lt: segments.join('.') + '.' + String.fromCharCode(255)
-});
+const keySearchCriteria = (segments: string[]) =>
+    segments[segments.length - 1].includes('*') ? ({
+        gte: segments.join('.').replace('*', ''),
+        lt: segments.join('.').replace('*', '') + String.fromCharCode(255)
+    }) : ({
+        gt: segments.join('.') + '.',
+        lt: segments.join('.') + '.' + String.fromCharCode(255)
+    });
+
+
+
 
 export const levelStoreGetRelationshipsHandler = (handlerOpts: LevelHandlerOpts): HandlerFn<'getRelationships'> =>
     ({graph, nodeId, rel, reverse}) => getStore(graph, handlerOpts).pipe(
@@ -118,7 +125,11 @@ export const levelStoreGetRelationshipsHandler = (handlerOpts: LevelHandlerOpts)
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
             map(pair => [pair?.[0].split('.')[4], pair?.[1]]),
-            map(([to, edgeId]) => ({edgeId: edgeId || '', to: reverse ? nodeId : (to || ''), from: reverse ? (to || '') : nodeId}) satisfies Relationship),
+            map(([to, edgeId]) => ({
+                edgeId: edgeId || '',
+                to: reverse ? nodeId : (to || ''),
+                from: reverse ? (to || '') : nodeId
+            }) satisfies Relationship),
             toArray()
         )),
         map(relationships => ({graph, rel, nodeId, to: '', from: '', relationships, reverse}))
