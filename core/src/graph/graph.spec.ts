@@ -159,9 +159,7 @@ describe('graph', () => {
             switchMap(graph => graphPut(graph, '', 'person', {name: 'scott'})),
             tap(({graph}) => setTimeout(() => graphPut(graph, '', 'person', {name: 'todd'}))),
             switchMap(({graph}) => nodesByLabel(graph, 'person')),
-            tap(x => console.log('a', x)),
-            bufferCount(2),
-            tap(x => console.log(x))
+            bufferCount(2)
         ))
     )
 });

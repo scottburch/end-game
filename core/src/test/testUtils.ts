@@ -12,19 +12,20 @@ import {newUid} from "../utils/uid.js";
 
 
 
-export const getAGraph = (opts: GraphOpts = {graphId: newUid()}) =>
-    graphOpen({
+export const getAGraph = (opts: GraphOpts = {graphId: newUid()}) => {
+    const handlerOpts = {};
+    return graphOpen({
         ...opts,
         handlers: {
-            putNode: handlers([memoryStorePutNodeHandler()]),
-            getNode: handlers([memoryStoreGetNodeHandler()]),
-            putEdge: handlers([memoryStorePutEdgeHandler()]),
-            getEdge: handlers([memoryStoreGetEdgeHandler()]),
-            nodesByLabel: handlers([memoryStoreNodesByLabelHandler()]),
-            nodesByProp: handlers([memoryStoreNodesByPropHandler()]),
-            getRelationships: handlers([memoryStoreGetRelationshipsHandler()]),
+            putNode: handlers([memoryStorePutNodeHandler(handlerOpts)]),
+            getNode: handlers([memoryStoreGetNodeHandler(handlerOpts)]),
+            putEdge: handlers([memoryStorePutEdgeHandler(handlerOpts)]),
+            getEdge: handlers([memoryStoreGetEdgeHandler(handlerOpts)]),
+            nodesByLabel: handlers([memoryStoreNodesByLabelHandler(handlerOpts)]),
+            nodesByProp: handlers([memoryStoreNodesByPropHandler(handlerOpts)]),
+            getRelationships: handlers([memoryStoreGetRelationshipsHandler(handlerOpts)]),
             ...opts.handlers
         },
     });
-
+};
 
