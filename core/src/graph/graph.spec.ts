@@ -1,4 +1,4 @@
-import {bufferCount, combineLatest, first, firstValueFrom, from, map, switchMap, tap, toArray} from "rxjs";
+import {bufferCount, combineLatest, delay, first, firstValueFrom, from, map, switchMap, tap, toArray} from "rxjs";
 import {
     graphGet,
     graphGetEdge,
@@ -107,6 +107,7 @@ describe('graph', () => {
                 graphPutEdge(graph, 'friend', id1, id2, {rank: 5}),
                 graphPutEdge(graph, 'friend', id1, id3, {rank: 10})
             ])),
+            delay(10),
             switchMap(edges => combineLatest([
                 graphGetRelationships(edges[0].graph, edges[0].edge.from, 'friend'),
                 graphGetRelationships(edges[0].graph, edges[0].edge.to, 'friend', {reverse: true})
