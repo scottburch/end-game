@@ -3,7 +3,7 @@ import {handlers} from "../handlers/handlers.js";
 import {
     memoryStoreGetEdgeHandler,
     memoryStoreGetNodeHandler,
-    memoryStoreGetRelationships,
+    memoryStoreGetRelationshipsHandler,
     memoryStoreNodesByLabelHandler, memoryStoreNodesByPropHandler,
     memoryStorePutEdgeHandler,
     memoryStorePutNodeHandler
@@ -11,17 +11,20 @@ import {
 import {newUid} from "../utils/uid.js";
 
 
+
 export const getAGraph = (opts: GraphOpts = {graphId: newUid()}) =>
     graphOpen({
         ...opts,
         handlers: {
-            putNode: handlers([memoryStorePutNodeHandler]),
-            getNode: handlers([memoryStoreGetNodeHandler]),
-            putEdge: handlers([memoryStorePutEdgeHandler]),
-            getEdge: handlers([memoryStoreGetEdgeHandler]),
-            nodesByLabel: handlers([memoryStoreNodesByLabelHandler]),
-            nodesByProp: handlers([memoryStoreNodesByPropHandler]),
-            getRelationships: handlers([memoryStoreGetRelationships]),
+            putNode: handlers([memoryStorePutNodeHandler()]),
+            getNode: handlers([memoryStoreGetNodeHandler()]),
+            putEdge: handlers([memoryStorePutEdgeHandler()]),
+            getEdge: handlers([memoryStoreGetEdgeHandler()]),
+            nodesByLabel: handlers([memoryStoreNodesByLabelHandler()]),
+            nodesByProp: handlers([memoryStoreNodesByPropHandler()]),
+            getRelationships: handlers([memoryStoreGetRelationshipsHandler()]),
             ...opts.handlers
         },
     });
+
+
