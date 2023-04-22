@@ -18,13 +18,13 @@ import {Iterator, Level} from "level";
 
 type LevelStore = AbstractLevel<string>;
 
-type HandlerOpts = {
+export type LevelHandlerOpts = {
     dir?: string
 }
 
 const stores: Record<string, LevelStore> = {};
 
-const getStore = (graph: Graph, handlerOpts: HandlerOpts) => of(stores[graph.graphId]).pipe(
+const getStore = (graph: Graph, handlerOpts: LevelHandlerOpts) => of(stores[graph.graphId]).pipe(
     map(store => store || (handlerOpts.dir ? new Level(handlerOpts.dir) : new MemoryLevel())),
     tap(store => stores[graph.graphId] = store)
 );
@@ -38,14 +38,14 @@ const storeIterator = (store: LevelStore, query: AbstractIteratorOptions<string,
 
 
 
-export const levelStoreGetNodeHandler = (handlerOpts: HandlerOpts): HandlerFn<'getNode'> =>
+export const levelStoreGetNodeHandler = (handlerOpts: LevelHandlerOpts): HandlerFn<'getNode'> =>
     ({graph, nodeId}) => getStore(graph, handlerOpts).pipe(
         mergeMap(store => store.get([graph.graphId, nodeId].join('.'))),
         map(json => ({graph, node: JSON.parse(json), nodeId})),
         catchError(err => err.notFound ? of({graph, nodeId}) : throwError(err))
     );
 
-export const levelStorePutNodeHandler = (handlerOpts: HandlerOpts): HandlerFn<'putNode'> =>
+export const levelStorePutNodeHandler = (handlerOpts: LevelHandlerOpts): HandlerFn<'putNode'> =>
     ({graph, node}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, node.nodeId].join('.'), JSON.stringify(node)),
@@ -60,24 +60,24 @@ const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode<
         switchMap(key => store.put([graph.graphId, IndexTypes.PROP, node.label, key, JSON.stringify(node.props[key]), node.nodeId].join('.'), ''))
     );
 
-export const levelStorePutEdgeHandler = (handlerOpts: HandlerOpts): HandlerFn<'putEdge'> =>
+export const levelStorePutEdgeHandler = (handlerOpts: LevelHandlerOpts): HandlerFn<'putEdge'> =>
     ({graph, edge}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, edge.edgeId].join('.'), JSON.stringify(edge)),
-            store.put([graph.graphId, IndexTypes.FROM_REL, edge.from, edge.rel, edge.to].join('.'), edge.edgeId), // edge from rel indexes
-            store.put([graph.graphId, IndexTypes.TO_REL, edge.to, edge.rel, edge.from].join('.'), edge.edgeId)   // edge to rel index
+            store.put([graph.graphId, IndexTypes.FROM_REL, edge.from, edge.rel, edge.to].join('.'), edge.edgeId),
+            store.put([graph.graphId, IndexTypes.TO_REL, edge.to, edge.rel, edge.from].join('.'), edge.edgeId)
         )),
         map(() => ({graph, edge}))
     );
 
-export const levelStoreGetEdgeHandler = (handlerOpts: HandlerOpts): HandlerFn<'getEdge'> =>
+export const levelStoreGetEdgeHandler = (handlerOpts: LevelHandlerOpts): HandlerFn<'getEdge'> =>
     ({graph, edgeId}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => store.get([graph.graphId, edgeId].join('.'))),
         map(json => JSON.parse(json)),
         map(edge => ({graph, edgeId, edge}))
     );
 
-export const levelStoreNodesByLabelHandler = (handlerOpts: HandlerOpts): HandlerFn<'nodesByLabel'> =>
+export const levelStoreNodesByLabelHandler = (handlerOpts: LevelHandlerOpts): HandlerFn<'nodesByLabel'> =>
     ({graph, label}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.LABEL, label]))),
         switchMap(iterator => range(1, 1000).pipe(
@@ -91,7 +91,7 @@ export const levelStoreNodesByLabelHandler = (handlerOpts: HandlerOpts): Handler
         map(nodes => ({graph, label, nodes})),
     );
 
-export const levelStoreNodesByPropHandler = (handlerOpts: HandlerOpts): HandlerFn<'nodesByProp'> =>
+export const levelStoreNodesByPropHandler = (handlerOpts: LevelHandlerOpts): HandlerFn<'nodesByProp'> =>
     ({graph, label, key, value}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, JSON.stringify(value)]))),
         switchMap(iterator => range(1, 1000).pipe(
@@ -111,7 +111,7 @@ const keySearchCriteria = (segments: string[]) => ({
     lt: segments.join('.') + '.' + String.fromCharCode(255)
 });
 
-export const levelStoreGetRelationshipsHandler = (handlerOpts: HandlerOpts): HandlerFn<'getRelationships'> =>
+export const levelStoreGetRelationshipsHandler = (handlerOpts: LevelHandlerOpts): HandlerFn<'getRelationships'> =>
     ({graph, nodeId, rel, reverse}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, reverse ? IndexTypes.TO_REL : IndexTypes.FROM_REL, nodeId, rel]))),
         switchMap(iterator => range(1, 1000).pipe(
