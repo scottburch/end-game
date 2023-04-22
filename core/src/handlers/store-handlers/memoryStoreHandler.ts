@@ -5,19 +5,27 @@ import {
     concatMap, from,
     map,
     merge,
-    mergeMap,
+    mergeMap, Observable,
     of,
     range,
     switchMap,
-    takeWhile, tap,
+    takeWhile,
     throwError, toArray
 } from "rxjs";
 import {Relationship} from "../../graph/relationship.js";
+import {AbstractIteratorOptions} from "abstract-level";
+import {Iterator} from "level";
 
 
 const stores: Record<string, MemoryLevel> = {};
 
 const getStore = (graph: Graph) => stores[graph.graphId] = stores[graph.graphId] || new MemoryLevel();
+
+const storeIterator = (store: MemoryLevel, query: AbstractIteratorOptions<string, string>) => new Observable<Iterator<any, any, any>>(observer => {
+    const iterator = store.iterator(query);
+    observer.next(iterator);
+    return () => iterator.close()
+})
 
 export const memoryStoreGetNodeHandler: HandlerFn<'getNode'> =
     ({graph, nodeId}) => of(getStore(graph)).pipe(
@@ -60,30 +68,28 @@ export const memoryStoreGetEdgeHandler: HandlerFn<'getEdge'> =
 
 export const memoryStoreNodesByLabelHandler: HandlerFn<'nodesByLabel'> =
     ({graph, label}) => of(getStore(graph)).pipe(
-        map(store => store.iterator(keySearchCriteria([graph.graphId, IndexTypes.LABEL, label]))),
+        switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.LABEL, label]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
             map(pair => pair?.[0].split('.')[3]),
-            mergeMap(nodeId => memoryStoreGetNodeHandler({graph, nodeId: nodeId as string})),
+            switchMap(nodeId => memoryStoreGetNodeHandler({graph, nodeId: nodeId as string})),
             map(({node}) => node as GraphNode<Props>),
-            toArray(),
-            tap(() => iterator.close())
+            toArray()
         )),
         map(nodes => ({graph, label, nodes})),
     );
 
 export const memoryStoreNodesByPropHandler: HandlerFn<'nodesByProp'> =
     ({graph, label, key, value}) => of(getStore(graph)).pipe(
-        map(store => store.iterator(keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, JSON.stringify(value)]))),
+        switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, JSON.stringify(value)]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
             map(pair => pair?.[0].split('.')[5]),
             mergeMap(nodeId => memoryStoreGetNodeHandler({graph, nodeId: nodeId as string})),
             map(({node}) => node as GraphNode<Props>),
-            toArray(),
-            tap(() => iterator.close())
+            toArray()
         )),
         map(nodes => ({graph, label, key, value, nodes}))
     )
@@ -96,14 +102,13 @@ const keySearchCriteria = (segments: string[]) => ({
 
 export const memoryStoreGetRelationships: HandlerFn<'getRelationships'> =
     ({graph, nodeId, rel, reverse}) => of(getStore(graph)).pipe(
-        map(store => store.iterator(keySearchCriteria([graph.graphId, reverse ? IndexTypes.TO_REL : IndexTypes.FROM_REL, nodeId, rel]))),
+        switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, reverse ? IndexTypes.TO_REL : IndexTypes.FROM_REL, nodeId, rel]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
             map(pair => [pair?.[0].split('.')[4], pair?.[1]]),
             map(([to, edgeId]) => ({edgeId: edgeId || '', to: reverse ? nodeId : (to || ''), from: reverse ? (to || '') : nodeId}) satisfies Relationship),
-            toArray(),
-            tap(() => iterator.close())
+            toArray()
         )),
         map(relationships => ({graph, rel, nodeId, to: '', from: '', relationships, reverse}))
     )
