@@ -1,4 +1,4 @@
-import {combineLatest, first, firstValueFrom, from, map, switchMap, tap, toArray} from "rxjs";
+import {bufferCount, combineLatest, first, firstValueFrom, from, map, switchMap, tap, toArray} from "rxjs";
 import {
     graphGet,
     graphGetEdge,
@@ -14,25 +14,42 @@ import {newUid} from "../utils/uid.js";
 
 describe('graph', () => {
     it('should open a graph', () =>
-        firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
+        firstValueFrom(graphOpen({graphId: newUid()}).pipe(
             tap(graph => expect(graph).not.to.be.undefined)
         ))
     );
+    describe('storing a node', () => {
+        it('should put a value in a graph and assign an id', () =>
+            firstValueFrom(graphOpen({graphId: newUid()}).pipe(
+                switchMap(graph => graphPut(graph, '', 'person', {name: 'scott'})),
+                tap(({graph, nodeId}) => expect(nodeId).to.have.length(12))
+            ))
+        );
 
-    it('should put a value in a graph and assign an id', () =>
-        firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
-            switchMap(graph => graphPut(graph, 'person', {name: 'scott'})),
-            tap(({graph, nodeId}) => expect(nodeId).to.have.length(12))
-        ))
-    );
+        it('should update a value in a graph at an assigned id', () =>
+            firstValueFrom(getAGraph().pipe(
+                switchMap(graph => graphPut(graph, '', 'person', {name: 'scott', foo: 1})),
+                map(({nodeId, graph}) => ({nid1: nodeId, graph, nodeId})),
+                switchMap(({graph, nodeId, nid1}) => graphPut(graph, nodeId, 'person', {name: 'scott', foo: 2}).pipe(
+                    map(({nodeId}) => ({graph, nodeId, nid1}))
+                )),
+                tap(({nid1, nodeId}) => expect(nid1).to.equal(nodeId)),
+                switchMap(({graph, nodeId}) => graphGet(graph, nodeId)),
+                tap(({graph, node}) => {
+                    expect(node.props.name).to.equal('scott');
+                    expect(node.props.foo).to.equal(2);
+                })
+            ))
+        );
+    });
 
     it('should get an item from the graph by id', () =>
         firstValueFrom(getAGraph().pipe(
-            switchMap(graph => graphPut(graph, 'person', {name: 'scott'})),
+            switchMap(graph => graphPut(graph, '', 'person', {name: 'scott'})),
             switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph, nodeId)),
             tap(({node}) => expect(node.props.name).to.equal('scott')),
             first(),
-            switchMap(({graph}) => graphPut(graph, 'person', {name: 'todd'})),
+            switchMap(({graph}) => graphPut(graph, '', 'person', {name: 'todd'})),
             switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph, nodeId)),
             tap(({node}) => expect(node.props.name).to.equal('todd')),
         ))
@@ -41,8 +58,8 @@ describe('graph', () => {
     it('should be able to add a relationship between two nodes', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
-                graphPut(graph, 'person', {name: 'scott'}),
-                graphPut(graph, 'person', {name: 'todd'})
+                graphPut(graph, '', 'person', {name: 'scott'}),
+                graphPut(graph, '', 'person', {name: 'todd'})
             ]).pipe(
                 switchMap(arr => from(arr)),
                 map(({nodeId}) => nodeId),
@@ -64,8 +81,8 @@ describe('graph', () => {
     it('should be able to find nodes with a given label', () =>
         firstValueFrom(getAGraph({graphId: newUid()}).pipe(
             switchMap(graph => combineLatest([
-                graphPut(graph, 'person', {name: 'scott'}),
-                graphPut(graph, 'person', {name: 'todd'})
+                graphPut(graph, '', 'person', {name: 'scott'}),
+                graphPut(graph, '', 'person', {name: 'todd'})
             ])),
             switchMap(([{graph}]) => nodesByLabel<{ name: string }>(graph, 'person')),
             switchMap(({nodes}) => from(nodes || [])),
@@ -82,9 +99,9 @@ describe('graph', () => {
     it('should be able to find nodes with a given relationship', () =>
         firstValueFrom(getAGraph({graphId: newUid()}).pipe(
             switchMap(graph => combineLatest([
-                graphPut(graph, 'person', {name: 'scott'}),
-                graphPut(graph, 'person', {name: 'todd'}),
-                graphPut(graph, 'person', {name: 'joe'}),
+                graphPut(graph, '', 'person', {name: 'scott'}),
+                graphPut(graph, '', 'person', {name: 'todd'}),
+                graphPut(graph, '', 'person', {name: 'joe'}),
             ])),
             switchMap(([{graph, nodeId: id1}, {nodeId: id2}, {nodeId: id3}]) => combineLatest([
                 graphPutEdge(graph, 'friend', id1, id2, {rank: 5}),
@@ -104,9 +121,9 @@ describe('graph', () => {
                 expect(toRelationships).to.have.length(1);
             }),
             switchMap(({graph, fromRelationships, toRelationships}) => combineLatest([
-                graphGetEdge<{rank: number}>(graph, fromRelationships?.[0].edgeId || ''),
-                graphGetEdge<{rank: number}>(graph, fromRelationships?.[1].edgeId || ''),
-                graphGetEdge<{rank: number}>(graph, toRelationships?.[0].edgeId || ''),
+                graphGetEdge<{ rank: number }>(graph, fromRelationships?.[0].edgeId || ''),
+                graphGetEdge<{ rank: number }>(graph, fromRelationships?.[1].edgeId || ''),
+                graphGetEdge<{ rank: number }>(graph, toRelationships?.[0].edgeId || ''),
             ])),
             tap(results => {
                 expect(results[0].edge.props.rank + results[1].edge.props.rank).to.equal(15);
@@ -118,9 +135,9 @@ describe('graph', () => {
     it('should be able to find nodes with a given property value', () =>
         firstValueFrom(getAGraph({graphId: newUid()}).pipe(
             switchMap(graph => combineLatest([
-                graphPut(graph, 'person', {name: 'scott', age: 1}),
-                graphPut(graph, 'person', {name: 'todd', age: 1}),
-                graphPut(graph, 'person', {name: 'joe', age: 2}),
+                graphPut(graph, '', 'person', {name: 'scott', age: 1}),
+                graphPut(graph, '', 'person', {name: 'todd', age: 1}),
+                graphPut(graph, '', 'person', {name: 'joe', age: 2}),
             ])),
             switchMap(([{graph}]) => combineLatest([
                 nodesByProp(graph, 'person', 'name', 'scott'),
@@ -136,4 +153,15 @@ describe('graph', () => {
             })
         ))
     );
+
+    it('should update a listener when new state is updated', () =>
+        firstValueFrom(getAGraph({graphId: newUid()}).pipe(
+            switchMap(graph => graphPut(graph, '', 'person', {name: 'scott'})),
+            tap(({graph}) => setTimeout(() => graphPut(graph, '', 'person', {name: 'todd'}))),
+            switchMap(({graph}) => nodesByLabel(graph, 'person')),
+            tap(x => console.log('a', x)),
+            bufferCount(2),
+            tap(x => console.log(x))
+        ))
+    )
 });

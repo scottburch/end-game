@@ -14,6 +14,7 @@ import {
 } from "rxjs";
 import {Relationship} from "../../graph/relationship.js";
 
+
 const stores: Record<string, MemoryLevel> = {};
 
 const getStore = (graph: Graph) => stores[graph.graphId] = stores[graph.graphId] || new MemoryLevel();
@@ -29,12 +30,15 @@ export const memoryStorePutNodeHandler: HandlerFn<'putNode'> =
     ({graph, node}) => of(getStore(graph)).pipe(
         switchMap(store => merge(
             store.put([graph.graphId, node.nodeId].join('.'), JSON.stringify(node)),
-            store.put([graph.graphId, IndexTypes.LABEL, node.label, node.nodeId].join('.'), ''),   // label index
-            from(Object.keys(node.props)).pipe(
-                 switchMap(key => store.put([graph.graphId, IndexTypes.PROP, node.label, key, JSON.stringify(node.props[key]), node.nodeId].join('.'), ''))
-             )
+            store.put([graph.graphId, IndexTypes.LABEL, node.label, node.nodeId].join('.'), ''),
+            createNodePropIndexes(graph, store, node)
         )),
         map(() => ({graph, node}))
+    );
+
+const createNodePropIndexes = (graph: Graph, store: MemoryLevel, node: GraphNode<Props>) =>
+    from(Object.keys(node.props)).pipe(
+        switchMap(key => store.put([graph.graphId, IndexTypes.PROP, node.label, key, JSON.stringify(node.props[key]), node.nodeId].join('.'), ''))
     );
 
 export const memoryStorePutEdgeHandler: HandlerFn<'putEdge'> =

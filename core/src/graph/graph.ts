@@ -1,4 +1,4 @@
-import {filter, first, map, Observable, of, switchMap, tap} from "rxjs";
+import {filter, first, map, Observable, of, switchMap} from "rxjs";
 import {newUid} from "../utils/uid.js";
 import {nullHandler} from "../handlers/handlers.js";
 import {DeepPartial} from "tsdef";
@@ -50,7 +50,7 @@ export type Handler<T> = Observable<T> & {next: (v: T) => Observable<T>, props: 
 export type HandlerProps<T extends HandlerNames> = Graph['handlers'][T]['props'];
 export type HandlerFn<T extends HandlerNames> = (p: HandlerProps<T>) => Observable<HandlerProps<T>>;
 
-export type GraphOpts = DeepPartial<Graph>
+export type GraphOpts = DeepPartial<Graph> & Pick<Graph, 'graphId'>
 
 
 export const graphOpen = (opts: GraphOpts) => of({
@@ -66,9 +66,9 @@ export const graphOpen = (opts: GraphOpts) => of({
     }
 } as Graph);
 
-export const graphPut = <T extends Props>(graph: Graph, label: string, props: T) =>
+export const graphPut = <T extends Props>(graph: Graph, nodeId: string, label: string, props: T) =>
     of({
-        nodeId: newUid(),
+        nodeId: nodeId || newUid(),
         label,
         props
     } satisfies GraphNode<T>).pipe(
