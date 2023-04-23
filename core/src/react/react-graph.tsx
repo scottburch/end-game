@@ -1,7 +1,6 @@
-import React, {createContext, PropsWithChildren, useContext, useEffect, useState} from "react";
-import {delay, of, switchMap, tap} from "rxjs";
-import {createRoot} from "react-dom/client";
 import {Graph, graphGet, GraphNode, graphOpen, graphPut, NodeId, nodesByLabel, Props} from "../graph/graph.ts";
+import React, {createContext, PropsWithChildren, useContext, useEffect, useState} from "react";
+import {of, switchMap} from "rxjs";
 import {newUid} from "../utils/uid.ts";
 import {handlers} from "../handlers/handlers.ts";
 import {
@@ -10,8 +9,9 @@ import {
     levelStorePutNodeHandler
 } from "../handlers/store-handlers/levelStoreHandler.ts";
 
+const GraphContext: React.Context<Graph> = createContext({} as Graph);
 
-const useGraphNodesByLabel = <T extends Props>(label: string) => {
+export const useGraphNodesByLabel = <T extends Props>(label: string) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>();
     const graph = useContext(GraphContext);
 
@@ -26,7 +26,7 @@ const useGraphNodesByLabel = <T extends Props>(label: string) => {
     return nodes;
 }
 
-const useGraphGet = <T extends Props>(nodeId: NodeId) => {
+export const useGraphGet = <T extends Props>(nodeId: NodeId) => {
     const [node, setNode] = useState<GraphNode<T>>();
     const graph = useContext(GraphContext);
 
@@ -39,7 +39,7 @@ const useGraphGet = <T extends Props>(nodeId: NodeId) => {
     return node;
 };
 
-const useGraphPut = <T extends Props>() => {
+export const useGraphPut = <T extends Props>() => {
     const graph: Graph = useContext(GraphContext);
 
     return (label: string, props: T) => {
@@ -47,10 +47,10 @@ const useGraphPut = <T extends Props>() => {
     }
 }
 
-const GraphContext: React.Context<Graph> = createContext({} as Graph);
 
 
-const ReactGraph: React.FC<PropsWithChildren> = ({children}) => {
+
+export const ReactGraph: React.FC<PropsWithChildren> = ({children}) => {
     const [graph, setGraph] = useState<Graph>();
     useEffect(() => {
         const sub = graphOpen({
@@ -67,39 +67,6 @@ const ReactGraph: React.FC<PropsWithChildren> = ({children}) => {
     return graph?.graphId ? (
         <GraphContext.Provider value={graph}>
             {children}
-        </GraphContext.Provider>
+            </GraphContext.Provider>
     ) : <div>'No graph'</div>
 };
-
-const Foo: React.FC = () => {
-    const nodes = useGraphNodesByLabel('person');
-
-    return <div>{nodes?.map(node => node.props.name)}</div>
-}
-
-export default function Body() {
-    const graphPut = useGraphPut();
-    const [nodeId, setNodeId] = useState<string>();
-
-
-    useEffect(() => {
-        setTimeout(() => {
-            graphPut('person', {name: 'scott'}).subscribe(({nodeId}) => setNodeId(nodeId));
-        }, 1000)
-    }, [])
-
-    return nodeId ? (<Foo />) : (<div>Loading...</div>);
-
-}
-
-const MyApp: React.FC = () => {
-    return (
-        <ReactGraph>
-            <Body/>
-        </ReactGraph>
-    )
-};
-
-of(createRoot(document.querySelector('#app') as Element)).pipe(
-    tap(root => root.render(<MyApp/>))
-).subscribe();

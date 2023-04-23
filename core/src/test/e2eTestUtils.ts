@@ -22,7 +22,7 @@ export const newBrowser = () => new Observable<Page>(observer => {
 })
 
 
-export const compileBrowserCode = (src: string) =>
+export const compileBrowserTestCode = (src: string) =>
     of(`<div id="app"></div><script src="../${src}" type="module"></script>`).pipe(
         switchMap(html => writeFile('src/test/test.html', html)),
         map(() => ({
@@ -42,6 +42,7 @@ export const compileBrowserCode = (src: string) =>
                 if (result?.type === 'buildSuccess') {
                     sub.next(result)
                 } else {
+                    console.error('BUILD_FAILURE', result?.diagnostics)
                     throw result
                 }
             })
