@@ -3,9 +3,8 @@ import {delay, firstValueFrom, switchMap} from "rxjs";
 
 describe('react', () => {
     it('should do it', () =>
-        firstValueFrom(compileBrowserCode('src/react/react-graph.html').pipe(
+        firstValueFrom(compileBrowserCode('react/react-graph.tsx').pipe(
             switchMap(() => newBrowser()),
-            delay(100000000)
         ))
     );
 });

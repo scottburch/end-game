@@ -1,6 +1,7 @@
 import playwright, {Page} from "playwright";
 import {map, Observable, of, switchMap, tap} from "rxjs";
 import {Parcel} from '@parcel/core';
+import {writeFile} from "fs/promises";
 
 
 export const newBrowser = () => new Observable<Page>(observer => {
@@ -22,13 +23,15 @@ export const newBrowser = () => new Observable<Page>(observer => {
 
 
 export const compileBrowserCode = (src: string) =>
-    of({
-        entries: src,
-        defaultConfig: '@parcel/config-default',
-        serveOptions: {
-            port: 1234
-        },
-    }).pipe(
+    of(`<div id="app"></div><script src="../${src}" type="module"></script>`).pipe(
+        switchMap(html => writeFile('src/test/test.html', html)),
+        map(() => ({
+            entries: 'src/test/test.html',
+            defaultConfig: '@parcel/config-default',
+            serveOptions: {
+                port: 1234
+            },
+        })),
         map(config => new Parcel(config)),
         switchMap(bundler => new Observable(sub => {
             let bundlerSub: { unsubscribe: () => Promise<any> };
