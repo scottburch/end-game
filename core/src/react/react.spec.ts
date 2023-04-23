@@ -1,10 +1,11 @@
-import {compileBrowserCode, newBrowser} from "../test/e2eTestUtils.js";
-import {firstValueFrom, switchMap} from "rxjs";
+import {compileBrowserCode, newBrowser} from "../test/e2eTestUtils.ts";
+import {delay, firstValueFrom, switchMap} from "rxjs";
 
 describe('react', () => {
     it('should do it', () =>
-        firstValueFrom(compileBrowserCode('src/index.html').pipe(
+        firstValueFrom(compileBrowserCode('src/react/react-graph.html').pipe(
             switchMap(() => newBrowser()),
+            delay(100000000)
         ))
     );
 });

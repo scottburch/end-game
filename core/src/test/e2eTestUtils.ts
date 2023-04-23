@@ -3,7 +3,7 @@ import {map, Observable, of, switchMap, tap} from "rxjs";
 import {Parcel} from '@parcel/core';
 
 
-export const newBrowser = () => new Observable(observer => {
+export const newBrowser = () => new Observable<Page>(observer => {
     let openPage: Page;
     const sub = of(playwright['chromium']).pipe(
         switchMap(f => f.launch({headless: !!process.env.CI, devtools: true})),

@@ -1,5 +1,5 @@
 import {MemoryLevel} from "memory-level";
-import {Graph, GraphNode, HandlerFn, IndexTypes, Props} from "../../graph/graph.js";
+import {Graph, GraphNode, HandlerFn, IndexTypes, Props} from "../../graph/graph.ts";
 import {
     catchError,
     concatMap, from,
@@ -12,7 +12,7 @@ import {
     takeWhile, tap,
     throwError, toArray
 } from "rxjs";
-import {Relationship} from "../../graph/relationship.js";
+import {Relationship} from "../../graph/relationship.ts";
 import {AbstractIteratorOptions, AbstractLevel} from "abstract-level";
 import {Iterator, Level} from "level";
 
