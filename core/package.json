@@ -65,7 +65,7 @@
     "@protobuf-ts/protoc": "^2.8.2",
     "chai": "^4.3.7",
     "mocha": "^10.2.0",
-    "parcel": "^2.8.2",
+    "parcel": "^2.8.3",
     "playwright": "^1.32.3",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",

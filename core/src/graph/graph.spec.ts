@@ -7,7 +7,7 @@ import {
     graphPut,
     graphPutEdge,
     nodesByLabel, nodesByProp
-} from "./graph.js";
+} from "./graph.ts";
 import {expect} from "chai";
 import {getAGraph} from "../test/testUtils.js";
 import {newUid} from "../utils/uid.js";
