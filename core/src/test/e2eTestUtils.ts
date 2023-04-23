@@ -3,23 +3,22 @@ import {map, Observable, of, switchMap, tap} from "rxjs";
 import {Parcel} from '@parcel/core';
 
 
-let openPages: Page[] = [];
-
-
-afterEach(() => {
-    return Promise.all(openPages.map(page => page.context().browser()?.close())).then(() => openPages = []);
-});
-
-
-export const newBrowser = () =>
-    of(playwright['chromium']).pipe(
+export const newBrowser = () => new Observable(observer => {
+    let openPage: Page;
+    const sub = of(playwright['chromium']).pipe(
         switchMap(f => f.launch({headless: !!process.env.CI, devtools: true})),
         switchMap(browser => browser.newContext()),
         switchMap(ctx => ctx.newPage()),
         switchMap(page => page.goto('http://localhost:1234').then(() => page)),
-        tap(page => openPages.push(page)),
-        map(page => page as Page)
-    );
+        tap(page => openPage = page),
+        tap(page => observer.next(page))
+    ).subscribe()
+
+    return () => {
+        sub.unsubscribe();
+        openPage.context().browser()?.close();
+    }
+})
 
 
 export const compileBrowserCode = (src: string) =>
