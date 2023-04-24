@@ -42,30 +42,34 @@ export const useGraphGet = <T extends Props>(nodeId: NodeId) => {
 export const useGraphPut = <T extends Props>() => {
     const graph: Graph = useContext(GraphContext);
 
-    return (label: string, props: T) => {
-        return graphPut(graph, '', label, props);
+    return (label: string, nodeId: NodeId, props: T) => {
+        return graphPut(graph, nodeId, label, props);
     }
 }
 
 
 
 
-export const ReactGraph: React.FC<PropsWithChildren> = ({children}) => {
-    const [graph, setGraph] = useState<Graph>();
+export const ReactGraph: React.FC<PropsWithChildren<{graph?: Graph}>> = ({graph, children}) => {
+    const [myGraph, setMyGraph] = useState<Graph>();
     useEffect(() => {
-        const sub = graphOpen({
-            graphId: newUid(),
-            handlers: {
-                putNode: handlers([levelStorePutNodeHandler({})]),
-                getNode: handlers([levelStoreGetNodeHandler({})]),
-                nodesByLabel: handlers([levelStoreNodesByLabelHandler({})])
-            }
-        }).subscribe(graph => setGraph(graph));
-        return () => sub.unsubscribe();
+        graph ? setMyGraph(graph) : createNewGraph();
+
+        function createNewGraph() {
+            const sub = graphOpen({
+                graphId: newUid(),
+                handlers: {
+                    putNode: handlers([levelStorePutNodeHandler({})]),
+                    getNode: handlers([levelStoreGetNodeHandler({})]),
+                    nodesByLabel: handlers([levelStoreNodesByLabelHandler({})])
+                }
+            }).subscribe(graph => setMyGraph(graph));
+            return () => sub.unsubscribe();
+        }
     }, [])
 
-    return graph?.graphId ? (
-        <GraphContext.Provider value={graph}>
+    return myGraph?.graphId ? (
+        <GraphContext.Provider value={myGraph}>
             {children}
             </GraphContext.Provider>
     ) : <div>'No graph'</div>

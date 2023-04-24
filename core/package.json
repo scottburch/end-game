@@ -8,10 +8,7 @@
     ".": {
       "node": "./lib/index.js",
       "default": "./lib/index-browser.js"
-    },
-    "./test/browser-functions": "./lib/test/e2e/browser/browser-functions.js",
-    "./test/browser-interface": "./lib/test/e2e/browser/browser-interface.js",
-    "./lib/test/e2e/browser/browser-interface.js": "./lib/test/e2e/browser/browser-interface.js"
+    }
   },
   "dependencies": {
     "@types/base-64": "^1.0.0",
@@ -77,7 +74,7 @@
   "scripts": {
     "build": "rm -rf lib && tsc",
     "build-watch": "rm -rf lib && tsc --watch",
-    "test": "mocha --require=ts-node/register src-old/**/*.spec.ts",
+    "test": "mocha src/**/*.spec.ts",
     "bundle": "node --require=ts-node/register --loader=ts-node/esm --experimental-specifier-resolution=node scripts/bundle.ts",
     "publishIt": "cd bundle && yarn publish --no-git-tag-version"
   }
