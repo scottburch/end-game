@@ -86,6 +86,7 @@ describe('graph', () => {
                 graphPut(graph, '', 'person', {name: 'todd'})
             ])),
             switchMap(([{graph}]) => nodesByLabel<{ name: string }>(graph, 'person')),
+            first(),
             switchMap(({nodes}) => from(nodes || [])),
             map(node => node.props.name),
             toArray(),
@@ -108,7 +109,7 @@ describe('graph', () => {
                 graphPutEdge(graph, 'friend', id1, id2, {rank: 5}),
                 graphPutEdge(graph, 'friend', id1, id3, {rank: 10})
             ])),
-            delay(10),
+            delay(50),
             switchMap(edges => combineLatest([
                 graphGetRelationships(edges[0].graph, edges[0].edge.from, 'friend'),
                 graphGetRelationships(edges[0].graph, edges[0].edge.to, 'friend', {reverse: true})
@@ -171,7 +172,7 @@ describe('graph', () => {
         ))
     );
 
-    it('should update a listener when new state is updated', () =>
+    it('should update a graphGet() listener when node props is updated', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => graphPut(graph, '', 'person', {name: 'scott'})),
             tap(({graph, nodeId}) => setTimeout(() => graphPut(graph, nodeId, 'person', {name: 'todd'}).subscribe())),
@@ -181,7 +182,22 @@ describe('graph', () => {
                 expect(n1.props.name).to.equal('scott');
                 expect(n2.props.name).to.equal('todd');
             }),
-            tap(x => x)
+        ))
+    );
+
+    it('should update a nodesByLabel() when node nodes are updated', () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph => graphPut(graph, '', 'person', {name: 'scott'})),
+            tap(({graph}) => setTimeout(() => graphPut(graph, '', 'person', {name: 'todd'}).subscribe())),
+            switchMap(({graph}) => nodesByLabel(graph, 'person')),
+            bufferCount(2),
+            tap(([{nodes: n1}, {nodes: n2}]) => {
+                expect(n1).to.have.length(1);
+                expect(n2).to.have.length(2);
+                expect(n1[0].props.name).to.equal('scott');
+                expect(['scott', 'todd']).to.include(n2[0].props.name);
+                expect(['scott', 'todd']).to.include(n2[1].props.name);
+            })
         ))
     )
 });

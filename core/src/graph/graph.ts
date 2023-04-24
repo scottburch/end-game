@@ -114,11 +114,24 @@ export const graphGet = <T extends Props>(graph: Graph, nodeId: NodeId) =>
     });
 
 export const nodesByLabel = <T extends Props>(graph: Graph, label: string) =>
-    graph.handlers.nodesByLabel.next({graph, label}).pipe(
-        filter(({label: l}) => l === label),
-        map(({nodes}) => ({graph, label, nodes: nodes as GraphNode<T>[]})),
-        first()
-    );
+    new Observable<{graph: Graph, label: string, nodes: GraphNode<T>[]}>(observable => {
+        const putSub = graph.handlers.putNode.pipe(
+            tap(() => graph.handlers.nodesByLabel.next({graph, label}))
+        ).subscribe();
+
+        const nodesSub = graph.handlers.nodesByLabel.next({graph, label}).pipe(
+            filter(({label: l}) => l === label),
+            map(({nodes}) => ({graph, label, nodes: nodes as GraphNode<T>[]})),
+            tap(({nodes}) => observable.next({graph, nodes, label}))
+        ).subscribe();
+
+
+        return () => {
+            putSub.unsubscribe();
+            nodesSub.unsubscribe();
+        }
+    });
+
 
 export const nodesByProp = <T extends Props>(graph: Graph, label: string, key: string, value: any ) =>
     graph.handlers.nodesByProp.next({graph, label, key, value}).pipe(
