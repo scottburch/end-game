@@ -1,6 +1,5 @@
-import {delay, firstValueFrom, from, merge, of, switchMap, tap} from "rxjs";
+import {combineLatest, firstValueFrom, of, switchMap, tap} from "rxjs";
 import {compileBrowserTestCode, newBrowser} from "../test/e2eTestUtils.ts";
-import {combineLatest} from "rxjs";
 import {expect} from "chai";
 
 describe('graphGet()', () => {
