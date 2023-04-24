@@ -174,9 +174,14 @@ describe('graph', () => {
     it('should update a listener when new state is updated', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => graphPut(graph, '', 'person', {name: 'scott'})),
-            tap(({graph}) => setTimeout(() => graphPut(graph, '', 'person', {name: 'todd'}))),
-            switchMap(({graph}) => nodesByLabel(graph, 'person')),
-            bufferCount(2)
+            tap(({graph, nodeId}) => setTimeout(() => graphPut(graph, nodeId, 'person', {name: 'todd'}).subscribe())),
+            switchMap(({graph, nodeId}) => graphGet(graph, nodeId)),
+            bufferCount(2),
+            tap(([{node: n1}, {node: n2}]) => {
+                expect(n1.props.name).to.equal('scott');
+                expect(n2.props.name).to.equal('todd');
+            }),
+            tap(x => x)
         ))
     )
 });

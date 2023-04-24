@@ -22,7 +22,6 @@ export default function Body() {
     }, [])
 
     return nodeId ? (<Foo />) : (<div>Loading...</div>);
-
 }
 
 const MyApp: React.FC = () => {

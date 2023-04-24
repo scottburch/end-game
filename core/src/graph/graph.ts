@@ -1,4 +1,4 @@
-import {filter, first, map, Observable, of, switchMap} from "rxjs";
+import {filter, first, map, merge, Observable, of, switchMap, tap} from "rxjs";
 import {newUid} from "../utils/uid.ts";
 import {nullHandler} from "../handlers/handlers.ts";
 import {DeepPartial} from "tsdef";
@@ -95,10 +95,23 @@ export const graphGetEdge = <T extends Props>(graph: Graph, edgeId: string) =>
 
 
 export const graphGet = <T extends Props>(graph: Graph, nodeId: NodeId) =>
-    graph.handlers.getNode.next({graph, nodeId}).pipe(
-        filter(({node, nodeId}) =>  node === undefined || node.nodeId === nodeId),
-        map(({node}) => ({graph, node: node as GraphNode<T>}))
-    );
+    new Observable<{graph: Graph, nodeId: NodeId, node: GraphNode<T>}>(observable => {
+        const putSub = graph.handlers.putNode.pipe(
+            tap(() => graph.handlers.getNode.next({graph, nodeId}))
+        ).subscribe();
+
+        const getSub = graph.handlers.getNode.next({graph, nodeId}).pipe(
+            filter(({node, nodeId}) =>  node === undefined || node.nodeId === nodeId),
+            map(({node}) => ({node: node as GraphNode<T>})),
+            tap(({node}) => observable.next({graph, nodeId, node}))
+        ).subscribe();
+
+
+        return () => {
+            putSub.unsubscribe();
+            getSub.unsubscribe();
+        }
+    });
 
 export const nodesByLabel = <T extends Props>(graph: Graph, label: string) =>
     graph.handlers.nodesByLabel.next({graph, label}).pipe(
