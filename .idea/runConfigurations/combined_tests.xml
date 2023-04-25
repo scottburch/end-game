@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="combined-tests" type="CompoundRunConfigurationType">
+    <toRun name="graph-tests" type="mocha-javascript-test-runner" />
+    <toRun name="react-graph-tests" type="mocha-javascript-test-runner" />
+    <method v="2" />
+  </configuration>
+</component>

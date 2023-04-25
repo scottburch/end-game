@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {of, tap} from "rxjs";
 import {createRoot} from "react-dom/client";
 import {ReactGraph, useGraphNodesByLabel, useGraphPut} from "../react/react-graph.tsx";
-import {Graph} from "../graph/graph.ts";
+import {Graph} from "../../../graph/src/graph/graph.ts";
 
 
 // const Foo: React.FC = () => {

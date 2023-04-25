@@ -1,13 +1,12 @@
-import {Graph, graphGet, GraphNode, graphOpen, graphPut, NodeId, nodesByLabel, Props} from "../graph/graph.ts";
+import {Graph, graphGet, GraphNode, graphOpen, graphPut, NodeId, nodesByLabel, Props} from "@end-game/graph/src/graph/graph.ts";
 import React, {createContext, PropsWithChildren, useContext, useEffect, useState} from "react";
 import {of, switchMap} from "rxjs";
-import {newUid} from "../utils/uid.ts";
-import {handlers} from "../handlers/handlers.ts";
+import {newUid} from "@end-game/graph/src/utils/uid.ts";
+import {handlers} from "@end-game/graph/src/handlers/handlers.ts";
 import {
-    levelStoreGetNodeHandler,
-    levelStoreNodesByLabelHandler,
+    levelStoreGetNodeHandler, levelStoreNodesByLabelHandler,
     levelStorePutNodeHandler
-} from "../handlers/store-handlers/levelStoreHandler.ts";
+} from "@end-game/graph/src/handlers/store-handlers/levelStoreHandler.ts";
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);
 
