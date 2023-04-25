@@ -10,8 +10,6 @@ describe('react graph', () => {
                 switchMap(page => page.textContent('#graph-id')),
                 tap(text => expect(text).to.equal('my-graph'))
             ))
-
-
-        )
-    })
-})
+        );
+    });
+});

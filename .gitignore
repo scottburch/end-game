@@ -1,9 +1,9 @@
 node_modules/
 .parcel-cache
-core/dist
 lib-browser
 lib
 bundle
 ~*
 .~*
 test.html
+dist

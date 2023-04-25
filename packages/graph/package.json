@@ -1,5 +1,5 @@
 {
-  "name": "@end-game/core",
+  "name": "@end-game/graph",
   "version": "1.4.3",
   "license": "MIT",
   "type": "module",
@@ -72,10 +72,10 @@
     "zx": "^7.1.1"
   },
   "scripts": {
-    "build": "rm -rf lib && tsc",
-    "build-watch": "rm -rf lib && tsc --watch",
-    "test": "mocha src/**/*.spec.ts",
-    "bundle": "node --require=ts-node/register --loader=ts-node/esm --experimental-specifier-resolution=node scripts/bundle.ts",
-    "publishIt": "cd bundle && yarn publish --no-git-tag-version"
+    "build": "rm -rf lib && ../../core/node_modules/.bin/tsc",
+    "build-watch": "rm -rf lib && ../../core/node_modules/.bin/tsc --watch",
+    "test": "../../core/node_modules/.bin/mocha ../packages/graph/src/**/*.spec.ts",
+    "bundle": "node --require=ts-node/register --loader=ts-node/esm --experimental-specifier-resolution=node ../../core/scripts/bundle.ts",
+    "publishIt": "cd bundle && ../../core/node_modules/.bin/yarn publish --no-git-tag-version"
   }
 }

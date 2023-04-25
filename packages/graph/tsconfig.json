@@ -102,7 +102,7 @@
     "allowImportingTsExtensions": true
   },
   "exclude": [ "lib",
-    "scripts", "bundle",
+    "../../core/scripts", "bundle",
     "src-old/**/*.spec.ts",
     "src-old/react/react-test-functions.tsx",
     "src-old/react/react-pistol.spec.ts"
