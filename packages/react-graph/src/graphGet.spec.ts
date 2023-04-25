@@ -1,10 +1,10 @@
-import {combineLatest, firstValueFrom, of, switchMap, tap} from "rxjs";
-import {compileBrowserTestCode, newBrowser} from "../test/e2eTestUtils.ts";
+import {combineLatest, delay, firstValueFrom, of, switchMap, tap} from "rxjs";
+import {compileBrowserTestCode, newBrowser} from "./test/e2eTestUtils.js";
 import {expect} from "chai";
 
 describe('graphGet()', () => {
     it('should get a value from the graph', () =>
-        firstValueFrom(compileBrowserTestCode('react/graphGet-test.tsx').pipe(
+        firstValueFrom(compileBrowserTestCode('./graphGet-test.tsx').pipe(
             switchMap(() => newBrowser()),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => combineLatest([

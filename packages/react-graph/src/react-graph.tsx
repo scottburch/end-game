@@ -1,5 +1,8 @@
-import {Graph, graphGet, GraphNode, graphOpen, graphPut, NodeId, nodesByLabel, Props} from "@end-game/graph";
-import React, {createContext, PropsWithChildren, useContext, useEffect, useState} from "react";
+import type {Graph, GraphNode, NodeId, Props} from '@end-game/graph'
+import {graphGet, graphOpen, graphPut, nodesByLabel} from "@end-game/graph";
+import type {PropsWithChildren} from 'react';
+import {createContext, useContext, useEffect, useState} from "react";
+import * as React from 'react'
 import {of, switchMap} from "rxjs";
 import {handlers} from "@end-game/graph";
 import {

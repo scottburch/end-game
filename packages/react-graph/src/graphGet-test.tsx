@@ -1,6 +1,8 @@
-import {renderApp} from "../test/reactTestUtils.tsx";
+import {renderApp} from "@end-game/react-graph";
 import React from 'react'
-import {useGraphGet, useGraphPut} from "./react-graph.tsx";
+import {useGraphGet, useGraphPut} from "@end-game/react-graph";
+
+console.log('**', renderApp);
 
 renderApp(() => {
     const node = useGraphGet('1');

@@ -11,8 +11,7 @@ module.exports = {
             request.startsWith('.') ? cb() : cb(null, `module ${request}`)
     ],
     entry: {
-        'index': './src/index.ts',
-        'index-browser': './src/index-browser.ts'
+        'index': './src/index.ts'
     },
     output: {
         path: path.resolve(__dirname, 'lib'),
@@ -22,17 +21,18 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.ts?$/,
+                test: /\.tsx?$/,
                 use: 'ts-loader',
                 exclude: /node_modules/,
-            },
+            }
         ],
+
     },
     resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
+        extensions: ['.tsx', '.ts', '.js', '.jsx'],
         extensionAlias: {
-            '.js': ['.ts', '.js'],
-            '.mjs': ['.mts', '.mjs'],
+            '.jsx': ['.tsx', '.jsx'],
+            '.js': ['.ts', '.js']
         },
         fallback: {
             dgram: false,

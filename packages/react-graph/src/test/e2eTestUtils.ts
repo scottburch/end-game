@@ -1,4 +1,5 @@
-import playwright, {Page} from "playwright";
+import type {Page} from 'playwright'
+import playwright from "playwright";
 import {map, Observable, of, switchMap, tap} from "rxjs";
 import {Parcel} from '@parcel/core';
 import {writeFile} from "fs/promises";

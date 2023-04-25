@@ -1,10 +1,10 @@
-import {combineLatest, delay, firstValueFrom, of, range, switchMap, tap} from "rxjs";
-import {compileBrowserTestCode, newBrowser} from "../test/e2eTestUtils.ts";
+import {combineLatest, firstValueFrom, switchMap, tap} from "rxjs";
+import {compileBrowserTestCode, newBrowser} from "./test/e2eTestUtils.js";
 import {expect} from "chai";
 
 describe("nodesByLabel()", () => {
     it('should update reactively', () =>
-        firstValueFrom(compileBrowserTestCode('react/nodesByLabel-test.tsx').pipe(
+        firstValueFrom(compileBrowserTestCode('./nodesByLabel-test.tsx').pipe(
             switchMap(() => newBrowser()),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
