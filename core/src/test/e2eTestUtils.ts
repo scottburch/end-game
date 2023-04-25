@@ -28,6 +28,7 @@ export const compileBrowserTestCode = (src: string) =>
         map(() => ({
             entries: 'src/test/test.html',
             defaultConfig: '@parcel/config-default',
+            shouldDisableCache: true,
             serveOptions: {
                 port: 1234
             },

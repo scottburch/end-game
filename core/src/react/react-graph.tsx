@@ -11,6 +11,8 @@ import {
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);
 
+export const useGraph = () => useContext(GraphContext);
+
 export const useGraphNodesByLabel = <T extends Props>(label: string) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>();
     const graph = useContext(GraphContext);
