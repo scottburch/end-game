@@ -1,7 +1,7 @@
 import {renderApp} from "../test/reactTestUtils.tsx";
 import React from 'react'
 import {useGraph} from "./react-graph.tsx";
-import {Graph, graphOpen} from "../../../graph/src/graph/graph.ts";
+import {Graph, graphOpen} from "@end-game/graph";
 
 setTimeout(() => graphOpen({graphId: 'my-graph'}).subscribe(doRender))
 

@@ -1,10 +1,12 @@
-import {graphOpen, GraphOpts} from "../graph/graph.js";
+import type {GraphOpts} from "../graph/graph.js";
+import {graphOpen} from "../graph/graph.js";
 import {handlers} from "../handlers/handlers.js";
 import {
     levelStoreGetEdgeHandler,
     levelStoreGetNodeHandler,
     levelStoreGetRelationshipsHandler,
-    levelStoreNodesByLabelHandler, levelStoreNodesByPropHandler,
+    levelStoreNodesByLabelHandler,
+    levelStoreNodesByPropHandler,
     levelStorePutEdgeHandler,
     levelStorePutNodeHandler
 } from "../handlers/store-handlers/levelStoreHandler.js";

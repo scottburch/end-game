@@ -1,4 +1,4 @@
-import {HandlerNames, Handler, HandlerProps, HandlerFn} from "../graph/graph.js";
+import type {HandlerNames, Handler, HandlerProps, HandlerFn} from "../graph/graph.js";
 import {mergeMap, of, Subject} from "rxjs";
 
 export const handlers = <T extends HandlerNames>(fns: HandlerFn<T>[]) => {

@@ -1,8 +1,8 @@
 import {filter, first, map, Observable, of, switchMap, tap} from "rxjs";
-import {newUid} from "../utils/uid.ts";
-import {nullHandler} from "../handlers/handlers.ts";
-import {DeepPartial} from "tsdef";
-import {Relationship} from "./relationship.ts";
+import {newUid} from "../utils/uid.js";
+import {nullHandler} from "../handlers/handlers.js";
+import type {DeepPartial} from "tsdef";
+import type {Relationship} from "./relationship.js";
 
 
 export type NodeId = string

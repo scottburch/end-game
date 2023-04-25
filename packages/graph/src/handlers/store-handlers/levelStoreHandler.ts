@@ -1,5 +1,6 @@
 import {MemoryLevel} from "memory-level";
-import {Graph, GraphNode, HandlerFn, IndexTypes, Props} from "../../graph/graph.ts";
+import {IndexTypes} from '../../graph/graph.js';
+import type {Graph, GraphNode, HandlerFn, Props} from "../../graph/graph.js";
 import {
     catchError,
     concatMap, from,
@@ -12,9 +13,11 @@ import {
     takeWhile, tap,
     throwError, toArray
 } from "rxjs";
-import {Relationship} from "../../graph/relationship.ts";
-import {AbstractIteratorOptions, AbstractLevel} from "abstract-level";
-import {Iterator, Level} from "level";
+import type {Relationship} from "../../graph/relationship.js";
+import {AbstractLevel} from "abstract-level";
+import type {AbstractIteratorOptions} from "abstract-level";
+import {Level} from "level";
+import type {Iterator} from "level";
 
 
 type LevelStore = AbstractLevel<string>;
