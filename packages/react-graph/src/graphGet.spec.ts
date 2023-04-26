@@ -1,5 +1,5 @@
-import {combineLatest, delay, firstValueFrom, of, switchMap, tap} from "rxjs";
-import {compileBrowserTestCode, newBrowser} from "./test/e2eTestUtils.js";
+import {combineLatest,  firstValueFrom, of, switchMap, tap} from "rxjs";
+import {compileBrowserTestCode, newBrowser} from "@end-game/react-graph";
 import {expect} from "chai";
 
 describe('graphGet()', () => {
