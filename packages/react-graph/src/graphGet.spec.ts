@@ -1,6 +1,6 @@
 import {combineLatest,  firstValueFrom, of, switchMap, tap} from "rxjs";
-import {compileBrowserTestCode, newBrowser} from "@end-game/react-graph";
 import {expect} from "chai";
+import {compileBrowserTestCode, newBrowser} from "./test/e2eTestUtils.js";
 
 describe('graphGet()', () => {
     it('should get a value from the graph', () =>
