@@ -1,6 +1,6 @@
-import {renderApp} from "@end-game/react-graph";
-import {useGraphNodesByLabel, useGraphPut} from "@end-game/react-graph";
 import React, {useState} from "react";
+import {useGraphNodesByLabel, useGraphPut} from "./react-graph.jsx";
+import {renderApp} from "./test/reactTestUtils.jsx";
 
 renderApp(() => {
     const nodes = useGraphNodesByLabel('person');

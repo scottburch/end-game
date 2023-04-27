@@ -1,8 +1,9 @@
-import {renderApp} from "@end-game/react-graph";
 import React from 'react'
-import {useGraph} from "@end-game/react-graph";
-import type {Graph} from '@end-game/graph';
+import type {Graph} from '@end-game/graph'
 import {graphOpen} from "@end-game/graph";
+import {useGraph} from "./react-graph.jsx";
+import {renderApp} from "./test/reactTestUtils.jsx";
+
 
 setTimeout(() => graphOpen({graphId: 'my-graph'}).subscribe(doRender))
 
