@@ -1,6 +1,7 @@
 import type {Page} from 'playwright'
 import playwright from "playwright";
-import {map, Observable, of, switchMap, tap} from "rxjs";
+import {first, map, Observable, of, switchMap, tap} from "rxjs";
+
 import Webpack from 'webpack'
 import WebpackDevServer from 'webpack-dev-server'
 import * as url from "url";
@@ -27,8 +28,8 @@ export const newBrowser = () => new Observable<Page>(observer => {
     }
 })
 
-
-export const compileBrowserTestCode = (src: string) =>
+export const compileBrowserTestCode = (src: string) => new Observable(subscriber => {
+    let server: WebpackDevServer;
     of({}).pipe(
         map(() => new WebpackDevServer({
             static: {
@@ -66,44 +67,16 @@ export const compileBrowserTestCode = (src: string) =>
             }
 
         }))),
+        tap(s => server = s),
         switchMap(server => server.start()),
-        tap(x => x)
-    );
+        tap(() => subscriber.next(undefined)),
+        first()
+    ).subscribe();
+
+    return () => {
+        return server.stop()
+    }
+});
 
 
 
-// export const compileBrowserTestCode = (src: string) =>
-//     of(`<div id="app"></div><script src="../${src}" type="module"></script>`).pipe(
-//         switchMap(html => writeFile('src/test/test.html', html)),
-//         map(() => ({
-//             mode: 'development',
-//             entries: 'src/test/test.html',
-//             defaultConfig: '@parcel/config-default',
-//             shouldDisableCache: true,
-//             shouldAutoInstall: true,
-//             serveOptions: {
-//                 port: 1234
-//             },
-//         } satisfies InitialParcelOptions)),
-//         map(config => new Parcel(config)),
-//         switchMap(bundler => new Observable(sub => {
-//             let bundlerSub: { unsubscribe: () => Promise<any> };
-//             bundler.watch((err, result) => {
-//                 if (err) {
-//                     throw err
-//                 }
-//                 if (result?.type === 'buildSuccess') {
-//                     sub.next(result)
-//                 } else {
-//                     console.error('BUILD_FAILURE', result?.diagnostics)
-//                     throw result
-//                 }
-//             })
-//                 .then(bs => bundlerSub = bs)
-//             return () =>
-//                 of(bundlerSub).pipe(
-//                     switchMap(bundlerSub => bundlerSub.unsubscribe()),
-//                 ).subscribe();
-//         })));
-//
-//
