@@ -1,6 +1,8 @@
-const path = require('path');
+import * as url from "url";
 
-module.exports = {
+const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
+
+export default {
     experiments: {
         outputModule: true
     },
@@ -15,15 +17,20 @@ module.exports = {
         'index-browser': './src/index-browser.ts'
     },
     output: {
-        path: path.resolve(__dirname, 'lib'),
+        path: absPath('lib'),
         filename: '[name].js',
-      libraryTarget: 'module',
+        libraryTarget: 'module',
     },
     module: {
         rules: [
             {
                 test: /\.ts?$/,
-                use: 'ts-loader',
+                use: {
+                    loader: 'ts-loader',
+                    options: {
+                        onlyCompileBundledFiles: true,
+                    }
+                },
                 exclude: /node_modules/,
             },
         ],
@@ -33,21 +40,6 @@ module.exports = {
         extensionAlias: {
             '.js': ['.ts', '.js'],
             '.mjs': ['.mts', '.mjs'],
-        },
-        fallback: {
-            dgram: false,
-            os: false,
-            url: false,
-            stream: false,
-            crypto: false,
-            tls: false,
-            net: false,
-            http: false,
-            https: false,
-            util: false,
-            bufferutil: false,
-            'utf-8-validate': false,
-            zlib: false
         }
     },
 };

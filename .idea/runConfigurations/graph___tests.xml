@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="react-graph-tests" type="mocha-javascript-test-runner">
+  <configuration default="false" name="graph---tests" type="mocha-javascript-test-runner">
     <node-interpreter>$USER_HOME$/.nvm/versions/node/v19.7.0/bin/node</node-interpreter>
     <node-options />
     <mocha-package>$PROJECT_DIR$/node_modules/mocha</mocha-package>
-    <working-directory>$PROJECT_DIR$/packages/react-graph</working-directory>
+    <working-directory>$PROJECT_DIR$/packages/graph</working-directory>
     <pass-parent-env>true</pass-parent-env>
     <ui>bdd</ui>
     <extra-mocha-options />
