@@ -11,10 +11,10 @@
     "typescript": "^4.9.4"
   },
   "scripts": {
-    "dev": "dev",
-    "build": "build",
-    "serve": "serve",
-    "test": "mocha src/**/*.spec.ts"
+    "dev": "dtg-scripts dev",
+    "build": "dtg-scripts build",
+    "serve": "dtg-scripts serve",
+    "test": "dtg-scripts test"
   },
   "engines": {
     "node": ">=19"
