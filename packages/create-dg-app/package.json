@@ -1,6 +1,6 @@
 {
-  "name": "create-dds-app",
-  "version": "1.0.2",
+  "name": "@end-game/create-react-app",
+  "version": "1.0.0",
   "main": "lib/create-dds-app.js",
   "bin": {
     "create-dds-app": "lib/create-dds-app.js"

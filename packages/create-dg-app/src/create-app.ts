@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import {$, cd, fs} from 'zx'
 import {program} from 'commander'
-import {firstValueFrom, map, of, switchMap, tap} from "rxjs";
+import {firstValueFrom, of, switchMap, tap} from "rxjs";
 
 program
-    .description('Create a template for a DDS project')
+    .description('Create a template for a end-game project')
     .argument('<dest>', 'destination for files')
     .action((dest) => doIt(dest).then(() => {}))
     .parse(process.argv);
