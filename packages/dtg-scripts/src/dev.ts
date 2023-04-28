@@ -11,7 +11,10 @@ export const devCmd = () => {
                 directory: resolve('./public'),
             },
             port: 1234,
-            open: true
+            open: true,
+            headers: {
+                'Cache-Control': 'no-store',
+            },
         }, Webpack({
             target: 'web',
             mode: 'development',

@@ -1,10 +1,13 @@
 import React, {CSSProperties} from 'react';
+import {AddTodoPanel} from "./components/AddTodoPanel.jsx";
+import {TodoList} from "./components/TodoList.jsx";
 
 
 export const Main: React.FC = () => {
     return (
         <div style={styles.main}>
-            TODO APP
+            <AddTodoPanel/>
+            <TodoList/>
         </div>
     );
 };
