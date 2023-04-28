@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {Main} from './Main.jsx';
+import {ReactGraph} from "@end-game/react-graph";
+
 
 setTimeout(() => renderIt());
 
@@ -10,7 +12,9 @@ const renderIt = () => {
     );
     root.render(
         <React.StrictMode>
-            <Main/>
+            <ReactGraph>
+                <Main/>
+            </ReactGraph>
         </React.StrictMode>
     );
 }

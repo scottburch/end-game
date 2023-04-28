@@ -33,13 +33,6 @@ export default {
         ],
 
     },
-    devServer: {
-        static: {
-            directory: './src/test',
-        },
-        compress: true,
-        port: 1234,
-    },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.jsx'],
         extensionAlias: {
