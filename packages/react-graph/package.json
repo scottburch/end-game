@@ -82,6 +82,6 @@
     "build": "rm -rf lib && webpack",
     "build-watch": "rm -rf lib && webpack --watch",
     "test": "mocha src/**/*.spec.ts",
-    "publishIt": "cd bundle && ../../core/node_modules/.bin/yarn publish --no-git-tag-version"
+    "publishIt": "cd bundle && ../../old/core/node_modules/.bin/yarn publish --no-git-tag-version"
   }
 }
