@@ -8,5 +8,8 @@
   },
   "scripts": {
     "build": "rm -rf lib & tsc"
+  },
+  "dependencies": {
+    "@end-game/dtg-scripts": "*"
   }
 }

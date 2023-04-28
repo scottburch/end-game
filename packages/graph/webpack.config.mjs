@@ -1,6 +1,4 @@
-import * as url from "url";
-
-const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
+import {absPath} from '@end-game/utils'
 
 export default {
     experiments: {
@@ -17,7 +15,7 @@ export default {
         'index-browser': './src/index-browser.ts'
     },
     output: {
-        path: absPath('lib'),
+        path: absPath(import.meta.url, 'lib'),
         filename: '[name].js',
         libraryTarget: 'module',
     },
