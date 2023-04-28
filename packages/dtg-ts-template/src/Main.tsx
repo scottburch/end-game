@@ -4,7 +4,7 @@ import React, {CSSProperties} from 'react';
 export const Main: React.FC = () => {
     return (
         <div style={styles.main}>
-            APP HERE
+            TODO APP
         </div>
     );
 };

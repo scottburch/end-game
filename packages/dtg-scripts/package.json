@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "type": "module",
   "bin": {
     "dev": "lib/dev.js"
   },
@@ -10,6 +11,10 @@
     "build": "rm -rf lib & tsc"
   },
   "dependencies": {
-    "@end-game/dtg-scripts": "*"
+    "@end-game/dtg-scripts": "*",
+    "@end-game/utils": "*",
+    "rxjs": "^7.8.1",
+    "webpack": "^5.81.0",
+    "webpack-dev-server": "^4.13.3"
   }
 }
