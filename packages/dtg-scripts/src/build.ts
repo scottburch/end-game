@@ -2,7 +2,7 @@
 import {resolve} from 'node:path'
 import {map, Observable, of, switchMap, tap} from "rxjs";
 
-import {webpack, Configuration} from 'webpack'
+import Webpack from 'webpack'
 
 export const buildCmd = () => {
     of({
@@ -35,8 +35,8 @@ export const buildCmd = () => {
             },
         }
 
-    } satisfies Configuration).pipe(
-        map(config => webpack(config)),
+    } satisfies Webpack.Configuration).pipe(
+        map(config => Webpack.webpack(config)),
         switchMap(compiler => new Observable(subscriber =>
             compiler.compile(x => subscriber.next(x))
         )),
