@@ -1,5 +1,5 @@
 import {useGraphPut} from "@end-game/react-graph";
-import type {Todo} from "../types/Todo.jsx";
+import type {Todo} from "../types/Todo.js";
 import {useState} from "react";
 import React from 'react';
 

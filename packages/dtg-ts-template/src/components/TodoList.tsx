@@ -1,6 +1,6 @@
 import {useGraphNodesByLabel} from "@end-game/react-graph";
 import React from 'react';
-import {Todo} from "../types/Todo.jsx";
+import {Todo} from "../types/Todo.js";
 
 export const TodoList: React.FC = () => {
     const todos = useGraphNodesByLabel<Todo>('todo');
