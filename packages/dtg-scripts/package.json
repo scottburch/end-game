@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "lib/index.js",
   "license": "MIT",
+  "private": false,
   "type": "module",
   "bin": {
     "dtg-scripts": "lib/index.js"
@@ -17,5 +18,6 @@
     "rxjs": "^7.8.1",
     "webpack": "^5.81.0",
     "webpack-dev-server": "^4.13.3"
-  }
+  },
+  "gitHead": "eea362ffb1b240cc72db55f6386b6a036a2f8ef2"
 }

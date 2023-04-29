@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "type": "module",
+  "private": false,
   "main": "./lib/index-browser.js",
   "exports": {
     ".": {
@@ -70,5 +71,6 @@
     "build-watch": "yarn build --watch",
     "test": "mocha ./src/**/*.spec.ts",
     "publishIt": "cd bundle && ../../old/core/node_modules/.bin/yarn publish --no-git-tag-version"
-  }
+  },
+  "gitHead": "eea362ffb1b240cc72db55f6386b6a036a2f8ef2"
 }

@@ -4,6 +4,7 @@
   "main": "./lib/index.js",
   "license": "MIT",
   "type": "module",
+  "private": false,
   "exports": {
     ".": "./lib/index.js"
   },
@@ -14,5 +15,6 @@
   },
   "scripts": {
     "build": "rm -rf lib && tsc"
-  }
+  },
+  "gitHead": "eea362ffb1b240cc72db55f6386b6a036a2f8ef2"
 }

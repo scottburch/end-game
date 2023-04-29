@@ -2,6 +2,7 @@
   "name": "@end-game/react-graph",
   "version": "1.0.0",
   "license": "MIT",
+  "private": false,
   "type": "module",
   "main": "./lib/index.js",
   "browser": "./lib/index.js",
@@ -83,5 +84,6 @@
     "build-watch": "rm -rf lib && webpack --watch",
     "test": "mocha src/**/*.spec.ts",
     "publishIt": "cd bundle && ../../old/core/node_modules/.bin/yarn publish --no-git-tag-version"
-  }
+  },
+  "gitHead": "eea362ffb1b240cc72db55f6386b6a036a2f8ef2"
 }
