@@ -2,7 +2,7 @@
 import {resolve} from 'node:path'
 import {map, Observable, of, switchMap, tap} from "rxjs";
 
-import Webpack from 'webpack'
+import * as Webpack from 'webpack'
 
 export const buildCmd = () => {
     of({
