@@ -1,6 +1,6 @@
 {
   "name": "@end-game/dtg-scripts",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "lib/index.js",
   "license": "MIT",
   "private": false,
@@ -12,8 +12,8 @@
     "build": "rm -rf lib & tsc"
   },
   "dependencies": {
-    "@end-game/dtg-scripts": "^1.0.6",
-    "@end-game/utils": "^1.0.2",
+    "@end-game/dtg-scripts": "^1.0.7",
+    "@end-game/utils": "^1.0.7",
     "commander": "^10.0.1",
     "rxjs": "^7.8.1",
     "webpack": "^5.81.0",
