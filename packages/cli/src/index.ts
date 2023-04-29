@@ -7,6 +7,6 @@ program
     .command('create-app')
     .description('Create a template for a dtg project')
     .argument('<dest>', 'destination for files')
-    .action(([dest]) => createAppCmd(dest))
+    .action(dest => createAppCmd(dest))
 
 program.parse()

@@ -9,7 +9,7 @@ import {absPath} from "@end-game/utils";
 
 export const createAppCmd = (dest: string) => {
     untarTemplate(dest).pipe().subscribe(() => console.log('Done'))
-}
+};
 
 
 const untarTemplate = (dest: string) =>
