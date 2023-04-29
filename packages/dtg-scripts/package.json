@@ -11,8 +11,8 @@
     "build": "rm -rf lib & tsc"
   },
   "dependencies": {
-    "@end-game/dtg-scripts": "*",
-    "@end-game/utils": "*",
+    "@end-game/dtg-scripts": "^1.0.0",
+    "@end-game/utils": "^1.0.0",
     "commander": "^10.0.1",
     "rxjs": "^7.8.1",
     "webpack": "^5.81.0",

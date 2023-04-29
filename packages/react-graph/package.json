@@ -12,8 +12,8 @@
     }
   },
   "dependencies": {
-    "@end-game/graph": "*",
-    "@end-game/utils": "*",
+    "@end-game/graph": "^1.0.0",
+    "@end-game/utils": "^1.0.0",
     "@types/base-64": "^1.0.0",
     "@types/chai": "^4.3.4",
     "@types/ip": "^1.1.0",
