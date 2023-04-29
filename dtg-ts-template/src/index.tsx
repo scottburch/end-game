@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import {Main} from './Main.js';
+import {Main} from './Main.jsx';
 import {ReactGraph} from "@end-game/react-graph";
 
 
