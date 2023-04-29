@@ -25,5 +25,11 @@
   "publishConfig": {
     "access": "public"
   },
+  "mocha": {
+    "require": "ts-node/register",
+    "loader": "ts-node/esm",
+    "experimental-specifier-resolution": "node",
+    "bail": true
+  },
   "gitHead": "a01ca1e84d2758a3f85629f5dac3f4d3c0afd984"
 }
