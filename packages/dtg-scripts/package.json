@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@end-game/dtg-scripts": "^1.0.11",
-    "@end-game/utils": "^1.0.7",
+    "@end-game/utils": "*",
     "commander": "^10.0.1",
     "rxjs": "^7.8.1",
     "webpack": "^5.81.0",
