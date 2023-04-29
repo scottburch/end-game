@@ -3,6 +3,7 @@ import {resolve} from 'node:path'
 import {map, Observable, of, switchMap, tap} from "rxjs";
 
 import Webpack from 'webpack'
+import {absPath} from "@end-game/utils";
 
 export const buildCmd = () => {
     of({
@@ -12,7 +13,7 @@ export const buildCmd = () => {
             'index.tsx': resolve('./src/index.tsx')
         },
         output: {
-            path: './lib',
+            path: absPath(import.meta.url, 'lib'),
             filename: '[name]',
             libraryTarget: 'umd'
         },
