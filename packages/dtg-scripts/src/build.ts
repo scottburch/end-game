@@ -47,5 +47,5 @@ export const buildCmd = () => {
         )),
         tap(x => console.log(x))
 
-    )
+    ).subscribe()
 }
