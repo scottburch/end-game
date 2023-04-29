@@ -9,6 +9,7 @@
     "endgame": "lib/index.js"
   },
   "dependencies": {
+    "@end-game/utils": "*",
     "@types/commander": "^2.12.2",
     "@types/node": "^18.11.18",
     "@types/tar": "^6.1.4",
