@@ -6,8 +6,6 @@ import {createWriteStream} from "fs";
 import {mkdir} from "fs/promises";
 import {$} from "zx";
 
-
-
 of(true).pipe(
     delay(0),
     tap(() => console.log("tar up the templates")),
@@ -22,8 +20,9 @@ const tarTemplate = () =>
             opts: {
                 gzip: true,
                 filter: (path) => !/node_modules/.test(path),
+                cwd: absPath(import.meta.url, '../../../dtg-ts-template')
             } satisfies CreateOptions,
-            files: [absPath(import.meta.url, '../../../dtg-ts-template')]
+            files: ['.']
         })),
         tap(({
                  opts,

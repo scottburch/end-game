@@ -1,11 +1,30 @@
 import {$, cd, fs} from 'zx'
-import {firstValueFrom, of, switchMap, tap} from "rxjs";
+import {firstValueFrom, from, map, of, switchMap, tap} from "rxjs";
+import {mkdir} from "fs/promises";
+import type {ExtractOptions} from "tar";
+import * as tar from "tar";
+import {absPath} from "@end-game/utils";
+
 
 
 export const createAppCmd = (dest: string) => {
-    console.log('create app', dest);
+    untarTemplate(dest).pipe().subscribe(() => console.log('Done'))
 }
 
+
+const untarTemplate = (dest: string) =>
+    from(mkdir(dest)).pipe(
+        map(() => ({
+            opts: {
+                cwd: dest
+            } satisfies ExtractOptions,
+        })),
+        tap(({opts}) => {
+            fs.createReadStream(absPath(import.meta.url, '../templates/dtg-ts-template.tgz')).pipe(
+                tar.x(opts)
+            )
+        })
+    );
 
 function doIt(dest: string) {
     return firstValueFrom(of(dest).pipe(
