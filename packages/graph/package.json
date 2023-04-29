@@ -72,5 +72,5 @@
     "test": "mocha ./src/**/*.spec.ts",
     "publishIt": "cd bundle && ../../old/core/node_modules/.bin/yarn publish --no-git-tag-version"
   },
-  "gitHead": "eea362ffb1b240cc72db55f6386b6a036a2f8ef2"
+  "gitHead": "a01ca1e84d2758a3f85629f5dac3f4d3c0afd984"
 }
