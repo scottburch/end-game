@@ -11,10 +11,10 @@
     "typescript": "^5.0.4"
   },
   "scripts": {
-    "dev": "dtg-scripts dev",
-    "build": "dtg-scripts build",
-    "serve": "dtg-scripts serve",
-    "test": "dtg-scripts test"
+    "dev": "node_modules/.bin/dtg-scripts dev",
+    "build": "node_modules/.bin/dtg-scripts build",
+    "serve": "node_modules/.bin/dtg-scripts serve",
+    "test": "node_modules/.bin/dtg-scripts test"
   },
   "engines": {
     "node": ">=19"

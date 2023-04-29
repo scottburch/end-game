@@ -8,7 +8,14 @@ import {absPath} from "@end-game/utils";
 
 
 export const createAppCmd = (dest: string) => {
-    untarTemplate(dest).pipe().subscribe(() => console.log('Done'))
+    untarTemplate(dest).pipe(
+        tap(() => console.log('\n\n')),
+        tap(() => console.log(`You have successfully created a template for ${dest}`)),
+        tap(() => console.log('Next steps\n----------')),
+        tap(() => console.log(`type "cd ${dest}"`)),
+        tap(() => console.log(`type "yarn start" to start the development environment`)),
+//        tap(() => console.log('[optional] type "yarn testnet" to start a two node testnet to use for development')),
+    ).subscribe()
 };
 
 
