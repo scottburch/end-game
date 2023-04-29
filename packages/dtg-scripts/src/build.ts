@@ -7,9 +7,14 @@ import * as Webpack from 'webpack'
 export const buildCmd = () => {
     of({
         target: 'web',
-        mode: 'development',
+        mode: 'production',
         entry: {
-            'index': resolve('./src/index.tsx')
+            'index.tsx': resolve('./src/index.tsx')
+        },
+        output: {
+            path: './lib',
+            filename: '[name]',
+            libraryTarget: 'umd'
         },
         module: {
             rules: [
