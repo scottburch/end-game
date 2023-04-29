@@ -1,6 +1,7 @@
 import {delay, firstValueFrom, from, map, of, switchMap, tap} from "rxjs";
-import {$, cd} from 'zx'
+import {$} from 'zx'
 import {newBrowser} from "@end-game/react-graph";
+import {createApp} from "./test/testUtils.js";
 
 
 
@@ -9,14 +10,7 @@ describe('create app', function()  {
    it('should create a working demo app', () =>
         firstValueFrom(from($`yarn build`).pipe(
             switchMap(() => of(true).pipe(
-                // setup app
-                switchMap(() => $`npm uninstall -g @end-game/cli`),
-                switchMap(() => $`npm install -g .`),
-                switchMap(() => $`rm -rf /tmp/endgame-test`),
-                switchMap(() => $`mkdir /tmp/endgame-test`),
-                tap(() => cd('/tmp/endgame-test')),
-                switchMap(() => $`endgame create-app my-app`),
-                tap(() => cd('/tmp/endgame-test/my-app')),
+                switchMap(createApp),
                 map(() => $`yarn dev`),
             )),
             delay(1000),
