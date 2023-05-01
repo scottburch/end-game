@@ -1,12 +1,10 @@
 {
   "name": "@end-game/utils",
   "version": "1.0.2",
-  "main": "./lib/index.js",
   "license": "MIT",
   "type": "module",
   "private": false,
   "exports": {
-    ".": "./lib/index.js",
     "./absPath": "./src/absPath.ts"
   },
   "dependencies": {
