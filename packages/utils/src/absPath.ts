@@ -1,3 +1,3 @@
 import url from "url";
 
-export const absPath = (source: string, filename = '.') => url.fileURLToPath(new URL(filename, source));
+export const absPath = (source: string, filename: string) => url.fileURLToPath(new URL(filename, source));

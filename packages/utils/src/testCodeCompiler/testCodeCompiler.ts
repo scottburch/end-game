@@ -10,7 +10,7 @@ export const compileBrowserTestCode = (src: string) => new Observable(subscriber
     of({}).pipe(
         map(() => new WebpackDevServer({
             static: {
-                directory: absPath(import.meta.url),
+                directory: absPath(import.meta.url, '.'),
             },
             port: 1234,
         }, Webpack({
