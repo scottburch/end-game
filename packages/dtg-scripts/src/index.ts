@@ -7,6 +7,7 @@ const program = new Command();
 program
     .command('dev')
     .option('-h --headless', 'do not open a browser after build')
+    .option('-p --port <port>', 'port to listen on')
     .action((opts) => devCmd(opts));
 
 program

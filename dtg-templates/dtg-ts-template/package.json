@@ -16,7 +16,6 @@
   },
   "scripts": {
     "dev": "dtg-scripts dev",
-    "dev-headless": "dtg-scripts dev --headless",
     "build": "dtg-scripts build",
     "serve": "dtg-scripts serve",
     "test": "dtg-scripts test"

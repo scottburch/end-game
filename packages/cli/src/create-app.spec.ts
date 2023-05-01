@@ -8,11 +8,11 @@ describe('create app', function () {
     this.timeout(40_000);
     it('should create a working demo app', () =>
         firstValueFrom(createApp().pipe(
-            map(() => $`yarn dev-headless`),
+            map(() => $`yarn run dev --headless --port 1235`),
             delay(3000),
             switchMap(proc => of(true).pipe(
                 // test app starts
-                switchMap(() => openBrowser()),
+                switchMap(() => openBrowser({port: 1235})),
                 switchMap(page => page.waitForSelector('text=Task:')),
                 tap(() => proc.kill())
             ))
