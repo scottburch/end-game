@@ -1,8 +1,9 @@
 import {$, cd} from "zx";
 import {of, switchMap, tap} from "rxjs";
-import {absPath} from "@end-game/utils/absPath";
 
-const tmpDir = absPath(import.meta.url, '../../../tmp');
+import {endgamePackagesDir} from "@end-game/utils/dirs";
+
+const tmpDir = endgamePackagesDir('tmp')
 
 
 export const createApp = () =>
