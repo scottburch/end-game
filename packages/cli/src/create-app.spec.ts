@@ -13,7 +13,7 @@ describe('create app', function()  {
                 switchMap(createApp),
                 map(() => $`yarn dev-headless`),
             )),
-            delay(2000),
+            delay(3000),
             switchMap(proc => of(true).pipe(
                 // test app starts
                 switchMap(() => openBrowser()),
