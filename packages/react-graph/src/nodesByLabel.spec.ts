@@ -1,11 +1,13 @@
 import {combineLatest, firstValueFrom, switchMap, tap} from "rxjs";
-import {compileBrowserTestCode} from "./test/e2eTestUtils.js";
+
 import {openBrowser} from "@end-game/utils/openBrowser";
 import {expect} from "chai";
+import {compileBrowserTestCode} from "@end-game/utils/testCodeCompiler";
+import {absPath} from "@end-game/utils/absPath";
 
 describe("nodesByLabel()", () => {
     it('should update reactively', () =>
-        firstValueFrom(compileBrowserTestCode('./nodesByLabel-test.tsx').pipe(
+        firstValueFrom(compileBrowserTestCode(absPath(import.meta.url, 'nodesByLabel-test.tsx')).pipe(
             switchMap(() => openBrowser()),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),

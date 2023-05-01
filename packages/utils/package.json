@@ -6,7 +6,8 @@
   "private": false,
   "exports": {
     "./absPath": "./lib/absPath.js",
-    "./openBrowser": "./lib/openBrowser.js"
+    "./openBrowser": "./lib/openBrowser.js",
+    "./testCodeCompiler": "./lib/testCodeCompiler/testCodeCompiler.js"
   },
   "dependencies": {
     "@types/node": "^18.16.2",
@@ -15,7 +16,7 @@
     "typescript": "^5.0.4"
   },
   "scripts": {
-    "build": "rm -rf lib && tsc"
+    "build": "rm -rf lib && tsc && cp ./src/testCodeCompiler/* ./lib/testCodeCompiler"
   },
   "publishConfig": {
     "access": "public"

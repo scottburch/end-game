@@ -6,8 +6,6 @@ import url from "node:url";
 
 const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
 
-
-
 export const compileBrowserTestCode = (src: string) => new Observable(subscriber => {
     let server: WebpackDevServer;
     of({}).pipe(
@@ -20,7 +18,7 @@ export const compileBrowserTestCode = (src: string) => new Observable(subscriber
             target: 'web',
             mode: 'development',
             entry: {
-                'index': absPath(`../${src}`)
+                'index': src
             },
             module: {
                 rules: [

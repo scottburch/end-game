@@ -10,8 +10,7 @@
     ".": {
       "node": "./lib/index.js",
       "default": "./lib/index.js"
-    },
-    "./e2eTestUtils": "./lib/test/e2eTestUtils.js"
+    }
   },
   "dependencies": {
     "@end-game/graph": "^1.0.2",
