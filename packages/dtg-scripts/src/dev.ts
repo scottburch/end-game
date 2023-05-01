@@ -4,7 +4,7 @@ import {map, of, switchMap} from "rxjs";
 import WebpackDevServer from 'webpack-dev-server'
 import Webpack from 'webpack'
 
-export const devCmd = () => {
+export const devCmd = (opts: {headless: boolean}) => {
     of({}).pipe(
         map(() => new WebpackDevServer({
             static: {

@@ -6,7 +6,8 @@ const program = new Command();
 
 program
     .command('dev')
-    .action(() => devCmd());
+    .option('-h --headless', 'do not open a browser after build')
+    .action((opts) => devCmd(opts));
 
 program
     .command('build')
