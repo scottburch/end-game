@@ -6,7 +6,7 @@ import {mkdir} from "fs/promises";
 import {$} from "zx";
 import url from "url";
 
-export const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
+const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
 
 
 of(true).pipe(

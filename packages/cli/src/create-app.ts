@@ -3,11 +3,7 @@ import {from, map, switchMap, tap} from "rxjs";
 import {mkdir} from "fs/promises";
 import type {ExtractOptions} from "tar";
 import * as tar from "tar";
-import url from "url";
-
-export const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
-
-
+import {absPath} from "@end-game/utils/absPath";
 
 export const createAppCmd = (dest: string) => {
     untarTemplate(dest).pipe(
@@ -30,7 +26,7 @@ const untarTemplate = (dest: string) =>
             } satisfies ExtractOptions,
         })),
         tap(({opts}) => {
-            fs.createReadStream(absPath('../templates/dtg-ts-template.tgz')).pipe(
+            fs.createReadStream(absPath(import.meta.url, '../templates/dtg-ts-template.tgz')).pipe(
                 tar.x(opts)
             )
         })

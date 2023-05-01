@@ -14,6 +14,7 @@ of(true).pipe(
     bufferCount(DIRS.length),
     switchMap(() => from(DIRS)),
     concatMap(dir => of(dir).pipe(
+        tap(dir => console.log('***********', 'building', dir, '*************')),
         tap(() => cd(`${dir}`)),
         switchMap(() => $`yarn build`),
         tap(() => cd('..'))
