@@ -5,10 +5,12 @@
   "type": "module",
   "private": false,
   "exports": {
-    "./absPath": "./src/absPath.ts"
+    "./absPath": "./lib/absPath.js",
+    "./openBrowser": "./lib/openBrowser.js"
   },
   "dependencies": {
     "@types/node": "^18.16.2",
+    "playwright": "^1.33.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },

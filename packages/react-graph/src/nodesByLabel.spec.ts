@@ -1,11 +1,12 @@
 import {combineLatest, firstValueFrom, switchMap, tap} from "rxjs";
-import {compileBrowserTestCode, newBrowser} from "./test/e2eTestUtils.js";
+import {compileBrowserTestCode} from "./test/e2eTestUtils.js";
+import {openBrowser} from "@end-game/utils/openBrowser";
 import {expect} from "chai";
 
 describe("nodesByLabel()", () => {
     it('should update reactively', () =>
         firstValueFrom(compileBrowserTestCode('./nodesByLabel-test.tsx').pipe(
-            switchMap(() => newBrowser()),
+            switchMap(() => openBrowser()),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),

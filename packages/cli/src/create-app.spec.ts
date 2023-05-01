@@ -1,7 +1,7 @@
 import {delay, firstValueFrom, from, map, of, switchMap, tap} from "rxjs";
 import {$} from 'zx'
-import {newBrowser} from "@end-game/react-graph/e2eTestUtils";
 import {createApp} from "./test/testUtils.js";
+import {openBrowser} from "@end-game/utils/openBrowser";
 
 
 
@@ -16,7 +16,7 @@ describe('create app', function()  {
             delay(2000),
             switchMap(proc => of(true).pipe(
                 // test app starts
-                switchMap(() => newBrowser()),
+                switchMap(() => openBrowser()),
                 switchMap(page => page.waitForSelector('text=Task:')),
                 tap(() => proc.kill())
             ))
