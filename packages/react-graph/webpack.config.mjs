@@ -13,7 +13,8 @@ export default {
             request.startsWith('.') ? cb() : cb(null, `module ${request}`)
     ],
     entry: {
-        'index': './src/index.ts'
+        'index': './src/index.ts',
+        'test/e2eTestUtils': './src/test/e2eTestUtils.ts'
     },
     output: {
         path: absPath('lib'),

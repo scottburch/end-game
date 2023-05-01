@@ -9,6 +9,7 @@
     "endgame": "lib/index.js"
   },
   "dependencies": {
+    "@end-game/react-graph": "*",
     "@end-game/utils": "*",
     "@types/node": "^18.11.18",
     "@types/tar": "^6.1.4",

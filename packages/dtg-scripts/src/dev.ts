@@ -5,6 +5,7 @@ import WebpackDevServer from 'webpack-dev-server'
 import Webpack from 'webpack'
 
 export const devCmd = (opts: {headless: boolean}) => {
+    console.log('*****', opts);
     of({}).pipe(
         map(() => new WebpackDevServer({
             static: {

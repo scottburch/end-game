@@ -1,6 +1,6 @@
 import {delay, firstValueFrom, from, map, of, switchMap, tap} from "rxjs";
 import {$} from 'zx'
-import {newBrowser} from "@end-game/react-graph";
+import {newBrowser} from "@end-game/react-graph/e2eTestUtils";
 import {createApp} from "./test/testUtils.js";
 
 
@@ -11,7 +11,7 @@ describe('create app', function()  {
         firstValueFrom(from($`yarn build`).pipe(
             switchMap(() => of(true).pipe(
                 switchMap(createApp),
-                map(() => $`yarn dev`),
+                map(() => $`yarn dev-headless`),
             )),
             delay(2000),
             switchMap(proc => of(true).pipe(
