@@ -1,6 +1,5 @@
-
 import {resolve} from 'node:path'
-import {map, Observable, of, switchMap, tap} from "rxjs";
+import {Observable, of, switchMap, throwError} from "rxjs";
 import type {Configuration} from 'webpack'
 import Webpack from 'webpack'
 
@@ -36,11 +35,8 @@ export const buildCmd = () => {
         }
 
     } satisfies Configuration).pipe(
-        map(config => Webpack.webpack(config)),
-        switchMap(compiler => new Observable(subscriber =>
-            compiler.compile(x => subscriber.next(x))
-        )),
-        tap(x => console.log(x))
-
-    )
+        switchMap(config => new Observable(subscriber => {
+            Webpack.webpack(config, err => err ? throwError(() => err) : subscriber.next())
+        }))
+    ).subscribe()
 }

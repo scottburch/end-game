@@ -15,6 +15,7 @@
     "@end-game/dtg-scripts": "^1.0.6",
     "@end-game/utils": "^1.0.2",
     "commander": "^10.0.1",
+    "serve": "^14.2.0",
     "webpack": "^5.81.0",
     "webpack-dev-server": "^4.13.3"
   },
