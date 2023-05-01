@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="build-all" type="TypeScriptProgramRunner" factoryName="TypeScript">
+    <module name="end-game" />
+    <option name="interpreterRef" value="project" />
+    <option name="enabledTsNodeEsmLoader" value="true" />
+    <option name="interpreterOptions" value="" />
+    <option name="workingDirectory" value="$PROJECT_DIR$/scripts" />
+    <option name="tsconfigFile" value="" />
+    <option name="extraTypeScriptOptions" value="" />
+    <option name="scriptName" value="$PROJECT_DIR$/scripts/build-all.ts" />
+    <option name="programParameters" value="" />
+    <option name="tsnodePackage" value="~/work/end-game/node_modules/ts-node" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -6,7 +6,8 @@
   "type": "module",
   "private": false,
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./absPath": "./src/absPath.ts"
   },
   "dependencies": {
     "@types/node": "^18.16.2",

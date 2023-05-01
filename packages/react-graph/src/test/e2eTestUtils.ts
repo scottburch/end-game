@@ -4,7 +4,10 @@ import {first, map, Observable, of, switchMap, tap} from "rxjs";
 
 import Webpack from 'webpack'
 import WebpackDevServer from 'webpack-dev-server'
-import {absPath} from "@end-game/utils";
+import url from "node:url";
+
+const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
+
 
 
 export const newBrowser = () => new Observable<Page>(observer => {
@@ -36,7 +39,7 @@ export const compileBrowserTestCode = (src: string) => new Observable(subscriber
             target: 'web',
             mode: 'development',
             entry: {
-                'index': absPath(import.meta.url, `../${src}`)
+                'index': absPath(`../${src}`)
             },
             module: {
                 rules: [
@@ -46,7 +49,7 @@ export const compileBrowserTestCode = (src: string) => new Observable(subscriber
                             loader: 'ts-loader',
                             options: {
                                 onlyCompileBundledFiles: true,
-                                configFile: absPath(import.meta.url, 'tsconfig.e2e.json')
+                                configFile: absPath('tsconfig.e2e.json')
                             }
                         },
                         exclude: /node_modules/,

@@ -1,4 +1,6 @@
-import {absPath} from "@end-game/utils";
+import url from "node:url";
+
+export const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
 
 export default {
     experiments: {
@@ -14,7 +16,7 @@ export default {
         'index': './src/index.ts'
     },
     output: {
-        path: absPath(import.meta.url, 'lib'),
+        path: absPath('lib'),
         filename: '[name].js',
       libraryTarget: 'module',
     },

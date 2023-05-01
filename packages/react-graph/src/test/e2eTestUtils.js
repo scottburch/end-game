@@ -2,7 +2,8 @@ import playwright from "playwright";
 import { first, map, Observable, of, switchMap, tap } from "rxjs";
 import Webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
-import { absPath } from "@end-game/utils";
+import { absPath } from "@end-game/utils/absPath";
+
 export const newBrowser = () => new Observable(observer => {
     let openPage;
     const sub = of(playwright['chromium']).pipe(switchMap(f => f.launch({ headless: !!process.env.CI, devtools: true })), switchMap(browser => browser.newContext()), switchMap(ctx => ctx.newPage()), switchMap(page => page.goto('http://localhost:1234').then(() => page)), tap(page => openPage = page), tap(page => observer.next(page))).subscribe();

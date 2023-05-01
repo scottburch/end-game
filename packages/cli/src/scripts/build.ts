@@ -1,10 +1,13 @@
 import {delay, from, map, of, switchMap, tap} from "rxjs";
-import {absPath} from "@end-game/utils";
 import * as tar from 'tar'
 import {CreateOptions} from "tar";
 import {createWriteStream} from "fs";
 import {mkdir} from "fs/promises";
 import {$} from "zx";
+import url from "url";
+
+export const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
+
 
 of(true).pipe(
     delay(0),
@@ -15,17 +18,17 @@ of(true).pipe(
 ).subscribe(() => console.log('done'));
 
 const tarTemplate = () =>
-    from(mkdir(absPath(import.meta.url, '../../templates'), {recursive: true})).pipe(
+    from(mkdir(absPath('../../templates'), {recursive: true})).pipe(
         map(() => ({
             opts: {
                 gzip: true,
                 filter: (path) => !/node_modules/.test(path),
-                cwd: absPath(import.meta.url, '../../../../dtg-templates/dtg-ts-template')
+                cwd: absPath('../../../../dtg-templates/dtg-ts-template')
             } satisfies CreateOptions,
             files: ['.']
         })),
         tap(({
                  opts,
                  files
-             }) => tar.c(opts, files).pipe(createWriteStream(absPath(import.meta.url, '../../templates/dtg-ts-template.tgz')))),
+             }) => tar.c(opts, files).pipe(createWriteStream(absPath('../../templates/dtg-ts-template.tgz')))),
     );
