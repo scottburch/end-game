@@ -8,3 +8,4 @@ bundle
 test.html
 dist
 packages/cli/templates
+tmp
