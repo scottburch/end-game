@@ -8,7 +8,7 @@ export default {
         outputModule: true
     },
     target: 'es2020',
-    mode: 'production',
+    mode: 'development',
     externals: [
         ({context, request, dependencyType, contextInfo}, cb) =>
             request.startsWith('.') ? cb() : cb(null, `module ${request}`)
