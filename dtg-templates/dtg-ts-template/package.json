@@ -42,8 +42,5 @@
     "experimental-specifier-resolution": "node",
     "bail": true,
     "timeout": 100000
-  },
-  "devDependencies": {
-    "@parcel/transformer-webmanifest": "2.8.3"
   }
 }
