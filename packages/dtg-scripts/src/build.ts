@@ -39,6 +39,6 @@ export const buildCmd = () => {
         switchMap(config => new Observable(subscriber => {
             Webpack.webpack(config, err => err ? throwError(() => err) : subscriber.next())
         })),
-        switchMap(() => fs.copy(resolve('public'), resolve('dist'), {recursive: true}))
+        switchMap(() => fs.copy(resolve('public'), resolve('dist'), {}))
     ).subscribe()
 }
