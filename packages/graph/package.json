@@ -1,6 +1,6 @@
 {
   "name": "@end-game/graph",
-  "version": "1.0.17",
+  "version": "1.0.21",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -12,8 +12,8 @@
     }
   },
   "dependencies": {
-    "@end-game/react-graph": "^1.0.17",
-    "@end-game/utils": "^1.0.17",
+    "@end-game/react-graph": "^1.0.21",
+    "@end-game/utils": "^1.0.21",
     "@types/base-64": "^1.0.0",
     "@types/chai": "^4.3.4",
     "@types/ip": "^1.1.0",
