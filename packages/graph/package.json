@@ -1,6 +1,6 @@
 {
   "name": "@end-game/graph",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -12,7 +12,7 @@
     }
   },
   "dependencies": {
-    "@end-game/utils": "^1.0.15",
+    "@end-game/utils": "^1.0.16",
     "@types/base-64": "^1.0.0",
     "@types/chai": "^4.3.4",
     "@types/ip": "^1.1.0",
