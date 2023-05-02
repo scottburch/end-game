@@ -1,6 +1,6 @@
 {
   "name": "@end-game/dtg-scripts",
-  "version": "1.0.6",
+  "version": "1.0.14",
   "main": "lib/index.js",
   "license": "MIT",
   "private": false,
@@ -12,8 +12,8 @@
     "build": "rm -rf lib & tsc"
   },
   "dependencies": {
-    "@end-game/dtg-scripts": "^1.0.6",
-    "@end-game/utils": "^1.0.2",
+    "@end-game/dtg-scripts": "^1.0.14",
+    "@end-game/utils": "^1.0.14",
     "@types/serve-handler": "^6.1.1",
     "commander": "^10.0.1",
     "serve": "^14.2.0",
