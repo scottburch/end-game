@@ -16,6 +16,7 @@
     "@end-game/utils": "^1.0.15",
     "@types/serve-handler": "^6.1.1",
     "commander": "^10.0.1",
+    "rxjs": "^7.8.1",
     "serve": "^14.2.0",
     "webpack": "^5.81.0",
     "webpack-dev-server": "^4.13.3"
