@@ -15,7 +15,7 @@ renderApp(() => {
     return (
         <>
             <button id="count" onClick={putNode}/>
-            {nodes?.map((node, idx) => <div id={`node-${idx}`}>{node.props.name}</div>)}
+            {nodes.map((node, idx) => <div id={`node-${idx}`}>{node.props.name}</div>)}
         </>
     )
 });
