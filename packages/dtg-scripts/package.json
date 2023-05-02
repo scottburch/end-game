@@ -12,7 +12,6 @@
     "build": "rm -rf lib & tsc"
   },
   "dependencies": {
-    "@end-game/dtg-scripts": "^1.0.19",
     "@end-game/utils": "^1.0.17",
     "@types/serve-handler": "^6.1.1",
     "commander": "^10.0.1",
