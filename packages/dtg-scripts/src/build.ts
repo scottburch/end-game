@@ -2,6 +2,7 @@ import {resolve} from 'node:path'
 import {Observable, of, switchMap, throwError} from "rxjs";
 import type {Configuration} from 'webpack'
 import Webpack from 'webpack'
+import {fs} from 'zx'
 
 export const buildCmd = () => {
     of({
@@ -37,6 +38,7 @@ export const buildCmd = () => {
     } satisfies Configuration).pipe(
         switchMap(config => new Observable(subscriber => {
             Webpack.webpack(config, err => err ? throwError(() => err) : subscriber.next())
-        }))
+        })),
+        switchMap(() => fs.copy(resolve('public'), resolve('dist'), {recursive: true}))
     ).subscribe()
 }

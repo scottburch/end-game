@@ -1,21 +1,19 @@
 import {delay, firstValueFrom, map, of, switchMap, tap} from "rxjs";
-import {$} from 'zx'
 import {createApp} from "./test/testUtils.js";
+import {$} from "zx";
 import {openBrowser} from "@end-game/utils/openBrowser";
 
-
-describe('create app', function () {
-    this.timeout(40_000);
-    it('should create a working demo app', () =>
+describe('serve app', () => {
+    it('should serve a built app', () =>
         firstValueFrom(createApp().pipe(
-            map(() => $`yarn run dev --headless --port 1235`),
-            delay(3000),
+            switchMap(() => $`yarn build`),
+            map(() => $`yarn serve --port 1235`),
+            delay(1000),
             switchMap(proc => of(proc).pipe(
-                // test app starts
                 switchMap(() => openBrowser({port: 1235})),
                 switchMap(page => page.waitForSelector('text=Task:')),
-                switchMap(() => proc.kill()),
+                switchMap(() => proc.kill())
             ))
         ))
-    )
+    );
 });
