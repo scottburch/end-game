@@ -80,17 +80,29 @@ export const graphPut = <T extends Props>(graph: Graph, nodeId: string, label: s
         first()
     );
 
-export const graphPutEdge = <T extends Props>(graph: Graph, label: string, from: NodeId, to: NodeId, props: T) =>
-    of({edgeId: newUid(), rel: label, props, from, to } satisfies GraphEdge<T>).pipe(
+export const graphPutEdge = <T extends Props>(graph: Graph, edgeId: string, label: string, from: NodeId, to: NodeId, props: T) =>
+    of({edgeId: edgeId || newUid(), rel: label, props, from, to } satisfies GraphEdge<T>).pipe(
         switchMap(edge => graph.handlers.putEdge.next({graph, edge})),
         first()
     );
 
 export const graphGetEdge = <T extends Props>(graph: Graph, edgeId: string) =>
-    graph.handlers.getEdge.next({graph, edgeId}).pipe(
-        filter(({edge}) => edge === undefined || edge?.edgeId === edgeId),
-        map(({edge, edgeId, graph}) => ({graph, edgeId, edge: edge as GraphEdge<T>}))
-    );
+    new Observable<{graph: Graph, edgeId: EdgeId, edge: GraphEdge<T>}>(subscriber => {
+        const putEdgeSub = graph.handlers.putEdge.pipe(
+            tap(() => graph.handlers.getEdge.next({graph, edgeId}))
+        ).subscribe();
+
+        const getEdgeSub = graph.handlers.getEdge.next({graph, edgeId}).pipe(
+            filter(({edge}) => edge === undefined || edge?.edgeId === edgeId),
+            map(({edge, edgeId, graph}) => ({graph, edgeId, edge: edge as GraphEdge<T>})),
+            tap(({edge}) => subscriber.next({graph, edgeId, edge}))
+        ).subscribe();
+
+        return () => {
+            putEdgeSub.unsubscribe();
+            getEdgeSub.unsubscribe();
+        }
+    });
 
 
 
