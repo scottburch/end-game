@@ -162,8 +162,19 @@ export const graphGetRelationships = (graph: Graph, nodeId: NodeId, rel: string,
     })
 
 export const nodesByProp = <T extends Props>(graph: Graph, label: string, key: string, value: any ) =>
-    graph.handlers.nodesByProp.next({graph, label, key, value}).pipe(
-        filter(({label: l, key: k, value: v}) => label === l && key === k && value === v ),
-        map(({nodes}) => ({graph, label, key, value, nodes}))
-    );
+    new Observable<{graph: Graph, nodes: GraphNode<T>[], label: string, key: string, value: string}>(subscriber => {
+        const putSub = graph.handlers.putNode.pipe(
+            tap(() => graph.handlers.nodesByProp.next({graph, label, key, value}))
+        ).subscribe();
+        const nodesByPropSub = graph.handlers.nodesByProp.next({graph, label, key, value}).pipe(
+            filter(({label: l, key: k, value: v}) => l === label &&k === key && v === value),
+            tap(({nodes}) => subscriber.next({graph, nodes: (nodes || []) as GraphNode<T>[], label, key, value}))
+        ).subscribe();
+
+
+        return () => {
+            putSub.unsubscribe();
+            nodesByPropSub.unsubscribe();
+        }
+    });
 

@@ -78,11 +78,10 @@ describe('graph', () => {
     );
 
 
-
     it('should be able to find nodes with a given relationship', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest(['scott', 'todd', 'joe'].map((name, idx) =>
-                    graphPut(graph, `n-${idx}`, 'person', {name})
+                graphPut(graph, `n-${idx}`, 'person', {name})
             ))),
             switchMap(([{graph, nodeId: id1}, {nodeId: id2}, {nodeId: id3}]) => combineLatest([
                 graphPutEdge(graph, 'e1', 'friend', id1, id2, {rank: 5}),
@@ -146,7 +145,7 @@ describe('graph', () => {
             switchMap(([{graph}]) => nodesByProp(graph, 'person', 'name', 'sc*')),
             tap(({nodes}) => expect(nodes).to.have.length(2)),
             switchMap(({nodes}) => from(nodes || [])),
-            tap(({props}) => expect(['scooter','scott']).to.include(props.name)),
+            tap(({props}) => expect(['scooter', 'scott']).to.include(props.name)),
             bufferCount(2)
         ))
     );
@@ -180,13 +179,26 @@ describe('graph', () => {
 
     it('should update a graphGetRelationships() when a relationship is added', () =>
         firstValueFrom(getAGraph().pipe(
-            switchMap(graph => combineLatest([
-                graphPutEdge(graph, 'e1', 'friend', 'n1', 'n2', {}),
-                graphPutEdge(graph, 'e2', 'friend', 'n1', 'n3', {})
-            ])),
-            tap(([{graph}]) => setTimeout(() => graphPutEdge(graph, 'e3', 'friend', 'n1', 'n4', {}).subscribe(), 1000)),
-            switchMap(([{graph}]) => graphGetRelationships(graph, 'n1', 'friend')),
-            skipWhile(({relationships}) => relationships.length < 3),
-        )
-    ));
+                switchMap(graph => combineLatest([
+                    graphPutEdge(graph, 'e1', 'friend', 'n1', 'n2', {}),
+                    graphPutEdge(graph, 'e2', 'friend', 'n1', 'n3', {})
+                ])),
+                tap(([{graph}]) => setTimeout(() => graphPutEdge(graph, 'e3', 'friend', 'n1', 'n4', {}).subscribe())),
+                switchMap(([{graph}]) => graphGetRelationships(graph, 'n1', 'friend')),
+                skipWhile(({relationships}) => relationships.length < 3),
+            )
+        ));
+
+    it('should update nodesByProp() when a node is added', () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph => graphPut(graph, 'n1', 'person', {group: 'foo'})),
+            tap(({graph}) => setTimeout(() => {
+                graphPut(graph, 'n2', 'car', {}).subscribe();
+                graphPut(graph, 'n3', 'person', {group: 'bar'}).subscribe();
+                graphPut(graph, 'n4', 'person', {group: 'bar'}).subscribe();
+            })),
+            switchMap(({graph}) => nodesByProp(graph, 'person', 'group', 'bar')),
+            skipWhile(({nodes}) => nodes.length < 2)
+        ))
+    )
 });
