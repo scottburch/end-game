@@ -144,17 +144,26 @@ export const nodesByLabel = <T extends Props>(graph: Graph, label: string) =>
         }
     });
 
+export const graphGetRelationships = (graph: Graph, nodeId: NodeId, rel: string, opts: {reverse?: boolean} = {}) =>
+    new Observable<{graph: Graph, nodeId: NodeId, rel: string, opts: {reverse?: boolean}, relationships: Relationship[]}>(subscriber => {
+        const putEdgeSub = graph.handlers.putEdge.pipe(
+            tap(() => graph.handlers.getRelationships.next({graph, nodeId, rel, reverse: !!opts.reverse}))
+        ).subscribe();
+
+        const getRelSub = graph.handlers.getRelationships.next({graph, nodeId, rel, reverse: !!opts.reverse}).pipe(
+            filter(({nodeId: nid, rel: r}) => nid === nodeId && r === rel),
+            tap(({relationships}) => subscriber.next({graph, nodeId, rel, opts, relationships: relationships || []}))
+        ).subscribe();
+
+        return () => {
+            putEdgeSub.unsubscribe();
+            getRelSub.unsubscribe();
+        }
+    })
 
 export const nodesByProp = <T extends Props>(graph: Graph, label: string, key: string, value: any ) =>
     graph.handlers.nodesByProp.next({graph, label, key, value}).pipe(
         filter(({label: l, key: k, value: v}) => label === l && key === k && value === v ),
         map(({nodes}) => ({graph, label, key, value, nodes}))
     );
-
-export const graphGetRelationships = (graph: Graph, nodeId: NodeId, rel: string, opts: {reverse?: boolean} = {}) =>
-    graph.handlers.getRelationships.next({graph, nodeId, rel, reverse: !!opts.reverse}).pipe(
-        filter(({nodeId: nid, rel: r}) => nid === nodeId && r === rel),
-        map(({relationships}) => ({graph, nodeId, rel, opts, relationships}))
-    );
-
 

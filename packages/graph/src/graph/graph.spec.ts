@@ -1,4 +1,4 @@
-import {bufferCount, combineLatest, first, firstValueFrom, from, map, switchMap, tap, toArray} from "rxjs";
+import {bufferCount, combineLatest, first, firstValueFrom, from, map, skipWhile, switchMap, tap, toArray} from "rxjs";
 import {
     graphGet,
     graphGetEdge,
@@ -177,4 +177,16 @@ describe('graph', () => {
             tap(values => expect(values).to.deep.equal([10, 11]))
         ))
     );
+
+    it('should update a graphGetRelationships() when a relationship is added', () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph => combineLatest([
+                graphPutEdge(graph, 'e1', 'friend', 'n1', 'n2', {}),
+                graphPutEdge(graph, 'e2', 'friend', 'n1', 'n3', {})
+            ])),
+            tap(([{graph}]) => setTimeout(() => graphPutEdge(graph, 'e3', 'friend', 'n1', 'n4', {}).subscribe(), 1000)),
+            switchMap(([{graph}]) => graphGetRelationships(graph, 'n1', 'friend')),
+            skipWhile(({relationships}) => relationships.length < 3),
+        )
+    ));
 });
