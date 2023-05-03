@@ -7,12 +7,14 @@ export default {
     target: 'es2020',
     mode: 'development',
     externals: [
+        // Don't include externally loaded modules in output bundle
         ({context, request, dependencyType, contextInfo}, cb) =>
             request.startsWith('.') ? cb() : cb(null, `module ${request}`)
     ],
     entry: {
         'index': './src/index.ts',
-        'index-browser': './src/index-browser.ts'
+        'index-browser': './src/index-browser.ts',
+        'test/testUtils': './src/test/testUtils.ts'
     },
     output: {
         path: absPath(import.meta.url, 'lib'),

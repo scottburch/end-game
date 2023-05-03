@@ -1,8 +1,11 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="all-tests" type="CompoundRunConfigurationType">
     <toRun name="cli---tests" type="mocha-javascript-test-runner" />
+    <toRun name="crypto---tests" type="mocha-javascript-test-runner" />
     <toRun name="graph---tests" type="mocha-javascript-test-runner" />
+    <toRun name="graph-explorer---tests" type="mocha-javascript-test-runner" />
     <toRun name="react-graph---tests" type="mocha-javascript-test-runner" />
+    <toRun name="rxjs-chain---tests" type="mocha-javascript-test-runner" />
     <method v="2" />
   </configuration>
 </component>

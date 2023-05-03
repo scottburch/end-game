@@ -1,6 +1,6 @@
 {
   "name": "@end-game/cli",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "main": "lib/index.js",
   "license": "MIT",
   "type": "module",
@@ -9,8 +9,7 @@
     "endgame": "lib/index.js"
   },
   "dependencies": {
-    "@end-game/react-graph": "^1.0.24",
-    "@end-game/utils": "^1.0.24",
+    "@end-game/utils": "^1.0.25",
     "@types/node": "^18.11.18",
     "@types/tar": "^6.1.4",
     "commander": "^10.0.0",

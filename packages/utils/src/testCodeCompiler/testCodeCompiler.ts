@@ -5,14 +5,14 @@ import WebpackDevServer from 'webpack-dev-server'
 import {absPath} from "../absPath.js";
 
 
-export const compileBrowserTestCode = (src: string) => new Observable(subscriber => {
+export const compileBrowserTestCode = (src: string, port: number = 1234) => new Observable(subscriber => {
     let server: WebpackDevServer;
     of({}).pipe(
         map(() => new WebpackDevServer({
             static: {
                 directory: absPath(import.meta.url, '.'),
             },
-            port: 1234,
+            port,
         }, Webpack({
             target: 'web',
             mode: 'development',

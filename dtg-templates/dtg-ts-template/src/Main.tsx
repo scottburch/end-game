@@ -1,7 +1,7 @@
-import React, {CSSProperties} from 'react';
+import * as React from 'react'
+import {CSSProperties} from 'react';
 import {AddTodoPanel} from "./components/AddTodoPanel.jsx";
 import {TodoList} from "./components/TodoList.jsx";
-
 
 export const Main: React.FC = () => {
     return (

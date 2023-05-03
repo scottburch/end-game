@@ -1,4 +1,4 @@
-import {bufferCount, combineLatest, first, firstValueFrom, from, map, switchMap, tap, toArray} from "rxjs";
+import {combineLatest, first, firstValueFrom, from, map, skipWhile, switchMap, tap, toArray} from "rxjs";
 import {getAGraph} from "../test/testUtils.js";
 import {graphPut, nodesByLabel} from "./graph.js";
 import {expect} from "chai";
@@ -27,14 +27,11 @@ describe('nodesByLabel()', () => {
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => graphPut(graph, '', 'person', {name: 'scott'})),
             tap(({graph}) => setTimeout(() => graphPut(graph, '', 'person', {name: 'todd'}).subscribe())),
+            tap(({graph}) => setTimeout(() => graphPut(graph, '', 'person', {name: 'joe'}).subscribe())),
             switchMap(({graph}) => nodesByLabel(graph, 'person')),
-            bufferCount(2),
-            tap(([{nodes: n1}, {nodes: n2}]) => {
-                expect(n1).to.have.length(1);
-                expect(n2).to.have.length(2);
-                expect(n1[0].props.name).to.equal('scott');
-                expect(['scott', 'todd']).to.include(n2[0].props.name);
-                expect(['scott', 'todd']).to.include(n2[1].props.name);
+            skipWhile(({nodes}) => nodes.length < 3),
+            tap(({nodes}) => {
+                expect(nodes.map(node => node.props.name).sort()).to.deep.equal(['joe', 'scott', 'todd'])
             })
         ))
     )

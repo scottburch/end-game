@@ -1,0 +1,45 @@
+{
+  "name": "@end-game/graph-explorer",
+  "version": "1.0.26",
+  "license": "MIT",
+  "private": false,
+  "type": "module",
+  "main": "./lib/index.js",
+  "browser": "./lib/index.js",
+  "exports": {
+    ".": {
+      "node": "./lib/index.js",
+      "default": "./lib/index.js"
+    }
+  },
+  "dependencies": {
+    "@end-game/graph": "^1.0.25",
+    "@end-game/react-graph": "^1.0.25",
+    "@end-game/utils": "^1.0.25",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router": "^6.11.1",
+    "react-router-dom": "^6.11.1"
+  },
+  "engines": {
+    "node": ">=19"
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "loader": "ts-node/esm",
+    "experimental-specifier-resolution": "node",
+    "bail": true
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.5",
+    "@types/mocha": "^10.0.1",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0"
+  },
+  "scripts": {
+    "build": "webpack"
+  }
+}
