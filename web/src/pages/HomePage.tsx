@@ -1,12 +1,15 @@
 import React, {CSSProperties} from 'react'
 import {EndgamePyramid} from "../components/EndgamePyramid.jsx";
+import triangleImg from '../images/eg-triangle.svg'
+import {Svg} from "../components/Svg.jsx";
 
 export const HomePage: React.FC = () => {
     return (
         <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
             <h2>Welcome to the new decentralized internet!</h2>
+            <Svg src={triangleImg}/>
             <h3>
-                Endgame products make developing internet applications faster, easier and cheaper while freeing data from the grasp of centralized clouds.
+                Endgame products make developing P2P internet applications faster, easier and cheaper.
             </h3>
             <h1>Endgame product stack</h1>
             <EndgamePyramid/>

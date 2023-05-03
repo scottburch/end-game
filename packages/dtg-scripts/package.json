@@ -1,6 +1,6 @@
 {
   "name": "@end-game/dtg-scripts",
-  "version": "1.0.24",
+  "version": "1.0.27",
   "main": "lib/index.js",
   "license": "MIT",
   "private": false,
@@ -12,14 +12,10 @@
     "build": "rm -rf lib & tsc"
   },
   "dependencies": {
-    "@end-game/react-graph": "^1.0.24",
-    "@end-game/utils": "^1.0.24",
     "@types/mime-types": "^2.1.1",
     "commander": "^10.0.1",
-    "css-loader": "^6.7.3",
     "mime-types": "^2.1.35",
     "rxjs": "^7.8.1",
-    "style-loader": "^3.3.2",
     "webpack": "^5.81.0",
     "webpack-dev-server": "^4.13.3",
     "zx": "^7.2.2"

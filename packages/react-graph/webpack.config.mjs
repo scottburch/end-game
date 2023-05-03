@@ -7,15 +7,19 @@ export default {
     target: 'es2020',
     mode: 'development',
     externals: [
+        // Don't add externally loaded modules in output bundle
         ({context, request, dependencyType, contextInfo}, cb) =>
             request.startsWith('.') ? cb() : cb(null, `module ${request}`)
     ],
     entry: {
-        'index': './src/index.ts'
+        'index': './src/index.ts',
+        'reactTestUtils': './src/test/reactTestUtils.tsx'
     },
     output: {
         path: absPath(import.meta.url,'lib'),
-        filename: '[name].js',
+        filename: pathInfo => {
+            return pathInfo.chunk.name === 'index' ? 'index.js' : './test/reactTestUtils.jsx'
+        },
       libraryTarget: 'module',
     },
     module: {

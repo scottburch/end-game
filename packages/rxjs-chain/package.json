@@ -1,0 +1,45 @@
+{
+  "name": "@end-game/rxjs-chain",
+  "version": "1.0.27",
+  "license": "MIT",
+  "type": "module",
+  "private": false,
+  "main": "./lib/index-browser.js",
+  "exports": {
+    ".": {
+      "node": "./lib/index.js",
+      "default": "./lib/index.js"
+    }
+  },
+  "dependencies": {
+    "@end-game/rxjs-chain": "^1.0.27",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.11.15",
+    "rxjs": "^7.8.1",
+    "typescript": "^5.0.4",
+    "yarn": "^1.22.19"
+  },
+  "engines": {
+    "node": ">=19"
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "loader": "ts-node/esm",
+    "experimental-specifier-resolution": "node",
+    "bail": true
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.1"
+  },
+  "scripts": {
+    "build": "rm -rf lib && tsc",
+    "build-watch": "yarn build --watch",
+    "test": "mocha ./src/**/*.spec.ts"
+  }
+}

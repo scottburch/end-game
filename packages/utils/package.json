@@ -1,6 +1,6 @@
 {
   "name": "@end-game/utils",
-  "version": "1.0.24",
+  "version": "1.0.27",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -8,18 +8,27 @@
     "./absPath": "./lib/absPath.js",
     "./openBrowser": "./lib/openBrowser.js",
     "./testCodeCompiler": "./lib/testCodeCompiler/testCodeCompiler.js",
-    "./dirs": "./lib/dirs.js"
+    "./dirs": "./lib/dirs.js",
+    "./byteUtils": "./lib/byteUtils.js",
+    "./serializer": "./lib/serializer.js"
   },
   "dependencies": {
-    "@end-game/react-graph": "^1.0.24",
     "@types/node": "^18.16.2",
     "playwright": "^1.33.0",
     "rxjs": "^7.8.1",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "webpack": "^5.82.0",
+    "webpack-dev-server": "^4.15.0"
   },
   "scripts": {
     "build": "rm -rf lib && tsc && cp ./src/testCodeCompiler/* ./lib/testCodeCompiler"
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "loader": "ts-node/esm",
+    "experimental-specifier-resolution": "node",
+    "bail": true
   },
   "publishConfig": {
     "access": "public"

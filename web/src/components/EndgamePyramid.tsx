@@ -2,7 +2,7 @@ import React, {CSSProperties} from 'react';
 
 export const EndgamePyramid: React.FC = () => (
     <div style={{...styles.pyramid, width: 300}}>
-        <div style={styles.section}>Endgame Pay</div>
+        <div style={{...styles.section, backgroundColor: '#ff9407'}}>Endgame Pay</div>
         <div style={{...styles.section, backgroundColor: 'blue', display: 'flex', flexDirection: 'column'}}>
             <div>DTG</div>
             <span style={{fontSize: 12}}>(Distributed Trustless Graph)</span>
