@@ -1,12 +1,12 @@
-import {compileBrowserTestCode} from "@end-game/utils/testCodeCompiler";
-import {absPath} from "@end-game/utils/absPath";
 import {combineLatest, firstValueFrom, switchMap, tap} from "rxjs";
 import {openBrowser} from "@end-game/utils/openBrowser";
 import {expect} from "chai";
+import {compileBrowserTestCode} from "@end-game/utils/testCodeCompiler";
+import {absPath} from "@end-game/utils/absPath";
 
-describe('nodesByProp()', () => {
-    it('should update reactively', () =>
-        firstValueFrom(compileBrowserTestCode(absPath(import.meta.url, 'nodesByProp-test.tsx')).pipe(
+describe('getRelationships()', () => {
+    it('should get relationships and update', () =>
+        firstValueFrom(compileBrowserTestCode(absPath(import.meta.url, 'getRelationships-test.tsx')).pipe(
             switchMap(() => openBrowser()),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
@@ -17,12 +17,10 @@ describe('nodesByProp()', () => {
                 page.textContent('#node-2'),
             ])),
             tap(([s1, s2, s3]) => {
-                expect(s1).to.equal('scott0')
-                expect(s2).to.equal('scott1')
-                expect(s3).to.equal('scott2')
+                expect(s1).to.equal('n1-other-0')
+                expect(s2).to.equal('n1-other-1')
+                expect(s3).to.equal('n1-other-2')
             })
-
         ))
-
-    )
+    );
 });

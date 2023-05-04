@@ -1,8 +1,8 @@
-import type {Graph, GraphNode, NodeId, Props} from '@end-game/graph'
+import type {Graph, GraphNode, NodeId, EdgeId, Props, Relationship} from '@end-game/graph'
 import {
-    graphGet,
+    graphGet, graphGetRelationships,
     graphOpen,
-    graphPut, levelStoreGetEdgeHandler, levelStoreGetRelationshipsHandler,
+    graphPut, graphPutEdge, levelStoreGetEdgeHandler, levelStoreGetRelationshipsHandler,
     levelStoreNodesByPropHandler,
     levelStorePutEdgeHandler,
     nodesByLabel, nodesByProp
@@ -17,6 +17,7 @@ import {
     levelStorePutNodeHandler
 } from "@end-game/graph";
 import {newUid} from "@end-game/graph";
+
 
 
 
@@ -57,6 +58,23 @@ export const useGraphNodesByProp = <T extends Props>(label: string, key: string,
     return nodes;
 }
 
+export const useGraphRelationships = (nodeId: NodeId, rel: string, opts: {reverse?: boolean}) => {
+    const [relationships, setRelationships] = useState<Relationship[]>([]);
+    const graph = useContext(GraphContext);
+
+    useEffect(() => {
+        if(graph) {
+            const sub = of(true).pipe(
+                switchMap(() => graphGetRelationships(graph, nodeId, rel, opts)),
+                tap(({relationships}) => setRelationships(relationships))
+            ).subscribe();
+            return () => sub.unsubscribe();
+        }
+    }, [graph]);
+    return relationships;
+
+}
+
 export const useGraphGet = <T extends Props>(nodeId: NodeId) => {
     const [node, setNode] = useState<GraphNode<T>>();
     const graph = useContext(GraphContext);
@@ -75,6 +93,14 @@ export const useGraphPut = <T extends Props>() => {
 
     return (label: string, nodeId: NodeId, props: T) => {
         return graphPut(graph, nodeId, label, props);
+    }
+}
+
+export const useGraphPutEdge = <T extends Props>() => {
+    const graph: Graph = useContext(GraphContext);
+
+    return (rel: string, edgeId: EdgeId, from: NodeId, to: NodeId, props: T) => {
+        return graphPutEdge(graph, edgeId, rel, from, to, props);
     }
 }
 
