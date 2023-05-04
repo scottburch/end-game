@@ -133,8 +133,7 @@ export const nodesByLabel = <T extends Props>(graph: Graph, label: string) =>
 
         const nodesSub = graph.handlers.nodesByLabel.next({graph, label}).pipe(
             filter(({label: l}) => l === label),
-            map(({nodes}) => ({graph, label, nodes: nodes as GraphNode<T>[]})),
-            tap(({nodes}) => observable.next({graph, nodes, label}))
+            tap(({nodes}) => observable.next({graph, nodes: (nodes || []) as GraphNode<T>[], label}))
         ).subscribe();
 
 

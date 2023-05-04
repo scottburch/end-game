@@ -1,15 +1,24 @@
 import type {Graph, GraphNode, NodeId, Props} from '@end-game/graph'
-import {graphGet, graphOpen, graphPut, nodesByLabel} from "@end-game/graph";
+import {
+    graphGet,
+    graphOpen,
+    graphPut, levelStoreGetEdgeHandler, levelStoreGetRelationshipsHandler,
+    levelStoreNodesByPropHandler,
+    levelStorePutEdgeHandler,
+    nodesByLabel, nodesByProp
+} from "@end-game/graph";
 import type {PropsWithChildren} from 'react';
 import {createContext, useContext, useEffect, useState} from "react";
 import * as React from 'react'
-import {of, switchMap} from "rxjs";
+import {of, switchMap, tap} from "rxjs";
 import {handlers} from "@end-game/graph";
 import {
     levelStoreGetNodeHandler, levelStoreNodesByLabelHandler,
     levelStorePutNodeHandler
 } from "@end-game/graph";
 import {newUid} from "@end-game/graph";
+
+
 
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);
@@ -24,7 +33,24 @@ export const useGraphNodesByLabel = <T extends Props>(label: string) => {
         if(graph) {
             const sub = of(true).pipe(
                 switchMap(() => nodesByLabel(graph, label)),
-            ).subscribe(({nodes}) => setNodes(nodes as GraphNode<T>[]));
+                tap(({nodes}) => setNodes(nodes as GraphNode<T>[]))
+            ).subscribe();
+            return () => sub.unsubscribe();
+        }
+    }, [graph]);
+    return nodes;
+}
+
+export const useGraphNodesByProp = <T extends Props>(label: string, key: string, value: any) => {
+    const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
+    const graph = useContext(GraphContext);
+
+    useEffect(() => {
+        if(graph) {
+            const sub = of(true).pipe(
+                switchMap(() => nodesByProp(graph, label, key, value)),
+                tap(({nodes}) => setNodes(nodes as GraphNode<T>[]))
+            ).subscribe();
             return () => sub.unsubscribe();
         }
     }, [graph]);
@@ -66,7 +92,11 @@ export const ReactGraph: React.FC<PropsWithChildren<{graph?: Graph}>> = ({graph,
                 handlers: {
                     putNode: handlers([levelStorePutNodeHandler({})]),
                     getNode: handlers([levelStoreGetNodeHandler({})]),
-                    nodesByLabel: handlers([levelStoreNodesByLabelHandler({})])
+                    nodesByLabel: handlers([levelStoreNodesByLabelHandler({})]),
+                    nodesByProp: handlers([levelStoreNodesByPropHandler({})]),
+                    putEdge: handlers([levelStorePutEdgeHandler({})]),
+                    getEdge: handlers([levelStoreGetEdgeHandler({})]),
+                    getRelationships: handlers([levelStoreGetRelationshipsHandler({})])
                 }
             }).subscribe(graph => setMyGraph(graph));
             return () => sub.unsubscribe();
