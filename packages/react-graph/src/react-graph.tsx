@@ -1,25 +1,19 @@
-import type {Graph, GraphNode, NodeId, EdgeId, Props, Relationship} from '@end-game/graph'
+import type {EdgeId, Graph, GraphNode, NodeId, Props, Relationship} from '@end-game/graph'
 import {
-    graphGet, graphGetRelationships,
+    graphGet,
+    graphGetRelationships,
     graphOpen,
-    graphPut, graphPutEdge, levelStoreGetEdgeHandler, levelStoreGetRelationshipsHandler,
-    levelStoreNodesByPropHandler,
-    levelStorePutEdgeHandler,
-    nodesByLabel, nodesByProp
+    graphPut,
+    graphPutEdge,
+    newUid,
+    nodesByLabel,
+    nodesByProp,
+    standardHandlers
 } from "@end-game/graph";
 import type {PropsWithChildren} from 'react';
+import * as React from "react";
 import {createContext, useContext, useEffect, useState} from "react";
-import * as React from 'react'
 import {of, switchMap, tap} from "rxjs";
-import {handlers} from "@end-game/graph";
-import {
-    levelStoreGetNodeHandler, levelStoreNodesByLabelHandler,
-    levelStorePutNodeHandler
-} from "@end-game/graph";
-import {newUid} from "@end-game/graph";
-
-
-
 
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);
@@ -104,9 +98,6 @@ export const useGraphPutEdge = <T extends Props>() => {
     }
 }
 
-
-
-
 export const ReactGraph: React.FC<PropsWithChildren<{graph?: Graph}>> = ({graph, children}) => {
     const [myGraph, setMyGraph] = useState<Graph>();
     useEffect(() => {
@@ -115,16 +106,10 @@ export const ReactGraph: React.FC<PropsWithChildren<{graph?: Graph}>> = ({graph,
         function createNewGraph() {
             const sub = graphOpen({
                 graphId: newUid(),
-                handlers: {
-                    putNode: handlers([levelStorePutNodeHandler({})]),
-                    getNode: handlers([levelStoreGetNodeHandler({})]),
-                    nodesByLabel: handlers([levelStoreNodesByLabelHandler({})]),
-                    nodesByProp: handlers([levelStoreNodesByPropHandler({})]),
-                    putEdge: handlers([levelStorePutEdgeHandler({})]),
-                    getEdge: handlers([levelStoreGetEdgeHandler({})]),
-                    getRelationships: handlers([levelStoreGetRelationshipsHandler({})])
-                }
-            }).subscribe(graph => setMyGraph(graph));
+                handlers: standardHandlers()
+            }).pipe(
+                tap(graph => setMyGraph(graph)),
+            ).subscribe();
             return () => sub.unsubscribe();
         }
     }, [])

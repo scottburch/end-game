@@ -10,7 +10,8 @@
     ".": {
       "node": "./lib/index.js",
       "default": "./lib/index.js"
-    }
+    },
+    "./reactTestUtils": "./lib/test/reactTestUtils.jsx"
   },
   "dependencies": {
     "@end-game/graph": "^1.0.24",

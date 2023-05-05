@@ -1,0 +1,32 @@
+{
+  "name": "@end-game/graph-explorer",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": false,
+  "type": "module",
+  "main": "./lib/index.js",
+  "browser": "./lib/index.js",
+  "exports": {
+    ".": {
+      "node": "./lib/index.js",
+      "default": "./lib/index.js"
+    }
+  },
+  "dependencies": {
+    "@end-game/react-graph": "*",
+    "@end-game/utils": "*"
+  },
+  "engines": {
+    "node": ">=19"
+  },
+  "mocha": {
+    "require": "ts-node/register",
+    "loader": "ts-node/esm",
+    "experimental-specifier-resolution": "node",
+    "bail": true
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {}
+}

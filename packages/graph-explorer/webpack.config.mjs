@@ -11,14 +11,11 @@ export default {
             request.startsWith('.') ? cb() : cb(null, `module ${request}`)
     ],
     entry: {
-        'index': './src/index.ts',
-        'reactTestUtils': './src/test/reactTestUtils.tsx'
+        'index': './src/index.ts'
     },
     output: {
         path: absPath(import.meta.url,'lib'),
-        filename: pathInfo => {
-            return pathInfo.chunk.name === 'index' ? 'index.js' : './test/reactTestUtils.jsx'
-        },
+        filename: '[name].js',
       libraryTarget: 'module',
     },
     module: {

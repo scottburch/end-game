@@ -7,4 +7,5 @@ export {
         levelStorePutNodeHandler, levelStoreNodesByPropHandler,
     levelStorePutEdgeHandler, levelStoreGetRelationshipsHandler, levelStoreGetEdgeHandler
 } from "./handlers/store-handlers/levelStoreHandler.js";
+export {standardHandlers} from './handlers/standard-handlers.js'
 export {newUid, timestampFromUid} from './utils/uid.js'
