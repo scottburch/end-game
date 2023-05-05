@@ -13,6 +13,7 @@
     }
   },
   "dependencies": {
+    "@end-game/graph": "*",
     "@end-game/react-graph": "*",
     "@end-game/utils": "*"
   },

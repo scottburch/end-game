@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 import type {Graph} from '@end-game/graph'
 import {graphOpen} from "@end-game/graph";
 import {useGraph} from "./react-graph.jsx";

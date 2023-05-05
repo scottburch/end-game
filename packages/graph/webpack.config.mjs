@@ -7,6 +7,7 @@ export default {
     target: 'es2020',
     mode: 'development',
     externals: [
+        // Don't include externally loaded modules in output bundle
         ({context, request, dependencyType, contextInfo}, cb) =>
             request.startsWith('.') ? cb() : cb(null, `module ${request}`)
     ],
