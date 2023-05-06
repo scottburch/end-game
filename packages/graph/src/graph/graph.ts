@@ -113,7 +113,7 @@ export const graphGet = <T extends Props>(graph: Graph, nodeId: NodeId) =>
         ).subscribe();
 
         const getSub = graph.handlers.getNode.next({graph, nodeId}).pipe(
-            filter(({node, nodeId}) =>  node === undefined || node.nodeId === nodeId),
+            filter(({node}) =>  node === undefined || node.nodeId === nodeId),
             map(({node}) => ({node: node as GraphNode<T>})),
             tap(({node}) => observable.next({graph, nodeId, node}))
         ).subscribe();
