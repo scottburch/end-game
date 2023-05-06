@@ -1,32 +1,24 @@
-import {default as React} from 'react'
-import {useGraphGet} from "@end-game/react-graph";
-import {renderApp} from "@end-game/react-graph/reactTestUtils";
-import type {Graph} from '@end-game/graph'
-import {graphOpen, standardHandlers} from '@end-game/graph'
-import {tap} from "rxjs";
+import {default as React, useEffect} from 'react'
+import {useGraphGet, useGraphPut} from "@end-game/react-graph";
+import {renderApp} from "./test/reactTestUtils.jsx";
+import {GraphExplorerBtn} from "./GraphExplorerBtn.jsx";
 
 
-const doRender = (graph: Graph) =>
-    renderApp((graph) => {
+
+    renderApp(() => {
         const node = useGraphGet('1');
-//    const graphPut = useGraphPut();
+        const graphPut = useGraphPut();
+
+        useEffect(() => {
+            graphPut('person', '', {name: 'scott'}).subscribe()
+        }, [])
 
         return (
             <>
-                hello
-                {/*<button id="count" onClick={() => graphPut('person', '1', {count: (node?.props.count || 0) + 1}).subscribe()}/>*/}
-                {/*<div id="node-id">{node?.nodeId}</div>*/}
-                {/*<div id="node-count">{node?.props.count}</div>*/}
+                <GraphExplorerBtn/>
             </>
         )
     });
 
 
-graphOpen({
-    graphId: 'a-graph',
-    handlers: standardHandlers()
-}).pipe(
-    tap(() => console.log(doRender)),
-    tap(graph => doRender(graph))
-).subscribe();
 

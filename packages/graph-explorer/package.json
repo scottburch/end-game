@@ -15,7 +15,9 @@
   "dependencies": {
     "@end-game/graph": "*",
     "@end-game/react-graph": "*",
-    "@end-game/utils": "*"
+    "@end-game/utils": "*",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "engines": {
     "node": ">=19"
