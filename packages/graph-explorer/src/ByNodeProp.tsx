@@ -1,11 +1,11 @@
 import React from "react";
 import {useParams} from "react-router";
 import {useGraphNodesByProp} from "@end-game/react-graph";
+import {TreeNode} from "./TreeNode.jsx";
 
 export const ByNodeProp: React.FC = () => {
     const {prop: propString} = useParams();
     const [label, prop, value] = (propString || '').split(':');
-    console.log("***", label, prop, value)
     return (
         <>
             <h3>BY NODE PROP: {propString}</h3>
@@ -19,7 +19,7 @@ const NodesByPropTree: React.FC<{label: string, prop: string, value: string}> = 
 
     return (
         <div>
-            {nodes.map(node => <div>{node.nodeId} - {JSON.stringify(node.props)}</div>)}
+            {nodes.map(node => <TreeNode key={node.nodeId} nodeId={node.nodeId}/>)}
         </div>
     )
 

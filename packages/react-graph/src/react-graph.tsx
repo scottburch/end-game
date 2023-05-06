@@ -74,11 +74,11 @@ export const useGraphGet = <T extends Props>(nodeId: NodeId) => {
     const graph = useContext(GraphContext);
 
     useEffect(() => {
-        if(graph) {
+        if(graph && nodeId) {
             const sub = graphGet(graph, nodeId).subscribe(({node}) => setNode(node as GraphNode<T>));
             return () => sub.unsubscribe()
         }
-    }, [graph]);
+    }, [graph, nodeId]);
     return node;
 };
 

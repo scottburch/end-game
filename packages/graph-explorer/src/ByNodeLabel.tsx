@@ -1,6 +1,7 @@
 import React from "react";
 import {useParams} from "react-router";
 import {useGraphNodesByLabel} from "@end-game/react-graph";
+import {TreeNode} from "./TreeNode.jsx";
 
 export const ByNodeLabel: React.FC = () => {
     const {label} = useParams();
@@ -17,7 +18,7 @@ const NodesByLabelTree: React.FC<{label: string}> = ({label}) => {
 
     return (
         <div>
-            {nodes.map(node => <div>{node.nodeId} - {JSON.stringify(node.props)}</div>)}
+            {nodes.map(node => <TreeNode key={node.nodeId} nodeId={node.nodeId}/>)}
         </div>
     )
 
