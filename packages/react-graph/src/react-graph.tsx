@@ -1,6 +1,6 @@
-import type {EdgeId, Graph, GraphNode, NodeId, Props, Relationship} from '@end-game/graph'
+import type {EdgeId, Graph, GraphEdge, GraphNode, NodeId, Props, Relationship} from '@end-game/graph'
 import {
-    graphGet,
+    graphGet, graphGetEdge,
     graphGetRelationships,
     graphOpen,
     graphPut,
@@ -76,11 +76,24 @@ export const useGraphGet = <T extends Props>(nodeId: NodeId) => {
     useEffect(() => {
         if(graph && nodeId) {
             const sub = graphGet(graph, nodeId).subscribe(({node}) => setNode(node as GraphNode<T>));
-            return () => sub.unsubscribe()
+            return () => sub.unsubscribe();
         }
     }, [graph, nodeId]);
     return node;
 };
+
+export const useGraphEdge = <T extends Props>(edgeId: EdgeId) => {
+    const [edge, setEdge] = useState<GraphEdge<T>>();
+    const graph = useContext(GraphContext);
+
+    useEffect(() => {
+        if(graph && edgeId) {
+            const sub = graphGetEdge(graph, edgeId).subscribe(({edge}) => setEdge(edge as GraphEdge<T>))
+            return () => sub.unsubscribe();
+        }
+    }, [graph, edgeId]);
+    return edge;
+}
 
 export const useGraphPut = <T extends Props>() => {
     const graph: Graph = useContext(GraphContext);

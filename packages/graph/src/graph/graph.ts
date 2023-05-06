@@ -25,7 +25,7 @@ export type GraphNode<T extends Props> = {
     props: T
 }
 
-type GraphEdge<T extends Record<string, any>> = {
+export type GraphEdge<T extends Record<string, any>> = {
     edgeId: EdgeId
     rel: string
     from: NodeId

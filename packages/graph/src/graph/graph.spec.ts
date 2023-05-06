@@ -113,6 +113,37 @@ describe('graph', () => {
         ))
     );
 
+    it('should be able to find all relationships for a given node', () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph => combineLatest([
+                graphPutEdge(graph, 'e1', 'friend', 'n1', 'n2', {}),
+                graphPutEdge(graph, 'e2', 'friend', 'n1', 'n3', {}),
+                graphPutEdge(graph, 'e3', 'owns', 'n1', 'n4', {}),
+                graphPutEdge(graph, 'e4', 'owns', 'n1', 'n5', {}),
+            ])),
+            switchMap(([{graph}]) => graphGetRelationships(graph, 'n1', '*')),
+            tap(({relationships}) => {
+                expect(relationships).to.deep.equal([{
+                        "edgeId": "e1",
+                        "to": "n2",
+                        "from": "n1"
+                    },{
+                        "edgeId": "e2",
+                        "to": "n3",
+                        "from": "n1"
+                    },{
+                        "edgeId": "e3",
+                        "to": "n4",
+                        "from": "n1"
+                    },{
+                        "edgeId": "e4",
+                        "to": "n5",
+                        "from": "n1"
+                }])
+            })
+        ))
+    );
+
     it('should be able to find nodes with a given property value', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([

@@ -1,6 +1,7 @@
 import * as React from 'react'
-import {useGraphGet} from "@end-game/react-graph";
+import {useGraphEdge, useGraphGet, useGraphRelationships} from "@end-game/react-graph";
 import {useState} from "react";
+import type {EdgeId, GraphNode} from "@end-game/graph";
 
 export const TreeNode: React.FC<{nodeId: string}> = ({nodeId}) => {
     const node = useGraphGet(nodeId);
@@ -13,16 +14,44 @@ export const TreeNode: React.FC<{nodeId: string}> = ({nodeId}) => {
             <div style={{marginRight: 10}}>{node?.label}</div>
             <div>({node?.nodeId})</div>
         </div>
-            {open ? (
+            {(open && node) ? (
                 <div style={{paddingLeft: 20}}>
-                    {Object.keys(node?.props || {}).map(key => (
-                        <div key={key} style={{display: 'flex'}}>
-                        <div>{key}:</div>
-                            <div>{node?.props[key]}</div>
-                        </div>
-                    ))}
+                    <NodeProps node={node}/>
+                    <NodeRelationships node={node}/>
                 </div>
             ) : null}
         </div>
     )
 }
+
+const NodeRelationships: React.FC<{node: GraphNode<any>}> = ({node}) => {
+    const rels = useGraphRelationships(node.nodeId, '*', {});
+
+    return (
+        <>
+            {rels.map(rel => <NodeRelationship edgeId={rel.edgeId}/>)}
+        </>
+    )
+}
+
+const NodeRelationship: React.FC<{edgeId: EdgeId}> = ({edgeId}) => {
+    const edge = useGraphEdge(edgeId);
+
+    return (
+        <>
+            {edge?.rel} - {edge?.edgeId} - {edge?.to}
+        </>
+    )
+
+}
+
+const NodeProps: React.FC<{node: GraphNode<any>}> = ({node}) => (
+    <div>
+        {Object.keys(node?.props || {}).map(key => (
+            <div key={key} style={{display: 'flex'}}>
+                <div>{key}:</div>
+                <div>{node?.props[key]}</div>
+            </div>
+        ))}
+    </div>
+)
