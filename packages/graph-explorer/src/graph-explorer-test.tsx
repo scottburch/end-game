@@ -10,7 +10,8 @@ import {GraphExplorerBtn} from "./GraphExplorerBtn.jsx";
         const graphPut = useGraphPut();
 
         useEffect(() => {
-            graphPut('person', '', {name: 'scott'}).subscribe()
+            graphPut('person', '', {name: 'scott'}).subscribe();
+            graphPut('person', '', {name: 'todd'}).subscribe()
         }, [])
 
         return (
