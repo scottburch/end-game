@@ -1,15 +1,10 @@
 import * as React from 'react'
 import {useGraphGet} from "@end-game/react-graph";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 
 export const TreeNode: React.FC<{nodeId: string}> = ({nodeId}) => {
     const node = useGraphGet(nodeId);
     const [open, setOpen] = useState(false);
-
-    useEffect(() => {
-        console.log('in', nodeId, node?.nodeId);
-        return () => console.log('out', nodeId, node?.nodeId);
-    })
 
     return (
         <div>
