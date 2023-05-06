@@ -1,2 +1,2 @@
-export {useGraph, useGraphNodesByLabel, useGraphNodesByProp, useGraphPut, useGraphGet, ReactGraph} from './react-graph.jsx'
+export {useGraph, useGraphNodesByLabel, useGraphNodesByProp, useGraphPut, useGraphPutEdge, useGraphGet, ReactGraph} from './react-graph.jsx'
 

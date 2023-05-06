@@ -1,24 +1,33 @@
 import {default as React, useEffect} from 'react'
-import {useGraphPut} from "@end-game/react-graph";
+import {useGraphPut, useGraphPutEdge} from "@end-game/react-graph";
 import {renderApp} from "./test/reactTestUtils.jsx";
 import {GraphExplorerBtn} from "./GraphExplorerBtn.jsx";
+import {combineLatest} from "rxjs";
 
 
+renderApp(() => {
+    const graphPut = useGraphPut();
+    const graphPutEdge = useGraphPutEdge();
 
-    renderApp(() => {
-        const graphPut = useGraphPut();
+    useEffect(() => {
+        combineLatest([
+            graphPut('person', 'scott', {name: 'scott', age: 1}),
+            graphPut('person', 'todd', {name: 'todd', age: 2}),
 
-        useEffect(() => {
-            graphPut('person', '', {name: 'scott'}).subscribe();
-            graphPut('person', '', {name: 'todd'}).subscribe()
-        }, [])
+            graphPutEdge('friend', '', 'scott', 'todd', {}),
+            graphPutEdge('friend', '', 'todd', 'scott', {}),
 
-        return (
-            <>
-                <GraphExplorerBtn/>
-            </>
-        )
-    });
+            graphPut('country', 'canada', {name: 'canada'}),
+            graphPutEdge('lives_in', '', 'scott', 'canada', {})
+        ]).subscribe()
+    }, [])
+
+    return (
+        <>
+            <GraphExplorerBtn/>
+        </>
+    )
+});
 
 
 
