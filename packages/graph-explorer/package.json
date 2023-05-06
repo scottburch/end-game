@@ -17,7 +17,9 @@
     "@end-game/react-graph": "*",
     "@end-game/utils": "*",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router": "^6.11.1",
+    "react-router-dom": "^6.11.1"
   },
   "engines": {
     "node": ">=19"
