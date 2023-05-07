@@ -34,7 +34,7 @@ describe('graph-explorer', () => {
             )),
             switchMap(pages => pages[1].waitForSelector(':text("name:scott")').then(() => pages)),
             switchMap(pages => pages[1].waitForSelector(':text("name:todd")')),
-//            delay(1_000_000_000)
+            delay(1_000_000_000)
         ))
     );
 });
