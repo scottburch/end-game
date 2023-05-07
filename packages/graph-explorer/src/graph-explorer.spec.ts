@@ -24,7 +24,7 @@ describe('graph-explorer', () => {
             map(page => page.context().pages()),
             switchMap(pages => pages[1].fill('input', 'person').then(() => pages)),
             switchMap(pages => pages[1].click('button:text("By Node Label")').then(() => pages)),
-            delay(100),
+            delay(1000),
             switchMap(pages => of(pages[1]).pipe(
                 switchMap(page => page.locator('div:text("+")').all()),
                 switchMap(locators => from(locators)),
@@ -33,8 +33,7 @@ describe('graph-explorer', () => {
                 map(() => pages)
             )),
             switchMap(pages => pages[1].waitForSelector(':text("name:scott")').then(() => pages)),
-            switchMap(pages => pages[1].waitForSelector(':text("name:todd")')),
-            delay(1_000_000_000)
+            switchMap(pages => pages[1].waitForSelector(':text("name:todd")'))
         ))
     );
 });
