@@ -220,6 +220,19 @@ describe('graph', () => {
             )
         ));
 
+    it('should be able to get all relationships', () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph => combineLatest([
+                graphPutEdge(graph, 'e1', 'friend', 'n1', 'n2', {}),
+                graphPutEdge(graph, 'e4', 'friend', 'n2', 'n1', {}),
+                graphPutEdge(graph, 'e2', 'friend', 'n1', 'n3', {}),
+                graphPutEdge(graph, 'e3', 'owns', 'n1', 'n4', {})
+            ])),
+            switchMap(([{graph}]) => graphGetRelationships(graph, 'n1', '*')),
+            skipWhile(({relationships}) => relationships.length < 3),
+        ))
+    )
+
     it('should update nodesByProp() when a node is added', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => graphPut(graph, 'n1', 'person', {group: 'foo'})),

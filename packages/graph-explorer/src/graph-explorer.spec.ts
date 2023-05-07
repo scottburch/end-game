@@ -1,4 +1,4 @@
-import {delay, firstValueFrom, map, switchMap} from "rxjs";
+import {delay, firstValueFrom, from, last, map, of, switchMap} from "rxjs";
 import {compileBrowserTestCode} from "@end-game/utils/testCodeCompiler";
 import {absPath} from "@end-game/utils/absPath";
 import {openBrowser} from "@end-game/utils/openBrowser";
@@ -24,11 +24,17 @@ describe('graph-explorer', () => {
             map(page => page.context().pages()),
             switchMap(pages => pages[1].fill('input', 'person').then(() => pages)),
             switchMap(pages => pages[1].click('button:text("By Node Label")').then(() => pages)),
-            switchMap(pages => pages[1].click('div:text("+")').then(() => pages)),
+            delay(100),
+            switchMap(pages => of(pages[1]).pipe(
+                switchMap(page => page.locator('div:text("+")').all()),
+                switchMap(locators => from(locators)),
+                switchMap(locator => locator.click()),
+                last(),
+                map(() => pages)
+            )),
             switchMap(pages => pages[1].waitForSelector(':text("name:scott")').then(() => pages)),
-            switchMap(pages => pages[1].click('div:text("+")').then(() => pages)),
             switchMap(pages => pages[1].waitForSelector(':text("name:todd")')),
-            delay(1_000_000_000)
+//            delay(1_000_000_000)
         ))
     );
 });

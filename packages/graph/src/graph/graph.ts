@@ -80,8 +80,8 @@ export const graphPut = <T extends Props>(graph: Graph, nodeId: string, label: s
         first()
     );
 
-export const graphPutEdge = <T extends Props>(graph: Graph, edgeId: string, label: string, from: NodeId, to: NodeId, props: T) =>
-    of({edgeId: edgeId || newUid(), rel: label, props, from, to } satisfies GraphEdge<T>).pipe(
+export const graphPutEdge = <T extends Props>(graph: Graph, edgeId: string, rel: string, from: NodeId, to: NodeId, props: T) =>
+    of({edgeId: edgeId || newUid(), rel, props, from, to } satisfies GraphEdge<T>).pipe(
         switchMap(edge => graph.handlers.putEdge.next({graph, edge})),
         first()
     );
@@ -150,6 +150,7 @@ export const graphGetRelationships = (graph: Graph, nodeId: NodeId, rel: string,
         ).subscribe();
 
         const getRelSub = graph.handlers.getRelationships.next({graph, nodeId, rel, reverse: !!opts.reverse}).pipe(
+            tap(x => console.log('aaa', x)),
             filter(({nodeId: nid, rel: r}) => nid === nodeId && r === rel),
             tap(({relationships}) => subscriber.next({graph, nodeId, rel, opts, relationships: relationships || []}))
         ).subscribe();
