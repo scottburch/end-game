@@ -1,6 +1,6 @@
 {
   "name": "@end-game/dtg-scripts",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "main": "lib/index.js",
   "license": "MIT",
   "private": false,
@@ -12,8 +12,8 @@
     "build": "rm -rf lib & tsc"
   },
   "dependencies": {
-    "@end-game/react-graph": "^1.0.24",
-    "@end-game/utils": "^1.0.24",
+    "@end-game/react-graph": "^1.0.25",
+    "@end-game/utils": "^1.0.25",
     "@types/mime-types": "^2.1.1",
     "commander": "^10.0.1",
     "css-loader": "^6.7.3",
