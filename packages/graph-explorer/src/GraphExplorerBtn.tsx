@@ -1,10 +1,8 @@
-import * as React from 'react'
-import * as ReactDom from "react-dom";
 import type {PropsWithChildren} from "react";
-import {useEffect, useState} from "react";
-import {Main} from "./Main.jsx";
+import * as React from 'react'
+import {useState} from 'react'
 import {createPortal} from "react-dom";
-import type {Graph} from "@end-game/graph";
+import {Main} from "./Main.js";
 
 export const GraphExplorerBtn: React.FC = () => {
     const [open, setOpen] = useState(false);

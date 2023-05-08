@@ -1,7 +1,7 @@
 import React from "react";
 import {useParams} from "react-router";
 import {useGraphNodesByLabel} from "@end-game/react-graph";
-import {TreeNode} from "./TreeNode.jsx";
+import {TreeNode} from "./TreeNode.js";
 
 export const ByNodeLabel: React.FC = () => {
     const {label} = useParams();

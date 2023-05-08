@@ -1,8 +1,8 @@
 import * as React from "react";
-import {Header} from "./components/Header.jsx";
+import {Header} from "./components/Header.js";
 import {HashRouter, Routes, Route} from "react-router-dom";
-import {ByNodeLabel} from "./ByNodeLabel.jsx";
-import {ByNodeProp} from "./ByNodeProp.jsx";
+import {ByNodeLabel} from "./ByNodeLabel.js";
+import {ByNodeProp} from "./ByNodeProp.js";
 
 export const Main: React.FC = () => {
     return (

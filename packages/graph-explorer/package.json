@@ -4,12 +4,12 @@
   "license": "MIT",
   "private": false,
   "type": "module",
-  "main": "./lib/index.jsx",
-  "browser": "./lib/index.jsx",
+  "main": "./lib/index.js",
+  "browser": "./lib/index.js",
   "exports": {
     ".": {
-      "node": "./lib/index.jsx",
-      "default": "./lib/index.jsx"
+      "node": "./lib/index.js",
+      "default": "./lib/index.js"
     }
   },
   "dependencies": {

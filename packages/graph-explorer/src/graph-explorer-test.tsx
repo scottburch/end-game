@@ -1,7 +1,7 @@
 import {default as React, useEffect} from 'react'
 import {useGraphPut, useGraphPutEdge} from "@end-game/react-graph";
-import {renderApp} from "./test/reactTestUtils.jsx";
-import {GraphExplorerBtn} from "./GraphExplorerBtn.jsx";
+import {renderApp} from "./test/reactTestUtils.js";
+import {GraphExplorerBtn} from "./GraphExplorerBtn.js";
 import {concatMap, of} from "rxjs";
 
 
