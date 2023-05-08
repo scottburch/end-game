@@ -13,7 +13,7 @@ describe('graph-explorer', () => {
             switchMap(pages => pages[1].fill('input', 'person').then(() => pages)),
             switchMap(pages => pages[1].click('button:text("By Node Label")').then(() => pages)),
             switchMap(pages => pages[1].waitForSelector('div:text("(scott)")').then(() => pages)),
-            switchMap(pages => pages[1].waitForSelector('div:text("(todd)")').then(() => pages)),
+            switchMap(pages => pages[1].waitForSelector('div:text("(todd)")').then(() => pages))
         ))
     );
 

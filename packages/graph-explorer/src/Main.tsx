@@ -1,8 +1,8 @@
 import * as React from "react";
-import {Header} from "./components/Header.js";
+import {Header} from "./components/Header.jsx";
 import {HashRouter, Routes, Route} from "react-router-dom";
-import {ByNodeLabel} from "./ByNodeLabel.js";
-import {ByNodeProp} from "./ByNodeProp.js";
+import {ByNodeLabel} from "./ByNodeLabel.jsx";
+import {ByNodeProp} from "./ByNodeProp.jsx";
 
 export const Main: React.FC = () => {
     return (
@@ -14,4 +14,4 @@ export const Main: React.FC = () => {
             </Routes>
         </HashRouter>
     )
-}
+};

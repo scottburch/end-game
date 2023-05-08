@@ -12,12 +12,14 @@ const renderIt = () => {
         document.getElementById('root') as HTMLElement
     );
     root.render(
-        <React.StrictMode>
-            <GraphExplorerBtn/>
+        <>
             <ReactGraph>
-                <Main/>
+                <GraphExplorerBtn/>
+                <React.StrictMode>
+                    <Main/>
+                </React.StrictMode>
             </ReactGraph>
-        </React.StrictMode>
+        </>
     );
 }
 

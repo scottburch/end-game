@@ -6,7 +6,7 @@
   "dependencies": {
     "@end-game/dtg-scripts": "^1.0.24",
     "@end-game/graph-explorer": "../../packages/graph-explorer/",
-    "@end-game/react-graph": "^1.0.24",
+    "@end-game/react-graph": "^1.0.25",
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
     "react": "^18.2.0",

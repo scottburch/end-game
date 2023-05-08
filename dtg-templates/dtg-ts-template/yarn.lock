@@ -32,17 +32,17 @@
     zx "^7.2.2"
 
 "@end-game/graph-explorer@../../packages/graph-explorer/":
-  version "1.0.0"
+  version "1.0.25"
   dependencies:
-    "@end-game/graph" "*"
-    "@end-game/react-graph" "*"
-    "@end-game/utils" "*"
+    "@end-game/graph" "^1.0.25"
+    "@end-game/react-graph" "^1.0.25"
+    "@end-game/utils" "^1.0.25"
     react "^18.2.0"
     react-dom "^18.2.0"
     react-router "^6.11.1"
     react-router-dom "^6.11.1"
 
-"@end-game/graph@*", "@end-game/graph@^1.0.24":
+"@end-game/graph@^1.0.24":
   version "1.0.24"
   resolved "https://registry.yarnpkg.com/@end-game/graph/-/graph-1.0.24.tgz#8ca26bc76836f76e7825712eb8dedeff8143026f"
   integrity sha512-xNzOwTrjtZVUjGSwi6YnWwTeRzFz5qx4xXCgjEkOnJS4N7nm/AyHJE3JWCFwubzUby2ioPL9krmahAduXN0i0Q==
@@ -81,7 +81,46 @@
     ws "^8.11.0"
     yarn "^1.22.19"
 
-"@end-game/react-graph@*", "@end-game/react-graph@^1.0.24":
+"@end-game/graph@^1.0.25":
+  version "1.0.25"
+  resolved "https://registry.yarnpkg.com/@end-game/graph/-/graph-1.0.25.tgz#2c41b43578f5df0db35e06792d3cd0950e2715f0"
+  integrity sha512-axJgdfH2Jhgs0RsUYulcXoDRPNAKSabsUGnPTDJNpaJ5z25YIUnJsx/eJmBMPLK9TRIKcwwG90KOv9RXSuJKLQ==
+  dependencies:
+    "@end-game/react-graph" "^1.0.25"
+    "@end-game/utils" "^1.0.25"
+    "@types/base-64" "^1.0.0"
+    "@types/chai" "^4.3.4"
+    "@types/ip" "^1.1.0"
+    "@types/lodash" "^4.14.191"
+    "@types/mocha" "^10.0.1"
+    "@types/node" "^18.11.15"
+    "@types/ws" "^8.5.3"
+    abstract-level "^1.0.3"
+    add "^2.0.6"
+    base-64 "^1.0.0"
+    bech32 "^2.0.0"
+    buffer "^6.0.3"
+    crypto-browserify "^3.12.0"
+    curve25519-js "^0.0.4"
+    cypher.js "^1.0.0-beta.6"
+    ip "^1.1.8"
+    isomorphic-ws "^5.0.0"
+    js-crypto-key-utils "^1.0.4"
+    level "^8.0.0"
+    lodash "^4.17.21"
+    memory-level "^1.0.0"
+    process "^0.11.10"
+    rxjs "^7.8.1"
+    short-unique-id "^4.4.4"
+    stream-browserify "^3.0.0"
+    ts-loader "^9.4.2"
+    tsdef "^0.0.14"
+    typescript "^5.0.4"
+    webpack "^5.80.0"
+    ws "^8.11.0"
+    yarn "^1.22.19"
+
+"@end-game/react-graph@^1.0.24":
   version "1.0.24"
   resolved "https://registry.yarnpkg.com/@end-game/react-graph/-/react-graph-1.0.24.tgz#a9b668b14c4f409d70c972f04883a16e047736b6"
   integrity sha512-5ypARSP9UT5kusBerC3zi0vmXT7kGFHJhKzJ9/wE5/C03pAv6bZ9tf4G8V6lci8/lXZbx4Z3Wr68o9deu/zCLw==
@@ -125,12 +164,68 @@
     webpack-dev-server "^4.13.3"
     yarn "^1.22.19"
 
-"@end-game/utils@*", "@end-game/utils@^1.0.24":
+"@end-game/react-graph@^1.0.25":
+  version "1.0.25"
+  resolved "https://registry.yarnpkg.com/@end-game/react-graph/-/react-graph-1.0.25.tgz#97d5dbb425e20229aa1cbee810329e3d397a8248"
+  integrity sha512-WXjt+qQNmZqVjeyOv8T4ARpiGvpTIAcFg9pPSYhELjw6omTfmRqQoBSL537bkpMFvaBzkfS44wYcRKWAo7bvKg==
+  dependencies:
+    "@end-game/graph" "^1.0.25"
+    "@end-game/utils" "^1.0.25"
+    "@types/base-64" "^1.0.0"
+    "@types/chai" "^4.3.4"
+    "@types/ip" "^1.1.0"
+    "@types/lodash" "^4.14.191"
+    "@types/mocha" "^10.0.1"
+    "@types/node" "^18.11.15"
+    "@types/react" "^18.0.26"
+    "@types/react-bootstrap" "^0.32.32"
+    "@types/react-dom" "^18.0.9"
+    "@types/ws" "^8.5.3"
+    abstract-level "^1.0.3"
+    add "^2.0.6"
+    base-64 "^1.0.0"
+    bech32 "^2.0.0"
+    buffer "^6.0.3"
+    crypto-browserify "^3.12.0"
+    curve25519-js "^0.0.4"
+    cypher.js "^1.0.0-beta.6"
+    ip "^1.1.8"
+    isomorphic-ws "^5.0.0"
+    js-crypto-key-utils "^1.0.4"
+    level "^8.0.0"
+    lodash "^4.17.21"
+    memory-level "^1.0.0"
+    process "^0.11.10"
+    react "^18.2.0"
+    react-dom "^18.2.0"
+    rxjs "^7.8.1"
+    short-unique-id "^4.4.4"
+    stream-browserify "^3.0.0"
+    tsdef "^0.0.14"
+    typescript "^5.0.4"
+    webpack "^5.81.0"
+    webpack-cli "^5.0.2"
+    webpack-dev-server "^4.13.3"
+    yarn "^1.22.19"
+
+"@end-game/utils@^1.0.24":
   version "1.0.24"
   resolved "https://registry.yarnpkg.com/@end-game/utils/-/utils-1.0.24.tgz#0849f5b41828ca392f36ef100d23b3c0627c22f0"
   integrity sha512-HgWPK+w2MPgLn3YvbNRr8qtdRozqjLaG4s7+7+W3vxltCEH1vXLUW0tpqnswFRQMV/TC73D8nNLveSI7aiwYkw==
   dependencies:
     "@end-game/react-graph" "^1.0.24"
+    "@types/node" "^18.16.2"
+    playwright "^1.33.0"
+    rxjs "^7.8.1"
+    ts-node "^10.9.1"
+    typescript "^5.0.4"
+
+"@end-game/utils@^1.0.25":
+  version "1.0.25"
+  resolved "https://registry.yarnpkg.com/@end-game/utils/-/utils-1.0.25.tgz#1434d7ebd38f2190468e7257a86b2ec8072d62c0"
+  integrity sha512-9NX4dT1fCszQzREbBcwZzi6BlUpstGLU/e9IwKJZoSYpUOBgKUpu8/nSH/nMef3sb9UjgQRQwYXQx4a1jLycjQ==
+  dependencies:
+    "@end-game/react-graph" "^1.0.25"
     "@types/node" "^18.16.2"
     playwright "^1.33.0"
     rxjs "^7.8.1"
