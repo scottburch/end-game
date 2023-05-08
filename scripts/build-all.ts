@@ -5,7 +5,7 @@ import {bufferCount, concatMap, from, mergeMap, of, switchMap, tap} from "rxjs";
 
 export const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
 
-const DIRS = ['utils', 'graph', 'react-graph', 'dtg-scripts', 'cli'];
+const DIRS = ['utils', 'graph', 'react-graph', 'dtg-scripts', 'cli', 'graph-explorer'];
 
 of(true).pipe(
     tap(() => cd('../packages')),

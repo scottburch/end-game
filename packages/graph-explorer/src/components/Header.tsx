@@ -6,7 +6,6 @@ export const Header: React.FC = () => {
     const navigate = useNavigate();
     const [query, setQuery] = useState('');
 
-
     return (
         <div>
             <span>Search Nodes:</span>

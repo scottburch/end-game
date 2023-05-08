@@ -15,8 +15,15 @@ const Opener: React.FC<{ text: ReactNode, children: () => ReactNode }> = ({text,
                     cursor: 'pointer',
                     fontFamily: 'monospace'
                 }}>
-                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid black', height: 12, width: 12}}>
-                    {isOpen ? '-' : '+'}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid black',
+                        height: 12,
+                        width: 12
+                    }}>
+                        {isOpen ? '-' : '+'}
                     </div>
                 </div>
                 <div>{text}</div>
@@ -37,10 +44,10 @@ export const TreeNode: React.FC<{ nodeId: string }> = ({nodeId}) => {
         <div style={{color: 'red'}}>
             <Opener text={<>{node?.label} - ({node?.nodeId})</>}>
                 {() => node ? (
-                <div style={{paddingLeft: 20}}>
-                    <Props props={node.props}/>
-                    <NodeRelationships node={node}/>
-                </div>
+                    <div style={{paddingLeft: 20}}>
+                        <Props props={node.props}/>
+                        <NodeRelationships node={node}/>
+                    </div>
                 ) : null}
             </Opener>
         </div>
@@ -65,8 +72,8 @@ const Edge: React.FC<{ edgeId: EdgeId }> = ({edgeId}) => {
             <Opener text={<>{edge?.rel} ({edge?.edgeId})</>}>
                 {() => edge?.to ? (
                     <>
-                    <Props props={edge.props}/>
-                    <TreeNode nodeId={edge.to}/>
+                        <Props props={edge.props}/>
+                        <TreeNode nodeId={edge.to}/>
                     </>
                 ) : null}
             </Opener>
@@ -76,7 +83,7 @@ const Edge: React.FC<{ edgeId: EdgeId }> = ({edgeId}) => {
 
 }
 
-const Props: React.FC<{ props: Props}> = ({props = {}}) => (
+const Props: React.FC<{ props: Props }> = ({props = {}}) => (
     <div>
         {Object.keys(props).map(key => (
             <div key={key} style={{display: 'flex'}}>

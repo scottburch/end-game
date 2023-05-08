@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import {Header} from "./components/Header.jsx";
 import {HashRouter, Routes, Route} from "react-router-dom";
 import {ByNodeLabel} from "./ByNodeLabel.jsx";

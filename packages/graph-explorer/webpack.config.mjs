@@ -11,11 +11,11 @@ export default {
             request.startsWith('.') ? cb() : cb(null, `module ${request}`)
     ],
     entry: {
-        'index': './src/index.ts'
+        'index': './src/index.tsx'
     },
     output: {
         path: absPath(import.meta.url,'lib'),
-        filename: '[name].js',
+        filename: '[name].jsx',
       libraryTarget: 'module',
     },
     module: {
