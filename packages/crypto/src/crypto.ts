@@ -14,7 +14,6 @@ export type KeyBundle = {
     salt: Uint8Array
 };
 
-
 export type EncryptedKeyBundle = {
     pub: string
     priv: string
