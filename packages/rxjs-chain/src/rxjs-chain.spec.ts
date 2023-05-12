@@ -1,6 +1,6 @@
 import {appendHandler, chainNext, insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "./rxjs-chain.js";
 import {expect} from "chai";
-import {bufferCount, firstValueFrom, map, of, range, switchMap, tap} from "rxjs";
+import {bufferCount, filter, firstValueFrom, last, map, of, range, switchMap, take, tap, toArray} from "rxjs";
 
 describe('rxjs chain', () => {
     it('should create a new chain', () => {
@@ -100,6 +100,23 @@ describe('rxjs chain', () => {
                 "testing-a-3-3"
             ]))
 
+        ))
+    );
+
+    it('should be able to only forward some messages', () =>
+        firstValueFrom(of(newRxjsChain<number>()).pipe(
+            tap(chain => appendHandler(chain, 'oddOnly',  n => of(n).pipe(
+                filter(n => !!(n % 2))
+            ))),
+            switchMap(chain => range(1,5).pipe(
+                tap(n => setTimeout(() => chainNext(chain, n))),
+                map(() => chain),
+                last()
+            )),
+            switchMap(chain => chain),
+            take(3),
+            toArray(),
+            tap(x => expect(x).to.deep.equal([1,3,5]))
         ))
     );
 });
