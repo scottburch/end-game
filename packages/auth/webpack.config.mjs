@@ -12,8 +12,7 @@ export default {
             request.startsWith('.') ? cb() : cb(null, `module ${request}`)
     ],
     entry: {
-        'index': './src/index.ts',
-        'index-browser': './src/index-browser.ts'
+        'index': './src/index.ts'
     },
     output: {
         path: absPath(import.meta.url, 'lib'),

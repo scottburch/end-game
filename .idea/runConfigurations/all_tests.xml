@@ -1,5 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="all-tests" type="CompoundRunConfigurationType">
+    <toRun name="auth---tests" type="mocha-javascript-test-runner" />
     <toRun name="cli---tests" type="mocha-javascript-test-runner" />
     <toRun name="crypto---tests" type="mocha-javascript-test-runner" />
     <toRun name="graph---tests" type="mocha-javascript-test-runner" />

@@ -13,7 +13,7 @@ import type {PropsWithChildren} from 'react';
 import * as React from "react";
 import {createContext, useContext, useEffect, useState} from "react";
 import {of, switchMap, tap} from "rxjs";
-import {insertLevelStoreHandlers} from "@end-game/graph";
+import {levelStoreHandlers} from "@end-game/graph";
 
 
 
@@ -126,7 +126,7 @@ export const ReactGraph: React.FC<PropsWithChildren<{ graph?: Graph }>> = ({grap
             const sub = graphOpen({
                 graphId: newUid()
             }).pipe(
-                switchMap(graph => insertLevelStoreHandlers(graph)),
+                switchMap(graph => levelStoreHandlers(graph)),
                 tap(graph => setMyGraph(graph))
             ).subscribe();
             return () => sub.unsubscribe();

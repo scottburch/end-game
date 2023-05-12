@@ -4,14 +4,16 @@
   "license": "MIT",
   "type": "module",
   "private": false,
-  "main": "./lib/index-browser.js",
+  "main": "./lib/index.js",
   "exports": {
     ".": {
       "node": "./lib/index.js",
-      "default": "./lib/index-browser.js"
+      "default": "./lib/index.js"
     }
   },
   "dependencies": {
+    "@end-game/auth": "*",
+    "@end-game/graph": "*",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.15",

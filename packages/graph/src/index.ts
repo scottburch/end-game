@@ -4,7 +4,7 @@ export {graphGet, graphOpen, graphPut, nodesByLabel, nodesByProp, graphGetEdge, 
 export {
     levelStoreGetNodeHandler, levelStoreNodesByLabelHandler,
         levelStorePutNodeHandler, levelStoreNodesByPropHandler,
-    levelStorePutEdgeHandler, levelStoreGetRelationshipsHandler, levelStoreGetEdgeHandler, insertLevelStoreHandlers
+    levelStorePutEdgeHandler, levelStoreGetRelationshipsHandler, levelStoreGetEdgeHandler, levelStoreHandlers
 } from "./handlers/store-handlers/levelStoreHandler.js";
 export type {LevelHandlerOpts} from './handlers/store-handlers/levelStoreHandler.js'
 

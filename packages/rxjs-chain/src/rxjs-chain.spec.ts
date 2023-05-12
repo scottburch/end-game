@@ -87,7 +87,6 @@ describe('rxjs chain', () => {
             ))),
             tap(chain => setTimeout(() => chain.next('testing'))),
             switchMap(chain => chain),
-            tap(console.log),
             bufferCount(9),
             tap(x => expect(x).to.deep.equal([
                 "testing-a-1-1",

@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@end-game/dtg-scripts": "^1.0.24",
-    "@end-game/graph-explorer": "^1.0.26",
-    "@end-game/react-graph": "^1.0.25",
+    "@end-game/dtg-scripts": "^1.0.27",
+    "@end-game/graph-explorer": "^1.0.27",
+    "@end-game/react-graph": "^1.0.27",
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
     "react": "^18.2.0",

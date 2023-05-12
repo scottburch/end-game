@@ -28,7 +28,7 @@ export type LevelHandlerOpts = {
     dir?: string
 }
 
-export const insertLevelStoreHandlers = (graph: Graph, opts: LevelHandlerOpts = {}) => of(graph).pipe(
+export const levelStoreHandlers = (graph: Graph, opts: LevelHandlerOpts = {}) => of(graph).pipe(
         tap(graph => graph.chains.putNode.appendHandler('storage', levelStorePutNodeHandler(opts))),
         tap(graph => graph.chains.getNode.appendHandler('storage', levelStoreGetNodeHandler(opts))),
         tap(graph => graph.chains.putEdge.appendHandler('storage', levelStorePutEdgeHandler(opts))),

@@ -1,1 +1,2 @@
-console.log('index');
+export type {KeyBundle, EncryptedKeyBundle} from './crypto.js'
+export {generateNewAccount, serializeKeys, deserializeKeys, deserializePubKey, encrypt, decrypt, sign, verify, serializePubKey} from './crypto.js'
