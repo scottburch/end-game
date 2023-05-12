@@ -1,4 +1,4 @@
-import {newRxjsChain} from "./rxjs-chain.js";
+import {appendHandler, chainNext, insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "./rxjs-chain.js";
 import {expect} from "chai";
 import {bufferCount, firstValueFrom, map, of, range, switchMap, tap} from "rxjs";
 
@@ -9,14 +9,14 @@ describe('rxjs chain', () => {
 
     it('should append a handler', () =>
         firstValueFrom(of(newRxjsChain<string>()).pipe(
-            tap(chain => chain.appendHandler('fn1', (v: string) => of(v + '1'))),
-            tap(chain => chain.appendHandler('fn2', (v: string) => of(v + '2'))),
+            tap(chain => appendHandler(chain,'fn1', (v: string) => of(v + '1'))),
+            tap(chain => appendHandler(chain,'fn2', (v: string) => of(v + '2'))),
             tap(chain => {
                 expect(chain.fns).to.have.length(2);
                 expect(chain.fns[0][0]).to.equal('fn1');
                 expect(chain.fns[1][0]).to.equal('fn2');
             }),
-            tap(chain => setTimeout(() => chain.next('a'))),
+            tap(chain => setTimeout(() => chainNext(chain, 'a'))),
             switchMap(chain => chain),
             tap(v => expect(v).to.equal('a12'))
         ))
@@ -24,15 +24,15 @@ describe('rxjs chain', () => {
 
     it('should insert a handler before', () =>
         firstValueFrom(of(newRxjsChain<string>()).pipe(
-            tap(chain => chain.appendHandler('fn1', (v: string) => of(v + '1'))),
-            tap(chain => chain.appendHandler('fn2', (v: string) => of(v + '2'))),
-            tap(chain => chain.appendHandler('fn4', (v: string) => of(v + '4'))),
-            tap(chain => chain.appendHandler('fn5', (v: string) => of(v + '5'))),
-            tap(chain => chain.insertHandlerBefore('fn4', 'fn3', (v: string) => of(v + '3'))),
+            tap(chain => appendHandler(chain,'fn1', (v: string) => of(v + '1'))),
+            tap(chain => appendHandler(chain,'fn2', (v: string) => of(v + '2'))),
+            tap(chain => appendHandler(chain, 'fn4', (v: string) => of(v + '4'))),
+            tap(chain => appendHandler(chain, 'fn5', (v: string) => of(v + '5'))),
+            tap(chain => insertHandlerBefore(chain,'fn4', 'fn3', (v: string) => of(v + '3'))),
             tap(chain => {
                 expect(chain.fns).to.have.length(5);
             }),
-            tap(chain => setTimeout(() => chain.next('a'))),
+            tap(chain => setTimeout(() => chainNext(chain, 'a'))),
             switchMap(chain => chain),
             tap(v => expect(v).to.equal('a12345'))
         ))
@@ -40,15 +40,15 @@ describe('rxjs chain', () => {
 
     it('should insert a handler after', () =>
         firstValueFrom(of(newRxjsChain<string>()).pipe(
-            tap(chain => chain.appendHandler('fn1', (v: string) => of(v + '1'))),
-            tap(chain => chain.appendHandler('fn2', (v: string) => of(v + '2'))),
-            tap(chain => chain.appendHandler('fn4', (v: string) => of(v + '4'))),
-            tap(chain => chain.appendHandler('fn5', (v: string) => of(v + '5'))),
-            tap(chain => chain.insertHandlerAfter('fn2', 'fn3', (v: string) => of(v + '3'))),
+            tap(chain => appendHandler(chain,'fn1', (v: string) => of(v + '1'))),
+            tap(chain => appendHandler(chain,'fn2', (v: string) => of(v + '2'))),
+            tap(chain => appendHandler(chain,'fn4', (v: string) => of(v + '4'))),
+            tap(chain => appendHandler(chain,'fn5', (v: string) => of(v + '5'))),
+            tap(chain => insertHandlerAfter(chain,'fn2', 'fn3', (v: string) => of(v + '3'))),
             tap(chain => {
                 expect(chain.fns).to.have.length(5);
             }),
-            tap(chain => setTimeout(() => chain.next('a'))),
+            tap(chain => setTimeout(() => chainNext(chain, 'a'))),
             switchMap(chain => chain),
             tap(v => expect(v).to.equal('a12345'))
         ))
@@ -56,16 +56,16 @@ describe('rxjs chain', () => {
 
     it('should not error out if there are no listeners', () =>
         firstValueFrom(of(newRxjsChain()).pipe(
-            tap(chain => chain.next('testing'))
+            tap(chain => chainNext(chain, 'testing'))
         ))
     );
 
     it('should allow for multiple input events and chain listeners', () =>
         firstValueFrom(of(newRxjsChain()).pipe(
-            tap(chain => chain.appendHandler('mine', (s) => of(s + 'xx'))),
-            tap(chain => setTimeout(() => chain.next('testing'))),
-            tap(chain => setTimeout(() => chain.next('testing2'), 100)),
-            tap(chain => setTimeout(() => chain.next('testing3'), 200)),
+            tap(chain => appendHandler(chain,'mine', (s) => of(s + 'xx'))),
+            tap(chain => setTimeout(() => chainNext(chain, 'testing'))),
+            tap(chain => setTimeout(() => chainNext(chain, 'testing2'), 100)),
+            tap(chain => setTimeout(() => chainNext(chain, 'testing3'), 200)),
             switchMap(chain => chain),
             bufferCount(3),
             tap(x => expect(x).to.deep.equal([
@@ -78,14 +78,14 @@ describe('rxjs chain', () => {
 
     it('should allow a handler to emit multiple events', () =>
         firstValueFrom(of(newRxjsChain<string>()).pipe(
-            tap(chain => chain.appendHandler('mine1', (s: string) => of(s + '-a'))),
-            tap(chain => chain.appendHandler('mine2', (s) => range(1,3).pipe(
+            tap(chain => appendHandler(chain,'mine1', (s: string) => of(s + '-a'))),
+            tap(chain => appendHandler(chain,'mine2', (s) => range(1,3).pipe(
                 map(n => `${s}-${n}`)
             ))),
-            tap(chain => chain.appendHandler('mine3', (s) => range(1,3).pipe(
+            tap(chain => appendHandler(chain,'mine3', (s) => range(1,3).pipe(
                 map(n => `${s}-${n}`)
             ))),
-            tap(chain => setTimeout(() => chain.next('testing'))),
+            tap(chain => setTimeout(() => chainNext(chain, 'testing'))),
             switchMap(chain => chain),
             bufferCount(9),
             tap(x => expect(x).to.deep.equal([

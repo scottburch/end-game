@@ -19,6 +19,7 @@ import {AbstractLevel} from "abstract-level";
 import type {AbstractIteratorOptions} from "abstract-level";
 import {Level} from "level";
 import type {Iterator} from "level";
+import {appendHandler} from "@end-game/rxjs-chain";
 
 
 
@@ -29,13 +30,13 @@ export type LevelHandlerOpts = {
 }
 
 export const levelStoreHandlers = (graph: Graph, opts: LevelHandlerOpts = {}) => of(graph).pipe(
-        tap(graph => graph.chains.putNode.appendHandler('storage', levelStorePutNodeHandler(opts))),
-        tap(graph => graph.chains.getNode.appendHandler('storage', levelStoreGetNodeHandler(opts))),
-        tap(graph => graph.chains.putEdge.appendHandler('storage', levelStorePutEdgeHandler(opts))),
-        tap(graph => graph.chains.getEdge.appendHandler('storage', levelStoreGetEdgeHandler(opts))),
-        tap(graph => graph.chains.nodesByLabel.appendHandler('storage', levelStoreNodesByLabelHandler(opts))),
-        tap(graph => graph.chains.nodesByProp.appendHandler('storage', levelStoreNodesByPropHandler(opts))),
-        tap(graph => graph.chains.getRelationships.appendHandler('storage', levelStoreGetRelationshipsHandler(opts)))
+        tap(graph => appendHandler(graph.chains.putNode, 'storage', levelStorePutNodeHandler(opts))),
+        tap(graph => appendHandler(graph.chains.getNode, 'storage', levelStoreGetNodeHandler(opts))),
+        tap(graph => appendHandler(graph.chains.putEdge, 'storage', levelStorePutEdgeHandler(opts))),
+        tap(graph => appendHandler(graph.chains.getEdge, 'storage', levelStoreGetEdgeHandler(opts))),
+        tap(graph => appendHandler(graph.chains.nodesByLabel, 'storage', levelStoreNodesByLabelHandler(opts))),
+        tap(graph => appendHandler(graph.chains.nodesByProp, 'storage', levelStoreNodesByPropHandler(opts))),
+        tap(graph => appendHandler(graph.chains.getRelationships, 'storage', levelStoreGetRelationshipsHandler(opts)))
 );
 
 const stores: Record<string, LevelStore> = {};
