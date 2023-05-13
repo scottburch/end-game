@@ -11,9 +11,11 @@ export type UserPass = {
     password: string
 }
 
-let user: { nodeId: NodeId, auth: KeyBundle } = {nodeId: '', auth: {} as KeyBundle};
+export type GraphWithUser = Graph & {user?: {auth: KeyBundle, nodeId: NodeId}};
 
-export const graphUnauth = () => user = {nodeId: '', auth: {} as KeyBundle};
+
+
+export const graphUnauth = (graph: Graph) => (graph as GraphWithUser).user = {nodeId: '', auth: {} as KeyBundle};
 
 export const graphAuth = ({graph, username, password}: { graph: Graph } & UserPass) => timer(1000).pipe(
     raceWith(findAuthNode(graph, username)),
@@ -26,7 +28,7 @@ export const graphAuth = ({graph, username, password}: { graph: Graph } & UserPa
         ),
         of(({nodeId: '', auth: {} as KeyBundle}))
     )),
-    tap(u => user = u),
+    tap(u => (graph as GraphWithUser).user = u),
     catchError(err => err.cause.message.includes('bad decrypt') ? of({
         nodeId: '',
         auth: {} as KeyBundle
@@ -53,6 +55,6 @@ export const authHandlers = (graph: Graph) => of(graph).pipe(
 );
 
 const authPutHandler: GraphHandler<'putNode'> = ({graph, node}) =>
-    of(user).pipe(
-        switchMap(user => user.auth.pubKey ? of({graph, node}) : throwError(() => 'NOT_LOGGED_IN'))
+    of((graph as GraphWithUser).user).pipe(
+        switchMap(user => user?.auth.pubKey ? of({graph, node}) : throwError(() => 'NOT_LOGGED_IN'))
     )

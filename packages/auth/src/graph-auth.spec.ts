@@ -39,7 +39,7 @@ describe('graph auth', () => {
         ))
     );
 
-    describe.skip('auth handlers', () => {
+    describe('auth handlers', () => {
         it('should require an auth to put a value', (done) =>
             firstValueFrom(graphWithAuth().pipe(
                 switchMap(graph => graphPut(graph, 'scott', 'person', {name: 'scott'})),
