@@ -1,15 +1,19 @@
-import {catchError, filter, first, iif, map, of, raceWith, switchMap, throwError, timer} from "rxjs";
-import type {Graph, GraphNode} from '@end-game/graph'
+import {catchError, filter, first, iif, map, of, raceWith, switchMap, tap, throwError, timer} from "rxjs";
+import type {Graph, GraphHandler, GraphNode, NodeId} from '@end-game/graph'
 import {graphPut, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
 import {deserializeKeys, generateNewAccount, serializeKeys} from '@end-game/crypto'
+import {insertHandlerBefore} from "@end-game/rxjs-chain";
+
 
 export type UserPass = {
     username: string
     password: string
 }
 
+let user: { nodeId: NodeId, auth: KeyBundle } = {nodeId: '', auth: {} as KeyBundle};
 
+export const graphUnauth = () => user = {nodeId: '', auth: {} as KeyBundle};
 
 export const graphAuth = ({graph, username, password}: { graph: Graph } & UserPass) => timer(1000).pipe(
     raceWith(findAuthNode(graph, username)),
@@ -22,7 +26,11 @@ export const graphAuth = ({graph, username, password}: { graph: Graph } & UserPa
         ),
         of(({nodeId: '', auth: {} as KeyBundle}))
     )),
-    catchError(err => err.cause.message.includes('bad decrypt') ? of({nodeId: '', auth: {} as KeyBundle}) : throwError(() => err))
+    tap(u => user = u),
+    catchError(err => err.cause.message.includes('bad decrypt') ? of({
+        nodeId: '',
+        auth: {} as KeyBundle
+    }) : throwError(() => err))
 );
 
 const findAuthNode = (graph: Graph, username: string) =>
@@ -32,8 +40,19 @@ const findAuthNode = (graph: Graph, username: string) =>
         map(node => node as GraphNode<EncryptedKeyBundle>)
     );
 
-export const graphNewAuth = ({graph, username, password}: {graph: Graph} & UserPass) =>
+export const graphNewAuth = ({graph, username, password}: { graph: Graph } & UserPass) =>
     generateNewAccount().pipe(
         switchMap(keys => serializeKeys(keys, password)),
         switchMap(keys => graphPut(graph, '', 'auth', {...keys, username})),
+    );
+
+
+export const authHandlers = (graph: Graph) => of(graph).pipe(
+    tap(graph => insertHandlerBefore(graph.chains.putNode, 'storage', 'auth', authPutHandler)),
+
+);
+
+const authPutHandler: GraphHandler<'putNode'> = ({graph, node}) =>
+    of(user).pipe(
+        switchMap(user => user.auth.pubKey ? of({graph, node}) : throwError(() => 'NOT_LOGGED_IN'))
     )

@@ -1,4 +1,4 @@
-import {filter, map, Observable, of, tap} from "rxjs";
+import {filter, map, mergeMap, Observable, of, switchMap, tap} from "rxjs";
 import {newUid} from "../utils/uid.js";
 
 import type {DeepPartial} from "tsdef";
@@ -75,21 +75,21 @@ export const graphPut = <T extends Props>(graph: Graph, nodeId: string, label: s
         label,
         props
     } satisfies GraphNode<T>).pipe(
-        tap(node => chainNext(graph.chains.putNode, {graph, node})),
-        map(node => ({graph, nodeId: node.nodeId})),
+        switchMap(node => chainNext(graph.chains.putNode, {graph, node})),
+        map(({node}) => ({graph, nodeId: node.nodeId})),
     );
 
 export const graphPutEdge = <T extends Props>(graph: Graph, edgeId: string, rel: string, from: NodeId, to: NodeId, props: T) =>
     of({edgeId: edgeId || newUid(), rel, props, from, to } satisfies GraphEdge<T>).pipe(
-        tap(edge => chainNext(graph.chains.putEdge, {graph, edge})),
-        map(edge => ({graph, edge}))
+        switchMap(edge => chainNext(graph.chains.putEdge, {graph, edge})),
+        map(({edge}) => ({graph, edge}))
     );
 
 export const graphGetEdge = <T extends Props>(graph: Graph, edgeId: string) =>
     new Observable<{graph: Graph, edgeId: EdgeId, edge: GraphEdge<T>}>(subscriber => {
         const putEdgeSub = graph.chains.putEdge.pipe(
             filter(({edge}) => edge.edgeId === edgeId),
-            tap(() => chainNext(graph.chains.getEdge, {graph, edgeId}))
+            mergeMap(() => chainNext(graph.chains.getEdge, {graph, edgeId}))
         ).subscribe();
 
         const getEdgeSub = graph.chains.getEdge.pipe(
@@ -98,7 +98,7 @@ export const graphGetEdge = <T extends Props>(graph: Graph, edgeId: string) =>
             tap(({edge}) => subscriber.next({graph, edgeId, edge}))
         ).subscribe();
 
-        chainNext(graph.chains.getEdge, {graph, edgeId});
+        chainNext(graph.chains.getEdge, {graph, edgeId}).subscribe();
 
         return () => {
             putEdgeSub.unsubscribe();
@@ -112,7 +112,7 @@ export const graphGet = <T extends Props>(graph: Graph, nodeId: NodeId) =>
     new Observable<{graph: Graph, nodeId: NodeId, node: GraphNode<T>}>(observable => {
         const putSub = graph.chains.putNode.pipe(
             filter(({node: n}) => n.nodeId === nodeId),
-            tap(({node: n}) => chainNext(graph.chains.getNode, {graph, nodeId: n.nodeId, node: n}))
+            mergeMap(({node: n}) => chainNext(graph.chains.getNode, {graph, nodeId: n.nodeId, node: n}))
         ).subscribe();
 
         const getSub = graph.chains.getNode.pipe(
@@ -121,7 +121,7 @@ export const graphGet = <T extends Props>(graph: Graph, nodeId: NodeId) =>
             tap(({node}) => observable.next({graph, nodeId, node}))
         ).subscribe();
 
-        chainNext(graph.chains.getNode, {graph, nodeId});
+        chainNext(graph.chains.getNode, {graph, nodeId}).subscribe();
 
         return () => {
             putSub.unsubscribe();
@@ -133,7 +133,7 @@ export const nodesByLabel = <T extends Props>(graph: Graph, label: string) =>
     new Observable<{graph: Graph, label: string, nodes: GraphNode<T>[]}>(subscriber => {
         const putSub = graph.chains.putNode.pipe(
             filter(({node}) => node.label === label),
-            tap(() => chainNext(graph.chains.nodesByLabel, {graph, label}))
+            mergeMap(() => chainNext(graph.chains.nodesByLabel, {graph, label}))
         ).subscribe();
 
         const nodesSub = graph.chains.nodesByLabel.pipe(
@@ -141,7 +141,7 @@ export const nodesByLabel = <T extends Props>(graph: Graph, label: string) =>
             tap(({nodes}) => subscriber.next({graph, nodes: (nodes || []) as GraphNode<T>[], label}))
         ).subscribe();
 
-        chainNext(graph.chains.nodesByLabel, {graph, label});
+        chainNext(graph.chains.nodesByLabel, {graph, label}).subscribe();
 
         return () => {
             putSub.unsubscribe();
@@ -153,7 +153,7 @@ export const graphGetRelationships = (graph: Graph, nodeId: NodeId, rel: string,
     new Observable<{graph: Graph, nodeId: NodeId, rel: string, opts: {reverse?: boolean}, relationships: Relationship[]}>(subscriber => {
         const putEdgeSub = graph.chains.putEdge.pipe(
             filter(({edge}) => edge.from === nodeId || edge.to === nodeId),
-            tap(() => chainNext(graph.chains.getRelationships, {graph, nodeId, rel, reverse: !!opts.reverse}))
+            mergeMap(() => chainNext(graph.chains.getRelationships, {graph, nodeId, rel, reverse: !!opts.reverse}))
         ).subscribe();
 
         const getRelSub = graph.chains.getRelationships.pipe(
@@ -161,7 +161,8 @@ export const graphGetRelationships = (graph: Graph, nodeId: NodeId, rel: string,
             tap(({relationships}) => subscriber.next({graph, nodeId, rel, opts, relationships: relationships || []}))
         ).subscribe();
 
-        chainNext(graph.chains.getRelationships, {graph, nodeId, rel, reverse: !!opts.reverse});
+        chainNext(graph.chains.getRelationships, {graph, nodeId, rel, reverse: !!opts.reverse}).subscribe();
+
         return () => {
             putEdgeSub.unsubscribe();
             getRelSub.unsubscribe();
@@ -172,7 +173,7 @@ export const nodesByProp = <T extends Props>(graph: Graph, label: string, key: s
     new Observable<{graph: Graph, nodes: GraphNode<T>[], label: string, key: string, value: string}>(subscriber => {
         const putSub = graph.chains.putNode.pipe(
             filter(({node}) => node.label === label),
-            tap(() => chainNext(graph.chains.nodesByProp, {graph, label, key, value}))
+            mergeMap(() => chainNext(graph.chains.nodesByProp, {graph, label, key, value}))
         ).subscribe();
 
         const nodesByPropSub = graph.chains.nodesByProp.pipe(
@@ -180,7 +181,7 @@ export const nodesByProp = <T extends Props>(graph: Graph, label: string, key: s
             tap(({nodes}) => subscriber.next({graph, nodes: (nodes || []) as GraphNode<T>[], label, key, value}))
         ).subscribe();
 
-        chainNext(graph.chains.nodesByProp, {graph, label, key, value});
+        chainNext(graph.chains.nodesByProp, {graph, label, key, value}).subscribe();
 
         return () => {
             putSub.unsubscribe();

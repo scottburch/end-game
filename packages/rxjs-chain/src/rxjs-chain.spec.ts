@@ -1,6 +1,19 @@
 import {appendHandler, chainNext, insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "./rxjs-chain.js";
 import {expect} from "chai";
-import {bufferCount, filter, firstValueFrom, last, map, of, range, switchMap, take, tap, toArray} from "rxjs";
+import {
+    bufferCount, catchError,
+    filter,
+    firstValueFrom,
+    last,
+    map,
+    of,
+    range,
+    switchMap,
+    take,
+    tap,
+    throwError,
+    toArray
+} from "rxjs";
 
 describe('rxjs chain', () => {
     it('should create a new chain', () => {
@@ -16,7 +29,7 @@ describe('rxjs chain', () => {
                 expect(chain.fns[0][0]).to.equal('fn1');
                 expect(chain.fns[1][0]).to.equal('fn2');
             }),
-            tap(chain => setTimeout(() => chainNext(chain, 'a'))),
+            tap(chain => setTimeout(() => chainNext(chain, 'a').subscribe())),
             switchMap(chain => chain),
             tap(v => expect(v).to.equal('a12'))
         ))
@@ -32,7 +45,7 @@ describe('rxjs chain', () => {
             tap(chain => {
                 expect(chain.fns).to.have.length(5);
             }),
-            tap(chain => setTimeout(() => chainNext(chain, 'a'))),
+            tap(chain => setTimeout(() => chainNext(chain, 'a').subscribe())),
             switchMap(chain => chain),
             tap(v => expect(v).to.equal('a12345'))
         ))
@@ -48,7 +61,7 @@ describe('rxjs chain', () => {
             tap(chain => {
                 expect(chain.fns).to.have.length(5);
             }),
-            tap(chain => setTimeout(() => chainNext(chain, 'a'))),
+            tap(chain => setTimeout(() => chainNext(chain, 'a').subscribe())),
             switchMap(chain => chain),
             tap(v => expect(v).to.equal('a12345'))
         ))
@@ -63,9 +76,9 @@ describe('rxjs chain', () => {
     it('should allow for multiple input events and chain listeners', () =>
         firstValueFrom(of(newRxjsChain()).pipe(
             tap(chain => appendHandler(chain,'mine', (s) => of(s + 'xx'))),
-            tap(chain => setTimeout(() => chainNext(chain, 'testing'))),
-            tap(chain => setTimeout(() => chainNext(chain, 'testing2'), 100)),
-            tap(chain => setTimeout(() => chainNext(chain, 'testing3'), 200)),
+            tap(chain => setTimeout(() => chainNext(chain, 'testing').subscribe())),
+            tap(chain => setTimeout(() => chainNext(chain, 'testing2').subscribe(), 100)),
+            tap(chain => setTimeout(() => chainNext(chain, 'testing3').subscribe(), 200)),
             switchMap(chain => chain),
             bufferCount(3),
             tap(x => expect(x).to.deep.equal([
@@ -85,7 +98,7 @@ describe('rxjs chain', () => {
             tap(chain => appendHandler(chain,'mine3', (s) => range(1,3).pipe(
                 map(n => `${s}-${n}`)
             ))),
-            tap(chain => setTimeout(() => chainNext(chain, 'testing'))),
+            tap(chain => setTimeout(() => chainNext(chain, 'testing').subscribe())),
             switchMap(chain => chain),
             bufferCount(9),
             tap(x => expect(x).to.deep.equal([
@@ -109,7 +122,7 @@ describe('rxjs chain', () => {
                 filter(n => !!(n % 2))
             ))),
             switchMap(chain => range(1,5).pipe(
-                tap(n => setTimeout(() => chainNext(chain, n))),
+                tap(n => setTimeout(() => chainNext(chain, n).subscribe())),
                 map(() => chain),
                 last()
             )),
@@ -119,4 +132,12 @@ describe('rxjs chain', () => {
             tap(x => expect(x).to.deep.equal([1,3,5]))
         ))
     );
+
+    it('should allow you to catch errors thrown in handlers', (done) => {
+        firstValueFrom(of(newRxjsChain<string>()).pipe(
+            tap(chain => appendHandler(chain, 'error', () => throwError(() => 'testError'))),
+            switchMap(chain => chainNext(chain, 'testing')),
+            catchError(err => err === 'testError' ? of(done()) : throwError('error should be "testError"'))
+        ))
+    })
 });
