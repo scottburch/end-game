@@ -1,43 +1,59 @@
-import {catchError, combineLatest, firstValueFrom, of, switchMap, tap} from "rxjs";
+import {catchError, firstValueFrom, of, switchMap, tap} from "rxjs";
+import type {GraphWithUser} from './graph-auth.js'
 import {graphAuth, graphNewAuth, graphUnauth} from "./graph-auth.js";
-import {getAGraph} from "@end-game/graph/testUtils";
+
 import {expect} from 'chai'
 import {graphWithAuth} from "./test/testUtils.js";
-import {graphPut} from "@end-game/graph";
+import {graphGet, graphPut} from "@end-game/graph";
 
 
 describe('graph auth', () => {
     it('should return undefined if a user does not exist', () =>
-        firstValueFrom(getAGraph().pipe(
-            switchMap(graph => graphAuth({graph, username: 'scott', password: 'pass'})),
-            tap(({nodeId}) => expect(nodeId).to.equal(''))
+        firstValueFrom(graphWithAuth().pipe(
+            switchMap(graph => graphAuth(graph, 'scott', 'pass')),
+            tap(({graph}) => expect(graph.user).to.be.undefined)
         ))
     );
 
     it('should allow a user to signup for an account', () =>
-        firstValueFrom(getAGraph().pipe(
-            switchMap(graph => graphNewAuth({graph, username: 'scott', password: 'pass'})),
-            switchMap(({graph}) => graphAuth({graph, username: 'scott', password: 'pass'})),
-            tap(({nodeId, auth}) => expect(auth).to.have.property('pubKey')),
+        firstValueFrom(graphWithAuth().pipe(
+            switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
+            switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
+            tap(({graph}) => expect(graph.user?.auth).to.have.property('pubKey')),
         ))
     );
 
-    it('should return empty nodeId and auth object if auth failed', () =>
-        firstValueFrom(getAGraph().pipe(
-            switchMap(graph => graphNewAuth({graph, username: 'scott', password: 'pass'})),
-            switchMap(({graph}) => combineLatest([
-                graphAuth({graph, username: 'scott', password: 'wrong'}),
-                graphAuth({graph, username: 'scott', password: 'pass'}),
-            ])),
-            tap(([badAuth, goodAuth]) => {
-                expect(badAuth.nodeId).to.equal('');
-                expect(badAuth.auth.pubKey).to.be.undefined;
+    it('should error if a user tries to sign up twice', (done) => {
+        firstValueFrom(graphWithAuth().pipe(
+            switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
+            tap(({nodeId}) => expect(nodeId).to.have.length(12)),
+            switchMap(({graph}) => graphNewAuth(graph, 'scott', 'pass')),
+            catchError(err => of(err).pipe(
+                tap(() => err === 'USER_ALREADY_EXISTS' ? done() : done('invalid error message'))
+            ))
+        ))
+    })
 
-                expect(goodAuth.nodeId).to.have.length(12);
-                expect(goodAuth.auth.pubKey.type).to.equal('public')
+    it('should return undefined user if auth failed', () =>
+        firstValueFrom(graphWithAuth().pipe(
+            switchMap(graph => graphNewAuth(graph, 'scott','pass')),
+            switchMap(({graph}) => graphAuth(graph, 'scott', 'wrong')),
+            tap(badAuth => {
+                expect(badAuth.graph.user).to.be.undefined;
             })
         ))
     );
+
+    it('should set the graph user to undefined if unauth called', () => {
+        firstValueFrom(graphWithAuth().pipe(
+            switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
+            switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
+            tap(({graph}) => expect(graph.user?.nodeId).to.have.length(12)),
+            switchMap(({graph}) => graphUnauth(graph)),
+            tap(({graph}) => expect((graph as GraphWithUser).user).to.be.undefined)
+
+        ))
+    })
 
     describe('auth handlers', () => {
         it('should require an auth to put a value', (done) =>
@@ -49,8 +65,14 @@ describe('graph auth', () => {
             ))
         );
 
-        it('should put a value in the store if user is logged in', () => {
-
-        })
+        it('should put a value in the store if user is logged in', () =>
+            firstValueFrom(graphWithAuth().pipe(
+                switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
+                switchMap(({graph}) => graphAuth(graph, 'scott', 'pass' )),
+                switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'scott'})),
+                switchMap(({graph, nodeId}) => graphGet(graph, nodeId)),
+                tap(({node}) => expect(node.props.name).to.equal('scott'))
+            ))
+        )
     });
 });

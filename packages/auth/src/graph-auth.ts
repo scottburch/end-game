@@ -11,13 +11,15 @@ export type UserPass = {
     password: string
 }
 
-export type GraphWithUser = Graph & {user?: {auth: KeyBundle, nodeId: NodeId}};
+export type GraphWithUser = Graph & { user?: { auth: KeyBundle, nodeId: NodeId } };
 
 
+export const graphUnauth = (graph: Graph) => of(graph).pipe(
+    tap((graph as GraphWithUser).user = undefined),
+    map(() => ({graph}))
+);
 
-export const graphUnauth = (graph: Graph) => (graph as GraphWithUser).user = {nodeId: '', auth: {} as KeyBundle};
-
-export const graphAuth = ({graph, username, password}: { graph: Graph } & UserPass) => timer(1000).pipe(
+export const graphAuth = (graph: Graph, username: string, password: string) => timer(1000).pipe(
     raceWith(findAuthNode(graph, username)),
     first(),
     map(node => !!node ? ({nodeId: node.nodeId, auth: node.props}) : ({nodeId: '', auth: {}})),
@@ -26,14 +28,17 @@ export const graphAuth = ({graph, username, password}: { graph: Graph } & UserPa
         deserializeKeys(auth as EncryptedKeyBundle, password).pipe(
             map(auth => ({nodeId, auth}))
         ),
-        of(({nodeId: '', auth: {} as KeyBundle}))
+        of(undefined)
     )),
     tap(u => (graph as GraphWithUser).user = u),
-    catchError(err => err.cause.message.includes('bad decrypt') ? of({
-        nodeId: '',
-        auth: {} as KeyBundle
-    }) : throwError(() => err))
+    map(() => ({graph: graph as GraphWithUser})),
+    catchError(err => err.cause.message.includes('bad decrypt') ? of({graph: graph as GraphWithUser}) : throwError(() => err))
 );
+
+const authNodeExists = (graph: Graph, username: string) =>
+    nodesByProp(graph, 'auth', 'username', username).pipe(
+        map(({nodes}) => !!nodes.length)
+    );
 
 const findAuthNode = (graph: Graph, username: string) =>
     nodesByProp(graph, 'auth', 'username', username).pipe(
@@ -42,7 +47,7 @@ const findAuthNode = (graph: Graph, username: string) =>
         map(node => node as GraphNode<EncryptedKeyBundle>)
     );
 
-export const graphNewAuth = ({graph, username, password}: { graph: Graph } & UserPass) =>
+export const graphNewAuth = (graph: Graph, username: string, password: string) =>
     generateNewAccount().pipe(
         switchMap(keys => serializeKeys(keys, password)),
         switchMap(keys => graphPut(graph, '', 'auth', {...keys, username})),
@@ -51,10 +56,16 @@ export const graphNewAuth = ({graph, username, password}: { graph: Graph } & Use
 
 export const authHandlers = (graph: Graph) => of(graph).pipe(
     tap(graph => insertHandlerBefore(graph.chains.putNode, 'storage', 'auth', authPutHandler)),
-
 );
 
 const authPutHandler: GraphHandler<'putNode'> = ({graph, node}) =>
-    of((graph as GraphWithUser).user).pipe(
-        switchMap(user => user?.auth.pubKey ? of({graph, node}) : throwError(() => 'NOT_LOGGED_IN'))
-    )
+    node.label === 'auth' ? (
+        of({graph, node}).pipe(
+            switchMap(({graph, node}) => authNodeExists(graph, node.props.username)),
+            switchMap(exists => exists ? throwError(() => 'USER_ALREADY_EXISTS') : of({graph, node})),
+        )
+    ) : (
+        of((graph as GraphWithUser).user).pipe(
+            switchMap(user => user?.auth.pubKey ? of({graph, node}) : throwError(() => 'NOT_LOGGED_IN'))
+        )
+    );
