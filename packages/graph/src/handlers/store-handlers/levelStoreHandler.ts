@@ -20,6 +20,7 @@ import type {AbstractIteratorOptions} from "abstract-level";
 import {Level} from "level";
 import type {Iterator} from "level";
 import {appendHandler} from "@end-game/rxjs-chain";
+import {deserializer, serializer} from "@end-game/utils/serializer";
 
 
 
@@ -57,7 +58,7 @@ const storeIterator = (store: LevelStore, query: AbstractIteratorOptions<string,
 export const levelStoreGetNodeHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'getNode'> =>
     ({graph, nodeId}) => getStore(graph, handlerOpts).pipe(
         mergeMap(store => store.get([graph.graphId, nodeId].join('.'))),
-        map(json => ({graph, node: JSON.parse(json), nodeId})),
+        map(json => ({graph, node: deserializer(json), nodeId})),
         catchError(err => err.notFound ? of({graph, nodeId}) : throwError(err))
     );
 
@@ -65,7 +66,7 @@ export const levelStorePutNodeHandler = (handlerOpts: LevelHandlerOpts): GraphHa
     ({graph, node}) => getStore(graph, handlerOpts).pipe(
         tap(x => x),
         switchMap(store => combineLatest([
-            store.put([graph.graphId, node.nodeId].join('.'), JSON.stringify(node)),
+            store.put([graph.graphId, node.nodeId].join('.'), serializer(node)),
             store.put([graph.graphId, IndexTypes.LABEL, node.label, node.nodeId].join('.'), ''),
             createNodePropIndexes(graph, store, node)
         ])),
@@ -82,7 +83,7 @@ const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode<
 export const levelStorePutEdgeHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'putEdge'> =>
     ({graph, edge}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => merge(
-            store.put([graph.graphId, edge.edgeId].join('.'), JSON.stringify(edge)),
+            store.put([graph.graphId, edge.edgeId].join('.'), serializer(edge)),
             store.put([graph.graphId, IndexTypes.FROM_REL, edge.from, edge.rel, edge.to].join('.'), edge.edgeId),
             store.put([graph.graphId, IndexTypes.TO_REL, edge.to, edge.rel, edge.from].join('.'), edge.edgeId)
         )),
@@ -92,7 +93,7 @@ export const levelStorePutEdgeHandler = (handlerOpts: LevelHandlerOpts): GraphHa
 export const levelStoreGetEdgeHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'getEdge'> =>
     ({graph, edgeId}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => store.get([graph.graphId, edgeId].join('.'))),
-        map(json => JSON.parse(json)),
+        map(json => deserializer(json)),
         map(edge => ({graph, edgeId, edge}))
     );
 

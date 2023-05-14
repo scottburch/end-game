@@ -1,4 +1,4 @@
-import {catchError, firstValueFrom, of, switchMap, tap} from "rxjs";
+import {catchError, first, firstValueFrom, of, switchMap, tap} from "rxjs";
 import type {GraphWithUser} from './graph-auth.js'
 import {graphAuth, graphNewAuth, graphUnauth} from "./graph-auth.js";
 
@@ -65,7 +65,7 @@ describe('graph auth', () => {
             ))
         );
 
-        it('should put a value in the store if user is logged in', () =>
+        it('should put a value in the store if correct user is logged in', () =>
             firstValueFrom(graphWithAuth().pipe(
                 switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
                 switchMap(({graph}) => graphAuth(graph, 'scott', 'pass' )),
@@ -73,6 +73,33 @@ describe('graph auth', () => {
                 switchMap(({graph, nodeId}) => graphGet(graph, nodeId)),
                 tap(({node}) => expect(node.props.name).to.equal('scott'))
             ))
+        );
+
+        it('will allow the authorized user to update a value', () =>
+            firstValueFrom(graphWithAuth().pipe(
+                switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
+                switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
+                switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'joe'})),
+                switchMap(({graph}) => graphGet(graph, 'item').pipe(first())),
+                tap(({node}) => expect(node.props.name).to.equal('joe')),
+                switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'scott'})),
+                switchMap(({graph}) => graphGet(graph, 'item')),
+                tap(({node}) => expect(node.props.name).to.equal('scott'))
+            ))
         )
+
+        it('will not put a value in the store if the wrong user is logged in', (done) => {
+            firstValueFrom(graphWithAuth().pipe(
+                switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
+                switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
+                switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'scott'})),
+                switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
+                switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
+                switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'todd'})),
+                catchError(err => of(err).pipe(
+                    tap(() => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown ${err}`))
+                ))
+            ))
+        });
     });
 });

@@ -1,9 +1,11 @@
-import {catchError, filter, first, iif, map, of, raceWith, switchMap, tap, throwError, timer} from "rxjs";
-import type {Graph, GraphHandler, GraphNode, NodeId} from '@end-game/graph'
-import {graphPut, nodesByProp} from "@end-game/graph";
+import {catchError, delay, filter, first, iif, map, of, raceWith, switchMap, tap, throwError, timer} from "rxjs";
+import type {Graph, GraphHandler, GraphNode, NodeId, Props} from '@end-game/graph'
+import {graphGet, graphPut, graphPutEdge, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
-import {deserializeKeys, generateNewAccount, serializeKeys} from '@end-game/crypto'
-import {insertHandlerBefore} from "@end-game/rxjs-chain";
+import {deserializeKeys, generateNewAccount, serializeKeys, sign, verify} from '@end-game/crypto'
+import {insertHandlerAfter, insertHandlerBefore} from "@end-game/rxjs-chain";
+import {serializer} from "@end-game/utils/serializer";
+
 
 
 export type UserPass = {
@@ -12,6 +14,7 @@ export type UserPass = {
 }
 
 export type GraphWithUser = Graph & { user?: { auth: KeyBundle, nodeId: NodeId } };
+export type NodeWithSig<T extends Props> = GraphNode<T> & {sig: Uint8Array}
 
 
 export const graphUnauth = (graph: Graph) => of(graph).pipe(
@@ -55,17 +58,70 @@ export const graphNewAuth = (graph: Graph, username: string, password: string) =
 
 
 export const authHandlers = (graph: Graph) => of(graph).pipe(
-    tap(graph => insertHandlerBefore(graph.chains.putNode, 'storage', 'auth', authPutHandler)),
+    tap(graph => insertHandlerBefore(graph.chains.putNode, 'storage', 'auth', authPutAnteHandler)),
+    tap(graph => insertHandlerAfter(graph.chains.putNode, 'storage', 'auth', authPutPostHandler))
 );
 
-const authPutHandler: GraphHandler<'putNode'> = ({graph, node}) =>
-    node.label === 'auth' ? (
+const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
+    return node.label === 'auth' ? (
         of({graph, node}).pipe(
             switchMap(({graph, node}) => authNodeExists(graph, node.props.username)),
             switchMap(exists => exists ? throwError(() => 'USER_ALREADY_EXISTS') : of({graph, node})),
         )
     ) : (
         of((graph as GraphWithUser).user).pipe(
-            switchMap(user => user?.auth.pubKey ? of({graph, node}) : throwError(() => 'NOT_LOGGED_IN'))
+            switchMap(user => user?.auth.pubKey ? (
+                of({graph, node})
+            ) : (
+                throwError(() => 'NOT_LOGGED_IN')
+            )),
         )
+    ).pipe(
+        switchMap(({graph, node}) =>
+            verifyUserAuth(graph, node as NodeWithSig<Props>).pipe(
+                switchMap(valid => valid ? (
+                    of({graph, node})
+                ) : (
+                    throwError(() =>'UNAUTHORIZED_USER')
+                ))
+            )
+        ),
+        switchMap(({graph, node}) => signGraphNode(graph, node))
     );
+};
+
+const signGraphNode = (graph: GraphWithUser, node: GraphNode<any>) =>
+    getNodeSignData(node).pipe(
+        switchMap(bytes => sign(bytes, graph.user?.auth as KeyBundle)),
+        map(sig => ({...node, sig})),
+        map(node => ({graph, node}))
+    );
+
+const verifyUserAuth = (graph: GraphWithUser, node: NodeWithSig<any>) =>
+    // TODO: This is stupid, need to read the existing node and check, this node has no signature
+    graphGet(graph, node.nodeId).pipe(
+        tap(x => x),
+        switchMap(({node}) => node ? (
+            getNodeSignData(node).pipe(
+                switchMap(bytes => verify(bytes, (node as NodeWithSig<Props>).sig, graph.user?.auth.pubKey as CryptoKey))
+            )
+        ) : (
+            of(true)
+        )),
+)
+
+const getNodeSignData = (node: GraphNode<any>) =>
+    of(node.nodeId + node.label + serializer(node.props)).pipe(
+        map(str => new TextEncoder().encode(str))
+    )
+
+
+const authPutPostHandler: GraphHandler<'putNode'> = ({graph, node}) => {
+    return of((graph as GraphWithUser).user?.nodeId).pipe(
+        switchMap(nodeId => nodeId ? (
+            graphPutEdge(graph, '', 'owned_by', node.nodeId, nodeId, {})
+        ) : of(undefined)),
+        map(() => ({graph, node}))
+    )
+}
+

@@ -9,7 +9,8 @@
     "./openBrowser": "./lib/openBrowser.js",
     "./testCodeCompiler": "./lib/testCodeCompiler/testCodeCompiler.js",
     "./dirs": "./lib/dirs.js",
-    "./byteUtils": "./lib/byteUtils.js"
+    "./byteUtils": "./lib/byteUtils.js",
+    "./serializer": "./lib/serializer.js"
   },
   "dependencies": {
     "@types/node": "^18.16.2",
