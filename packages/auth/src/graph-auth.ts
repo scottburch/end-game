@@ -69,23 +69,12 @@ const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
         )
     ) : (
         of((graph as GraphWithUser).user).pipe(
-            switchMap(user => user?.auth.pubKey ? (
-                of({graph, node})
-            ) : (
-                throwError(() => 'NOT_LOGGED_IN')
-            )),
+            switchMap(user => user?.auth.pubKey ?
+                of({graph, node}) : throwError(() => 'NOT_LOGGED_IN'))
         )
     ).pipe(
-        switchMap(({graph, node}) =>
-            verifyUserAuth(graph, node as NodeWithSig<Props>).pipe(
-                switchMap(valid => valid ? (
-                    of({graph, node})
-                ) : (
-                    throwError(() => 'UNAUTHORIZED_USER')
-                ))
-            )
-        ),
-        switchMap(({graph, node}) => signGraphNode(graph, node))
+        switchMap(({graph, node}) => isUserNodeOwner(graph, node as NodeWithSig<Props>)),
+        switchMap(isOwner => isOwner ? signGraphNode(graph, node) : throwError(() => 'UNAUTHORIZED_USER')),
     );
 };
 
@@ -96,7 +85,7 @@ const signGraphNode = (graph: GraphWithUser, node: GraphNode<any>) =>
         map(node => ({graph, node}))
     );
 
-const verifyUserAuth = (graph: GraphWithUser, node: NodeWithSig<any>) =>
+const isUserNodeOwner = (graph: GraphWithUser, node: NodeWithSig<any>) =>
     timer(1000).pipe(switchMap(() => of(true))).pipe(
         raceWith(
             graphGet(graph, node.nodeId).pipe(
