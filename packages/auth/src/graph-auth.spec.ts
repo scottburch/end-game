@@ -5,6 +5,7 @@ import {graphAuth, graphNewAuth, graphUnauth} from "./graph-auth.js";
 import {expect} from 'chai'
 import {graphWithAuth} from "./test/testUtils.js";
 import {graphGet, graphPut} from "@end-game/graph";
+import {getAGraph} from "@end-game/graph/testUtils";
 
 
 describe('graph auth', () => {
@@ -86,7 +87,7 @@ describe('graph auth', () => {
                 switchMap(({graph}) => graphGet(graph, 'item')),
                 tap(({node}) => expect(node.props.name).to.equal('scott'))
             ))
-        )
+        );
 
         it('will not put a value in the store if the wrong user is logged in', (done) => {
             firstValueFrom(graphWithAuth().pipe(
