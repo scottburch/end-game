@@ -102,6 +102,15 @@ describe('graph auth', () => {
             ))
         });
 
+        it('should not allow you to add an edge if you are not logged in', (done) => {
+            firstValueFrom(graphWithAuth().pipe(
+                switchMap(graph => graphPutEdge(graph, 'my-edge', 'rel', 'from', 'to', {})),
+                catchError(err => of(err).pipe(
+                    tap(() => err === 'NOT_LOGGED_IN' ? done() : done(`wrong error thrown: ${err}`))
+                ))
+            ))
+        })
+
         it('should not allow you to add a edge "from" a node you do not own', (done) => {
             firstValueFrom(graphWithAuth().pipe(
                 switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
