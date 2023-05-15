@@ -15,7 +15,7 @@ import type {PropsWithChildren} from 'react';
 import * as React from "react";
 import {createContext, useContext, useEffect, useState} from "react";
 import {of, switchMap, tap} from "rxjs";
-import {authHandlers, graphNewAuth} from "@end-game/auth";
+import {authHandlers, graphAuth, graphNewAuth} from "@end-game/auth";
 
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);
@@ -117,6 +117,14 @@ export const useNewAccount = () => {
         return graphNewAuth(graph, username, password);
     }
 }
+
+export const useGraphLogin = () => {
+    const graph: Graph = useContext(GraphContext);
+
+    return (username: string, password: string) => {
+        return graphAuth(graph, username, password)
+    }
+};
 
 export const useGraphPutEdge = <T extends Props>() => {
     const graph: Graph = useContext(GraphContext);

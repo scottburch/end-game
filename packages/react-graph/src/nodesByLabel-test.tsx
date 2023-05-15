@@ -1,10 +1,24 @@
-import React, {useRef} from "react";
-import {useGraphNodesByLabel, useGraphPut} from "./react-graph.jsx";
+import React, {useEffect, useRef} from "react";
+import {useGraphLogin, useGraphNodesByLabel, useGraphPut, useNewAccount} from "./react-graph.jsx";
 import {renderApp} from "./test/reactTestUtils.jsx";
+import {switchMap} from "rxjs";
+
+let accountCreated = false;
 
 renderApp(() => {
     const nodes = useGraphNodesByLabel('person');
     const graphPut = useGraphPut();
+    const newAccount = useNewAccount();
+    const login = useGraphLogin();
+
+
+    useEffect(() => {
+        accountCreated || newAccount('scott', 'pass').pipe(
+            switchMap(() => login('scott', 'pass'))
+        ).subscribe();
+        accountCreated = true;
+    }, [])
+
 
     const count = useRef(0);
 
