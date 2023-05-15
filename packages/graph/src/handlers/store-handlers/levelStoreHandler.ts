@@ -64,7 +64,6 @@ export const levelStoreGetNodeHandler = (handlerOpts: LevelHandlerOpts): GraphHa
 
 export const levelStorePutNodeHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'putNode'> =>
     ({graph, node}) => getStore(graph, handlerOpts).pipe(
-        tap(x => x),
         switchMap(store => combineLatest([
             store.put([graph.graphId, node.nodeId].join('.'), serializer(node)),
             store.put([graph.graphId, IndexTypes.LABEL, node.label, node.nodeId].join('.'), ''),

@@ -4,8 +4,7 @@ import {graphAuth, graphNewAuth, graphUnauth} from "./graph-auth.js";
 
 import {expect} from 'chai'
 import {graphWithAuth} from "./test/testUtils.js";
-import {graphGet, graphPut} from "@end-game/graph";
-import {getAGraph} from "@end-game/graph/testUtils";
+import {graphGet, graphPut, graphPutEdge} from "@end-game/graph";
 
 
 describe('graph auth', () => {
@@ -98,7 +97,21 @@ describe('graph auth', () => {
                 switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
                 switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'todd'})),
                 catchError(err => of(err).pipe(
-                    tap(() => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown ${err}`))
+                    tap(() => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
+                ))
+            ))
+        });
+
+        it('should not allow you to add a edge "from" a node you do not own', (done) => {
+            firstValueFrom(graphWithAuth().pipe(
+                switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
+                switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
+                switchMap(({graph}) => graphPut(graph, 'item', 'person', {})),
+                switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
+                switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
+                switchMap(({graph}) => graphPutEdge(graph, 'edge1', 'friend', 'item', 'some', {})),
+                catchError(err => of(err).pipe(
+                    tap(() => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
                 ))
             ))
         });
