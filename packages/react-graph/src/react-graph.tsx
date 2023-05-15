@@ -1,10 +1,12 @@
 import type {EdgeId, Graph, GraphEdge, GraphNode, NodeId, Props, Relationship} from '@end-game/graph'
 import {
-    graphGet, graphGetEdge,
+    graphGet,
+    graphGetEdge,
     graphGetRelationships,
     graphOpen,
     graphPut,
     graphPutEdge,
+    levelStoreHandlers,
     newUid,
     nodesByLabel,
     nodesByProp,
@@ -13,8 +15,7 @@ import type {PropsWithChildren} from 'react';
 import * as React from "react";
 import {createContext, useContext, useEffect, useState} from "react";
 import {of, switchMap, tap} from "rxjs";
-import {levelStoreHandlers} from "@end-game/graph";
-
+import {authHandlers, graphNewAuth} from "@end-game/auth";
 
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);
@@ -107,6 +108,14 @@ export const useGraphPut = <T extends Props>() => {
     return (label: string, nodeId: NodeId, props: T) => {
         return graphPut(graph, nodeId, label, props);
     }
+};
+
+export const useNewAccount = () => {
+    const graph: Graph = useContext(GraphContext);
+
+    return (username: string, password: string) => {
+        return graphNewAuth(graph, username, password);
+    }
 }
 
 export const useGraphPutEdge = <T extends Props>() => {
@@ -127,6 +136,7 @@ export const ReactGraph: React.FC<PropsWithChildren<{ graph?: Graph }>> = ({grap
                 graphId: newUid()
             }).pipe(
                 switchMap(graph => levelStoreHandlers(graph)),
+                switchMap(graph => authHandlers(graph)),
                 tap(graph => setMyGraph(graph))
             ).subscribe();
             return () => sub.unsubscribe();
