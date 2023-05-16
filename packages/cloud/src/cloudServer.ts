@@ -1,8 +1,10 @@
 import {fromEvent, map, mergeMap, Observable, of, switchMap, tap} from "rxjs";
-import type {Graph} from "@end-game/graph";
+import type {Graph, GraphNode, Props} from "@end-game/graph";
 import WS from "isomorphic-ws";
 import {insertHandlerAfter} from "@end-game/rxjs-chain";
 import type {GraphHandler} from "@end-game/graph";
+import {deserializer} from "@end-game/utils/serializer";
+import {graphPut} from "@end-game/graph";
 
 
 export type CloudServerOpts = {
@@ -22,7 +24,6 @@ export const startServer = (graph: Graph, port: number) => new Observable<Graph>
     const wss = new WS.WebSocketServer({port});
     const serverSub = of(wss).pipe(
         switchMap(wss => fromEvent(wss, 'listening').pipe(map(() => wss))),
-        // observe when a client connects
         mergeMap(wss => fromEvent(wss, 'connection').pipe(
             map(x => (x as [WS.WebSocket])[0]),
             switchMap(conn => listener(graph, conn))
@@ -39,7 +40,13 @@ export const startServer = (graph: Graph, port: number) => new Observable<Graph>
 });
 
 const listener = (graph: Graph, conn: WS.WebSocket) =>
-    fromEvent(conn, 'data').pipe(
-        tap(x => x)
+    fromEvent<MessageEvent>(conn, 'message').pipe(
+        map(ev => deserializer(ev.data)),
+        tap(({cmd, data}) => fns[cmd](graph, data).subscribe()),
     );
+
+const fns: Record<string, (graph: Graph, data: any) => Observable<any>> = {
+    put: (graph, data: GraphNode<Props>) => graphPut(graph, data.nodeId, data.label, data.props)
+}
+
 
