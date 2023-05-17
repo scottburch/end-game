@@ -1,9 +1,8 @@
-import {catchError, first, firstValueFrom, map, of, switchMap, tap} from "rxjs";
+import {catchError, first, firstValueFrom, of, switchMap, tap} from "rxjs";
 import {graphWithAuth} from "./test/testUtils.js";
 import {graphGet, graphPut, graphPutEdge} from "@end-game/graph";
-import type {NodeWithSig} from './graph-auth.js'
-import {graphAuth, graphNewAuth} from "./graph-auth.js";
 import {expect} from "chai";
+import {graphAuth, graphNewAuth} from "./user-auth.js";
 
 describe('auth handlers', () => {
 

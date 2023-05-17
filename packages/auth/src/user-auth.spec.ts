@@ -1,9 +1,10 @@
 import {catchError, firstValueFrom, of, switchMap, tap} from "rxjs";
 import type {GraphWithUser} from './graph-auth.js'
-import {graphAuth, graphNewAuth, graphUnauth} from "./graph-auth.js";
+
 
 import {expect} from 'chai'
 import {graphWithAuth} from "./test/testUtils.js";
+import {graphAuth, graphNewAuth, graphUnauth} from "./user-auth.js";
 
 
 describe('graph auth', () => {

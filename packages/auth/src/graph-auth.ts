@@ -1,10 +1,9 @@
-import {catchError, filter, first, iif, map, of, raceWith, switchMap, tap, throwError, timer} from "rxjs";
+import {filter, first, map, of, raceWith, switchMap, tap, timer} from "rxjs";
 import type {Graph, GraphEdge, GraphNode, NodeId, Props} from '@end-game/graph'
-import {graphGet, graphPut, nodesByProp} from "@end-game/graph";
+import {graphGet, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
-import {deserializeKeys, generateNewAccount, serializeKeys, sign, verify} from '@end-game/crypto'
+import {sign, verify} from '@end-game/crypto'
 import {serializer} from "@end-game/utils/serializer";
-
 
 
 export type UserPass = {
@@ -16,26 +15,7 @@ export type GraphWithUser = Graph & { user?: { auth: KeyBundle, nodeId: NodeId }
 export type NodeWithSig<T extends Props> = GraphNode<T> & { sig: Uint8Array }
 
 
-export const graphUnauth = (graph: Graph) => of(graph).pipe(
-    tap((graph as GraphWithUser).user = undefined),
-    map(() => ({graph}))
-);
 
-export const graphAuth = (graph: Graph, username: string, password: string) => timer(1000).pipe(
-    raceWith(findAuthNode(graph, username)),
-    first(),
-    map(node => !!node ? ({nodeId: node.nodeId, auth: node.props}) : ({nodeId: '', auth: {}})),
-    switchMap(({nodeId, auth}) => iif(
-        () => !!(auth as EncryptedKeyBundle).pub,
-        deserializeKeys(auth as EncryptedKeyBundle, password).pipe(
-            map(auth => ({nodeId, auth}))
-        ),
-        of(undefined)
-    )),
-    tap(u => (graph as GraphWithUser).user = u),
-    map(() => ({graph: graph as GraphWithUser})),
-    catchError(err => err.cause.message.includes('bad decrypt') ? of({graph: graph as GraphWithUser}) : throwError(() => err))
-);
 
 export const authNodeExists = (graph: Graph, username: string) =>
     nodesByProp(graph, 'auth', 'username', username).pipe(
@@ -49,11 +29,6 @@ export const findAuthNode = (graph: Graph, username: string) =>
         map(node => node as GraphNode<EncryptedKeyBundle>)
     );
 
-export const graphNewAuth = (graph: Graph, username: string, password: string) =>
-    generateNewAccount().pipe(
-        switchMap(keys => serializeKeys(keys, password)),
-        switchMap(keys => graphPut(graph, '', 'auth', {...keys, username})),
-    );
 
 
 
