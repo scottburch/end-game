@@ -3,7 +3,7 @@ import {graphPut} from "@end-game/graph";
 import type {EncryptedKeyBundle} from "@end-game/crypto";
 import {deserializeKeys, generateNewAccount, serializeKeys} from "@end-game/crypto";
 import {catchError, first, iif, map, of, raceWith, switchMap, tap, throwError, timer} from "rxjs";
-import type {GraphWithUser} from "./auth-utils.js";
+import type {GraphWithAuth} from "./auth-utils.js";
 import {findAuthNode} from "./auth-utils.js";
 import {chainNext} from "@end-game/rxjs-chain";
 
@@ -24,14 +24,14 @@ export const graphAuth = (graph: Graph, username: string, password: string) => t
         ),
         of(undefined)
     )),
-    tap(u => (graph as GraphWithUser).user = u),
-    map(() => ({graph: graph as GraphWithUser})),
+    tap(u => (graph as GraphWithAuth).user = u),
+    map(() => ({graph: graph as GraphWithAuth})),
     tap(({graph}) => chainNext(graph.chains.authChanged, {graph}).subscribe()),
-    catchError(err => err.cause.message.includes('bad decrypt') ? of({graph: graph as GraphWithUser}) : throwError(() => err))
+    catchError(err => err.cause.message.includes('bad decrypt') ? of({graph: graph as GraphWithAuth}) : throwError(() => err))
 );
 
 export const graphUnauth = (graph: Graph) => of(graph).pipe(
-    tap((graph as GraphWithUser).user = undefined),
-    tap(graph => chainNext((graph as GraphWithUser).chains.authChanged, {graph}).subscribe()),
+    tap((graph as GraphWithAuth).user = undefined),
+    tap(graph => chainNext((graph as GraphWithAuth).chains.authChanged, {graph}).subscribe()),
     map(() => ({graph}))
 );

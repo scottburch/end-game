@@ -15,7 +15,7 @@ import type {PropsWithChildren} from 'react';
 import * as React from "react";
 import {createContext, useContext, useEffect, useState} from "react";
 import {catchError, of, switchMap, tap, throwError} from "rxjs";
-import type {GraphWithUser} from '@end-game/auth'
+import type {GraphWithAuth} from '@end-game/auth'
 import {authHandlers, graphAuth, graphNewAuth} from "@end-game/auth";
 
 
@@ -30,9 +30,9 @@ export const useAuth = () =>  {
 
 
     useEffect(() => {
-        setAuth({username: (graph as GraphWithUser).user?.username || ''});
-        const authChangedSub = (graph as GraphWithUser).chains.authChanged.pipe(
-            tap(({graph}) => setAuth({username: (graph as GraphWithUser).user?.username || ''}))
+        setAuth({username: (graph as GraphWithAuth).user?.username || ''});
+        const authChangedSub = (graph as GraphWithAuth).chains.authChanged.pipe(
+            tap(({graph}) => setAuth({username: (graph as GraphWithAuth).user?.username || ''}))
         ).subscribe()
 
         return () => authChangedSub.unsubscribe();
@@ -171,7 +171,7 @@ export const ReactGraph: React.FC<PropsWithChildren<{ graph?: Graph }>> = ({grap
                 switchMap(graph => levelStoreHandlers(graph)),
                 switchMap(graph => authHandlers(graph)),
                 tap(graph => setMyGraph(graph)),
-                switchMap(graph => (graph as GraphWithUser).chains.authChanged),
+                switchMap(graph => (graph as GraphWithAuth).chains.authChanged),
                 tap(({graph}) => setMyGraph(graph)),
             ).subscribe();
             return () => sub.unsubscribe();

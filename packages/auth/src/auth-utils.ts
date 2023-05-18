@@ -12,7 +12,7 @@ export type UserPass = {
     password: string
 }
 
-export type GraphWithUser = Graph & {
+export type GraphWithAuth = Graph & {
     user?: {
         auth: KeyBundle,
         nodeId: NodeId,
@@ -42,20 +42,20 @@ export const findAuthNode = (graph: Graph, username: string) =>
 
 export const isUserAuthedToWriteEdge = (graph: Graph, edge: GraphEdge<Props>) =>
     getNodeOnce(graph, edge.from).pipe(
-    switchMap(({node}) => node ? isUserNodeOwner(graph as GraphWithUser, node as NodeWithSig<Props>) : of(true)),
+    switchMap(({node}) => node ? isUserNodeOwner(graph as GraphWithAuth, node as NodeWithSig<Props>) : of(true)),
 );
 
-export const isUserLoggedIn = (graph: GraphWithUser) =>
+export const isUserLoggedIn = (graph: GraphWithAuth) =>
     !!graph.user?.auth.pubKey
 
-export const signGraphNode = (graph: GraphWithUser, node: GraphNode<any>) =>
+export const signGraphNode = (graph: GraphWithAuth, node: GraphNode<any>) =>
     getNodeSignData(node).pipe(
         switchMap(bytes => sign(bytes, graph.user?.auth as KeyBundle)),
         map(sig => ({...node, sig})),
         map(node => ({graph, node}))
     );
 
-export const isUserNodeOwner = (graph: GraphWithUser, node: NodeWithSig<any>) =>
+export const isUserNodeOwner = (graph: GraphWithAuth, node: NodeWithSig<any>) =>
     timer(1000).pipe(switchMap(() => of(true))).pipe(
         raceWith(
             graphGet(graph, node.nodeId).pipe(
