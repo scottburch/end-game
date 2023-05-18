@@ -1,8 +1,9 @@
 import {default as React, useEffect} from 'react'
 import {useGraphLogin, useGraphPut, useGraphPutEdge, useNewAccount} from "@end-game/react-graph";
-import {renderApp} from "./test/reactTestUtils.jsx";
+import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {GraphExplorerBtn} from "./GraphExplorerBtn.jsx";
-import {concatMap, delay, of, tap} from "rxjs";
+import {concatMap, of, tap} from "rxjs";
+
 
 let accountCreated = false;
 
@@ -30,6 +31,7 @@ renderApp(() => {
     return (
         <>
             <React.StrictMode>
+                <Username/>
                 <GraphExplorerBtn/>
             </React.StrictMode>
         </>
