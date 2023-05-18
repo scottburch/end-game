@@ -1,10 +1,11 @@
 import {catchError, firstValueFrom, of, switchMap, tap} from "rxjs";
-import type {GraphWithUser} from './graph-auth.js'
+import type {GraphWithUser} from './auth-utils.js'
 
 
 import {expect} from 'chai'
 import {graphWithAuth} from "./test/testUtils.js";
 import {graphAuth, graphNewAuth, graphUnauth} from "./user-auth.js";
+
 
 
 describe('graph auth', () => {
@@ -29,7 +30,7 @@ describe('graph auth', () => {
             tap(({nodeId}) => expect(nodeId).to.have.length(12)),
             switchMap(({graph}) => graphNewAuth(graph, 'scott', 'pass')),
             catchError(err => of(err).pipe(
-                tap(() => err === 'USER_ALREADY_EXISTS' ? done() : done('invalid error message'))
+                tap(() => err.code === 'USERNAME_ALREADY_EXISTS' ? done() : done('invalid error message'))
             ))
         ))
     })
@@ -52,7 +53,15 @@ describe('graph auth', () => {
             switchMap(({graph}) => graphUnauth(graph)),
             tap(({graph}) => expect((graph as GraphWithUser).user).to.be.undefined)
         ))
-    })
+    });
 
-
+    it("should notify on chain authChanged when user is changed", (done) => {
+         firstValueFrom(graphWithAuth().pipe(
+             switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
+             tap(({graph}) => (graph as GraphWithUser).chains.authChanged.pipe(
+                 tap(({graph}) => (graph as GraphWithUser).user?.username === 'scott' ? done() : done('authChanged fired without username'))
+             ).subscribe()),
+             switchMap(({graph}) => graphAuth(graph, 'scott', 'pass'))
+         ))
+    });
 });

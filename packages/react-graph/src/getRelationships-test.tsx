@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {useGraphLogin, useGraphPutEdge, useGraphRelationships, useNewAccount} from "./react-graph.jsx";
+import {useAuth, useGraphLogin, useGraphPutEdge, useGraphRelationships, useNewAccount} from "./react-graph.jsx";
 import {renderApp} from "./test/reactTestUtils.jsx";
 import {switchMap, tap} from "rxjs";
 
@@ -11,6 +11,7 @@ renderApp(() => {
     const graphPutEdge = useGraphPutEdge();
     const newAccount = useNewAccount();
     const login = useGraphLogin();
+    const auth = useAuth();
 
 
     useEffect(() => {
@@ -27,6 +28,7 @@ renderApp(() => {
 
     return (
         <>
+            <div id="username">{auth.username}</div>
             <button id="count" onClick={putNode}/>
             {rels.map((rel, idx) => <div id={`node-${idx}`}>{rel.from}-{rel.to}</div>)}
         </>

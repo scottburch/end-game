@@ -1,4 +1,4 @@
-import {combineLatest, firstValueFrom, switchMap, tap} from "rxjs";
+import {combineLatest, delay, firstValueFrom, switchMap, tap} from "rxjs";
 import {openBrowser} from "@end-game/utils/openBrowser";
 import {expect} from "chai";
 import {compileBrowserTestCode} from "@end-game/utils/testCodeCompiler";
@@ -8,6 +8,7 @@ describe('getRelationships()', () => {
     it('should get relationships and update', () =>
         firstValueFrom(compileBrowserTestCode(absPath(import.meta.url, 'getRelationships-test.tsx')).pipe(
             switchMap(() => openBrowser()),
+            switchMap(page => page.waitForSelector('div:text("scott")').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),

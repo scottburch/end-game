@@ -14,7 +14,8 @@ import {
 import type {PropsWithChildren} from 'react';
 import * as React from "react";
 import {createContext, useContext, useEffect, useState} from "react";
-import {of, switchMap, tap} from "rxjs";
+import {catchError, of, switchMap, tap, throwError} from "rxjs";
+import type {GraphWithUser} from '@end-game/auth'
 import {authHandlers, graphAuth, graphNewAuth} from "@end-game/auth";
 
 
@@ -22,9 +23,27 @@ const GraphContext: React.Context<Graph> = createContext({} as Graph);
 
 export const useGraph = () => useContext(GraphContext);
 
+
+export const useAuth = () =>  {
+    const [auth, setAuth] = useState<{username: string}>({username: ''});
+    let graph = useGraph();
+
+
+    useEffect(() => {
+        setAuth({username: (graph as GraphWithUser).user?.username || ''});
+        const authChangedSub = (graph as GraphWithUser).chains.authChanged.pipe(
+            tap(({graph}) => setAuth({username: (graph as GraphWithUser).user?.username || ''}))
+        ).subscribe()
+
+        return () => authChangedSub.unsubscribe();
+    }, [graph])
+
+    return auth;
+}
+
 export const useGraphNodesByLabel = <T extends Props>(label: string) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
-    const graph = useContext(GraphContext);
+    const graph = useGraph();
 
     useEffect(() => {
         if (graph) {
@@ -42,7 +61,7 @@ export const useGraphNodesByLabel = <T extends Props>(label: string) => {
 
 export const useGraphNodesByProp = <T extends Props>(label: string, key: string, value: any) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
-    const graph = useContext(GraphContext);
+    const graph = useGraph();
 
     useEffect(() => {
         if (graph) {
@@ -58,7 +77,7 @@ export const useGraphNodesByProp = <T extends Props>(label: string, key: string,
 
 export const useGraphRelationships = (nodeId: NodeId, rel: string, opts: { reverse?: boolean }) => {
     const [relationships, setRelationships] = useState<Relationship[]>([]);
-    const graph = useContext(GraphContext);
+    const graph = useGraph();
 
     useEffect(() => {
         if (graph) {
@@ -75,7 +94,7 @@ export const useGraphRelationships = (nodeId: NodeId, rel: string, opts: { rever
 
 export const useGraphGet = <T extends Props>(nodeId: NodeId) => {
     const [node, setNode] = useState<GraphNode<T>>();
-    const graph = useContext(GraphContext);
+    const graph = useGraph();
 
     useEffect(() => {
         !graph && console.error('useGraphGet() called outside of a graph context');
@@ -91,7 +110,7 @@ export const useGraphGet = <T extends Props>(nodeId: NodeId) => {
 
 export const useGraphEdge = <T extends Props>(edgeId: EdgeId) => {
     const [edge, setEdge] = useState<GraphEdge<T>>();
-    const graph = useContext(GraphContext);
+    const graph = useGraph();
 
     useEffect(() => {
         if (graph && edgeId) {
@@ -103,7 +122,7 @@ export const useGraphEdge = <T extends Props>(edgeId: EdgeId) => {
 }
 
 export const useGraphPut = <T extends Props>() => {
-    const graph: Graph = useContext(GraphContext);
+    const graph: Graph = useGraph();
 
     return (label: string, nodeId: NodeId, props: T) => {
         return graphPut(graph, nodeId, label, props);
@@ -111,7 +130,7 @@ export const useGraphPut = <T extends Props>() => {
 };
 
 export const useNewAccount = () => {
-    const graph: Graph = useContext(GraphContext);
+    const graph: Graph = useGraph();
 
     return (username: string, password: string) => {
         return graphNewAuth(graph, username, password);
@@ -119,23 +138,29 @@ export const useNewAccount = () => {
 }
 
 export const useGraphLogin = () => {
-    const graph: Graph = useContext(GraphContext);
+    const graph: Graph = useGraph();
 
     return (username: string, password: string) => {
         return graphAuth(graph, username, password)
     }
 };
 
+
+
 export const useGraphPutEdge = <T extends Props>() => {
-    const graph: Graph = useContext(GraphContext);
+    const graph: Graph = useGraph();
 
     return (rel: string, edgeId: EdgeId, from: NodeId, to: NodeId, props: T) => {
-        return graphPutEdge(graph, edgeId, rel, from, to, props);
+        return graphPutEdge(graph, edgeId, rel, from, to, props).pipe(
+            catchError(err => throwError(err.code || err))
+        );
     }
 }
 
 export const ReactGraph: React.FC<PropsWithChildren<{ graph?: Graph }>> = ({graph, children}) => {
     const [myGraph, setMyGraph] = useState<Graph>();
+
+
     useEffect(() => {
         graph ? setMyGraph(graph) : createNewGraph();
 
@@ -145,7 +170,9 @@ export const ReactGraph: React.FC<PropsWithChildren<{ graph?: Graph }>> = ({grap
             }).pipe(
                 switchMap(graph => levelStoreHandlers(graph)),
                 switchMap(graph => authHandlers(graph)),
-                tap(graph => setMyGraph(graph))
+                tap(graph => setMyGraph(graph)),
+                switchMap(graph => (graph as GraphWithUser).chains.authChanged),
+                tap(({graph}) => setMyGraph(graph)),
             ).subscribe();
             return () => sub.unsubscribe();
         }

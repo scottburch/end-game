@@ -10,7 +10,7 @@ describe('auth handlers', () => {
     it('should require an auth to put a value', (done) =>
         firstValueFrom(graphWithAuth().pipe(
             switchMap(graph => graphPut(graph, 'scott', 'person', {name: 'scott'})),
-            catchError(err => of(err).pipe(
+            catchError(err => of(err.code).pipe(
                 tap(err => err === 'NOT_LOGGED_IN' && done())
             ))
         ))
@@ -47,8 +47,8 @@ describe('auth handlers', () => {
             switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
             switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'todd'})),
-            catchError(err => of(err).pipe(
-                tap(() => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
+            catchError(err => of(err.code).pipe(
+                tap(err => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
             ))
         ))
     });
@@ -56,8 +56,8 @@ describe('auth handlers', () => {
     it('should not allow you to add an edge if you are not logged in', (done) => {
         firstValueFrom(graphWithAuth().pipe(
             switchMap(graph => graphPutEdge(graph, 'my-edge', 'rel', 'from', 'to', {})),
-            catchError(err => of(err).pipe(
-                tap(() => err === 'NOT_LOGGED_IN' ? done() : done(`wrong error thrown: ${err}`))
+            catchError(err => of(err.code).pipe(
+                tap(err => err === 'NOT_LOGGED_IN' ? done() : done(`wrong error thrown: ${err}`))
             ))
         ))
     })
@@ -70,8 +70,8 @@ describe('auth handlers', () => {
             switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
             switchMap(({graph}) => graphPutEdge(graph, 'edge1', 'friend', 'item', 'some', {})),
-            catchError(err => of(err).pipe(
-                tap(() => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
+            catchError(err => of(err.code).pipe(
+                tap(err => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
             ))
         ))
     });

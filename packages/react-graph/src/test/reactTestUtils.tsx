@@ -21,6 +21,7 @@ export const renderApp = (Body: React.FC, graph?: Graph) => {
     of(createRoot(document.querySelector('#app') as Element)).pipe(
         tap(root => root.render(<MyApp/>))
     ).subscribe();
-}
+};
+
 
 

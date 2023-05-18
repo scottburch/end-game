@@ -4,6 +4,7 @@ import {graphGet, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
 import {sign, verify} from '@end-game/crypto'
 import {serializer} from "@end-game/utils/serializer";
+import type {RxjsChain} from "@end-game/rxjs-chain";
 
 
 export type UserPass = {
@@ -11,15 +12,25 @@ export type UserPass = {
     password: string
 }
 
-export type GraphWithUser = Graph & { user?: { auth: KeyBundle, nodeId: NodeId } };
+export type GraphWithUser = Graph & {
+    user?: {
+        auth: KeyBundle,
+        nodeId: NodeId,
+        username: string
+    },
+    chains: Graph['chains'] & {
+        authChanged: RxjsChain<{graph: Graph}>
+    }
+};
 export type NodeWithSig<T extends Props> = GraphNode<T> & { sig: Uint8Array }
 
 
-
-
-export const authNodeExists = (graph: Graph, username: string) =>
+export const doesAuthNodeExist = (graph: Graph, username: string) =>
     nodesByProp(graph, 'auth', 'username', username).pipe(
-        map(({nodes}) => !!nodes.length)
+        filter(({nodes}) => !!nodes.length),
+        map(() => ({graph, exists: true}))
+    ).pipe(
+        raceWith(timer(1000).pipe(map(() => ({graph, exists: false}))))
     );
 
 export const findAuthNode = (graph: Graph, username: string) =>
@@ -29,14 +40,9 @@ export const findAuthNode = (graph: Graph, username: string) =>
         map(node => node as GraphNode<EncryptedKeyBundle>)
     );
 
-
-
-
-
-
 export const isUserAuthedToWriteEdge = (graph: Graph, edge: GraphEdge<Props>) =>
     getNodeOnce(graph, edge.from).pipe(
-    switchMap(({node}) => node ? isUserNodeOwner(graph, node as NodeWithSig<Props>) : of(true)),
+    switchMap(({node}) => node ? isUserNodeOwner(graph as GraphWithUser, node as NodeWithSig<Props>) : of(true)),
 );
 
 export const isUserLoggedIn = (graph: GraphWithUser) =>

@@ -139,5 +139,12 @@ describe('rxjs chain', () => {
             switchMap(chain => chainNext(chain, 'testing')),
             catchError(err => err === 'testError' ? of(done()) : throwError('error should be "testError"'))
         ))
+    });
+
+    it('should notify the stream even without handlers', (done) => {
+        firstValueFrom(of(newRxjsChain<number>()).pipe(
+            tap(chain => chain.subscribe(v => v === 10 ? done() : done('event with wront value: ' + v))),
+            switchMap(chain => chainNext(chain, 10))
+        ))
     })
 });
