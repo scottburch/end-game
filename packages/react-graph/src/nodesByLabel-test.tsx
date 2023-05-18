@@ -1,6 +1,6 @@
 import React, {useEffect, useRef} from "react";
 import {useGraphLogin, useGraphNodesByLabel, useGraphPut, useNewAccount} from "./react-graph.jsx";
-import {renderApp} from "./test/reactTestUtils.jsx";
+import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {switchMap} from "rxjs";
 
 let accountCreated = false;
@@ -29,6 +29,7 @@ renderApp(() => {
 
     return (
         <>
+            <Username/>
             <button id="count" onClick={addPerson}/>
             {nodes.map((node, idx) => <div key={node.nodeId} id={`node-${idx}`}>{node.props.name}</div>)}
         </>

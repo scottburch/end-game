@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {renderApp} from "./test/reactTestUtils.jsx";
+import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {useGraphGet, useGraphLogin, useGraphNodesByLabel, useGraphPut, useNewAccount} from "./react-graph.jsx";
 import {useEffect, useRef} from "react";
 import {switchMap} from "rxjs";
@@ -31,6 +31,7 @@ renderApp(() => {
 
     return (
         <>
+            <Username/>
             <button id="count" onClick={addPerson}/>
             {nodes.map(node => <Person key={node.nodeId} nodeId={node.nodeId}/>)}
         </>

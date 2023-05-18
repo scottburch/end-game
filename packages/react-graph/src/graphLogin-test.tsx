@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {renderApp} from "./test/reactTestUtils.jsx";
+import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {useGraphGet, useGraphLogin, useGraphPut, useNewAccount} from "./react-graph.jsx";
 import {switchMap} from "rxjs";
 

@@ -8,6 +8,7 @@ describe('nodesByProp()', () => {
     it('should update reactively', () =>
         firstValueFrom(compileBrowserTestCode(absPath(import.meta.url, 'nodesByProp-test.tsx')).pipe(
             switchMap(() => openBrowser()),
+            switchMap(page => page.waitForSelector('div:text("scott")').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),

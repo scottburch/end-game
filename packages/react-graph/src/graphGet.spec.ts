@@ -8,6 +8,7 @@ describe('graphGet()', () => {
     it('should get a value from the graph', () =>
         firstValueFrom(compileBrowserTestCode(absPath(import.meta.url, 'graphGet-test.tsx')).pipe(
             switchMap(() => openBrowser()),
+            switchMap(page => page.waitForSelector('div:text("scott")').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
