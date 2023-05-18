@@ -1,14 +1,12 @@
 import type {Graph, GraphHandler, Props} from '@end-game/graph'
 import {graphPutEdge} from "@end-game/graph";
-import {map, of, switchMap, tap, throwError} from "rxjs";
+import {map, of, switchMap, tap} from "rxjs";
 import {insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "@end-game/rxjs-chain";
 import type {GraphWithAuth, NodeWithSig} from "./auth-utils.js";
-import {doesAuthNodeExist, isUserAuthedToWriteEdge, isUserLoggedIn, isUserNodeOwner, signGraphNode} from "./auth-utils.js";
+import {doesAuthNodeExist, isUserAuthedToWriteEdge, isUserLoggedIn, signGraphNode} from "./auth-utils.js";
+import {notLoggedInError, unauthorizedUserError, userAlreadyExistsError} from "./auth-errors.js";
+import {isUserNodeOwner} from "./auth-utils.js";
 
-const error = <Code extends string, T extends Object>(code: Code, data?: T) => throwError(() => ({code, ...(data || {})}));
-const userAlreadyExistsError = (username: string) => error('USERNAME_ALREADY_EXISTS', {username});
-const notLoggedInError = () => error('NOT_LOGGED_IN');
-const unauthorizedUserError = (username: string) => error('UNAUTHORIZED_USER', {username});
 
 
 
