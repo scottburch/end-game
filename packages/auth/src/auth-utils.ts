@@ -1,4 +1,4 @@
-import {filter, first, map, of, raceWith, switchMap, tap, timer} from "rxjs";
+import {filter, first, map, of, switchMap, tap, timeout, timer} from "rxjs";
 import type {Graph, GraphEdge, GraphNode, NodeId, Props} from '@end-game/graph'
 import {graphGet, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
@@ -19,7 +19,7 @@ export type GraphWithAuth = Graph & {
         username: string
     },
     chains: Graph['chains'] & {
-        authChanged: RxjsChain<{graph: Graph}>
+        authChanged: RxjsChain<{ graph: Graph }>
     }
 };
 export type NodeWithSig<T extends Props> = GraphNode<T> & { sig: Uint8Array }
@@ -30,7 +30,7 @@ export const doesAuthNodeExist = (graph: Graph, username: string) =>
         filter(({nodes}) => !!nodes.length),
         map(() => ({graph, exists: true}))
     ).pipe(
-        raceWith(timer(1000).pipe(map(() => ({graph, exists: false}))))
+        timeout({first: 1000, with: () => of({graph, exists: false})})
     );
 
 export const findAuthNode = (graph: Graph, username: string) =>
@@ -42,8 +42,8 @@ export const findAuthNode = (graph: Graph, username: string) =>
 
 export const isUserAuthedToWriteEdge = (graph: Graph, edge: GraphEdge<Props>) =>
     getNodeOnce(graph, edge.from).pipe(
-    switchMap(({node}) => node ? isUserNodeOwner(graph as GraphWithAuth, node as NodeWithSig<Props>) : of(true)),
-);
+        switchMap(({node}) => node ? isUserNodeOwner(graph as GraphWithAuth, node as NodeWithSig<Props>) : of(true)),
+    );
 
 export const isUserLoggedIn = (graph: GraphWithAuth) =>
     !!graph.user?.auth.pubKey
@@ -56,16 +56,13 @@ export const signGraphNode = (graph: GraphWithAuth, node: GraphNode<any>) =>
     );
 
 export const isUserNodeOwner = (graph: GraphWithAuth, node: NodeWithSig<any>) =>
-    timer(1000).pipe(switchMap(() => of(true))).pipe(
-        raceWith(
-            graphGet(graph, node.nodeId).pipe(
-                filter(({node}) => !!node),
-                switchMap(({node}) => getNodeSignData(node).pipe(
-                    switchMap(bytes => verify(bytes, (node as NodeWithSig<Props>).sig, graph.user?.auth.pubKey as CryptoKey))
-                )),
-                first()
-            )
-        )
+    graphGet(graph, node.nodeId).pipe(
+        filter(({node}) => !!node),
+        switchMap(({node}) => getNodeSignData(node).pipe(
+            switchMap(bytes => verify(bytes, (node as NodeWithSig<Props>).sig, graph.user?.auth.pubKey as CryptoKey))
+        )),
+        first(),
+        timeout({first: 1000, with: () => of(true)})
     );
 
 
@@ -75,13 +72,11 @@ export const getNodeSignData = (node: GraphNode<any>) =>
     );
 
 
-
 const getNodeOnce = (graph: Graph, nodeId: NodeId) =>
-    timer(1000).pipe(map(() => ({graph, nodeId, node: undefined}))).pipe(
-        raceWith(graphGet(graph, nodeId).pipe(
-            tap(x => x),
-            filter(({node}) => !!node),
-            first()
-        ))
+    graphGet(graph, nodeId).pipe(
+        tap(x => x),
+        filter(({node}) => !!node),
+        first(),
+        timeout({first: 1000, with: () => of({graph, nodeId, node: undefined})})
     );
 
