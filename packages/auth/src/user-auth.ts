@@ -15,20 +15,20 @@ export const graphNewAuth = (graph: Graph, username: string, password: string) =
 
 export const graphAuth = (graph: Graph, username: string, password: string) =>
     findAuthNode(graph, username).pipe(
-        filter(node => !!node.nodeId),
-        map(node => ({nodeId: node.nodeId, auth: node.props})),
-        timeout({first: 1000, with: () => of({nodeId: '', auth: {}})}),
-        switchMap(({nodeId, auth}) => iif(
-            () => !!(auth as EncryptedKeyBundle).pub,
-            deserializeKeys(auth as EncryptedKeyBundle, password).pipe(
-                map(auth => ({nodeId, auth, username}))
-            ),
-            of(undefined)
-        )),
-        tap(u => (graph as GraphWithAuth).user = u),
-        map(() => ({graph: graph as GraphWithAuth})),
-        tap(({graph}) => chainNext(graph.chains.authChanged, {graph}).subscribe()),
-        catchError(err => err.cause.message.includes('bad decrypt') ? of({graph: graph as GraphWithAuth}) : throwError(() => err))
+        switchMap(({graph, node}) => iif(() => !!node.nodeId, of({node}).pipe(
+            map(({node}) => ({nodeId: node.nodeId, auth: node.props})),
+            switchMap(({nodeId, auth}) => iif(
+                () => !!(auth as EncryptedKeyBundle).pub,
+                deserializeKeys(auth as EncryptedKeyBundle, password).pipe(
+                    map(auth => ({nodeId, auth, username}))
+                ),
+                of(undefined)
+            )),
+            tap(u => (graph as GraphWithAuth).user = u),
+            map(() => ({graph: graph as GraphWithAuth})),
+            tap(({graph}) => chainNext(graph.chains.authChanged, {graph}).subscribe()),
+            catchError(err => err.cause.message.includes('bad decrypt') ? of({graph: graph as GraphWithAuth}) : throwError(() => err))
+        ), of({graph: graph as GraphWithAuth, node}))),
     );
 
 export const graphUnauth = (graph: Graph) => of(graph).pipe(

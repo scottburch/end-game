@@ -1,4 +1,4 @@
-import {filter, first, map, of, switchMap, tap, timeout, timer} from "rxjs";
+import {filter, first, map, of, switchMap, tap, timeout} from "rxjs";
 import type {Graph, GraphEdge, GraphNode, NodeId, Props} from '@end-game/graph'
 import {graphGet, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
@@ -25,19 +25,19 @@ export type GraphWithAuth = Graph & {
 export type NodeWithSig<T extends Props> = GraphNode<T> & { sig: Uint8Array }
 
 
-export const doesAuthNodeExist = (graph: Graph, username: string) =>
-    nodesByProp(graph, 'auth', 'username', username).pipe(
+export const doesAuthNodeExist = (graph: Graph, username: string) => {
+    return nodesByProp(graph, 'auth', 'username', username).pipe(
         filter(({nodes}) => !!nodes.length),
-        map(() => ({graph, exists: true}))
-    ).pipe(
+        map(() => ({graph, exists: true})),
         timeout({first: 1000, with: () => of({graph, exists: false})})
     );
-
+}
 export const findAuthNode = (graph: Graph, username: string) =>
     nodesByProp(graph, 'auth', 'username', username).pipe(
         map(({nodes}) => nodes[0]),
         filter(node => !!node),
-        map(node => node as GraphNode<EncryptedKeyBundle>)
+        map(node => ({graph, node: node as GraphNode<EncryptedKeyBundle>})),
+        timeout({first: 1000, with: () => of({graph, node: {} as GraphNode<EncryptedKeyBundle> })})
     );
 
 export const isUserAuthedToWriteEdge = (graph: Graph, edge: GraphEdge<Props>) =>

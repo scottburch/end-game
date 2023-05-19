@@ -239,13 +239,23 @@ describe('graph', () => {
         ))
     )
 
+    it('should update nodesByProp() when a single node is added later', () =>
+        firstValueFrom(getAGraph().pipe(
+            tap(graph => {
+                setTimeout(() => graphPut(graph, 'n3', 'person', {group: 'bar'}).subscribe(), 100);
+            }),
+            switchMap(graph => nodesByProp(graph, 'person', 'group', 'bar')),
+            skipWhile(({nodes}) => nodes.length !== 1),
+        ))
+    )
+
     it('should update nodesByProp() when a node is added', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => graphPut(graph, 'n1', 'person', {group: 'foo'})),
             tap(({graph}) => {
                 setTimeout(() => graphPut(graph, 'n2', 'car', {}).subscribe());
                 setTimeout(() => graphPut(graph, 'n3', 'person', {group: 'bar'}).subscribe());
-                setTimeout(() => graphPut(graph, 'n4', 'person', {group: 'bar'}).subscribe());
+                setTimeout(() => graphPut(graph, 'n4', 'person', {group: 'bar'}).subscribe(), 200);
             }),
             switchMap(({graph}) => nodesByProp(graph, 'person', 'group', 'bar')),
             skipWhile(({nodes}) => nodes.length < 2),

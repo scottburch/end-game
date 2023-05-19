@@ -1,6 +1,6 @@
 import type {Graph, GraphHandler, Props} from '@end-game/graph'
 import {graphPutEdge} from "@end-game/graph";
-import {map, of, switchMap, tap} from "rxjs";
+import {first, map, of, switchMap, tap} from "rxjs";
 import {insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "@end-game/rxjs-chain";
 import type {GraphWithAuth, NodeWithSig} from "./auth-utils.js";
 import {doesAuthNodeExist, isUserAuthedToWriteEdge, isUserLoggedIn, signGraphNode} from "./auth-utils.js";
@@ -20,9 +20,9 @@ export const authHandlers = (graph: Graph) => of(graph).pipe(
 );
 
 const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
-
     if(node.label === 'auth') {
         return doesAuthNodeExist(graph, node.props.username).pipe(
+            first(),
             switchMap(({exists}) => exists ? userAlreadyExistsError(node.props.username) : of({graph, node})),
         )
     }

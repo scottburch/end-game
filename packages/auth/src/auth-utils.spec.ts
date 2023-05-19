@@ -1,6 +1,6 @@
-import {firstValueFrom, switchMap, tap} from "rxjs";
-import {graphWithAuth} from "./test/testUtils.js";
-import {doesAuthNodeExist} from "./auth-utils.js";
+import {delay, firstValueFrom, switchMap, tap, timer} from "rxjs";
+import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
+import {doesAuthNodeExist, findAuthNode} from "./auth-utils.js";
 import {expect} from "chai";
 import {graphNewAuth} from "./user-auth.js";
 
@@ -20,6 +20,35 @@ describe('auth utils', () => {
                 switchMap(({graph}) => doesAuthNodeExist(graph, 'scott')),
                 tap(({exists}) => expect(exists).to.be.true)
             ))
+        );
+
+        it('should work if the node is added later', () =>
+            firstValueFrom(graphWithAuth().pipe(
+                tap(graph => timer(1).pipe(
+                    switchMap(() => graphNewAuth(graph, 'scott', 'pass'))
+                ).subscribe()),
+                // this delay is here to give the graphNewAuth time to complete since it will delay 1 sec also
+                // which causes the dosAuthNodeExist() to fail
+                delay(500),
+                switchMap(graph => doesAuthNodeExist(graph, 'scott')),
+                tap(({exists}) => expect(exists).to.be.true)
+            ))
         )
-    })
-})
+    });
+
+    describe('findAuthNode()', () => {
+        it('should return a node with an undefined nodeId if not found', () => {
+            firstValueFrom(graphWithAuth().pipe(
+                switchMap(graph => findAuthNode(graph, 'not-here')),
+                tap(({node}) => expect(node.nodeId).to.be.undefined)
+            ))
+        });
+
+        it('should return a auth node if one exists', () => {
+            firstValueFrom(graphWithUser().pipe(
+                switchMap(graph => findAuthNode(graph, 'scott')),
+                tap(({node}) => expect(node.nodeId).to.have.length(12))
+            ))
+        })
+    });
+});
