@@ -1,6 +1,6 @@
 import {catchError, delay, first, firstValueFrom, of, switchMap, tap} from "rxjs";
 import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
-import {graphGet, graphPut, graphPutEdge} from "@end-game/graph";
+import {graphGet, graphPutNode, graphPutEdge} from "@end-game/graph";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
 
@@ -9,7 +9,7 @@ describe('auth handlers', function()  {
 
     it('should fail to put a value if no auth', (done) =>
         firstValueFrom(graphWithAuth().pipe(
-            switchMap(graph => graphPut(graph, 'scott', 'person', {name: 'scott'})),
+            switchMap(graph => graphPutNode(graph, 'scott', 'person', {name: 'scott'})),
             catchError(err => of(err.code).pipe(
                 tap(err => err === 'NOT_LOGGED_IN' && done())
             ))
@@ -20,7 +20,7 @@ describe('auth handlers', function()  {
         firstValueFrom(graphWithAuth().pipe(
             switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
-            switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'scott'})),
+            switchMap(({graph}) => graphPutNode(graph, 'item', 'person', {name: 'scott'})),
             switchMap(({graph, nodeId}) => graphGet(graph, nodeId)),
             tap(({node}) => expect(node.props.name).to.equal('scott'))
         ))
@@ -30,10 +30,10 @@ describe('auth handlers', function()  {
         firstValueFrom(graphWithAuth().pipe(
             switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
-            switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'joe'})),
+            switchMap(({graph}) => graphPutNode(graph, 'item', 'person', {name: 'joe'})),
             switchMap(({graph}) => graphGet(graph, 'item').pipe(first())),
             tap(({node}) => expect(node.props.name).to.equal('joe')),
-            switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'scott'})),
+            switchMap(({graph}) => graphPutNode(graph, 'item', 'person', {name: 'scott'})),
             switchMap(({graph}) => graphGet(graph, 'item')),
             tap(({node}) => expect(node.props.name).to.equal('scott'))
         ))
@@ -41,10 +41,10 @@ describe('auth handlers', function()  {
 
     it('will not put a value in the store if the wrong user is logged in', (done) => {
         firstValueFrom(graphWithUser().pipe(
-            switchMap(graph => graphPut(graph, 'item', 'person', {name: 'scott'})),
+            switchMap(graph => graphPutNode(graph, 'item', 'person', {name: 'scott'})),
             switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
-            switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'todd'})),
+            switchMap(({graph}) => graphPutNode(graph, 'item', 'person', {name: 'todd'})),
             catchError(err => of(err.code).pipe(
                 tap(err => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
             ))

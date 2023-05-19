@@ -1,6 +1,6 @@
 export type {Graph, GraphNode, GraphEdge, GraphOpts, NodeId, EdgeId, Props, GraphHandler} from './graph/graph.js'
 export type {Relationship} from './graph/relationship.js'
-export {graphGet, graphOpen, graphPut, nodesByLabel, nodesByProp, graphGetEdge, graphGetRelationships, graphPutEdge} from './graph/graph.js'
+export {graphGet, graphOpen, graphPutNode, nodesByLabel, nodesByProp, graphGetEdge, graphGetRelationships, graphPutEdge} from './graph/graph.js'
 export {
     levelStoreGetNodeHandler, levelStoreNodesByLabelHandler,
         levelStorePutNodeHandler, levelStoreNodesByPropHandler,

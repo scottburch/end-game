@@ -4,7 +4,7 @@ import {
     graphGetEdge,
     graphGetRelationships,
     graphOpen,
-    graphPut,
+    graphPutNode,
     graphPutEdge,
     levelStoreHandlers,
     newUid,
@@ -125,7 +125,7 @@ export const useGraphPut = <T extends Props>() => {
     const graph: Graph = useGraph();
 
     return (label: string, nodeId: NodeId, props: T) => {
-        return graphPut(graph, nodeId, label, props);
+        return graphPutNode(graph, nodeId, label, props);
     }
 };
 

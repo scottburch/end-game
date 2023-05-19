@@ -1,15 +1,15 @@
 import {combineLatest, first, firstValueFrom, from, map, skipWhile, switchMap, tap, toArray} from "rxjs";
 import {getAGraph} from "../test/testUtils.js";
-import {graphPut, nodesByLabel} from "./graph.js";
+import {graphPutNode, nodesByLabel} from "./graph.js";
 import {expect} from "chai";
 
 describe('nodesByLabel()', () => {
     it('should be able to find nodes with a given label', () =>
         firstValueFrom(getAGraph().pipe(
-            tap(graph => setTimeout(() => graphPut(graph, '', 'person', {name: 'joe'}).subscribe(), 100)),
+            tap(graph => setTimeout(() => graphPutNode(graph, '', 'person', {name: 'joe'}).subscribe(), 100)),
             switchMap(graph => combineLatest([
-                graphPut(graph, '', 'person', {name: 'scott'}),
-                graphPut(graph, '', 'person', {name: 'todd'})
+                graphPutNode(graph, '', 'person', {name: 'scott'}),
+                graphPutNode(graph, '', 'person', {name: 'todd'})
             ])),
             switchMap(([{graph}]) => nodesByLabel<{ name: string }>(graph, 'person')),
             skipWhile(({nodes}) => nodes.length < 3),
@@ -26,9 +26,9 @@ describe('nodesByLabel()', () => {
 
     it('should update a nodesByLabel() when node nodes are updated', () =>
         firstValueFrom(getAGraph().pipe(
-            switchMap(graph => graphPut(graph, '', 'person', {name: 'scott'})),
-            tap(({graph}) => setTimeout(() => graphPut(graph, '', 'person', {name: 'todd'}).subscribe())),
-            tap(({graph}) => setTimeout(() => graphPut(graph, '', 'person', {name: 'joe'}).subscribe())),
+            switchMap(graph => graphPutNode(graph, '', 'person', {name: 'scott'})),
+            tap(({graph}) => setTimeout(() => graphPutNode(graph, '', 'person', {name: 'todd'}).subscribe())),
+            tap(({graph}) => setTimeout(() => graphPutNode(graph, '', 'person', {name: 'joe'}).subscribe())),
             switchMap(({graph}) => nodesByLabel(graph, 'person')),
             skipWhile(({nodes}) => nodes.length < 3),
             tap(({nodes}) => {

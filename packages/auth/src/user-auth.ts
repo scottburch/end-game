@@ -1,5 +1,5 @@
 import type {Graph} from "@end-game/graph";
-import {graphPut} from "@end-game/graph";
+import {graphPutNode} from "@end-game/graph";
 import type {EncryptedKeyBundle} from "@end-game/crypto";
 import {deserializeKeys, generateNewAccount, serializeKeys} from "@end-game/crypto";
 import {catchError, iif, map, of, switchMap, tap, throwError} from "rxjs";
@@ -10,7 +10,7 @@ import {chainNext} from "@end-game/rxjs-chain";
 export const graphNewAuth = (graph: Graph, username: string, password: string) =>
     generateNewAccount().pipe(
         switchMap(keys => serializeKeys(keys, password)),
-        switchMap(keys => graphPut(graph, '', 'auth', {...keys, username})),
+        switchMap(keys => graphPutNode(graph, '', 'auth', {...keys, username})),
     );
 
 export const graphAuth = (graph: Graph, username: string, password: string) =>

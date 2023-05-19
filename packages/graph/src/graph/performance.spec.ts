@@ -1,6 +1,6 @@
 import {firstValueFrom, last, map, mergeMap, range, switchMap, tap} from "rxjs";
 import {getAGraph} from "../test/testUtils.js";
-import {graphPut} from "./graph.js";
+import {graphPutNode} from "./graph.js";
 import {expect} from "chai";
 
 describe('performance tests', () => {
@@ -10,16 +10,16 @@ describe('performance tests', () => {
 
          return firstValueFrom(getAGraph().pipe(
              tap(() => start = process.hrtime.bigint()),
-             switchMap(graph => graphPut(graph, '', 'person', {a:1, b:2, c:3, d: 4})),
+             switchMap(graph => graphPutNode(graph, '', 'person', {a:1, b:2, c:3, d: 4})),
              tap(() => before = process.hrtime.bigint() - start),
              switchMap(({graph}) => range(1, 1_000).pipe(
-                 mergeMap(() => graphPut(graph, '', 'person', {a:1, b:2, c:3, d: 4})),
+                 mergeMap(() => graphPutNode(graph, '', 'person', {a:1, b:2, c:3, d: 4})),
                  last(),
                  map(() => graph)
              )),
              tap(() => console.log('loading', bigToMs(process.hrtime.bigint() - start))),
              tap(() => start = process.hrtime.bigint()),
-             switchMap(graph => graphPut(graph, '', 'person', {a:1, b:2, c:3, d: 4})),
+             switchMap(graph => graphPutNode(graph, '', 'person', {a:1, b:2, c:3, d: 4})),
              tap(() => expect(process.hrtime.bigint() - start < (start + 5000n)).to.be.true),
              tap(() => console.log('before', bigToMs(before))),
              tap(() => console.log('after', bigToMs(process.hrtime.bigint() - start)))

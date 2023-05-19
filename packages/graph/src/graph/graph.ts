@@ -69,7 +69,7 @@ export const graphOpen = (opts: GraphOpts = {graphId: newUid()}) => of({
 } as Graph);
 
 
-export const graphPut = <T extends Props>(graph: Graph, nodeId: string, label: string, props: T) =>
+export const graphPutNode = <T extends Props>(graph: Graph, nodeId: string, label: string, props: T) =>
     of({
         nodeId: nodeId || newUid(),
         label,
