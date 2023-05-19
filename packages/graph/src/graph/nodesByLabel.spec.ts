@@ -6,19 +6,20 @@ import {expect} from "chai";
 describe('nodesByLabel()', () => {
     it('should be able to find nodes with a given label', () =>
         firstValueFrom(getAGraph().pipe(
+            tap(graph => setTimeout(() => graphPut(graph, '', 'person', {name: 'joe'}).subscribe(), 100)),
             switchMap(graph => combineLatest([
                 graphPut(graph, '', 'person', {name: 'scott'}),
                 graphPut(graph, '', 'person', {name: 'todd'})
             ])),
             switchMap(([{graph}]) => nodesByLabel<{ name: string }>(graph, 'person')),
+            skipWhile(({nodes}) => nodes.length < 3),
             first(),
             switchMap(({nodes}) => from(nodes || [])),
             map(node => node.props.name),
             toArray(),
             tap(names => {
-                expect(names).to.have.length(2);
-                expect(names).to.include('scott');
-                expect(names).to.include('todd');
+                expect(names).to.have.length(3);
+                expect(names.sort()).to.deep.equal(['joe', 'scott', 'todd']);
             }),
         ))
     );
@@ -34,6 +35,5 @@ describe('nodesByLabel()', () => {
                 expect(nodes.map(node => node.props.name).sort()).to.deep.equal(['joe', 'scott', 'todd'])
             })
         ))
-    )
-
+    );
 });

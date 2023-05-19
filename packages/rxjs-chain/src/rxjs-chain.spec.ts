@@ -1,7 +1,7 @@
 import {appendHandler, chainNext, insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "./rxjs-chain.js";
 import {expect} from "chai";
 import {
-    bufferCount, catchError,
+    bufferCount, catchError, delay,
     filter,
     firstValueFrom,
     last,
@@ -88,6 +88,20 @@ describe('rxjs chain', () => {
             ]))
         ))
     );
+
+    it('should wait until the chain completes to return the chainNext()', () => {
+        let called = ''
+        return firstValueFrom(of(newRxjsChain<number>()).pipe(
+            tap(chain => appendHandler(chain, 'mine', n => of(n + 1))),
+            tap(chain => setTimeout(() => chainNext(chain, 1).pipe(
+                tap(n => expect(n).to.equal(2)),
+                tap(() => expect(called+='chain').to.equal('chain'))
+            ).subscribe())),
+            switchMap(chain => chain),
+            tap(n => expect(n).to.equal(2)),
+            tap(() => expect(called+='end').to.equal('chainend'))
+        ))
+    });
 
     it('should allow a handler to emit multiple events', () =>
         firstValueFrom(of(newRxjsChain<string>()).pipe(
