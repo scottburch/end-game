@@ -3,7 +3,7 @@ import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
 import {doesAuthNodeExist, findAuthNode} from "./auth-utils.js";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
-import {graphPutNode, graphPutEdge} from "@end-game/graph";
+import {graphPutNode, graphPutEdge, newGraphEdge} from "@end-game/graph";
 import {newGraphNode} from "@end-game/graph";
 
 describe('auth utils', () => {
@@ -73,7 +73,7 @@ describe('auth utils', () => {
                 switchMap(graph => graphPutNode(graph, newGraphNode('item', 'person', {}))),
                 switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
                 switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
-                switchMap(({graph}) => graphPutEdge(graph, 'edge1', 'friend', 'item', 'some', {})),
+                switchMap(({graph}) => graphPutEdge(graph, newGraphEdge('edge1', 'friend', 'item', 'some', {}))),
                 catchError(err => of(err.code).pipe(
                     tap(err => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
                 ))
@@ -87,7 +87,7 @@ describe('auth utils', () => {
                 ).subscribe()),
                 switchMap(graph => graphNewAuth(graph, 'todd', 'pass')),
                 switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
-                switchMap(({graph}) => graphPutEdge(graph, 'edge1', 'friend', 'item', 'some', {})),
+                switchMap(({graph}) => graphPutEdge(graph, newGraphEdge('edge1', 'friend', 'item', 'some', {}))),
                 catchError(err => of(err.code).pipe(
                     tap(err => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
                 ))

@@ -21,7 +21,7 @@ import {
     graphOpen,
     graphPutNode,
     graphPutEdge,
-    nodesByProp, newGraphNode
+    nodesByProp, newGraphNode, newGraphEdge
 } from "./graph.js";
 import {expect} from "chai";
 import {getAGraph} from "../test/testUtils.js";
@@ -80,7 +80,7 @@ describe('graph', () => {
                 switchMap(arr => from(arr)),
                 map(({nodeId}) => nodeId),
                 toArray(),
-                switchMap(([n1, n2]) => graphPutEdge(graph, 'e1', 'friend', n1, n2, {foo: 10})),
+                switchMap(([n1, n2]) => graphPutEdge(graph, newGraphEdge('e1', 'friend', n1, n2, {foo: 10}))),
                 switchMap(({edge}) => graphGetEdge(graph, edge.edgeId)),
                 tap(({edge}) => {
                     expect(edge?.rel).to.equal('friend');
@@ -100,8 +100,8 @@ describe('graph', () => {
             ))),
             switchMap(([{graph}]) => combineLatest([
                 of(graph),
-                graphPutEdge(graph, 'e0', 'friend', 'n0', 'n1', {rank: 5}),
-                graphPutEdge(graph, 'e1', 'friend', 'n0', 'n2', {rank: 10})
+                graphPutEdge(graph, newGraphEdge('e0', 'friend', 'n0', 'n1', {rank: 5})),
+                graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n0', 'n2', {rank: 10}))
             ])),
             switchMap(([graph]) => graphGetRelationships(graph, 'n0', 'friend')),
             tap(({relationships}) => expect(relationships).to.deep.equal([{
@@ -125,10 +125,10 @@ describe('graph', () => {
     it('should be able to find all relationships for a given node', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
-                graphPutEdge(graph, 'e1', 'friend', 'n1', 'n2', {}),
-                graphPutEdge(graph, 'e2', 'friend', 'n1', 'n3', {}),
-                graphPutEdge(graph, 'e3', 'owns', 'n1', 'n4', {}),
-                graphPutEdge(graph, 'e4', 'owns', 'n1', 'n5', {}),
+                graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {})),
+                graphPutEdge(graph, newGraphEdge('e2', 'friend', 'n1', 'n3', {})),
+                graphPutEdge(graph, newGraphEdge('e3', 'owns', 'n1', 'n4', {})),
+                graphPutEdge(graph, newGraphEdge('e4', 'owns', 'n1', 'n5', {})),
             ])),
             switchMap(([{graph}]) => graphGetRelationships(graph, 'n1', '*')),
             tap(({relationships}) => {
@@ -204,9 +204,9 @@ describe('graph', () => {
 
     it('should update a graphGetEdge() when the edge properties is updated', () =>
         firstValueFrom(getAGraph().pipe(
-            switchMap(graph => graphPutEdge(graph, 'e1', 'friend', 'n1', 'n2', {foo: 10})),
+            switchMap(graph => graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {foo: 10}))),
             tap(({graph}) => setTimeout(() =>
-                graphPutEdge(graph, 'e1', 'friend', 'n1', 'n2', {foo: 11}).subscribe()
+                graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {foo: 11})).subscribe()
             , 100)),
             switchMap(({graph}) => graphGetEdge(graph, 'e1')),
             skipWhile(({edge}) => edge.props.foo !== 11),
@@ -216,11 +216,11 @@ describe('graph', () => {
     it('should update a graphGetRelationships() when a relationship is added', () =>
         firstValueFrom(getAGraph().pipe(
                 tap(graph => {
-                    graphPutEdge(graph, 'e1', 'friend', 'n1', 'n2', {}).subscribe();
-                    graphPutEdge(graph, 'e2', 'friend', 'n1', 'n3', {}).subscribe();
+                    graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {})).subscribe();
+                    graphPutEdge(graph, newGraphEdge('e2', 'friend', 'n1', 'n3', {})).subscribe();
 
                 }),
-                tap(graph => setTimeout(() => graphPutEdge(graph, 'e3', 'friend', 'n1', 'n4', {}).subscribe())),
+                tap(graph => setTimeout(() => graphPutEdge(graph, newGraphEdge('e3', 'friend', 'n1', 'n4', {})).subscribe())),
                 switchMap(graph => graphGetRelationships(graph, 'n1', 'friend')),
                 skipWhile(({relationships}) => relationships.length < 3),
             )
@@ -229,10 +229,10 @@ describe('graph', () => {
     it('should be able to get all relationships', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
-                graphPutEdge(graph, 'e1', 'friend', 'n1', 'n2', {}),
-                graphPutEdge(graph, 'e4', 'friend', 'n2', 'n1', {}),
-                graphPutEdge(graph, 'e2', 'friend', 'n1', 'n3', {}),
-                graphPutEdge(graph, 'e3', 'owns', 'n1', 'n4', {})
+                graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {})),
+                graphPutEdge(graph, newGraphEdge('e4', 'friend', 'n2', 'n1', {})),
+                graphPutEdge(graph, newGraphEdge('e2', 'friend', 'n1', 'n3', {})),
+                graphPutEdge(graph, newGraphEdge('e3', 'owns', 'n1', 'n4', {}))
             ])),
             switchMap(([{graph}]) => graphGetRelationships(graph, 'n1', '*')),
             skipWhile(({relationships}) => relationships.length < 3),

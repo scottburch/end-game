@@ -1,5 +1,5 @@
 import type {Graph, GraphHandler, Props} from '@end-game/graph'
-import {graphPutEdge} from "@end-game/graph";
+import {graphPutEdge, newGraphEdge} from "@end-game/graph";
 import {first, map, of, switchMap, tap} from "rxjs";
 import {insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "@end-game/rxjs-chain";
 import type {GraphWithAuth, NodeWithSig} from "./auth-utils.js";
@@ -47,7 +47,7 @@ const authPutPostHandler: GraphHandler<'putNode'> = ({graph, node}) => {
     }
     return of((graph as GraphWithAuth).user?.nodeId).pipe(
         switchMap(nodeId => nodeId ? (
-            graphPutEdge(graph, '', 'owned_by', node.nodeId, nodeId, {})
+            graphPutEdge(graph, newGraphEdge('', 'owned_by', node.nodeId, nodeId, {}))
         ) : of(undefined)),
         map(() => ({graph, node}))
     )

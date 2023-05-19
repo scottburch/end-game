@@ -1,6 +1,6 @@
-import {catchError, delay, first, firstValueFrom, of, switchMap, tap} from "rxjs";
+import {catchError, first, firstValueFrom, of, switchMap, tap} from "rxjs";
 import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
-import {graphGet, graphPutNode, graphPutEdge} from "@end-game/graph";
+import {graphGet, graphPutNode, graphPutEdge, newGraphEdge} from "@end-game/graph";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
 import {newGraphNode} from "@end-game/graph";
@@ -54,7 +54,7 @@ describe('auth handlers', function()  {
 
     it('should not allow you to add an edge if you are not logged in', (done) => {
         firstValueFrom(graphWithAuth().pipe(
-            switchMap(graph => graphPutEdge(graph, 'my-edge', 'rel', 'from', 'to', {})),
+            switchMap(graph => graphPutEdge(graph, newGraphEdge('my-edge', 'rel', 'from', 'to', {}))),
             catchError(err => of(err.code).pipe(
                 tap(err => err === 'NOT_LOGGED_IN' ? done() : done(`wrong error thrown: ${err}`))
             ))

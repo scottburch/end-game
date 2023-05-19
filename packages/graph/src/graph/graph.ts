@@ -1,4 +1,4 @@
-import {filter, map, mergeMap, Observable, of, switchMap, tap} from "rxjs";
+import {filter, map, mergeMap, Observable, of, tap} from "rxjs";
 import {newUid} from "../utils/uid.js";
 
 import type {DeepPartial} from "tsdef";
@@ -85,9 +85,12 @@ export const graphPutNode = <T extends Props>(graph: Graph, node: GraphNode<T>) 
         map(({node}) => ({graph, nodeId: node.nodeId})),
     );
 
-export const graphPutEdge = <T extends Props>(graph: Graph, edgeId: string, rel: string, from: NodeId, to: NodeId, props: T) =>
-    of({edgeId: edgeId || newUid(), rel, props, from, to} satisfies GraphEdge<T>).pipe(
-        switchMap(edge => chainNext(graph.chains.putEdge, {graph, edge})),
+export const newGraphEdge = <T extends Props>(edgeId: string, rel: string, from: NodeId, to: NodeId, props: T) => ({
+    edgeId: edgeId || newUid(), rel, props, from, to} satisfies GraphEdge<T>
+)
+
+export const graphPutEdge = <T extends Props>(graph: Graph, edge: GraphEdge<T>) =>
+    chainNext(graph.chains.putEdge, {graph, edge}).pipe(
         map(({edge}) => ({graph, edge}))
     );
 
