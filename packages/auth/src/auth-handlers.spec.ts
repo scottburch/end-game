@@ -60,15 +60,4 @@ describe('auth handlers', function()  {
         ))
     })
 
-    it('should not allow you to add a edge "from" a node you do not own', (done) => {
-        firstValueFrom(graphWithUser().pipe(
-            switchMap(graph => graphPut(graph, 'item', 'person', {})),
-            switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
-            switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
-            switchMap(({graph}) => graphPutEdge(graph, 'edge1', 'friend', 'item', 'some', {})),
-            catchError(err => of(err.code).pipe(
-                tap(err => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
-            ))
-        ))
-    });
 });

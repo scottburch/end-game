@@ -1,8 +1,9 @@
-import {delay, firstValueFrom, switchMap, tap, timer} from "rxjs";
+import {catchError, delay, firstValueFrom, of, switchMap, tap, timer} from "rxjs";
 import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
 import {doesAuthNodeExist, findAuthNode} from "./auth-utils.js";
 import {expect} from "chai";
-import {graphNewAuth} from "./user-auth.js";
+import {graphAuth, graphNewAuth} from "./user-auth.js";
+import {graphPut, graphPutEdge} from "@end-game/graph";
 
 describe('auth utils', () => {
 
@@ -62,6 +63,34 @@ describe('auth utils', () => {
                 switchMap(graph => findAuthNode(graph, 'scott')),
                 tap(({node}) => expect(node.nodeId).to.have.length(12))
             ))
-        )
+        );
+    });
+
+    describe('isUserAuthedToWriteEdge()', () => {
+        it('should not allow you to add a edge "from" a node you do not own', (done) => {
+            firstValueFrom(graphWithUser().pipe(
+                switchMap(graph => graphPut(graph, 'item', 'person', {})),
+                switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
+                switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
+                switchMap(({graph}) => graphPutEdge(graph, 'edge1', 'friend', 'item', 'some', {})),
+                catchError(err => of(err.code).pipe(
+                    tap(err => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
+                ))
+            ))
+        });
+
+        it('should not allow you to add a edge "from" a node you do not own (with delay)', (done) => {
+            firstValueFrom(graphWithUser().pipe(
+                tap(graph => timer(1).pipe(
+                    switchMap(() => graphPut(graph, 'item', 'person', {}))
+                ).subscribe()),
+                switchMap(graph => graphNewAuth(graph, 'todd', 'pass')),
+                switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
+                switchMap(({graph}) => graphPutEdge(graph, 'edge1', 'friend', 'item', 'some', {})),
+                catchError(err => of(err.code).pipe(
+                    tap(err => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
+                ))
+            ))
+        });
     });
 });
