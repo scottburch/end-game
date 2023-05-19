@@ -17,6 +17,7 @@ import {createContext, useContext, useEffect, useState} from "react";
 import {catchError, of, switchMap, tap, throwError} from "rxjs";
 import type {GraphWithAuth} from '@end-game/auth'
 import {authHandlers, graphAuth, graphNewAuth} from "@end-game/auth";
+import {newGraphNode} from "@end-game/graph";
 
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);
@@ -125,7 +126,7 @@ export const useGraphPut = <T extends Props>() => {
     const graph: Graph = useGraph();
 
     return (label: string, nodeId: NodeId, props: T) => {
-        return graphPutNode(graph, nodeId, label, props);
+        return graphPutNode(graph, newGraphNode(nodeId, label, props));
     }
 };
 

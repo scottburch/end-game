@@ -4,6 +4,7 @@ import {combineLatest, filter, firstValueFrom, of, switchMap, tap} from "rxjs";
 import {cloudClientHandlers} from "./cloudClient.js";
 import {authHandlers, graphAuth, graphNewAuth} from "@end-game/auth";
 import {expect} from "chai";
+import {newGraphNode} from "@end-game/graph/lib/graph/graph.js";
 
 describe('cloud', () => {
     it('should send puts to the server', () =>
@@ -27,7 +28,7 @@ describe('cloud', () => {
             switchMap(([server, client1, client2]) => of({server, client1, client2}).pipe(
                 switchMap(() => graphNewAuth(client1, 'scott', 'pass')),
                 switchMap(() => graphAuth(client1, 'scott', 'pass')),
-                switchMap(() => graphPutNode(client1, 'me', 'person', {name:'scott'})),
+                switchMap(() => graphPutNode(client1, newGraphNode('me', 'person', {name:'scott'}))),
 
                 switchMap(() => nodesByLabel(client1, 'auth')),
                 filter(({nodes}) => !!nodes.length),

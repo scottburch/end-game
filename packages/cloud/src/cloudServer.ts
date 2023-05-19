@@ -5,6 +5,7 @@ import {insertHandlerAfter} from "@end-game/rxjs-chain";
 import type {GraphHandler} from "@end-game/graph";
 import {deserializer} from "@end-game/utils/serializer";
 import {graphPutNode} from "@end-game/graph";
+import {newGraphNode} from "@end-game/graph/lib/graph/graph.js";
 
 
 export type CloudServerOpts = {
@@ -46,7 +47,7 @@ const listener = (graph: Graph, conn: WS.WebSocket) =>
     );
 
 const fns: Record<string, (graph: Graph, data: any) => Observable<any>> = {
-    put: (graph, data: GraphNode<Props>) => graphPutNode(graph, data.nodeId, data.label, data.props)
+    put: (graph, data: GraphNode<Props>) => graphPutNode(graph, newGraphNode(data.nodeId, data.label, data.props))
 }
 
 
