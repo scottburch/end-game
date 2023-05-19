@@ -14,7 +14,7 @@
     "./reactTestUtils": "./lib/test/reactTestUtils.jsx"
   },
   "dependencies": {
-    "@end-game/auth": "*",
+    "@end-game/pwd-auth": "*",
     "@end-game/graph": "^1.0.27",
     "@end-game/utils": "^1.0.27",
     "@types/chai": "^4.3.4",

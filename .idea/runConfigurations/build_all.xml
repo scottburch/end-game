@@ -10,8 +10,6 @@
     <option name="scriptName" value="$PROJECT_DIR$/scripts/build-all.ts" />
     <option name="programParameters" value="" />
     <option name="tsnodePackage" value="~/work/end-game/node_modules/ts-node" />
-    <method v="2">
-      <option name="Make" enabled="true" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>

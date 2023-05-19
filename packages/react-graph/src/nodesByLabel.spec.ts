@@ -14,14 +14,14 @@ describe("nodesByLabel()", () => {
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => combineLatest([
-                page.textContent('#node-0'),
-                page.textContent('#node-1'),
-                page.textContent('#node-2'),
+                page.textContent('#thing4'),
+                page.textContent('#thing5'),
+                page.textContent('#thing6'),
             ])),
             tap(([s1, s2, s3]) => {
-                expect(s1).to.equal('scott0')
-                expect(s2).to.equal('scott1')
-                expect(s3).to.equal('scott2')
+                expect(s1).to.equal('thing4')
+                expect(s2).to.equal('thing5')
+                expect(s3).to.equal('thing6')
             })
         ))
     )

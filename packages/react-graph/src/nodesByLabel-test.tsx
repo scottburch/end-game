@@ -1,12 +1,12 @@
 import React, {useEffect, useRef} from "react";
 import {useGraphLogin, useGraphNodesByLabel, useGraphPut, useNewAccount} from "./react-graph.jsx";
 import {renderApp, Username} from "./test/reactTestUtils.jsx";
-import {switchMap} from "rxjs";
+import {switchMap, tap} from "rxjs";
 
 let accountCreated = false;
 
 renderApp(() => {
-    const nodes = useGraphNodesByLabel('person');
+    const nodes = useGraphNodesByLabel('thing');
     const graphPut = useGraphPut();
     const newAccount = useNewAccount();
     const login = useGraphLogin();
@@ -14,24 +14,27 @@ renderApp(() => {
 
     useEffect(() => {
         accountCreated || newAccount('scott', 'pass').pipe(
-            switchMap(() => login('scott', 'pass'))
+            switchMap(() => login('scott', 'pass')),
+            tap(() => graphPut('thing', 'thing1', {name: 'thing1'}).subscribe()),
+            tap(() => graphPut('thing', 'thing2', {name: 'thing2'}).subscribe()),
+            tap(() => graphPut('thing', 'thing3', {name: 'thing3'}).subscribe()),
         ).subscribe();
         accountCreated = true;
     }, [])
 
 
-    const count = useRef(0);
+    const count = useRef(4);
 
-    const addPerson = () => {
-        graphPut('person', count.current.toString(), {name: 'scott' + count.current}).subscribe();
+    const addThing = () => {
+        graphPut('thing', `thing${count.current}`, {name: 'thing' + count.current}).subscribe();
         count.current = count.current + 1;
     }
 
     return (
         <>
             <Username/>
-            <button id="count" onClick={addPerson}/>
-            {nodes.map((node, idx) => <div key={node.nodeId} id={`node-${idx}`}>{node.props.name}</div>)}
+            <button id="count" onClick={addThing}/>
+            {nodes.map((node) => <div key={node.nodeId} id={node.nodeId}>{node.props.name}</div>)}
         </>
     )
 });

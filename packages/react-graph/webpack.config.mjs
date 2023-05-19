@@ -1,47 +1,10 @@
-import {absPath} from "@end-game/utils/absPath";
+import {webpackBase} from "../webpack.config.base.mjs";
 
-export default {
-    experiments: {
-        outputModule: true
-    },
-    target: 'es2020',
-    mode: 'development',
-    externals: [
-        // Don't add externally loaded modules in output bundle
-        ({context, request, dependencyType, contextInfo}, cb) =>
-            request.startsWith('.') ? cb() : cb(null, `module ${request}`)
-    ],
+export default webpackBase(import.meta.url, {
     entry: {
         'index': './src/index.ts',
         'reactTestUtils': './src/test/reactTestUtils.tsx'
-    },
-    output: {
-        path: absPath(import.meta.url,'lib'),
-        filename: pathInfo => {
-            return pathInfo.chunk.name === 'index' ? 'index.js' : './test/reactTestUtils.jsx'
-        },
-      libraryTarget: 'module',
-    },
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: {
-                    loader: 'ts-loader',
-                    options: {
-                        onlyCompileBundledFiles: true
-                    }
-                },
-                exclude: /node_modules/,
-            }
-        ],
+    }
+});
 
-    },
-    resolve: {
-        extensions: ['.tsx', '.ts', '.js', '.jsx'],
-        extensionAlias: {
-            '.jsx': ['.tsx', '.jsx'],
-            '.js': ['.ts', '.js']
-        },
-    },
-};
+

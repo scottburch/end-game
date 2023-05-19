@@ -4,13 +4,11 @@
   "license": "MIT",
   "type": "module",
   "private": false,
-  "main": "./lib/index-browser.js",
+  "main": "./lib/index.js",
   "exports": {
     ".": {
-      "node": "./lib/index.js",
-      "default": "./lib/index-browser.js"
-    },
-    "./testUtils": "./lib/test/testUtils.js"
+      "default": "./lib/index.js"
+    }
   },
   "dependencies": {
     "@end-game/rxjs-chain": "^1.0.27",

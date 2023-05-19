@@ -4,19 +4,20 @@ import {
     graphGetEdge,
     graphGetRelationships,
     graphOpen,
-    graphPut,
+    graphPutNode,
     graphPutEdge,
-    levelStoreHandlers,
     newUid,
     nodesByLabel,
-    nodesByProp,
+    nodesByProp, newGraphEdge,
 } from "@end-game/graph";
 import type {PropsWithChildren} from 'react';
 import * as React from "react";
 import {createContext, useContext, useEffect, useState} from "react";
 import {catchError, of, switchMap, tap, throwError} from "rxjs";
-import type {GraphWithAuth} from '@end-game/auth'
-import {authHandlers, graphAuth, graphNewAuth} from "@end-game/auth";
+import type {GraphWithAuth} from '@end-game/pwd-auth'
+import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
+import {newGraphNode} from "@end-game/graph";
+import {levelStoreHandlers} from "@end-game/level-store";
 
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);
@@ -125,7 +126,7 @@ export const useGraphPut = <T extends Props>() => {
     const graph: Graph = useGraph();
 
     return (label: string, nodeId: NodeId, props: T) => {
-        return graphPut(graph, nodeId, label, props);
+        return graphPutNode(graph, newGraphNode(nodeId, label, props));
     }
 };
 
@@ -151,7 +152,7 @@ export const useGraphPutEdge = <T extends Props>() => {
     const graph: Graph = useGraph();
 
     return (rel: string, edgeId: EdgeId, from: NodeId, to: NodeId, props: T) => {
-        return graphPutEdge(graph, edgeId, rel, from, to, props).pipe(
+        return graphPutEdge(graph, newGraphEdge(edgeId, rel, from, to, props)).pipe(
             catchError(err => throwError(err.code || err))
         );
     }

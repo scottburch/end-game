@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {useAuth, useGraphLogin, useGraphPutEdge, useGraphRelationships, useNewAccount} from "./react-graph.jsx";
+import {useGraphLogin, useGraphPutEdge, useGraphRelationships, useNewAccount} from "./react-graph.jsx";
 import {renderApp, Username} from "./test/reactTestUtils.jsx";
-import {switchMap, tap} from "rxjs";
+import {switchMap} from "rxjs";
 
 let accountCreated = false;
 
