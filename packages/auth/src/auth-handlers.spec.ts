@@ -7,7 +7,7 @@ import {graphAuth, graphNewAuth} from "./user-auth.js";
 describe('auth handlers', function()  {
     this.timeout(60_000)
 
-    it('should require an auth to put a value', (done) =>
+    it('should fail to put a value if no auth', (done) =>
         firstValueFrom(graphWithAuth().pipe(
             switchMap(graph => graphPut(graph, 'scott', 'person', {name: 'scott'})),
             catchError(err => of(err.code).pipe(
