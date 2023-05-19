@@ -5,6 +5,7 @@ import type {GraphWithAuth} from './auth-utils.js'
 import {expect} from 'chai'
 import {graphWithAuth} from "./test/testUtils.js";
 import {graphAuth, graphNewAuth, graphUnauth} from "./user-auth.js";
+import {doesAuthNodeExist} from "./auth-utils.js";
 
 
 
@@ -64,4 +65,15 @@ describe('graph auth', () => {
              switchMap(({graph}) => graphAuth(graph, 'scott', 'pass'))
          ))
     });
+
+    it('should allow multiple users to be added', () =>
+        firstValueFrom(graphWithAuth().pipe(
+            switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
+            switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
+            switchMap(({graph}) => doesAuthNodeExist(graph, 'scott')),
+            tap(({exists}) => expect(exists).to.be.true),
+            switchMap(({graph}) => doesAuthNodeExist(graph, 'todd')),
+            tap(({exists}) => expect(exists).to.be.true)
+        ))
+    )
 });

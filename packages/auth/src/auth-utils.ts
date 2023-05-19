@@ -37,7 +37,8 @@ export const findAuthNode = (graph: Graph, username: string) =>
         map(({nodes}) => nodes[0]),
         filter(node => !!node),
         map(node => ({graph, node: node as GraphNode<EncryptedKeyBundle>})),
-        timeout({first: 1000, with: () => of({graph, node: {} as GraphNode<EncryptedKeyBundle> })})
+        timeout({first: 1000, with: () => of({graph, node: {} as GraphNode<EncryptedKeyBundle> })}),
+        first()
     );
 
 export const isUserAuthedToWriteEdge = (graph: Graph, edge: GraphEdge<Props>) =>

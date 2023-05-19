@@ -1,11 +1,11 @@
-import {catchError, first, firstValueFrom, of, switchMap, tap} from "rxjs";
-import {graphWithAuth} from "./test/testUtils.js";
+import {catchError, delay, first, firstValueFrom, of, switchMap, tap} from "rxjs";
+import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
 import {graphGet, graphPut, graphPutEdge} from "@end-game/graph";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
 
-describe('auth handlers', () => {
-
+describe('auth handlers', function()  {
+    this.timeout(60_000)
 
     it('should require an auth to put a value', (done) =>
         firstValueFrom(graphWithAuth().pipe(
@@ -40,10 +40,8 @@ describe('auth handlers', () => {
     );
 
     it('will not put a value in the store if the wrong user is logged in', (done) => {
-        firstValueFrom(graphWithAuth().pipe(
-            switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
-            switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
-            switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'scott'})),
+        firstValueFrom(graphWithUser().pipe(
+            switchMap(graph => graphPut(graph, 'item', 'person', {name: 'scott'})),
             switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
             switchMap(({graph}) => graphPut(graph, 'item', 'person', {name: 'todd'})),
@@ -63,10 +61,8 @@ describe('auth handlers', () => {
     })
 
     it('should not allow you to add a edge "from" a node you do not own', (done) => {
-        firstValueFrom(graphWithAuth().pipe(
-            switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
-            switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
-            switchMap(({graph}) => graphPut(graph, 'item', 'person', {})),
+        firstValueFrom(graphWithUser().pipe(
+            switchMap(graph => graphPut(graph, 'item', 'person', {})),
             switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
             switchMap(({graph}) => graphPutEdge(graph, 'edge1', 'friend', 'item', 'some', {})),

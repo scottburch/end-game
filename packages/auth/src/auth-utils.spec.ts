@@ -22,7 +22,7 @@ describe('auth utils', () => {
             ))
         );
 
-        it('should work if the node is added later', () =>
+        it('should work if the node is loaded remotely', () =>
             firstValueFrom(graphWithAuth().pipe(
                 tap(graph => timer(1).pipe(
                     switchMap(() => graphNewAuth(graph, 'scott', 'pass'))
@@ -49,6 +49,19 @@ describe('auth utils', () => {
                 switchMap(graph => findAuthNode(graph, 'scott')),
                 tap(({node}) => expect(node.nodeId).to.have.length(12))
             ))
-        })
+        });
+
+        it('should work if the node is loaded remotely', () =>
+            firstValueFrom(graphWithAuth().pipe(
+                tap(graph => timer(1).pipe(
+                    switchMap(() => graphNewAuth(graph, 'scott', 'pass'))
+                ).subscribe()),
+                // this delay is here to give the graphNewAuth time to complete since it will delay 1 sec also
+                // which causes the dosAuthNodeExist() to fail
+                delay(500),
+                switchMap(graph => findAuthNode(graph, 'scott')),
+                tap(({node}) => expect(node.nodeId).to.have.length(12))
+            ))
+        )
     });
 });

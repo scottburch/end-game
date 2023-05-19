@@ -2,7 +2,7 @@ import type {Graph} from "@end-game/graph";
 import {graphPut} from "@end-game/graph";
 import type {EncryptedKeyBundle} from "@end-game/crypto";
 import {deserializeKeys, generateNewAccount, serializeKeys} from "@end-game/crypto";
-import {catchError, filter, iif, map, of, switchMap, tap, throwError, timeout} from "rxjs";
+import {catchError, iif, map, of, switchMap, tap, throwError} from "rxjs";
 import type {GraphWithAuth} from "./auth-utils.js";
 import {findAuthNode} from "./auth-utils.js";
 import {chainNext} from "@end-game/rxjs-chain";
