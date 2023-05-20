@@ -1,10 +1,14 @@
-import {catchError, delay, firstValueFrom, of, switchMap, tap, timer} from "rxjs";
+import {catchError, delay, firstValueFrom, map, of, switchMap, tap, timer} from "rxjs";
 import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
-import {doesAuthNodeExist, findAuthNode} from "./auth-utils.js";
+import type {AuthNode, NodeWithSig} from './auth-utils.js'
+import {doesAuthNodeExist, findAuthNode, graphGetOwnerNode} from "./auth-utils.js";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
-import {graphPutNode, graphPutEdge, newGraphEdge} from "@end-game/graph";
+import type {Props} from '@end-game/graph'
+import {graphPutNode, graphPutEdge, newGraphEdge, graphGet, graphOpen, levelStoreHandlers} from "@end-game/graph";
 import {newGraphNode} from "@end-game/graph";
+import {authHandlers} from "./auth-handlers.js";
+
 
 describe('auth utils', () => {
 
@@ -94,4 +98,57 @@ describe('auth utils', () => {
             ))
         });
     });
+
+    describe('getNodeOwner()', () => {
+        it('it should return the auth owner node for a given node', () =>
+            firstValueFrom(graphWithUser().pipe(
+                switchMap(graph => graphPutNode(graph, newGraphNode('item', 'person', {}))),
+                switchMap(({graph, nodeId}) => graphGetOwnerNode(graph, nodeId)),
+                tap(({node}) => {
+                    expect(node.nodeId).to.have.length(12);
+                    expect(node.props.pub).to.not.be.empty;
+                })
+            ))
+        );
+
+        it('should be able to tolerate a delay', () =>
+            firstValueFrom(graphWithUser().pipe(
+                tap(graph => timer(1).pipe(
+                    switchMap(() => graphPutNode(graph, newGraphNode('item', 'person', {}))),
+                ).subscribe()),
+                delay(100),
+                switchMap(graph => graphGetOwnerNode(graph, 'item')),
+                tap(({node}) => {
+                    expect(node.nodeId).to.have.length(12);
+                    expect(node.props.pub).to.not.be.empty;
+                })
+            ))
+        );
+
+        it('should fail if the signature does not match pubKey', (done) => {
+            firstValueFrom(graphOpen().pipe(
+                switchMap(graph => levelStoreHandlers(graph)),
+                switchMap(graph =>
+                    graphPutNode(graph, {
+                        ...newGraphNode('item', 'person', {}),
+                        sig: new Uint8Array(Array(64))
+                    } as NodeWithSig<Props> satisfies NodeWithSig<Props>)
+                ),
+                switchMap(({graph}) => graphPutNode(graph, {
+                    ...newGraphNode<AuthNode['props']>('scott', 'auth', {
+                        pub: '',
+                        enc: '',
+                        priv: '',
+                        salt: ''
+                    })
+                })),
+                switchMap(({graph}) =>
+                    graphPutEdge(graph, newGraphEdge('', 'owned_by', 'item', 'scott', {}))
+                ),
+                switchMap(({graph}) => authHandlers(graph)),
+                switchMap(graph => graphGetOwnerNode(graph, 'item')),
+                catchError(err => err.code === 'UNAUTHORIZED_USER' ? of(done()) : of(done('wrong error thrown: ' + err))),
+            ))
+        });
+    })
 });
