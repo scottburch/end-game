@@ -90,7 +90,7 @@ export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
         switchMap(authNodeId => graphGet(graph, authNodeId).pipe(
             filter(({node}) => !!node?.nodeId)
         )),
-        timeout({first: 1000, with: () => of({graph, nodeId: '', node: {} as AuthNode})}),
+        timeout({first: 2000, with: () => of({graph, nodeId: '', node: {} as AuthNode})}),
     );
 
 export const verifyNodeSigWithAuthNode = <T extends Props>(node: NodeWithSig<T>, authNode: AuthNode) =>

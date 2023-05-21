@@ -33,7 +33,6 @@ describe('auth handlers', function()  {
             tap(graph =>
                 graphPutEdge(graph, newGraphEdge('person-scott', 'owned_by', 'person', 'scott', {})).subscribe()
             ),
-            delay(1000),
             tap(graph =>
                 graphPutNode(graph, {
                     ...newGraphNode('person', 'person', {}),

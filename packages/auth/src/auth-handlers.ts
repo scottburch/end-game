@@ -1,6 +1,6 @@
 import type {Graph, GraphHandler, Props} from '@end-game/graph'
-import {graphGet, graphPutEdge, newGraphEdge} from "@end-game/graph";
-import {combineLatestWith, first, map, of, switchMap, tap} from "rxjs";
+import {graphPutEdge, newGraphEdge} from "@end-game/graph";
+import {first, map, of, switchMap, tap} from "rxjs";
 import {insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "@end-game/rxjs-chain";
 import type {AuthNode, GraphWithAuth, NodeWithSig} from "./auth-utils.js";
 import {
@@ -8,10 +8,11 @@ import {
     graphGetOwnerNode,
     isUserAuthedToWriteEdge,
     isUserLoggedIn,
-    signGraphNode, verifyNodeSigWithAuthNode
+    isUserNodeOwner,
+    signGraphNode,
+    verifyNodeSigWithAuthNode
 } from "./auth-utils.js";
 import {notLoggedInError, unauthorizedUserError, userAlreadyExistsError} from "./auth-errors.js";
-import {isUserNodeOwner} from "./auth-utils.js";
 
 
 export const authHandlers = (graph: Graph) => of(graph).pipe(
