@@ -49,10 +49,7 @@ const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
 };
 
 const authPutEdgeAnteHandler: GraphHandler<'putEdge'> = ({graph, edge}) => {
-    return of({graph, edge});
-    // HACK: Temporary until I fix everything else, need to handle remotly adding here
-    (isUserLoggedIn(graph as GraphWithAuth) ? of({graph, edge}) : notLoggedInError()).pipe(
-        switchMap(() => isUserAuthedToWriteEdge(graph, edge)),
+    return isUserAuthedToWriteEdge(graph, edge).pipe(
         switchMap(authed => authed ? of({graph, edge}) : unauthorizedUserError('unknown'))
     );
 }

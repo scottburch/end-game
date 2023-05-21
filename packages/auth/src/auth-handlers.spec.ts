@@ -78,15 +78,4 @@ describe('auth handlers', function()  {
             ))
         ))
     });
-
-    it.skip('should not allow you to add an edge if you are not logged in', (done) => {
-        // TODO: I removed the auth edge handler until I get the put handler working
-        firstValueFrom(graphWithAuth().pipe(
-            switchMap(graph => graphPutEdge(graph, newGraphEdge('my-edge', 'rel', 'from', 'to', {}))),
-            catchError(err => of(err.code).pipe(
-                tap(err => err === 'NOT_LOGGED_IN' ? done() : done(`wrong error thrown: ${err}`))
-            ))
-        ))
-    })
-
 });

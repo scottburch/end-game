@@ -68,8 +68,7 @@ describe('auth utils', () => {
     });
 
     describe('isUserAuthedToWriteEdge()', () => {
-        // TODO: I removed the auth edge handler until I get the put handler working
-        it.skip('should not allow you to add a edge "from" a node you do not own', (done) => {
+        it('should not allow you to add a edge "from" a node you do not own', (done) => {
             firstValueFrom(graphWithUser().pipe(
                 switchMap(graph => graphPutNode(graph, newGraphNode('item', 'person', {}))),
                 switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
@@ -81,8 +80,7 @@ describe('auth utils', () => {
             ))
         });
 
-        it.skip('should not allow you to add a edge "from" a node you do not own (with delay)', (done) => {
-            // TODO: I removed the auth edge handler until I get the put handler working
+        it('should not allow you to add a edge "from" a node you do not own (with delay)', (done) => {
             firstValueFrom(graphWithUser().pipe(
                 tap(graph => timer(1).pipe(
                     switchMap(() => graphPutNode(graph, newGraphNode('item', 'person', {})))
