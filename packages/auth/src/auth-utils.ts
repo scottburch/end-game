@@ -91,11 +91,7 @@ export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
         combineLatestWith(graphGet(graph, nodeId).pipe(filter(({node}) => !!node?.nodeId))),
         first(),
         switchMap(([{graph, node: authNode}, {node}]) =>
-            combineLatest([
-                getNodeSignData(node),
-                deserializePubKey(authNode.props.pub)
-            ]).pipe(
-                switchMap(([data, pubKey]) => verify(data, (node as NodeWithSig<Props>).sig, pubKey)),
+            verifyNodeWithAuthNode(node as NodeWithSig<Props>, authNode as AuthNode).pipe(
                 catchError(() =>
                     unauthorizedUserError(authNode.props.username)
                 ),
@@ -104,6 +100,17 @@ export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
         ),
         timeout({first: 1000, with: () => of({graph, nodeId: '', node: {} as AuthNode})})
     );
+
+const verifyNodeWithAuthNode = <T extends Props>(node: NodeWithSig<T>, authNode: AuthNode) =>
+    combineLatest([
+        getNodeSignData(node),
+        deserializePubKey(authNode.props.pub)
+    ]).pipe(
+        switchMap(([data, pubKey]) => verify(data, (node as NodeWithSig<Props>).sig, pubKey)),
+        map(() => ({node, authNode}))
+    );
+
+
 
 
 
