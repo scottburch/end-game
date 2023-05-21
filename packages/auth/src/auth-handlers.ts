@@ -1,14 +1,17 @@
 import type {Graph, GraphHandler, Props} from '@end-game/graph'
-import {graphPutEdge, newGraphEdge} from "@end-game/graph";
-import {first, map, of, switchMap, tap} from "rxjs";
+import {graphGet, graphPutEdge, newGraphEdge} from "@end-game/graph";
+import {combineLatestWith, first, map, of, switchMap, tap} from "rxjs";
 import {insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "@end-game/rxjs-chain";
-import type {GraphWithAuth, NodeWithSig} from "./auth-utils.js";
-import {doesAuthNodeExist, isUserAuthedToWriteEdge, isUserLoggedIn, signGraphNode} from "./auth-utils.js";
+import type {AuthNode, GraphWithAuth, NodeWithSig} from "./auth-utils.js";
+import {
+    doesAuthNodeExist,
+    graphGetOwnerNode,
+    isUserAuthedToWriteEdge,
+    isUserLoggedIn,
+    signGraphNode, verifyNodeSigWithAuthNode
+} from "./auth-utils.js";
 import {notLoggedInError, unauthorizedUserError, userAlreadyExistsError} from "./auth-errors.js";
 import {isUserNodeOwner} from "./auth-utils.js";
-
-
-
 
 
 export const authHandlers = (graph: Graph) => of(graph).pipe(
@@ -20,13 +23,22 @@ export const authHandlers = (graph: Graph) => of(graph).pipe(
 );
 
 const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
-    if(node.label === 'auth') {
+    if (node.label === 'auth') {
         return doesAuthNodeExist(graph, node.props.username).pipe(
             first(),
             switchMap(({exists}) => exists ? userAlreadyExistsError(node.props.username) : of({graph, node})),
         )
     }
 
+    // verify signature if the node has one
+    if (!!(node as NodeWithSig<Props>).sig) {
+        return graphGetOwnerNode(graph, node.nodeId).pipe(
+            switchMap(({node: authNode}) =>
+                verifyNodeSigWithAuthNode(node as NodeWithSig<Props>, authNode as AuthNode)
+            ),
+            map(() => ({graph, node}))
+        )
+    }
 
 
     return (isUserLoggedIn(graph as GraphWithAuth) ? of({graph, node}) : notLoggedInError()).pipe(
@@ -35,14 +47,17 @@ const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
     )
 };
 
-const authPutEdgeAnteHandler: GraphHandler<'putEdge'> = ({graph, edge}) =>
+const authPutEdgeAnteHandler: GraphHandler<'putEdge'> = ({graph, edge}) => {
+    return of({graph, edge});
+    // HACK: Temporary until I fix everything else, need to handle remotly adding here
     (isUserLoggedIn(graph as GraphWithAuth) ? of({graph, edge}) : notLoggedInError()).pipe(
         switchMap(() => isUserAuthedToWriteEdge(graph, edge)),
         switchMap(authed => authed ? of({graph, edge}) : unauthorizedUserError('unknown'))
     );
+}
 
 const authPutPostHandler: GraphHandler<'putNode'> = ({graph, node}) => {
-    if(node.label === 'auth') {
+    if (node.label === 'auth') {
         return of({graph, node})
     }
     return of((graph as GraphWithAuth).user?.nodeId).pipe(

@@ -24,7 +24,7 @@ export type GraphWithAuth = Graph & {
     }
 };
 export type NodeWithSig<T extends Props> = GraphNode<T> & { sig: Uint8Array }
-export type AuthNode = GraphNode<EncryptedKeyBundle>;
+export type AuthNode = GraphNode<EncryptedKeyBundle & {username: string}>;
 
 
 export const doesAuthNodeExist = (graph: Graph, username: string) => {
@@ -87,27 +87,21 @@ export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
     graphGetRelationships(graph, nodeId, 'owned_by').pipe(
         filter(({relationships}) => !!relationships.length),
         map(({relationships}) => relationships[0].to),
-        switchMap(authNodeId => graphGet(graph, authNodeId).pipe(filter(({node}) => !!node.nodeId))),
-        combineLatestWith(graphGet(graph, nodeId).pipe(filter(({node}) => !!node?.nodeId))),
-        first(),
-        switchMap(([{graph, node: authNode}, {node}]) =>
-            verifyNodeWithAuthNode(node as NodeWithSig<Props>, authNode as AuthNode).pipe(
-                catchError(() =>
-                    unauthorizedUserError(authNode.props.username)
-                ),
-                map(() => ({graph, node: authNode, nodeId: authNode.nodeId}))
-            )
-        ),
-        timeout({first: 1000, with: () => of({graph, nodeId: '', node: {} as AuthNode})})
+        switchMap(authNodeId => graphGet(graph, authNodeId).pipe(
+            filter(({node}) => !!node?.nodeId)
+        )),
+        timeout({first: 1000, with: () => of({graph, nodeId: '', node: {} as AuthNode})}),
     );
 
-const verifyNodeWithAuthNode = <T extends Props>(node: NodeWithSig<T>, authNode: AuthNode) =>
+export const verifyNodeSigWithAuthNode = <T extends Props>(node: NodeWithSig<T>, authNode: AuthNode) =>
     combineLatest([
         getNodeSignData(node),
         deserializePubKey(authNode.props.pub)
     ]).pipe(
         switchMap(([data, pubKey]) => verify(data, (node as NodeWithSig<Props>).sig, pubKey)),
-        map(() => ({node, authNode}))
+        map(() => ({node, authNode})),
+        catchError(err => err.message === 'Invalid keyData' ? unauthorizedUserError(authNode.props.username) : of(err))
+
     );
 
 
