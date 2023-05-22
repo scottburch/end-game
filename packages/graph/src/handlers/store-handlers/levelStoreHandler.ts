@@ -1,5 +1,5 @@
 import {MemoryLevel} from "memory-level";
-import type {GraphHandler} from '@end-game/graph'
+import type {GraphEdge, GraphHandler} from '@end-game/graph'
 import {IndexTypes} from '../../graph/graph.js';
 import type {Graph, GraphNode, Props} from "../../graph/graph.js";
 import {
@@ -58,7 +58,7 @@ const storeIterator = (store: LevelStore, query: AbstractIteratorOptions<string,
 export const levelStoreGetNodeHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'getNode'> =>
     ({graph, nodeId}) => getStore(graph, handlerOpts).pipe(
         mergeMap(store => store.get([graph.graphId, nodeId].join('.'))),
-        map(json => ({graph, node: deserializer(json), nodeId})),
+        map(json => ({graph, node: deserializer<GraphNode<Props>>(json), nodeId})),
         catchError(err => err.notFound ? of({graph, nodeId}) : throwError(err))
     );
 
@@ -92,7 +92,7 @@ export const levelStorePutEdgeHandler = (handlerOpts: LevelHandlerOpts): GraphHa
 export const levelStoreGetEdgeHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'getEdge'> =>
     ({graph, edgeId}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => store.get([graph.graphId, edgeId].join('.'))),
-        map(json => deserializer(json)),
+        map(json => deserializer<GraphEdge<Props>>(json)),
         map(edge => ({graph, edgeId, edge}))
     );
 

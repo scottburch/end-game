@@ -35,7 +35,8 @@
     "require": "ts-node/register",
     "loader": "ts-node/esm",
     "experimental-specifier-resolution": "node",
-    "bail": true
+    "bail": true,
+    "async-only": true
   },
   "publishConfig": {
     "access": "public"

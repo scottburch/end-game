@@ -7,7 +7,7 @@ describe('seralizer', () => {
     it('should serialize an object with a Uint8Array', () =>
         firstValueFrom(of({num: 10, str: 'testing', bool: true, bytes: new Uint8Array([50, 100, 150, 200])}).pipe(
             map(serializer),
-            map(deserializer),
+            map(data => deserializer<any>(data)),
             tap(x => expect(x.bytes).to.deep.equal(new Uint8Array([50, 100, 150, 200])))
         ))
     )

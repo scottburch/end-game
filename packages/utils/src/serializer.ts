@@ -7,4 +7,4 @@ const deserReplacer = (k: string, v: any) =>
 
 export const serializer = (obj: any) => JSON.stringify(obj, serReplacer);
 
-export const deserializer = (str: string) => JSON.parse(str, deserReplacer);
+export const deserializer = <T>(str: string) => JSON.parse(str, deserReplacer) as T;
