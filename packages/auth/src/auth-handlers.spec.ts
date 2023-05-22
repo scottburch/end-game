@@ -78,4 +78,12 @@ describe('auth handlers', function()  {
             ))
         ))
     });
+
+    it('should send a signed object to storage', () =>
+        firstValueFrom(graphWithUser().pipe(
+            switchMap(graph => graphPutNode(graph, newGraphNode('item', 'person', {name: 'scott'}))),
+            switchMap(({graph}) => graphGet(graph, 'item')),
+            tap(({node}) => expect((node as NodeWithSig<Props>).sig).not.to.be.undefined)
+        ))
+    );
 });

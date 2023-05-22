@@ -6,6 +6,7 @@ export default {
     },
     target: 'es2020',
     mode: 'development',
+    devtool: 'source-map',
     externals: [
         // Don't include externally loaded modules in output bundle
         ({context, request, dependencyType, contextInfo}, cb) =>

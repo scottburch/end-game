@@ -1,18 +1,28 @@
+import type {Graph, GraphEdge, GraphNode, Props} from "@end-game/graph";
+import {graphPutEdge, graphPutNode} from "@end-game/graph";
 import {fromEvent, map, mergeMap, Observable, of, Subject, switchMap, tap} from "rxjs";
-import type {Graph, GraphEdge, GraphNode, NodeId, Props} from "@end-game/graph";
 import WS from "isomorphic-ws";
 import {deserializer, serializer} from "@end-game/utils/serializer";
-import {graphGet, graphPutEdge, graphPutNode} from "@end-game/graph";
-import type {ClientMsg, PutNodeClientMsg} from "./cloudClient.js";
+import type {RxjsChain} from "@end-game/rxjs-chain";
+import {newRxjsChain} from "@end-game/rxjs-chain";
 
-
-
-export type CloudServerOpts = {
-    port: number
+export type P2pOpts = {
+    listeningPort: number
 }
 
-export const cloudServerHandlers = (graph: Graph, opts: CloudServerOpts) => of(graph).pipe(
-    switchMap(graph => startServer(graph, opts.port))
+type GraphWithP2p = Graph & {
+    chains: Graph['chains'] & {
+        peerIn: RxjsChain<{ graph: Graph, msg: P2pMsg}>
+        peersOut: RxjsChain<{ graph: Graph, msg: P2pMsg}>
+    }
+}
+
+type P2pMsg<Cmd extends string = string, Data extends Object = Object> = {cmd: Cmd, data: Data};
+
+export const p2pHandlers = (graph: Graph, opts: P2pOpts) => of(graph).pipe(
+    tap(graph => (graph as GraphWithP2p).chains.peerIn = (graph as GraphWithP2p).chains.peerIn || newRxjsChain()),
+    tap(graph => (graph as GraphWithP2p).chains.peersOut = (graph as GraphWithP2p).chains.peersOut || newRxjsChain()),
+    switchMap(graph => startServer(graph, opts.listeningPort))
 );
 
 
@@ -38,7 +48,7 @@ export const startServer = (graph: Graph, port: number) => new Observable<Graph>
 });
 
 const listener = (graph: Graph, conn: WS.WebSocket) => {
-    const sub = new Subject<ClientMsg<string, any>>();
+    const sub = new Subject<P2pMsg<string, any>>();
 
     sub.pipe(
         map(msg => serializer(msg)),
@@ -47,20 +57,15 @@ const listener = (graph: Graph, conn: WS.WebSocket) => {
 
     return fromEvent<MessageEvent>(conn, 'message').pipe(
         map(ev => deserializer(ev.data)),
-        mergeMap(({cmd, data}) => fns[cmd](graph, data, sub)),
+        mergeMap(({cmd, data}) => fns[cmd](graph, data)),
     );
 }
 
-const fns: Record<string, (graph: Graph, data: any, client: Subject<ClientMsg<string, any>>) => Observable<any>> = {
+const fns: Record<string, (graph: Graph, data: any) => Observable<any>> = {
     putNode: (graph, data: GraphNode<Props>) =>
         graphPutNode(graph, data),
     putEdge: (graph: Graph, data: GraphEdge<Props>) =>
         graphPutEdge(graph, data),
-    getNode: (graph: Graph, data: NodeId, client) =>
-        graphGet(graph, data).pipe(
-            tap(({node}) => client.next({cmd: 'putNode', data:node} satisfies PutNodeClientMsg))
-        )
-
 }
 
 

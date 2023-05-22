@@ -60,7 +60,7 @@ describe('auth utils', () => {
                 ).subscribe()),
                 // this delay is here to give the graphNewAuth time to complete since it will delay 1 sec also
                 // which causes the dosAuthNodeExist() to fail
-                delay(500),
+                delay(700),
                 switchMap(graph => findAuthNode(graph, 'scott')),
                 tap(({node}) => expect(node.nodeId).to.have.length(12))
             ))
