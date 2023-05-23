@@ -1,14 +1,13 @@
-import {graphOpen} from "@end-game/graph";
-import {bufferCount, combineLatest, delay, firstValueFrom, map, mergeMap, of, range, switchMap, tap, timer} from "rxjs";
+import {GraphNode, graphOpen, graphPutNode, newGraphNode, Props} from "@end-game/graph";
+import {combineLatest, firstValueFrom, map, switchMap, tap, timer} from "rxjs";
 import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
-import {dialPeer} from "./dialer.js";
 
 describe('p2p handlers', () => {
     it('should setup peer chains', () =>
         firstValueFrom(graphOpen().pipe(
-            switchMap(graph => p2pHandlers(graph, {})),
+            switchMap(graph => p2pHandlers(graph, {peerId: 'test'})),
             map(graph => graph as GraphWithP2p),
             tap(graph => timer(1).pipe(
                 switchMap(() => chainNext(graph.chains.peerIn, {graph, msg: {peerId: '', cmd: 'peer-in', data: {}}})),
@@ -25,17 +24,18 @@ describe('p2p handlers', () => {
         )
     ));
 
-    it('should dial a peer', () =>
-        firstValueFrom(range(1, 2).pipe(
-            mergeMap(() => graphOpen()),
-            mergeMap((graph, idx) => p2pHandlers(graph, {listeningPort: 11110 + idx})),
-            bufferCount(2),
-            switchMap(([server, client]) => of({server, client}).pipe(
-                switchMap(() => dialPeer(client, {url: 'ws://localhost:11110'}))
-            )),
-            delay(1000),
-            tap(x => x)
-
+    it('should put a putNode onto the peersOut', () =>
+        firstValueFrom(graphOpen().pipe(
+            switchMap((graph, idx) => p2pHandlers(graph, {listeningPort: 11110 + idx, peerId: 'test'})),
+            tap(graph => timer(1).pipe(
+                switchMap(() => graphPutNode(graph, newGraphNode('node1', 'thing', {name: 'thing1'})))
+            ).subscribe()),
+            switchMap(graph => (graph as GraphWithP2p).chains.peersOut),
+            tap(({msg}) => {
+                expect(msg.peerId).to.equal('test');
+                expect(msg.cmd).to.equal('putNode');
+                expect((msg.data as GraphNode<Props>).label).to.equal('thing')
+            })
         ))
     )
 });
