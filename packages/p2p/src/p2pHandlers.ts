@@ -7,7 +7,7 @@ import {startServer} from "./server.js";
 
 export type P2pOpts = {
     listeningPort?: number,
-    peerId: string,
+    peerId?: string,
 }
 
 export type P2pMsg<Cmd extends string = string, Data extends Object = Object> = {
@@ -17,18 +17,22 @@ export type P2pMsg<Cmd extends string = string, Data extends Object = Object> = 
 };
 
 export type GraphWithP2p = Graph & {
+    peerId: string
     chains: Graph['chains'] & {
         peerIn: RxjsChain<{ graph: Graph, msg: P2pMsg }>
         peersOut: RxjsChain<{ graph: Graph, msg: P2pMsg }>
     }
 }
 
-export const p2pHandlers = (graph: Graph, opts: P2pOpts) => of(graph as GraphWithP2p).pipe(
-    tap(addChainsToGraph),
-    switchMap(graph => opts.listeningPort ? startServer(graph, opts.listeningPort) : of(graph)),
-    tap(graph => appendHandler(graph.chains.putNode, 'p2p', putNodeHandler(opts.peerId))),
-    tap(graph => appendHandler(graph.chains.putEdge, 'p2p', putEdgeHandler(opts.peerId))),
-);
+export const p2pHandlers = (graph: Graph, opts: P2pOpts) =>
+    of(graph as GraphWithP2p).pipe(
+        tap(graph => graph.peerId = opts.peerId || graph.graphId),
+        tap(addChainsToGraph),
+        switchMap(graph => opts.listeningPort ? startServer(graph, opts.listeningPort) : of(graph)),
+        tap(graph => appendHandler(graph.chains.putNode, 'p2p', putNodeHandler)),
+        tap(graph => appendHandler(graph.chains.putEdge, 'p2p', putEdgeHandler)),
+    );
+
 
 const addChainsToGraph = (graph: GraphWithP2p) => {
     graph.chains.peerIn = graph.chains.peerIn || newRxjsChain();
@@ -36,22 +40,18 @@ const addChainsToGraph = (graph: GraphWithP2p) => {
 };
 
 
-const putNodeHandler: (peerId: string) =>
-    GraphHandler<'putNode'> = (peerId: string) =>
-    ({graph, node}) => {
+const putNodeHandler: GraphHandler<'putNode'> = ({graph, node}) => {
         chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,
-            msg: {peerId, cmd: 'putNode', data: node}
+            msg: {peerId: (graph as GraphWithP2p).peerId, cmd: 'putNode', data: node}
         }).subscribe();
         return of({graph, node});
     };
 
-const putEdgeHandler: (peerId: string) =>
-    GraphHandler<'putEdge'> = (peerId: string) =>
-    ({graph, edge}) => {
+const putEdgeHandler: GraphHandler<'putEdge'> = ({graph, edge}) => {
         chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,
-            msg: {peerId, cmd: 'putEdge', data: edge}
+            msg: {peerId: (graph as GraphWithP2p).peerId, cmd: 'putEdge', data: edge}
         }).subscribe();
         return of({graph, edge});
     };

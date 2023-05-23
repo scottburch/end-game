@@ -36,9 +36,15 @@ export type GraphEdge<T extends Record<string, any>> = {
 
 export type GraphHandler<T extends keyof Graph['chains']> = RxjsChainFn<Graph['chains'][T]['type']>
 
+export type GraphLogItem = {
+    timestamp: string,
+    text: string
+}
+
 export type Graph = {
     graphId: string
     chains: {
+        log: RxjsChain<{graph: Graph, item: GraphLogItem}>
         putNode: RxjsChain<{ graph: Graph, node: GraphNode<Props> }>
         getNode: RxjsChain<{ graph: Graph, nodeId: NodeId, node?: GraphNode<Props> }>
         putEdge: RxjsChain<{ graph: Graph, edge: GraphEdge<Props> }>
@@ -63,6 +69,7 @@ export const graphOpen = (opts: GraphOpts = {graphId: newUid()}) => of({
     ...opts,
     graphId: opts.graphId || newUid(),
     chains: {
+        log: opts.chains?.log || newRxjsChain(),
         putNode: opts.chains?.putNode || newRxjsChain(),
         getNode: opts.chains?.getNode || newRxjsChain(),
         putEdge: opts.chains?.putEdge || newRxjsChain(),
