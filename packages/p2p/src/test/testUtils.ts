@@ -7,16 +7,16 @@ export const startTestNet = () => combineLatest([
     graphOpen({graphId: 'server'}).pipe(
         switchMap(graph => levelStoreHandlers(graph)),
         switchMap(graph => authHandlers(graph)),
-        switchMap(graph => p2pHandlers(graph, {listeningPort: 11110})),
+        switchMap(graph => p2pHandlers(graph, {listeningPort: 11110, peerId: 'server'})),
     ),
     graphOpen({graphId: 'client1'}).pipe(
         switchMap(graph => levelStoreHandlers(graph)),
         switchMap(graph => authHandlers(graph)),
-        switchMap(graph => p2pHandlers(graph, {listeningPort: 11111})),
+        switchMap(graph => p2pHandlers(graph, {listeningPort: 11111, peerId: 'client1'})),
     ),
     graphOpen({graphId: 'client2'}).pipe(
         switchMap(graph => levelStoreHandlers(graph)),
         switchMap(graph => authHandlers(graph)),
-        switchMap(graph => p2pHandlers(graph, {listeningPort: 11112})),
+        switchMap(graph => p2pHandlers(graph, {listeningPort: 11112, peerId: 'client2'})),
     )
 ])
