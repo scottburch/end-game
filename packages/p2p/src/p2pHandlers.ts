@@ -27,6 +27,7 @@ export const p2pHandlers = (graph: Graph, opts: P2pOpts) => of(graph as GraphWit
     tap(addChainsToGraph),
     switchMap(graph => opts.listeningPort ? startServer(graph, opts.listeningPort) : of(graph)),
     tap(graph => appendHandler(graph.chains.putNode, 'p2p', putNodeHandler(opts.peerId))),
+    tap(graph => appendHandler(graph.chains.putEdge, 'p2p', putEdgeHandler(opts.peerId))),
 );
 
 const addChainsToGraph = (graph: GraphWithP2p) => {
@@ -45,6 +46,15 @@ const putNodeHandler: (peerId: string) =>
         return of({graph, node});
     };
 
+const putEdgeHandler: (peerId: string) =>
+    GraphHandler<'putEdge'> = (peerId: string) =>
+    ({graph, edge}) => {
+        chainNext((graph as GraphWithP2p).chains.peersOut, {
+            graph,
+            msg: {peerId, cmd: 'putEdge', data: edge}
+        }).subscribe();
+        return of({graph, edge});
+    };
 
 
 
