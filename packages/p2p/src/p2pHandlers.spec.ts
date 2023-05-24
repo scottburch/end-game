@@ -66,19 +66,19 @@ describe('p2p handlers', () => {
         ))
     );
 
-    it.skip('should send a putNode to a remote peer', () =>
+    it('should send a putNode to a remote peer', () =>
         firstValueFrom(startTestNet([[1], []]).pipe(
-            switchMap(([{graph:p0}, {graph: p1}]) => of({p0, p1}).pipe(
+            switchMap(([{graph:n0}, {graph: n1}]) => of({n0, n1}).pipe(
                 tap(() => timer(1).pipe(
-                    switchMap(() => graphNewAuth(p0, 'scott', 'pass')),
-                    switchMap(() => graphAuth(p0, 'scott', 'pass')),
-                    switchMap(() => graphPutNode(p0, newGraphNode('', 'thing', {name: 'thing1'})))
+                    switchMap(() => graphNewAuth(n0, 'scott', 'pass')),
+                    switchMap(() => graphAuth(n0, 'scott', 'pass')),
+                    switchMap(() => graphPutNode(n0, newGraphNode('thing1', 'thing', {name: 'thing1'})))
                 ).subscribe()),
-                switchMap(() => nodesByLabel(p1, 'auth')),
+
+                switchMap(() => nodesByLabel(n1, 'auth')),
                 filter(({nodes}) => !!nodes.length),
 
-                // TODO: Causing NOT_LOGGED_IN error for some reason
-                switchMap(() => nodesByLabel(p1, 'thing')),
+                switchMap(() => nodesByLabel(n1, 'thing')),
                 filter(({nodes}) => !!nodes.length),
             )),
         ))

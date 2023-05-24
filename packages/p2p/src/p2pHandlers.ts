@@ -70,13 +70,13 @@ const peerInHandler: GraphP2pHandler<'peerIn'> = ({graph, msg}) =>
 
 const doPutNode = (graph: Graph, msg: P2pMsg) =>
     of(msg as P2pMsg<'putNode', GraphNode<Props>>).pipe(
-        switchMap(msg => graphPutNode(graph, newGraphNode(msg.data.nodeId, msg.data.label, msg.data.props)))
+        switchMap(msg => graphPutNode(graph, msg.data))
     );
 
 const doPutEdge = (graph: Graph, msg: P2pMsg) =>
     of(msg as P2pMsg<'putEdge', GraphEdge<Props>>).pipe(
         switchMap(msg =>
-            graphPutEdge(graph, newGraphEdge(msg.data.edgeId, msg.data.rel, msg.data.from, msg.data.to, msg.data.props))
+            graphPutEdge(graph, msg.data)
         )
     )
 
