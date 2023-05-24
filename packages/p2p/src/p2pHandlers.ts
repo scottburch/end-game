@@ -12,7 +12,6 @@ export type P2pOpts = {
 }
 
 export type P2pMsg<Cmd extends string = string, Data extends Object = Object> = {
-    peerId: string,
     cmd: Cmd,
     data: Data
 };
@@ -48,7 +47,7 @@ const addChainsToGraph = (graph: GraphWithP2p) => {
 const putNodeHandler: GraphP2pHandler<'putNode'> = ({graph, node}) => {
         chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,
-            msg: {peerId: (graph as GraphWithP2p).peerId, cmd: 'putNode', data: node}
+            msg: {cmd: 'putNode', data: node}
         }).subscribe();
         return of({graph, node});
     };
@@ -56,7 +55,7 @@ const putNodeHandler: GraphP2pHandler<'putNode'> = ({graph, node}) => {
 const putEdgeHandler: GraphP2pHandler<'putEdge'> = ({graph, edge}) => {
         chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,
-            msg: {peerId: (graph as GraphWithP2p).peerId, cmd: 'putEdge', data: edge}
+            msg: {cmd: 'putEdge', data: edge}
         }).subscribe();
         return of({graph, edge});
     };

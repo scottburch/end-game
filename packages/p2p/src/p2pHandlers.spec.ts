@@ -21,8 +21,8 @@ describe('p2p handlers', () => {
             switchMap(graph => p2pHandlers(graph, {peerId: 'test'})),
             map(graph => graph as GraphWithP2p),
             tap(graph => timer(1).pipe(
-                switchMap(() => chainNext(graph.chains.peerIn, {graph, msg: {peerId: '', cmd: 'peer-in', data: {}}})),
-                switchMap(() => chainNext(graph.chains.peersOut, {graph, msg: {peerId: '', cmd: 'peers-out', data: {}}})),
+                switchMap(() => chainNext(graph.chains.peerIn, {graph, msg: {cmd: 'peer-in', data: {}}})),
+                switchMap(() => chainNext(graph.chains.peersOut, {graph, msg: {cmd: 'peers-out', data: {}}})),
             ).subscribe()),
             switchMap(graph => combineLatest([
                 graph.chains.peerIn,
@@ -43,7 +43,6 @@ describe('p2p handlers', () => {
             ).subscribe()),
             switchMap(graph => (graph as GraphWithP2p).chains.peersOut),
             tap(({msg}) => {
-                expect(msg.peerId).to.equal('test');
                 expect(msg.cmd).to.equal('putNode');
                 expect((msg.data as GraphNode<Props>).label).to.equal('thing')
             })
@@ -59,7 +58,6 @@ describe('p2p handlers', () => {
             switchMap(graph => (graph as GraphWithP2p).chains.peersOut),
             map(({msg}) => ({msg, edge: (msg.data as GraphEdge<Props>)})),
             tap(({msg, edge}) => {
-                expect(msg.peerId).to.equal('test');
                 expect(msg.cmd).to.equal('putEdge');
                 expect(edge.from).to.equal('node1');
                 expect(edge.to).to.equal('node2');
@@ -68,7 +66,6 @@ describe('p2p handlers', () => {
         ))
     );
 
-    // TODO: Need to keep info from bouncing between peers - this throws errors because the auth makes it back to the original peer
     it.skip('should send a putNode to a remote peer', () =>
         firstValueFrom(startTestNet([[1], []]).pipe(
             switchMap(([{graph:p0}, {graph: p1}]) => of({p0, p1}).pipe(
@@ -79,8 +76,10 @@ describe('p2p handlers', () => {
                 ).subscribe()),
                 switchMap(() => nodesByLabel(p1, 'auth')),
                 filter(({nodes}) => !!nodes.length),
-                tap(x => x),
 
+                // TODO: Causing NOT_LOGGED_IN error for some reason
+                switchMap(() => nodesByLabel(p1, 'thing')),
+                filter(({nodes}) => !!nodes.length),
             )),
         ))
     );
