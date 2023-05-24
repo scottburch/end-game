@@ -17,7 +17,7 @@ export const dialPeer = (graph: Graph, opts: DialerOpts) =>
 
 
         const dial = () => {
-            socket = new WebSocket(opts.url, {});
+            socket = new WebSocket(opts.url);
 
             const openSub = fromEvent<WebSocket.Event>(socket, 'open').pipe(
                 switchMap(() => merge(
@@ -31,7 +31,7 @@ export const dialPeer = (graph: Graph, opts: DialerOpts) =>
                     openSub.unsubscribe();
                     errorSub.unsubscribe();
                     closeSub.unsubscribe();
-                    stopping || redial()
+                    stopping || redial();
                 })
             ).subscribe()
 

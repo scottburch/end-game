@@ -5,13 +5,15 @@ import {
     graphPutEdge,
     graphPutNode,
     newGraphEdge,
-    newGraphNode,
+    newGraphNode, nodesByLabel,
     Props
 } from "@end-game/graph";
-import {combineLatest, firstValueFrom, map, switchMap, tap, timer} from "rxjs";
+import {combineLatest, filter, firstValueFrom, map, of, switchMap, tap, timer} from "rxjs";
 import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
+import {startTestNet} from "./test/testUtils.js";
+import {graphAuth, graphNewAuth} from "@end-game/auth";
 
 describe('p2p handlers', () => {
     it('should setup peer chains', () =>
@@ -63,6 +65,23 @@ describe('p2p handlers', () => {
                 expect(edge.to).to.equal('node2');
                 expect(edge.rel).to.equal('friend');
             })
+        ))
+    );
+
+    // TODO: Need to keep info from bouncing between peers - this throws errors because the auth makes it back to the original peer
+    it.skip('should send a putNode to a remote peer', () =>
+        firstValueFrom(startTestNet([[1], []]).pipe(
+            switchMap(([{graph:p0}, {graph: p1}]) => of({p0, p1}).pipe(
+                tap(() => timer(1).pipe(
+                    switchMap(() => graphNewAuth(p0, 'scott', 'pass')),
+                    switchMap(() => graphAuth(p0, 'scott', 'pass')),
+                    switchMap(() => graphPutNode(p0, newGraphNode('', 'thing', {name: 'thing1'})))
+                ).subscribe()),
+                switchMap(() => nodesByLabel(p1, 'auth')),
+                filter(({nodes}) => !!nodes.length),
+                tap(x => x),
+
+            )),
         ))
     );
 });

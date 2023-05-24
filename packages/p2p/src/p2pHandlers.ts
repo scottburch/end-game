@@ -1,9 +1,10 @@
-import type {Graph} from "@end-game/graph";
-import {GraphHandler} from "@end-game/graph";
+import type {Graph, GraphEdge, GraphNode, Props} from "@end-game/graph";
+
 import {of, switchMap, tap} from "rxjs";
 import type {RxjsChain} from "@end-game/rxjs-chain";
-import {appendHandler, chainNext, newRxjsChain} from "@end-game/rxjs-chain";
+import {appendHandler, chainNext, newRxjsChain, RxjsChainFn} from "@end-game/rxjs-chain";
 import {startServer} from "./server.js";
+import {graphPutEdge, graphPutNode, newGraphEdge, newGraphNode} from "@end-game/graph";
 
 export type P2pOpts = {
     listeningPort?: number,
@@ -15,6 +16,9 @@ export type P2pMsg<Cmd extends string = string, Data extends Object = Object> = 
     cmd: Cmd,
     data: Data
 };
+
+export type GraphP2pHandler<T extends keyof GraphWithP2p['chains']> = RxjsChainFn<GraphWithP2p['chains'][T]['type']>
+
 
 export type GraphWithP2p = Graph & {
     peerId: string
@@ -29,6 +33,7 @@ export const p2pHandlers = (graph: Graph, opts: P2pOpts) =>
         tap(graph => graph.peerId = opts.peerId || graph.graphId),
         tap(addChainsToGraph),
         switchMap(graph => opts.listeningPort ? startServer(graph, opts.listeningPort) : of(graph)),
+        tap(graph => appendHandler((graph as GraphWithP2p).chains.peerIn, 'p2p', peerInHandler)),
         tap(graph => appendHandler(graph.chains.putNode, 'p2p', putNodeHandler)),
         tap(graph => appendHandler(graph.chains.putEdge, 'p2p', putEdgeHandler)),
     );
@@ -40,7 +45,7 @@ const addChainsToGraph = (graph: GraphWithP2p) => {
 };
 
 
-const putNodeHandler: GraphHandler<'putNode'> = ({graph, node}) => {
+const putNodeHandler: GraphP2pHandler<'putNode'> = ({graph, node}) => {
         chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,
             msg: {peerId: (graph as GraphWithP2p).peerId, cmd: 'putNode', data: node}
@@ -48,7 +53,7 @@ const putNodeHandler: GraphHandler<'putNode'> = ({graph, node}) => {
         return of({graph, node});
     };
 
-const putEdgeHandler: GraphHandler<'putEdge'> = ({graph, edge}) => {
+const putEdgeHandler: GraphP2pHandler<'putEdge'> = ({graph, edge}) => {
         chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,
             msg: {peerId: (graph as GraphWithP2p).peerId, cmd: 'putEdge', data: edge}
@@ -56,6 +61,25 @@ const putEdgeHandler: GraphHandler<'putEdge'> = ({graph, edge}) => {
         return of({graph, edge});
     };
 
+
+const peerInHandler: GraphP2pHandler<'peerIn'> = ({graph, msg}) =>
+    of({graph, msg}).pipe(
+        tap(({msg}) => msg.cmd === 'putNode' && doPutNode(graph, msg).subscribe()),
+        tap(({msg}) => msg.cmd === 'putEdge' && doPutEdge(graph, msg).subscribe())
+    )
+
+
+const doPutNode = (graph: Graph, msg: P2pMsg) =>
+    of(msg as P2pMsg<'putNode', GraphNode<Props>>).pipe(
+        switchMap(msg => graphPutNode(graph, newGraphNode(msg.data.nodeId, msg.data.label, msg.data.props)))
+    );
+
+const doPutEdge = (graph: Graph, msg: P2pMsg) =>
+    of(msg as P2pMsg<'putEdge', GraphEdge<Props>>).pipe(
+        switchMap(msg =>
+            graphPutEdge(graph, newGraphEdge(msg.data.edgeId, msg.data.rel, msg.data.from, msg.data.to, msg.data.props))
+        )
+    )
 
 
 

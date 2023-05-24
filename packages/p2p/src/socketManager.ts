@@ -7,7 +7,7 @@ import {chainNext} from "@end-game/rxjs-chain";
 export const socketManager = (graph: GraphWithP2p, conn: WS.WebSocket) => {
     graph.chains.peersOut.pipe(
         takeUntil(fromEvent(conn, 'close').pipe(first())),
-        map(msg => serializer(msg)),
+        map(({msg}) => serializer(msg)),
         tap(msg => conn.send(msg))
     ).subscribe();
 
