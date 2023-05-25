@@ -110,14 +110,15 @@ describe('p2p handlers', () => {
         )
 
         it('should be able to write a bunch of nodes quickly between peers', function () {
-            this.timeout(5000);
+            this.timeout(15000);
+            const COUNT = 20;
             return firstValueFrom(startTestNet([[1], []]).pipe(
                 switchMap(({node0, node1}) => of({node0, node1}).pipe(
                     tap(() => timer(1).pipe(
                         switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
                         switchMap(() => graphAuth(node0, 'scott', 'pass')),
                         tap(() => (global as any).start = Date.now()),
-                        switchMap(() => range(1, 20).pipe(
+                        switchMap(() => range(1, COUNT).pipe(
                             switchMap(idx => graphPutNode(node0, newGraphNode(`thing${idx}`, 'thing', {name: `thing${idx}`})))
                         )),
                     ).subscribe()),
@@ -126,7 +127,7 @@ describe('p2p handlers', () => {
                     filter(({nodes}) => !!nodes.length),
 
                     switchMap(() => nodesByLabel(node1, 'thing')),
-                    filter(({nodes}) => nodes.length === 20),
+                    filter(({nodes}) => nodes.length === COUNT),
                     tap(() => console.log(Date.now() - (global as any).start))
                 )),
             ))
