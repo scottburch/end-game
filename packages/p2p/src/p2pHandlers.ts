@@ -4,7 +4,7 @@ import {of, switchMap, tap} from "rxjs";
 import type {RxjsChain} from "@end-game/rxjs-chain";
 import {appendHandler, chainNext, newRxjsChain, RxjsChainFn} from "@end-game/rxjs-chain";
 import {startServer} from "./server.js";
-import {graphPutEdge, graphPutNode, newGraphEdge, newGraphNode} from "@end-game/graph";
+import {graphPutEdge, graphPutNode} from "@end-game/graph";
 
 export type P2pOpts = {
     listeningPort?: number,

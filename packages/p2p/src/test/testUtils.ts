@@ -1,5 +1,5 @@
-import {bufferCount, from, mergeMap, of, switchMap, tap, toArray} from "rxjs";
-import {graphOpen, levelStoreHandlers} from "@end-game/graph";
+import {bufferCount, from, last, mergeMap, of, scan, skip, switchMap, take, tap, toArray} from "rxjs";
+import {Graph, graphOpen, levelStoreHandlers} from "@end-game/graph";
 import {authHandlers} from "@end-game/auth";
 import {p2pHandlers} from "../p2pHandlers.js";
 import {dialPeer} from "../dialer.js";
@@ -7,7 +7,8 @@ import {dialPeer} from "../dialer.js";
 export const startTestNet = (nodes: number[][]) =>
     from(nodes).pipe(
         mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers)),
-        bufferCount(nodes.length)
+        scan((nodes, {graph}, idx) => ({...nodes, [`node${idx}`]: graph}), {} as Record<`node${number}`, Graph>),
+        skip(nodes.length - 1)
     );
 
 

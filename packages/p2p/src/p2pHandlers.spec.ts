@@ -8,7 +8,7 @@ import {
     newGraphNode, nodesByLabel,
     Props
 } from "@end-game/graph";
-import {combineLatest, filter, firstValueFrom, map, of, switchMap, tap, timer} from "rxjs";
+import {combineLatest, filter, firstValueFrom, map, of, pipe, range, switchMap, tap, timer} from "rxjs";
 import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
@@ -66,21 +66,74 @@ describe('p2p handlers', () => {
         ))
     );
 
+
     it('should send a putNode to a remote peer', () =>
         firstValueFrom(startTestNet([[1], []]).pipe(
-            switchMap(([{graph:n0}, {graph: n1}]) => of({n0, n1}).pipe(
+            switchMap(({node0, node1}) => of({node0, node1}).pipe(
                 tap(() => timer(1).pipe(
-                    switchMap(() => graphNewAuth(n0, 'scott', 'pass')),
-                    switchMap(() => graphAuth(n0, 'scott', 'pass')),
-                    switchMap(() => graphPutNode(n0, newGraphNode('thing1', 'thing', {name: 'thing1'})))
+                    switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
+                    switchMap(() => graphAuth(node0, 'scott', 'pass')),
+                    switchMap(() => graphPutNode(node0, newGraphNode('thing1', 'thing', {name: 'thing1'}))),
                 ).subscribe()),
 
-                switchMap(() => nodesByLabel(n1, 'auth')),
+                switchMap(() => nodesByLabel(node1, 'auth')),
                 filter(({nodes}) => !!nodes.length),
 
-                switchMap(() => nodesByLabel(n1, 'thing')),
+                switchMap(() => nodesByLabel(node1, 'thing')),
                 filter(({nodes}) => !!nodes.length),
             )),
         ))
     );
+
+    it('should send a putNode through a middle peer', () =>
+        firstValueFrom(startTestNet([[1], [2], []]).pipe(
+            switchMap(({node0, node1, node2}) => of({node0, node1, node2}).pipe(
+                tap(() => timer(1).pipe(
+                    switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
+                    switchMap(() => graphAuth(node0, 'scott', 'pass')),
+                    switchMap(() => graphPutNode(node0, newGraphNode('thing1', 'thing', {name: 'thing1'})))
+                ).subscribe()),
+
+                switchMap(() => nodesByLabel(node1, 'auth')),
+                filter(({nodes}) => !!nodes.length),
+
+                switchMap(() => nodesByLabel(node1, 'thing')),
+                filter(({nodes}) => !!nodes.length),
+
+                switchMap(() => nodesByLabel(node2, 'auth')),
+                filter(({nodes}) => !!nodes.length),
+
+                switchMap(() => nodesByLabel(node2, 'thing')),
+                filter(({nodes}) => !!nodes.length),
+            )),
+        ))
+    )
+
+    it('should be able to write a bunch of nodes quickly between peers', function() {
+        this.timeout(5000);
+        return firstValueFrom(startTestNet([[1], []]).pipe(
+            switchMap(({node0, node1}) => of({node0, node1}).pipe(
+                tap(() => timer(1).pipe(
+                    switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
+                    switchMap(() => graphAuth(node0, 'scott', 'pass')),
+                    tap(() => (global as any).start = Date.now()),
+                    switchMap(() => range(1, 20).pipe(
+                        switchMap(idx => graphPutNode(node0, newGraphNode(`thing${idx}`, 'thing', {name: `thing${idx}`})))
+                    )),
+                ).subscribe()),
+
+                switchMap(() => nodesByLabel(node1, 'auth')),
+                filter(({nodes}) => !!nodes.length),
+
+                switchMap(() => nodesByLabel(node1, 'thing')),
+                filter(({nodes}) => nodes.length === 20),
+                tap(() => console.log(Date.now() - (global as any).start))
+            )),
+        ))
+    })
 });
+
+
+export const sss = pipe(tap(() => (global as any).s = Date.now()));
+export const ttt = pipe(tap(() => console.log(Date.now() - (global as any).s)));
+
