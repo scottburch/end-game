@@ -29,7 +29,7 @@ const dupCache = (conn: WS.WebSocket, timeout: number = 5000) => {
     return (key: string) => {
         const exists = cache.has(key);
         exists || cache.add(key);
-        of(key).pipe(
+        exists || of(key).pipe(
             delay(5000),
             takeUntil(fromEvent(conn, 'close')),
             tap(() => cache.delete(key))

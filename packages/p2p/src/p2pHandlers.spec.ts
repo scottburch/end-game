@@ -5,10 +5,11 @@ import {
     graphPutEdge,
     graphPutNode,
     newGraphEdge,
-    newGraphNode, nodesByLabel,
+    newGraphNode,
+    nodesByLabel,
     Props
 } from "@end-game/graph";
-import {combineLatest, delay, filter, firstValueFrom, map, of, pipe, range, switchMap, tap, timer} from "rxjs";
+import {combineLatest, filter, firstValueFrom, map, of, range, switchMap, tap, timer} from "rxjs";
 import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
@@ -85,6 +86,35 @@ describe('p2p handlers', () => {
             ))
         );
 
+        it.skip('should send a putNode to more than one remote peer', () =>
+            firstValueFrom(startTestNet([[1,2,3,4,5], [], [], [], [], []]).pipe(
+                switchMap(({node0, node1, node2, node3, node4, node5}) => of({node0, node1, node2, node3, node4, node5}).pipe(
+                    tap(() => timer(1).pipe(
+                        switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
+                        switchMap(() => graphAuth(node0, 'scott', 'pass')),
+                        switchMap(() => graphPutNode(node0, newGraphNode('thing1', 'thing', {name: 'thing1'}))),
+                    ).subscribe()),
+
+                    switchMap(() => nodesByLabel(node1, 'auth')),
+                    filter(({nodes}) => !!nodes.length),
+
+                    switchMap(() => nodesByLabel(node2, 'thing')),
+                    filter(({nodes}) => !!nodes.length),
+
+                    switchMap(() => nodesByLabel(node3, 'thing')),
+                    filter(({nodes}) => !!nodes.length),
+
+                    switchMap(() => nodesByLabel(node4, 'thing')),
+                    filter(({nodes}) => !!nodes.length),
+
+                    switchMap(() => nodesByLabel(node5, 'thing')),
+                    filter(({nodes}) => !!nodes.length),
+
+                )),
+            ))
+        );
+
+
         it('should send a putNode through a middle peer', () =>
             firstValueFrom(startTestNet([[1], [2], []]).pipe(
                 switchMap(({node0, node1, node2}) => of({node0, node1, node2}).pipe(
@@ -108,6 +138,8 @@ describe('p2p handlers', () => {
                 )),
             ))
         )
+
+
 
         it('should be able to write a bunch of nodes quickly between peers', function () {
             this.timeout(15000);
