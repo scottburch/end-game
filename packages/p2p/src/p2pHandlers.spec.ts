@@ -9,7 +9,7 @@ import {
     nodesByLabel,
     Props
 } from "@end-game/graph";
-import {combineLatest, filter, firstValueFrom, map, of, range, switchMap, tap, timer} from "rxjs";
+import {combineLatest, delay, filter, firstValueFrom, map, of, range, switchMap, tap, timer} from "rxjs";
 import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
@@ -137,7 +137,23 @@ describe('p2p handlers', () => {
                     filter(({nodes}) => !!nodes.length),
                 )),
             ))
-        )
+        );
+
+        it('should handle a redundant connection', () =>
+            //TODO: In the future, don't allow redundant connections - testing for now to make sure it does not blow up
+            firstValueFrom(startTestNet([[1], [0]]).pipe(
+                switchMap(({node0, node1, node2}) => of({node0, node1, node2}).pipe(
+                    tap(() => timer(1).pipe(
+                        switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
+                        switchMap(() => graphAuth(node0, 'scott', 'pass')),
+                        switchMap(() => graphPutNode(node0, newGraphNode('thing1', 'thing', {name: 'thing1'})))
+                    ).subscribe()),
+
+                    switchMap(() => nodesByLabel(node1, 'thing')),
+                    filter(({nodes}) => !!nodes.length),
+                ))
+            ))
+        );
 
 
 
