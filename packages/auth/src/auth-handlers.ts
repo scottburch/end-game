@@ -10,7 +10,7 @@ import {
     isUserLoggedIn,
     isUserNodeOwner,
     signGraphNode,
-    verifyNodeSigWithAuthNode
+    verifyNodeSig
 } from "./auth-utils.js";
 import {notLoggedInError, unauthorizedUserError, userAlreadyExistsError} from "./auth-errors.js";
 
@@ -33,12 +33,7 @@ const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
 
     // verify signature if the node has one
     if (!!(node as NodeWithSig<Props>).sig) {
-        return graphGetOwnerNode(graph, node.nodeId).pipe(
-            switchMap(({node: authNode}) =>
-                verifyNodeSigWithAuthNode(node as NodeWithSig<Props>, authNode as AuthNode)
-            ),
-            map(() => ({graph, node}))
-        )
+        return verifyNodeSig(graph, node as NodeWithSig<Props>)
     }
 
 

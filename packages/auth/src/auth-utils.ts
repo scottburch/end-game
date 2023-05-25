@@ -1,4 +1,4 @@
-import {catchError, combineLatest, combineLatestWith, filter, first, map, of, switchMap, tap, timeout} from "rxjs";
+import {catchError, combineLatest, filter, first, map, of, switchMap, tap, timeout} from "rxjs";
 import type {Graph, GraphEdge, GraphNode, NodeId, Props} from '@end-game/graph'
 import {graphGet, graphGetRelationships, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
@@ -24,7 +24,7 @@ export type GraphWithAuth = Graph & {
     }
 };
 export type NodeWithSig<T extends Props> = GraphNode<T> & { sig: Uint8Array }
-export type AuthNode = GraphNode<EncryptedKeyBundle & {username: string}>;
+export type AuthNode = GraphNode<EncryptedKeyBundle & { username: string }>;
 
 
 export const doesAuthNodeExist = (graph: Graph, username: string) => {
@@ -93,16 +93,23 @@ export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
         timeout({first: 2000, with: () => of({graph, nodeId: '', node: {} as AuthNode})}),
     );
 
-export const verifyNodeSigWithAuthNode = <T extends Props>(node: NodeWithSig<T>, authNode: AuthNode) =>
-    combineLatest([
-        getNodeSignData(node),
-        deserializePubKey(authNode.props.pub)
-    ]).pipe(
-        switchMap(([data, pubKey]) => verify(data, (node as NodeWithSig<Props>).sig, pubKey)),
-        map(() => ({node, authNode})),
-        catchError(err => err.message === 'Invalid keyData' ? unauthorizedUserError(authNode.props.username) : of(err))
-
+export const verifyNodeSig = <T extends Props>(graph: Graph, node: NodeWithSig<T>) =>
+    graphGetOwnerNode(graph, node.nodeId).pipe(
+        switchMap(({node: authNode}) =>
+            combineLatest([
+                getNodeSignData(node),
+                deserializePubKey(authNode.props.pub)
+            ]).pipe(
+                switchMap(([data, pubKey]) => verify(data, (node as NodeWithSig<Props>).sig, pubKey)),
+                map(() => ({node, authNode})),
+                catchError(err => err.message === 'Invalid keyData' ? unauthorizedUserError(authNode.props.username) : of(err))
+            )
+        ),
+        map(() => ({graph, node}))
     );
+
+
+
 
 
 
