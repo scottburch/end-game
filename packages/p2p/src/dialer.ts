@@ -27,7 +27,6 @@ export const dialPeer = (graph: Graph, opts: DialerOpts) =>
 
             const closeSub = fromEvent<WebSocket.CloseEvent>(socket, 'close').pipe(
                 tap(() => {
-                    socket.close();
                     openSub.unsubscribe();
                     errorSub.unsubscribe();
                     closeSub.unsubscribe();

@@ -24,11 +24,17 @@ import {deserializer, serializer} from "@end-game/utils/serializer";
 
 
 
+
 type LevelStore = AbstractLevel<string>;
 
 export type LevelHandlerOpts = {
     dir?: string
 }
+
+export type GraphWithLevel = Graph & {
+    levelStore: LevelStore
+}
+
 
 export const levelStoreHandlers = (graph: Graph, opts: LevelHandlerOpts = {}) => of(graph).pipe(
         tap(graph => appendHandler(graph.chains.putNode, 'storage', levelStorePutNodeHandler(opts))),
@@ -40,11 +46,9 @@ export const levelStoreHandlers = (graph: Graph, opts: LevelHandlerOpts = {}) =>
         tap(graph => appendHandler(graph.chains.getRelationships, 'storage', levelStoreGetRelationshipsHandler(opts)))
 );
 
-const stores: Record<string, LevelStore> = {};
-
-const getStore = (graph: Graph, handlerOpts: LevelHandlerOpts) => of(stores[graph.graphId]).pipe(
+const getStore = (graph: Graph, handlerOpts: LevelHandlerOpts) => of((graph as GraphWithLevel).levelStore).pipe(
     map(store => store || (handlerOpts.dir ? new Level(handlerOpts.dir) : new MemoryLevel())),
-    tap(store => stores[graph.graphId] = store)
+    tap(store => (graph as GraphWithLevel).levelStore = store)
 );
 
 

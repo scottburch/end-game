@@ -36,10 +36,15 @@ export type GraphEdge<T extends Record<string, any>> = {
 
 export type GraphHandler<T extends keyof Graph['chains']> = RxjsChainFn<Graph['chains'][T]['type']>
 
+export enum LogLevel {INFO, WARNING, ERROR, DEBUG}
+
 export type GraphLogItem = {
-    timestamp: string,
-    text: string
+    code: string,
+    text: string,
+    level: LogLevel
 }
+
+
 
 export type Graph = {
     graphId: string
