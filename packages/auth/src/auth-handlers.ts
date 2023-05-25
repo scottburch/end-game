@@ -2,10 +2,9 @@ import type {Graph, GraphHandler, Props} from '@end-game/graph'
 import {graphPutEdge, newGraphEdge} from "@end-game/graph";
 import {first, map, of, switchMap, tap} from "rxjs";
 import {insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "@end-game/rxjs-chain";
-import type {AuthNode, GraphWithAuth, NodeWithSig} from "./auth-utils.js";
+import type {GraphWithAuth, NodeWithSig} from "./auth-utils.js";
 import {
     doesAuthNodeExist,
-    graphGetOwnerNode,
     isUserAuthedToWriteEdge,
     isUserLoggedIn,
     isUserNodeOwner,
@@ -27,7 +26,7 @@ const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
     if (node.label === 'auth') {
         return doesAuthNodeExist(graph, node.props.username).pipe(
             first(),
-            switchMap(({exists}) => exists ? userAlreadyExistsError(node.props.username) : of({graph, node})),
+            switchMap(({exists}) => exists ? userAlreadyExistsError(graph, node.props.username) : of({graph, node})),
         )
     }
 
@@ -37,15 +36,15 @@ const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
     }
 
 
-    return (isUserLoggedIn(graph as GraphWithAuth) ? of({graph, node}) : notLoggedInError()).pipe(
+    return (isUserLoggedIn(graph as GraphWithAuth) ? of({graph, node}) : notLoggedInError(graph)).pipe(
         switchMap(({graph, node}) => isUserNodeOwner(graph as GraphWithAuth, node as NodeWithSig<Props>)),
-        switchMap(isOwner => isOwner ? signGraphNode(graph as GraphWithAuth, node) : unauthorizedUserError('unknown')),
+        switchMap(isOwner => isOwner ? signGraphNode(graph as GraphWithAuth, node) : unauthorizedUserError(graph, 'unknown')),
     )
 };
 
 const authPutEdgeAnteHandler: GraphHandler<'putEdge'> = ({graph, edge}) => {
     return isUserAuthedToWriteEdge(graph, edge).pipe(
-        switchMap(authed => authed ? of({graph, edge}) : unauthorizedUserError('unknown'))
+        switchMap(authed => authed ? of({graph, edge}) : unauthorizedUserError(graph, 'unknown'))
     );
 }
 

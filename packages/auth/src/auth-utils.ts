@@ -102,7 +102,7 @@ export const verifyNodeSig = <T extends Props>(graph: Graph, node: NodeWithSig<T
             ]).pipe(
                 switchMap(([data, pubKey]) => verify(data, (node as NodeWithSig<Props>).sig, pubKey)),
                 map(() => ({node, authNode})),
-                catchError(err => err.message === 'Invalid keyData' ? unauthorizedUserError(authNode.props.username) : of(err))
+                catchError(err => err.message === 'Invalid keyData' ? unauthorizedUserError(graph, authNode.props.username) : of(err))
             )
         ),
         map(() => ({graph, node}))
