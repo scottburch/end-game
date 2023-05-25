@@ -86,7 +86,7 @@ describe('p2p handlers', () => {
             ))
         );
 
-        it.skip('should send a putNode to more than one remote peer', () =>
+        it('should send a putNode to more than one remote peer', () =>
             firstValueFrom(startTestNet([[1,2,3,4,5], [], [], [], [], []]).pipe(
                 switchMap(({node0, node1, node2, node3, node4, node5}) => of({node0, node1, node2, node3, node4, node5}).pipe(
                     tap(() => timer(1).pipe(

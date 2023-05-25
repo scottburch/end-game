@@ -8,7 +8,7 @@ export const startTestNet = (nodes: number[][]) =>
     from(nodes).pipe(
         mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers)),
         scan((nodes, {graph}, idx) => ({...nodes, [`node${idx}`]: graph}), {} as Record<`node${number}`, Graph>),
-        skip(nodes.length - 1)
+        skip(nodes.length - 1),
     );
 
 
@@ -17,7 +17,8 @@ export const startTestNode = (nodeNo: number, peers: number[] = []) => graphOpen
     switchMap(graph => authHandlers(graph)),
     switchMap(graph => p2pHandlers(graph, {listeningPort: 11110 + nodeNo})),
     switchMap(graph => peers.length ? from(peers).pipe(
-        mergeMap(peerNo => dialPeer(graph, {url: `ws://localhost:${11110 + peerNo}`, redialInterval: 1}))
+        mergeMap(peerNo => dialPeer(graph, {url: `ws://localhost:${11110 + peerNo}`, redialInterval: 1})),
+        skip(peers.length - 1)
     ) : of({graph}))
 )
 
