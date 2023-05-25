@@ -8,7 +8,6 @@ import {graphPutEdge, graphPutNode, newGraphEdge, newGraphNode} from "@end-game/
 
 describe('auth utils', () => {
 
-
     describe('findAuthNode()', () => {
         it('should return a node with an undefined nodeId if not found', () => {
             firstValueFrom(graphWithAuth().pipe(
