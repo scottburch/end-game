@@ -4,7 +4,7 @@ import {first, map, of, switchMap, tap} from "rxjs";
 import {insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "@end-game/rxjs-chain";
 import type {GraphWithAuth, NodeWithSig} from "./auth-utils.js";
 import {
-    doesAuthNodeExist,
+    findAuthNode,
     isUserAuthedToWriteEdge,
     isUserLoggedIn,
     isUserNodeOwner,
@@ -24,9 +24,9 @@ export const authHandlers = (graph: Graph) => of(graph).pipe(
 
 const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
     if (node.label === 'auth') {
-        return doesAuthNodeExist(graph, node.props.username).pipe(
+        return findAuthNode(graph, node.props.username).pipe(
             first(),
-            switchMap(({exists}) => exists ? userAlreadyExistsError(graph, node.props.username) : of({graph, node})),
+            switchMap(({node:foundNode}) => foundNode.props && foundNode.props.pub !== node.props.pub ? userAlreadyExistsError(graph, node.props.username) : of({graph, node})),
         )
     }
 

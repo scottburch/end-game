@@ -5,7 +5,7 @@ import type {GraphWithAuth} from './auth-utils.js'
 import {expect} from 'chai'
 import {graphWithAuth} from "./test/testUtils.js";
 import {graphAuth, graphNewAuth, graphUnauth} from "./user-auth.js";
-import {doesAuthNodeExist} from "./auth-utils.js";
+import {findAuthNode} from "./auth-utils.js";
 
 
 
@@ -70,10 +70,10 @@ describe('graph auth', () => {
         firstValueFrom(graphWithAuth().pipe(
             switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
-            switchMap(({graph}) => doesAuthNodeExist(graph, 'scott')),
-            tap(({exists}) => expect(exists).to.be.true),
-            switchMap(({graph}) => doesAuthNodeExist(graph, 'todd')),
-            tap(({exists}) => expect(exists).to.be.true)
+            switchMap(({graph}) => findAuthNode(graph, 'scott')),
+            tap(({node}) => expect(node.nodeId).not.to.be.empty),
+            switchMap(({graph}) => findAuthNode(graph, 'todd')),
+            tap(({node}) => expect(node).not.to.be.empty)
         ))
     )
 });

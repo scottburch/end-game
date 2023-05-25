@@ -27,13 +27,6 @@ export type NodeWithSig<T extends Props> = GraphNode<T> & { sig: Uint8Array }
 export type AuthNode = GraphNode<EncryptedKeyBundle & { username: string }>;
 
 
-export const doesAuthNodeExist = (graph: Graph, username: string) => {
-    return nodesByProp(graph, 'auth', 'username', username).pipe(
-        filter(({nodes}) => !!nodes.length),
-        map(() => ({graph, exists: true})),
-        timeout({first: 1000, with: () => of({graph, exists: false})})
-    );
-}
 export const findAuthNode = (graph: Graph, username: string) =>
     nodesByProp(graph, 'auth', 'username', username).pipe(
         map(({nodes}) => nodes[0]),
