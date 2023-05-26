@@ -12,7 +12,7 @@
     }
   },
   "dependencies": {
-    "@end-game/auth": "*",
+    "@end-game/pwd-auth": "*",
     "@end-game/graph": "*",
     "@end-game/rxjs-chain": "*",
     "@end-game/utils": "*",

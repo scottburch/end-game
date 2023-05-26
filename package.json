@@ -4,6 +4,7 @@
   "type": "module",
   "workspaces": [
     "packages/*",
+    "packages/auth/*",
     "packages/tmp/my-app"
   ],
   "dependencies": {

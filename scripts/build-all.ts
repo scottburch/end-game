@@ -5,19 +5,20 @@ import {bufferCount, concatMap, from, mergeMap, of, switchMap, tap} from "rxjs";
 
 export const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
 
-const DIRS = ['rxjs-chain', 'utils', 'crypto', 'graph', 'auth', 'p2p', 'react-graph', 'dtg-scripts', 'cli', 'graph-explorer'];
+const DIRS = ['rxjs-chain', 'utils', 'crypto', 'graph', 'auth/pwd-auth', 'p2p', 'react-graph', 'dtg-scripts', 'cli', 'graph-explorer'];
+
+console.log('********', absPath())
 
 of(true).pipe(
-    tap(() => cd('../packages')),
+    tap(() => cd(absPath('../packages'))),
     switchMap(() => from(DIRS)),
     mergeMap(dir => $`rm -rf .${dir}/lib`),
     bufferCount(DIRS.length),
     switchMap(() => from(DIRS)),
     concatMap(dir => of(dir).pipe(
         tap(dir => console.log('***********', 'building', dir, '*************')),
-        tap(() => cd(`${dir}`)),
-        switchMap(() => $`yarn build`),
-        tap(() => cd('..'))
+        tap(() => cd(absPath(`../packages/${dir}`))),
+        switchMap(() => $`yarn build`)
     ))
 ).subscribe();
 

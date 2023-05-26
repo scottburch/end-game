@@ -1,6 +1,6 @@
 import {bufferCount, delay, from, last, mergeMap, of, scan, skip, switchMap, take, tap, toArray} from "rxjs";
 import {Graph, graphOpen, levelStoreHandlers} from "@end-game/graph";
-import {authHandlers} from "@end-game/auth";
+import {authHandlers} from "@end-game/pwd-auth";
 import {p2pHandlers} from "../p2pHandlers.js";
 import {dialPeer} from "../dialer.js";
 

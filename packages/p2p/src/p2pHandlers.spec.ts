@@ -14,7 +14,7 @@ import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
 import {startTestNet, startTestNode} from "./test/testUtils.js";
-import {graphAuth, graphNewAuth} from "@end-game/auth";
+import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 
 describe('p2p handlers', () => {
     it('should setup peer chains', () =>

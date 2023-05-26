@@ -15,8 +15,8 @@ import type {PropsWithChildren} from 'react';
 import * as React from "react";
 import {createContext, useContext, useEffect, useState} from "react";
 import {catchError, of, switchMap, tap, throwError} from "rxjs";
-import type {GraphWithAuth} from '@end-game/auth'
-import {authHandlers, graphAuth, graphNewAuth} from "@end-game/auth";
+import type {GraphWithAuth} from '@end-game/pwd-auth'
+import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 import {newGraphNode} from "@end-game/graph";
 
 
