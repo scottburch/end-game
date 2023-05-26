@@ -181,7 +181,6 @@ describe('p2p handlers', () => {
             ))
         });
 
-        // TODO: FINISH HERE - need to add getEdge to the p2pHandlers like the other 'get' stuff
         it('should get a node from a peer', () =>
             firstValueFrom(startTestNode(0).pipe(
                 switchMap(({graph}) => graphNewAuth(graph, 'scott', 'pass')),
@@ -191,11 +190,9 @@ describe('p2p handlers', () => {
                     map(({graph}) => ({node0, node1: graph}))
                 )),
                 delay(1000),
-                switchMap(({node0, node1}) => of(undefined).pipe(
-                    switchMap(() => graphGet(node1, 'thing1'))
-                )),
-                tap(({node}) => console.log(node)),
-                delay(3000)
+                switchMap(({node0, node1}) => graphGet(node1, 'thing1')),
+                filter(({node}) => !!node?.nodeId),
+                tap(({node}) => expect(node.props.name).to.equal('thing1')),
             ))
         )
     });

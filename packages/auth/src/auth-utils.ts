@@ -1,10 +1,11 @@
 import {catchError, combineLatest, filter, first, map, of, switchMap, tap, timeout} from "rxjs";
 import type {Graph, GraphEdge, GraphNode, NodeId, Props} from '@end-game/graph'
-import {graphGet, graphGetRelationships, nodesByProp} from "@end-game/graph";
+import {graphGet, graphGetRelationships, LogLevel, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
 import {deserializePubKey, sign, verify} from '@end-game/crypto'
 import {serializer} from "@end-game/utils/serializer";
 import type {RxjsChain} from "@end-game/rxjs-chain";
+import {chainNext} from "@end-game/rxjs-chain";
 import {unauthorizedUserError} from "./auth-errors.js";
 
 
@@ -26,13 +27,14 @@ export type GraphWithAuth = Graph & {
 export type NodeWithSig<T extends Props> = GraphNode<T> & { sig: Uint8Array }
 export type AuthNode = GraphNode<EncryptedKeyBundle & { username: string }>;
 
+const TIMEOUT = 2000
 
 export const findAuthNode = (graph: Graph, username: string) =>
     nodesByProp(graph, 'auth', 'username', username).pipe(
         map(({nodes}) => nodes[0]),
         filter(node => !!node),
         map(node => ({graph, node: node as AuthNode})),
-        timeout({first: 1000, with: () => of({graph, node: {} as AuthNode})}),
+        timeout({first: TIMEOUT, with: () => of({graph, node: {} as AuthNode})}),
         first()
     );
 
@@ -58,7 +60,7 @@ export const isUserNodeOwner = (graph: GraphWithAuth, node: NodeWithSig<any>) =>
             switchMap(bytes => verify(bytes, (node as NodeWithSig<Props>).sig, graph.user?.auth.pubKey as CryptoKey))
         )),
         first(),
-        timeout({first: 1000, with: () => of(true)})
+        timeout({first: TIMEOUT, with: () => of(true)})
     );
 
 
@@ -73,7 +75,7 @@ const getNodeOnce = (graph: Graph, nodeId: NodeId) =>
         tap(x => x),
         filter(({node}) => !!node),
         first(),
-        timeout({first: 1000, with: () => of({graph, nodeId, node: undefined})})
+        timeout({first: TIMEOUT, with: () => of({graph, nodeId, node: undefined})})
     );
 
 export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
@@ -83,19 +85,31 @@ export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
         switchMap(authNodeId => graphGet(graph, authNodeId).pipe(
             filter(({node}) => !!node?.nodeId)
         )),
-        timeout({first: 2000, with: () => of({graph, nodeId: '', node: {} as AuthNode})}),
+        timeout({first: TIMEOUT * 2, with: () => of({graph, nodeId: '', node: {} as AuthNode})}),
     );
 
 export const verifyNodeSig = <T extends Props>(graph: Graph, node: NodeWithSig<T>) =>
     graphGetOwnerNode(graph, node.nodeId).pipe(
         switchMap(({node: authNode}) =>
-            combineLatest([
-                getNodeSignData(node),
-                deserializePubKey(authNode.props.pub)
-            ]).pipe(
-                switchMap(([data, pubKey]) => verify(data, (node as NodeWithSig<Props>).sig, pubKey)),
-                map(() => ({node, authNode})),
-                catchError(err => err.message === 'Invalid keyData' ? unauthorizedUserError(graph, authNode.props.username) : of(err))
+            authNode.nodeId ? (
+                combineLatest([
+                    getNodeSignData(node),
+                    deserializePubKey(authNode.props.pub)
+                ]).pipe(
+                    switchMap(([data, pubKey]) => verify(data, (node as NodeWithSig<Props>).sig, pubKey)),
+                    map(() => ({node, authNode})),
+                    catchError(err => err.message === 'Invalid keyData' ? unauthorizedUserError(graph, authNode.props.username) : of(err))
+                )
+            ) : of(undefined).pipe(
+                tap(() => chainNext(graph.chains.log, {
+                    graph,
+                    item: {
+                        code: 'NODE_SIG_VERIFY_ERROR',
+                        level: LogLevel.INFO,
+                        text: 'Unable to verify node signature, no auth object: ' + node.nodeId
+                    }
+
+                }))
             )
         ),
         map(() => ({graph, node}))
