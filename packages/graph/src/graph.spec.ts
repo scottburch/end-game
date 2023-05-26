@@ -25,7 +25,7 @@ import {
 } from "./graph.js";
 import {expect} from "chai";
 import {getAGraph} from "@end-game/test-utils";
-import {newUid} from "../utils/uid.js";
+import {newUid} from "./uid.js";
 
 describe('graph', () => {
     it('should open a graph', () =>

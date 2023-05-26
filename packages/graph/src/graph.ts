@@ -1,5 +1,5 @@
 import {filter, map, mergeMap, Observable, of, tap} from "rxjs";
-import {newUid} from "../utils/uid.js";
+import {newUid} from "./uid.js";
 
 import type {DeepPartial} from "tsdef";
 import type {Relationship} from "./relationship.js";
