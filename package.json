@@ -5,6 +5,7 @@
   "workspaces": [
     "packages/*",
     "packages/auth/*",
+    "packages/stores/*",
     "packages/tmp/my-app"
   ],
   "dependencies": {

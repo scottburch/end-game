@@ -1,14 +1,13 @@
 {
-  "name": "@end-game/graph",
+  "name": "@end-game/level-store",
   "version": "1.0.27",
   "license": "MIT",
   "type": "module",
   "private": false,
-  "main": "./lib/index-browser.js",
+  "main": "./lib/index.js",
   "exports": {
     ".": {
-      "node": "./lib/index.js",
-      "default": "./lib/index-browser.js"
+      "default": "./lib/index.js"
     }
   },
   "dependencies": {
@@ -49,6 +48,5 @@
     "build": "rm -rf lib && webpack",
     "build-watch": "yarn build --watch",
     "test": "mocha ./src/**/*.spec.ts"
-  },
-  "gitHead": "a01ca1e84d2758a3f85629f5dac3f4d3c0afd984"
+  }
 }

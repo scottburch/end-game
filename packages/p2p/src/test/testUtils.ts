@@ -1,8 +1,9 @@
 import {bufferCount, delay, from, last, mergeMap, of, scan, skip, switchMap, take, tap, toArray} from "rxjs";
-import {Graph, graphOpen, levelStoreHandlers} from "@end-game/graph";
+import {Graph, graphOpen} from "@end-game/graph";
 import {authHandlers} from "@end-game/pwd-auth";
 import {p2pHandlers} from "../p2pHandlers.js";
 import {dialPeer} from "../dialer.js";
+import {levelStoreHandlers} from "@end-game/level-store";
 
 export const startTestNet = (nodes: number[][]) =>
     from(nodes).pipe(

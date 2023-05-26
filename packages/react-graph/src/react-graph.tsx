@@ -6,7 +6,6 @@ import {
     graphOpen,
     graphPutNode,
     graphPutEdge,
-    levelStoreHandlers,
     newUid,
     nodesByLabel,
     nodesByProp, newGraphEdge,
@@ -18,6 +17,7 @@ import {catchError, of, switchMap, tap, throwError} from "rxjs";
 import type {GraphWithAuth} from '@end-game/pwd-auth'
 import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 import {newGraphNode} from "@end-game/graph";
+import {levelStoreHandlers} from "@end-game/level-store";
 
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);

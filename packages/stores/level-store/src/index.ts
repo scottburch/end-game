@@ -1,7 +1,7 @@
 import {MemoryLevel} from "memory-level";
 import type {GraphEdge, GraphHandler} from '@end-game/graph'
-import {IndexTypes} from '../../graph/graph.js';
-import type {Graph, GraphNode, Props} from "../../graph/graph.js";
+import {IndexTypes} from '@end-game/graph';
+import type {Graph, GraphNode, Props} from "@end-game/graph";
 import {
     catchError, combineLatest,
     concatMap, from, last,
@@ -14,7 +14,7 @@ import {
     takeWhile, tap,
     throwError, toArray
 } from "rxjs";
-import type {Relationship} from "../../graph/relationship.js";
+import type {Relationship} from "@end-game/graph";
 import {AbstractLevel} from "abstract-level";
 import type {AbstractIteratorOptions} from "abstract-level";
 import {Level} from "level";

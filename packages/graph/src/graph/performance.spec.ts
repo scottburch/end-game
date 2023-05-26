@@ -1,5 +1,5 @@
 import {firstValueFrom, last, map, mergeMap, range, switchMap, tap} from "rxjs";
-import {getAGraph} from "../test/testUtils.js";
+import {getAGraph} from "@end-game/test-utils";
 import {graphPutNode, newGraphNode} from "./graph.js";
 import {expect} from "chai";
 

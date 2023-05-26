@@ -3,14 +3,14 @@ import {
     graphOpen,
     graphPutEdge,
     graphPutNode,
-    levelStoreHandlers,
     newGraphEdge,
     newGraphNode
 } from "@end-game/graph";
-import {map, switchMap, tap} from "rxjs";
+import {map, switchMap} from "rxjs";
 import {authHandlers} from "../auth-handlers.js";
 import {graphAuth, graphNewAuth} from "../user-auth.js";
 import type {AuthNode, NodeWithSig} from "../auth-utils.js";
+import {levelStoreHandlers} from "@end-game/level-store";
 
 export const graphWithAuth = () => graphOpen().pipe(
     switchMap(graph => levelStoreHandlers(graph)),

@@ -24,7 +24,7 @@ import {
     nodesByProp, newGraphNode, newGraphEdge
 } from "./graph.js";
 import {expect} from "chai";
-import {getAGraph} from "../test/testUtils.js";
+import {getAGraph} from "@end-game/test-utils";
 import {newUid} from "../utils/uid.js";
 
 describe('graph', () => {
