@@ -1,5 +1,5 @@
 import {startTestNode} from "./test/testUtils.js";
-import {delay, filter, firstValueFrom, of, Subscription, switchMap, takeUntil, tap, timer} from "rxjs";
+import {delay, filter, firstValueFrom, Subscription, switchMap, tap} from "rxjs";
 import {expect} from "chai";
 import {Graph} from "@end-game/graph";
 
@@ -25,7 +25,8 @@ describe("dialer", () => {
             delay(2000),
             switchMap(() => startTestNode(1)),
             switchMap(({graph}) => graph.chains.log),
-            filter(({item}) => item.text.includes('connection received'))
+            filter(({item}) => item.text.includes('connection received')),
+            delay(500)
         ))
     })
 });

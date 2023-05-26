@@ -1,5 +1,5 @@
 import {
-    GraphEdge,
+    GraphEdge, graphGet,
     GraphNode,
     graphOpen,
     graphPutEdge,
@@ -13,7 +13,7 @@ import {combineLatest, delay, filter, firstValueFrom, map, of, range, switchMap,
 import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
-import {startTestNet} from "./test/testUtils.js";
+import {startTestNet, startTestNode} from "./test/testUtils.js";
 import {graphAuth, graphNewAuth} from "@end-game/auth";
 
 describe('p2p handlers', () => {
@@ -179,6 +179,24 @@ describe('p2p handlers', () => {
                     tap(() => console.log(Date.now() - (global as any).start))
                 )),
             ))
-        })
+        });
+
+        // TODO: FINISH HERE - need to add getEdge to the p2pHandlers like the other 'get' stuff
+        it('should get a node from a peer', () =>
+            firstValueFrom(startTestNode(0).pipe(
+                switchMap(({graph}) => graphNewAuth(graph, 'scott', 'pass')),
+                switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
+                switchMap(({graph}) => graphPutNode(graph, newGraphNode('thing1', 'thing', {name: 'thing1'}))),
+                switchMap(({graph: node0}) => startTestNode(1, [0]).pipe(
+                    map(({graph}) => ({node0, node1: graph}))
+                )),
+                delay(1000),
+                switchMap(({node0, node1}) => of(undefined).pipe(
+                    switchMap(() => graphGet(node1, 'thing1'))
+                )),
+                tap(({node}) => console.log(node)),
+                delay(3000)
+            ))
+        )
     });
 });
