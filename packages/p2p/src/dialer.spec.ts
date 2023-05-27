@@ -1,5 +1,5 @@
-import {startTestNode} from "./test/testUtils.js";
-import {delay, filter, firstValueFrom, Subscription, switchMap, tap} from "rxjs";
+import {startTestNet, startTestNode} from "./test/testUtils.js";
+import {delay, filter, firstValueFrom, merge, of, Subscription, switchMap, tap} from "rxjs";
 import {expect} from "chai";
 import {Graph} from "@end-game/graph";
 
@@ -29,4 +29,14 @@ describe("dialer", () => {
             delay(500)
         ))
     });
+
+    it('should reject duplicate connections', () =>
+        firstValueFrom(startTestNet([[1], [0]]).pipe(
+            switchMap(({node0, node1}) => merge(
+                node0.chains.log,
+                node1.chains.log
+            )),
+            filter(entry => !!entry)
+        ))
+    );
 });

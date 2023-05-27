@@ -3,19 +3,26 @@ import WS from "isomorphic-ws";
 import {delay, filter, first, fromEvent, map, mergeMap, of, takeUntil, tap} from "rxjs";
 import {deserializer, serializer} from "@end-game/utils/serializer";
 import {chainNext} from "@end-game/rxjs-chain";
+import WebSocket from "isomorphic-ws";
 
 
-export const socketManager = (graph: GraphWithP2p, conn: WS.WebSocket) => {
-    const isDup = dupCache(conn);
+export type PeerConn = {
+    socket: WebSocket,
+    close: () => void
+}
+
+export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
+    const isDup = dupCache(peerConn.socket);
 
     graph.chains.peersOut.pipe(
-        takeUntil(fromEvent(conn, 'close').pipe(first())),
+        takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
         map(({msg}) => serializer(msg)),
         filter(msg => !isDup(msg)),
-        tap(msg => conn.send(msg))
+        tap(msg => peerConn.socket.send(msg))
     ).subscribe();
 
-    return fromEvent<MessageEvent>(conn, 'message').pipe(
+    return fromEvent<MessageEvent>(peerConn.socket, 'message').pipe(
+        takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
         map(ev => ev.data),
         filter(msg => !isDup(msg)),
         map(msg => deserializer<P2pMsg>(msg)),
