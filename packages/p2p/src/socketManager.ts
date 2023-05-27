@@ -44,7 +44,9 @@ export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
     );
 
     function checkDupConn(msg: AnnounceMsg) {
-        if(graph.peerConnections.has(msg.data.graphId)) {
+        graph.peerConnections.has(msg.data.graphId) ? stopDupConnection() : addNewConnection();
+
+        function stopDupConnection() {
             peerConn.close();
             chainNext(graph.chains.log, {
                 graph,
@@ -54,7 +56,9 @@ export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
                     level: LogLevel.INFO
                 }
             }).subscribe()
-        } else {
+        }
+
+        function addNewConnection() {
             graph.peerConnections.add(msg.data.graphId);
             connOk = true;
         }
