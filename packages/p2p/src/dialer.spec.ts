@@ -28,5 +28,5 @@ describe("dialer", () => {
             filter(({item}) => item.text.includes('connection received')),
             delay(500)
         ))
-    })
+    });
 });

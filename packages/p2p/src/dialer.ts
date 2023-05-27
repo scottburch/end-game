@@ -1,5 +1,5 @@
 import {Graph} from "@end-game/graph";
-import {fromEvent, merge, Observable, switchMap, tap} from "rxjs";
+import {fromEvent, Observable, switchMap, tap} from "rxjs";
 import WebSocket from "isomorphic-ws";
 import {GraphWithP2p} from "./p2pHandlers.js";
 import {socketManager} from "./socketManager.js";
@@ -20,9 +20,7 @@ export const dialPeer = (graph: Graph, opts: DialerOpts) =>
             socket = new WebSocket(opts.url);
 
             const openSub = fromEvent<WebSocket.Event>(socket, 'open').pipe(
-                switchMap(() => merge(
-                    socketManager(graph as GraphWithP2p, socket)
-                ))
+                switchMap(() => socketManager(graph as GraphWithP2p, socket))
             ).subscribe();
 
             const closeSub = fromEvent<WebSocket.CloseEvent>(socket, 'close').pipe(

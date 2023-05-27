@@ -9,6 +9,7 @@ import {chainNext, newRxjsChain} from "@end-game/rxjs-chain";
 
 export type NodeId = string
 export type EdgeId = string
+export type GraphId = string
 
 export type Props = Record<string, any>;
 
