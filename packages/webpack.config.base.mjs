@@ -23,7 +23,7 @@ export const webpackBase = (importUrl, config = {}) => ({
     module: {
         rules: [
             {
-                test: /\.ts?$/,
+                test: /\.(ts?|tsx?)$/,
                 use: {
                     loader: 'ts-loader',
                     options: {
@@ -37,9 +37,9 @@ export const webpackBase = (importUrl, config = {}) => ({
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
         extensionAlias: {
-            '.js': ['.ts', '.js'],
-            '.mjs': ['.mts', '.mjs'],
-        }
+            '.jsx': ['.tsx', '.jsx'],
+            '.js': ['.ts', '.js']
+        },
     },
     ...config
 });
