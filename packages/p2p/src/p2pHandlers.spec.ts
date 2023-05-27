@@ -139,24 +139,6 @@ describe('p2p handlers', () => {
             ))
         );
 
-        it('should handle a redundant connection', () =>
-            //TODO: In the future, don't allow redundant connections - testing for now to make sure it does not blow up
-            firstValueFrom(startTestNet([[1], [0]]).pipe(
-                switchMap(({node0, node1, node2}) => of({node0, node1, node2}).pipe(
-                    tap(() => timer(1).pipe(
-                        switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
-                        switchMap(() => graphAuth(node0, 'scott', 'pass')),
-                        switchMap(() => graphPutNode(node0, newGraphNode('thing1', 'thing', {name: 'thing1'})))
-                    ).subscribe()),
-
-                    switchMap(() => nodesByLabel(node1, 'thing')),
-                    filter(({nodes}) => !!nodes.length),
-                ))
-            ))
-        );
-
-
-
         it('should be able to write a bunch of nodes quickly between peers', function () {
             this.timeout(15000);
             const COUNT = 20;

@@ -1,5 +1,5 @@
 import {startTestNet, startTestNode} from "./test/testUtils.js";
-import {delay, filter, firstValueFrom, merge, of, Subscription, switchMap, tap} from "rxjs";
+import {delay, filter, firstValueFrom, merge, Subscription, switchMap, take, tap} from "rxjs";
 import {expect} from "chai";
 import {Graph} from "@end-game/graph";
 
@@ -36,7 +36,8 @@ describe("dialer", () => {
                 node0.chains.log,
                 node1.chains.log
             )),
-            filter(entry => !!entry)
+            filter(({item}) => item.code === 'DUPLICATE_CONNECTION'),
+            take(2)
         ))
     );
 });
