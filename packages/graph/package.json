@@ -4,11 +4,10 @@
   "license": "MIT",
   "type": "module",
   "private": false,
-  "main": "./lib/index-browser.js",
+  "main": "./lib/index.js",
   "exports": {
     ".": {
-      "node": "./lib/index.js",
-      "default": "./lib/index-browser.js"
+      "default": "./lib/index.js"
     }
   },
   "dependencies": {
