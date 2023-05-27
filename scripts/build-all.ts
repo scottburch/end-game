@@ -5,7 +5,7 @@ import {bufferCount, concatMap, from, mergeMap, of, switchMap, tap} from "rxjs";
 
 export const absPath = (filename = '.') => url.fileURLToPath(new URL(filename, import.meta.url));
 
-const DIRS = ['rxjs-chain', 'utils', 'crypto', 'graph', 'stores/level-store', 'auth/pwd-auth', 'p2p', 'react-graph', 'dtg-scripts', 'cli', 'graph-explorer'];
+const DIRS = ['rxjs-chain', 'utils', 'crypto', 'graph', 'loggers/console-logger', 'stores/level-store', 'auth/pwd-auth', 'p2p', 'react-graph', 'dtg-scripts', 'cli', 'graph-explorer'];
 
 
 of(true).pipe(

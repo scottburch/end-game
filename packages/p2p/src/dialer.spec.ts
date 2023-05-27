@@ -2,6 +2,7 @@ import {startTestNet, startTestNode} from "./test/testUtils.js";
 import {delay, filter, firstValueFrom, merge, Subscription, switchMap, take, tap} from "rxjs";
 import {expect} from "chai";
 import {Graph} from "@end-game/graph";
+import {consoleLoggerHandlers} from "@end-game/console-logger";
 
 describe("dialer", () => {
     it('should redial until it can get a connection', () =>

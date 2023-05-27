@@ -1,5 +1,5 @@
 {
-  "name": "@end-game/level-store",
+  "name": "@end-game/console-logger",
   "version": "1.0.27",
   "license": "MIT",
   "type": "module",
@@ -11,14 +11,10 @@
     }
   },
   "dependencies": {
-    "@end-game/rxjs-chain": "^1.0.27",
+    "@end-game/graph": "*",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.15",
-    "abstract-level": "^1.0.3",
-    "level": "^8.0.0",
-    "memory-level": "^1.0.0",
-    "rxjs": "^7.8.1",
     "ts-loader": "^9.4.2",
     "typescript": "^5.0.4",
     "webpack": "^5.80.0",
