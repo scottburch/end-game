@@ -12,7 +12,7 @@ export type PeerConn = {
     close: () => void
 }
 
-type AnnounceMsg = P2pMsg<'announce', {graphId: GraphId}>
+type AnnounceMsg = P2pMsg<'announce', { graphId: GraphId }>
 
 export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
     const isDup = dupCache(peerConn.socket);
@@ -47,7 +47,7 @@ export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
         graph.peerConnections.has(msg.data.graphId) ? stopDupConnection() : addNewConnection();
 
         function stopDupConnection() {
-            peerConn.close();
+            peerConn?.close();
             chainNext(graph.chains.log, {
                 graph,
                 item: {
@@ -59,7 +59,12 @@ export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
         }
 
         function addNewConnection() {
+            chainNext(graph.chains.log, {
+                graph,
+                item: {code: 'NEW_PEER_CONNECTION', text: `New connection`, level: LogLevel.INFO}
+            }).subscribe();
             graph.peerConnections.add(msg.data.graphId);
+            chainNext(graph.chains.reloadGraph, '').subscribe();
             connOk = true;
         }
     }

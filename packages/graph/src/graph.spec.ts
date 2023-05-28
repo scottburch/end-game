@@ -15,7 +15,7 @@ import {
     toArray
 } from "rxjs";
 import {
-    graphGet,
+    graphGetNode,
     graphGetEdge,
     graphGetRelationships,
     graphOpen,
@@ -50,7 +50,7 @@ describe('graph', () => {
                     map(({nodeId}) => ({graph, nodeId, nid1}))
                 )),
                 tap(({nid1, nodeId}) => expect(nid1).to.equal(nodeId)),
-                switchMap(({graph, nodeId}) => graphGet(graph, nodeId)),
+                switchMap(({graph, nodeId}) => graphGetNode(graph, nodeId)),
                 tap(({graph, node}) => {
                     expect(node.props.name).to.equal('scott');
                     expect(node.props.foo).to.equal(2);
@@ -62,11 +62,11 @@ describe('graph', () => {
     it('should get an item from the graph by id', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => graphPutNode(graph, newGraphNode('', 'person', {name: 'scott'}))),
-            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph, nodeId)),
+            switchMap(({graph, nodeId}) => graphGetNode<{ name: string }>(graph, nodeId)),
             tap(({node}) => expect(node.props.name).to.equal('scott')),
             first(),
             switchMap(({graph}) => graphPutNode(graph, newGraphNode('', 'person', {name: 'todd'}))),
-            switchMap(({graph, nodeId}) => graphGet<{ name: string }>(graph, nodeId)),
+            switchMap(({graph, nodeId}) => graphGetNode<{ name: string }>(graph, nodeId)),
             tap(({node}) => expect(node.props.name).to.equal('todd')),
         ))
     );
@@ -190,11 +190,11 @@ describe('graph', () => {
         ))
     );
 
-    it('should update a graphGet() listener when node props is updated', () =>
+    it('should update a graphGetNode() listener when node props is updated', () =>
         firstValueFrom(getAGraph().pipe(
             tap(graph => graphPutNode(graph, newGraphNode('n1', 'person', {name: 'scott'})).subscribe()),
             tap(graph => setTimeout(() => graphPutNode(graph, newGraphNode('n1', 'person', {name: 'todd'})).subscribe(), 100)),
-            switchMap(graph => graphGet(graph, 'n1')),
+            switchMap(graph => graphGetNode(graph, 'n1')),
             map(({node}) => node.props.name),
             scan((names, name) => names.add(name), new Set()),
             skipWhile(names => names.size < 2),
@@ -274,9 +274,9 @@ describe('graph', () => {
             }),
             delay(100),
             switchMap(graph => merge(
-                graphGet(graph, 'n1'),
-                graphGet(graph, 'n2'),
-                graphGet(graph, 'n3'),
+                graphGetNode(graph, 'n1'),
+                graphGetNode(graph, 'n2'),
+                graphGetNode(graph, 'n3'),
             )),
             map(({nodeId}) => nodeId),
             bufferCount(3),

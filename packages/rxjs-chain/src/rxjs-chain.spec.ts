@@ -1,7 +1,8 @@
 import {appendHandler, chainNext, insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "./rxjs-chain.js";
 import {expect} from "chai";
 import {
-    bufferCount, catchError, delay,
+    bufferCount,
+    catchError,
     filter,
     firstValueFrom,
     last,
@@ -89,17 +90,17 @@ describe('rxjs chain', () => {
         ))
     );
 
-    it('should wait until the chain completes to return the chainNext()', () => {
+    it('should wait until the chain completes to return the chainNext()', (done) => {
         let called = ''
-        return firstValueFrom(of(newRxjsChain<number>()).pipe(
+        firstValueFrom(of(newRxjsChain<number>()).pipe(
             tap(chain => appendHandler(chain, 'mine', n => of(n + 1))),
             tap(chain => setTimeout(() => chainNext(chain, 1).pipe(
                 tap(n => expect(n).to.equal(2)),
-                tap(() => expect(called+='chain').to.equal('chain'))
+                tap(() => called === 'end' && done())
             ).subscribe())),
             switchMap(chain => chain),
             tap(n => expect(n).to.equal(2)),
-            tap(() => expect(called+='end').to.equal('chainend'))
+            tap(() => called += 'end')
         ))
     });
 
@@ -160,5 +161,5 @@ describe('rxjs chain', () => {
             tap(chain => chain.subscribe(v => v === 10 ? done() : done('event with wront value: ' + v))),
             switchMap(chain => chainNext(chain, 10))
         ))
-    })
+    });
 });

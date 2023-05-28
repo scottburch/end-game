@@ -1,8 +1,7 @@
-import {startTestNet, startTestNode} from "./test/testUtils.js";
 import {delay, filter, firstValueFrom, merge, Subscription, switchMap, take, tap} from "rxjs";
 import {expect} from "chai";
 import {Graph} from "@end-game/graph";
-import {consoleLoggerHandlers} from "@end-game/console-logger";
+import {startTestNet, startTestNode} from "@end-game/test-utils";
 
 describe("dialer", () => {
     it('should redial until it can get a connection', () =>
@@ -10,7 +9,7 @@ describe("dialer", () => {
             delay(3000),
             switchMap(() => startTestNode(1)),
             switchMap(({graph}) => graph.chains.log),
-            tap(({item}) => expect(item.text).to.contain('connection received'))
+            tap(({item}) => expect(item.code).to.equal('NEW_PEER_CONNECTION'))
         ))
     );
 
@@ -21,12 +20,12 @@ describe("dialer", () => {
         return firstValueFrom(startTestNode(0, [1]).pipe(
             tap(() => peer1Sub = startTestNode(1).subscribe(({graph}) => peer1 = graph)),
             switchMap(() => peer1.chains.log),
-            filter(({item}) => item.text.includes('connection received')),
+            filter(({item}) => item.code === 'NEW_PEER_CONNECTION'),
             tap(() => peer1Sub.unsubscribe()),
             delay(2000),
             switchMap(() => startTestNode(1)),
             switchMap(({graph}) => graph.chains.log),
-            filter(({item}) => item.text.includes('connection received')),
+            filter(({item}) => item.code === 'NEW_PEER_CONNECTION'),
             delay(500)
         ))
     });

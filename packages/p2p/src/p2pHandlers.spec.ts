@@ -1,5 +1,5 @@
 import {
-    GraphEdge, graphGet,
+    GraphEdge, graphGetNode,
     GraphNode,
     graphOpen,
     graphPutEdge,
@@ -9,12 +9,12 @@ import {
     nodesByLabel,
     Props
 } from "@end-game/graph";
-import {combineLatest, delay, filter, firstValueFrom, map, of, range, switchMap, tap, timer} from "rxjs";
+import {combineLatest, delay, filter, firstValueFrom, map, mergeMap, of, range, switchMap, tap, timer} from "rxjs";
 import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
-import {startTestNet, startTestNode} from "./test/testUtils.js";
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
+import {startTestNet, startTestNode} from "@end-game/test-utils";
 
 describe('p2p handlers', () => {
     it('should setup peer chains', () =>
@@ -149,7 +149,7 @@ describe('p2p handlers', () => {
                         switchMap(() => graphAuth(node0, 'scott', 'pass')),
                         tap(() => (global as any).start = Date.now()),
                         switchMap(() => range(1, COUNT).pipe(
-                            switchMap(idx => graphPutNode(node0, newGraphNode(`thing${idx}`, 'thing', {name: `thing${idx}`})))
+                            mergeMap(idx => graphPutNode(node0, newGraphNode(`thing${idx}`, 'thing', {name: `thing${idx}`})))
                         )),
                     ).subscribe()),
 
@@ -167,12 +167,12 @@ describe('p2p handlers', () => {
             firstValueFrom(startTestNode(0).pipe(
                 switchMap(({graph}) => graphNewAuth(graph, 'scott', 'pass')),
                 switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
-                switchMap(({graph}) => graphPutNode(graph, newGraphNode('thing1', 'thing', {name: 'thing1'}))),
+                tap(({graph}) => graphPutNode(graph, newGraphNode('thing1', 'thing', {name: 'thing1'})).subscribe()),
                 switchMap(({graph: node0}) => startTestNode(1, [0]).pipe(
                     map(({graph}) => ({node0, node1: graph}))
                 )),
                 delay(1000),
-                switchMap(({node0, node1}) => graphGet(node1, 'thing1')),
+                switchMap(({node0, node1}) => graphGetNode(node1, 'thing1')),
                 filter(({node}) => !!node?.nodeId),
                 tap(({node}) => expect(node.props.name).to.equal('thing1')),
             ))

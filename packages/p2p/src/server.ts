@@ -12,7 +12,6 @@ export const startServer = (graph: GraphWithP2p, port: number) => new Observable
     const serverSub = of(wss).pipe(
         switchMap(wss => fromEvent(wss, 'listening').pipe(map(() => wss))),
         mergeMap(wss => fromEvent(wss, 'connection').pipe(
-            tap(() => chainNext(graph.chains.log, {graph, item: {code: 'NEW_PEER_CONNECTION', text: `New connection received`, level: LogLevel.INFO}}).subscribe()),
             map(x => (x as [WS.WebSocket])[0]),
             mergeMap(conn => socketManager(graph, {
                 socket: conn,
@@ -25,8 +24,8 @@ export const startServer = (graph: GraphWithP2p, port: number) => new Observable
 
     return () => {
         serverSub.unsubscribe();
-        Array.from(wss.clients.values()).forEach(client => client.close());
-        wss.close();
+        Array.from(wss.clients.values()).forEach(client => client?.close());
+        wss?.close();
     };
 });
 

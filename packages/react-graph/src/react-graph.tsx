@@ -1,6 +1,6 @@
 import type {EdgeId, Graph, GraphEdge, GraphNode, NodeId, Props, Relationship} from '@end-game/graph'
 import {
-    graphGet,
+    graphGetNode,
     graphGetEdge,
     graphGetRelationships,
     graphOpen,
@@ -18,16 +18,22 @@ import type {GraphWithAuth} from '@end-game/pwd-auth'
 import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 import {newGraphNode} from "@end-game/graph";
 import {levelStoreHandlers} from "@end-game/level-store";
+import {dialPeer, p2pHandlers} from "@end-game/p2p";
+import type {DialerOpts} from "@end-game/p2p";
 
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);
 
 export const useGraph = () => useContext(GraphContext);
 
+export const useDialer = () => {
+    const graph = useGraph();
+    return (opts: DialerOpts) => dialPeer(graph, opts);
+}
 
 export const useAuth = () =>  {
     const [auth, setAuth] = useState<{username: string}>({username: ''});
-    let graph = useGraph();
+    const graph = useGraph();
 
 
     useEffect(() => {
@@ -100,7 +106,7 @@ export const useGraphGet = <T extends Props>(nodeId: NodeId) => {
     useEffect(() => {
         !graph && console.error('useGraphGet() called outside of a graph context');
         if (graph && nodeId) {
-            const sub = graphGet(graph, nodeId).pipe(
+            const sub = graphGetNode(graph, nodeId).pipe(
                 tap(({node}) => setNode(node as GraphNode<T>))
             ).subscribe();
             return () => sub.unsubscribe();
@@ -171,6 +177,7 @@ export const ReactGraph: React.FC<PropsWithChildren<{ graph?: Graph }>> = ({grap
             }).pipe(
                 switchMap(graph => levelStoreHandlers(graph)),
                 switchMap(graph => authHandlers(graph)),
+                switchMap(graph => p2pHandlers(graph, {})),
                 tap(graph => setMyGraph(graph)),
                 switchMap(graph => (graph as GraphWithAuth).chains.authChanged),
                 tap(({graph}) => setMyGraph(graph)),

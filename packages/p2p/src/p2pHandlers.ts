@@ -4,7 +4,7 @@ import {map, of, switchMap, tap} from "rxjs";
 import type {RxjsChain} from "@end-game/rxjs-chain";
 import {appendHandler, chainNext, newRxjsChain, RxjsChainFn} from "@end-game/rxjs-chain";
 import {startServer} from "./server.js";
-import {graphGet, graphGetEdge, graphGetRelationships, graphPutEdge, graphPutNode} from "@end-game/graph";
+import {graphGetNode, graphGetEdge, graphGetRelationships, graphPutEdge, graphPutNode} from "@end-game/graph";
 
 export type P2pOpts = {
     listeningPort?: number,
@@ -122,7 +122,7 @@ const doPutEdgeIn = (graph: Graph, msg: P2pMsg) =>
 
 const doGetNodeIn = (graph: Graph, msg: P2pMsg) =>
     of(msg as P2pMsg<'getNode', NodeId>).pipe(
-        switchMap(msg => graphGet(graph, msg.data)),
+        switchMap(msg => graphGetNode(graph, msg.data)),
         tap(({node}) => node?.nodeId && chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,
             msg: {cmd: 'putNode', data: node}

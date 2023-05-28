@@ -97,7 +97,8 @@ export const levelStoreGetEdgeHandler = (handlerOpts: LevelHandlerOpts): GraphHa
     ({graph, edgeId}) => getStore(graph, handlerOpts).pipe(
         switchMap(store => store.get([graph.graphId, edgeId].join('.'))),
         map(json => deserializer<GraphEdge<Props>>(json)),
-        map(edge => ({graph, edgeId, edge}))
+        map(edge => ({graph, edgeId, edge})),
+        catchError(err => err.notFound ? of({graph, edgeId}) : throwError(err))
     );
 
 export const levelStoreNodesByLabelHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'nodesByLabel'> =>

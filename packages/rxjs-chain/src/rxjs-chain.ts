@@ -1,5 +1,5 @@
 import type {Subscriber} from 'rxjs'
-import {catchError, concatMap, Observable, of, Subject, tap} from "rxjs";
+import {mergeMap, Observable, of, tap} from "rxjs";
 
 export type RxjsChainFn<T> = (v: T) => Observable<T>
 
@@ -23,24 +23,14 @@ export const insertHandlerAfter = <T>(chain: RxjsChain<T>, after: string, name: 
 };
 
 export const chainNext = <T>(chain: RxjsChain<T>, val: T) => {
-    return new Observable<T>(sub => {
         // TODO - change this so that it runs only once per change to handlers
-        const generateChain = (subject: Subject<T>) =>
-            chain.fns.reduce((o, [_, fn]) => {
-                return o.pipe(concatMap(fn))
-            }, subject.asObservable())
+        // maybe by sticking this in the chain itself.
+        const generateChain = () =>
+            chain.fns.reduce((o, [_, fn]) => o.pipe(mergeMap(fn)), of(val))
 
-        const subject = new Subject<T>()
-        generateChain(subject).pipe(
-            tap(v => {
-                sub.next(v);
-                sub.complete();
-            }),
-            tap(v => chain.subscribers.forEach(subscriber => subscriber.next(v))),
-            catchError(err => of(err).pipe(tap(() => sub.error(err))))
-        ).subscribe();
-        subject.next(val);
-    })
+        return generateChain().pipe(
+            tap(v => chain.subscribers.forEach(subscriber => subscriber.next(v)))
+        );
 };
 
 export const newRxjsChain = <T>() => {

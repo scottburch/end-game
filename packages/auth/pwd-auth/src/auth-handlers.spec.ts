@@ -1,7 +1,7 @@
 import {catchError, delay, first, firstValueFrom, of, switchMap, tap} from "rxjs";
 import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
 import type {Props} from "@end-game/graph";
-import {graphGet, graphPutNode, graphPutEdge, newGraphEdge} from "@end-game/graph";
+import {graphGetNode, graphPutNode, graphPutEdge, newGraphEdge} from "@end-game/graph";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
 import {newGraphNode} from "@end-game/graph";
@@ -49,7 +49,7 @@ describe('auth handlers', function()  {
             switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphPutNode(graph, newGraphNode('item', 'person', {name: 'scott'}))),
-            switchMap(({graph, nodeId}) => graphGet(graph, nodeId)),
+            switchMap(({graph, nodeId}) => graphGetNode(graph, nodeId)),
             tap(({node}) => expect(node.props.name).to.equal('scott'))
         ))
     );
@@ -59,10 +59,10 @@ describe('auth handlers', function()  {
             switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphPutNode(graph, newGraphNode('item', 'person', {name: 'joe'}))),
-            switchMap(({graph}) => graphGet(graph, 'item').pipe(first())),
+            switchMap(({graph}) => graphGetNode(graph, 'item').pipe(first())),
             tap(({node}) => expect(node.props.name).to.equal('joe')),
             switchMap(({graph}) => graphPutNode(graph, newGraphNode('item', 'person', {name: 'scott'}))),
-            switchMap(({graph}) => graphGet(graph, 'item')),
+            switchMap(({graph}) => graphGetNode(graph, 'item')),
             tap(({node}) => expect(node.props.name).to.equal('scott'))
         ))
     );
@@ -82,7 +82,7 @@ describe('auth handlers', function()  {
     it('should send a signed object to storage', () =>
         firstValueFrom(graphWithUser().pipe(
             switchMap(graph => graphPutNode(graph, newGraphNode('item', 'person', {name: 'scott'}))),
-            switchMap(({graph}) => graphGet(graph, 'item')),
+            switchMap(({graph}) => graphGetNode(graph, 'item')),
             tap(({node}) => expect((node as NodeWithSig<Props>).sig).not.to.be.undefined)
         ))
     );

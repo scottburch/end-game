@@ -39,7 +39,7 @@ export const dialPeer = (graph: Graph, opts: DialerOpts) =>
             ).subscribe()
 
             const errorSub = fromEvent<ErrorEvent>(peerConn.socket, 'error').pipe(
-                tap(() => peerConn.socket.close())
+                tap(() => peerConn.socket?.close())
             ).subscribe()
         };
 
@@ -47,5 +47,5 @@ export const dialPeer = (graph: Graph, opts: DialerOpts) =>
 
         subscriber.next({graph});
 
-        return () => peerConn.close()
+        return () => peerConn?.close()
     });

@@ -1,6 +1,6 @@
 import {catchError, combineLatest, filter, first, map, of, switchMap, tap, timeout} from "rxjs";
 import type {Graph, GraphEdge, GraphNode, NodeId, Props} from '@end-game/graph'
-import {graphGet, graphGetRelationships, LogLevel, nodesByProp} from "@end-game/graph";
+import {graphGetNode, graphGetRelationships, LogLevel, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
 import {deserializePubKey, sign, verify} from '@end-game/crypto'
 import {serializer} from "@end-game/utils/serializer";
@@ -54,7 +54,7 @@ export const signGraphNode = (graph: GraphWithAuth, node: GraphNode<any>) =>
     );
 
 export const isUserNodeOwner = (graph: GraphWithAuth, node: NodeWithSig<any>) =>
-    graphGet(graph, node.nodeId).pipe(
+    graphGetNode(graph, node.nodeId).pipe(
         filter(({node}) => !!node),
         switchMap(({node}) => getNodeSignData(node).pipe(
             switchMap(bytes => verify(bytes, (node as NodeWithSig<Props>).sig, graph.user?.auth.pubKey as CryptoKey))
@@ -71,7 +71,7 @@ export const getNodeSignData = (node: GraphNode<any>) =>
 
 
 const getNodeOnce = (graph: Graph, nodeId: NodeId) =>
-    graphGet(graph, nodeId).pipe(
+    graphGetNode(graph, nodeId).pipe(
         tap(x => x),
         filter(({node}) => !!node),
         first(),
@@ -82,7 +82,7 @@ export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
     graphGetRelationships(graph, nodeId, 'owned_by').pipe(
         filter(({relationships}) => !!relationships.length),
         map(({relationships}) => relationships[0].to),
-        switchMap(authNodeId => graphGet(graph, authNodeId).pipe(
+        switchMap(authNodeId => graphGetNode(graph, authNodeId).pipe(
             filter(({node}) => !!node?.nodeId)
         )),
         timeout({first: TIMEOUT * 1.2, with: () => of({graph, nodeId: '', node: {} as AuthNode})}),
