@@ -251,14 +251,17 @@ describe('graph', () => {
 
     it('should update nodesByProp() when a node is added', () =>
         firstValueFrom(getAGraph().pipe(
-            switchMap(graph => graphPutNode(graph, newGraphNode('n1', 'person', {group: 'foo'}))),
+            switchMap(graph => graphPutNode(graph, newGraphNode('before1', 'thing', {group: 'bar'}))),
+            switchMap(({graph}) => graphPutNode(graph, newGraphNode('before2', 'thing', {group: 'foo'}))),
+            switchMap(({graph}) => graphPutNode(graph, newGraphNode('before3', 'thing', {group: 'bar'}))),
             tap(({graph}) => {
-                setTimeout(() => graphPutNode(graph, newGraphNode('n2', 'car', {})).subscribe());
-                setTimeout(() => graphPutNode(graph, newGraphNode('n3', 'person', {group: 'bar'})).subscribe());
-                setTimeout(() => graphPutNode(graph, newGraphNode('n4', 'person', {group: 'bar'})).subscribe(), 200);
+                setTimeout(() => graphPutNode(graph, newGraphNode('after1', 'car', {})).subscribe());
+                setTimeout(() => graphPutNode(graph, newGraphNode('after2', 'thing', {group: 'bar'})).subscribe());
+                setTimeout(() => graphPutNode(graph, newGraphNode('after3', 'thing', {group: 'bar'})).subscribe(), 200);
             }),
-            switchMap(({graph}) => nodesByProp(graph, 'person', 'group', 'bar')),
-            skipWhile(({nodes}) => nodes.length < 2),
+            switchMap(({graph}) => nodesByProp(graph, 'thing', 'group', 'bar')),
+            skipWhile(({nodes}) => nodes.length < 4),
+            tap(({nodes}) => nodes.forEach(node => expect(node.props.group).to.equal('bar')))
         ))
     );
 
