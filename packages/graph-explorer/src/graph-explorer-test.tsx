@@ -2,7 +2,7 @@ import {default as React, useEffect} from 'react'
 import {useGraphLogin, useGraphPut, useGraphPutEdge, useNewAccount} from "@end-game/react-graph";
 import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {GraphExplorerBtn} from "./GraphExplorerBtn.jsx";
-import {concatMap, of, tap} from "rxjs";
+import {switchMap, of, tap} from "rxjs";
 
 
 let accountCreated = false;
@@ -16,15 +16,15 @@ renderApp(() => {
 
     useEffect(() => {
         of(true).pipe(
-            concatMap(() => accountCreated ? of(true) :  newAccount('scott', 'pass')),
+            switchMap(() => accountCreated ? of(true) :  newAccount('scott', 'pass')),
             tap(() => accountCreated = true),
-            concatMap(() => login('scott', 'pass')),
-            concatMap(() => graphPut('person', 'scott', {name: 'scott', age: 1})),
-            concatMap(() => graphPut('person', 'todd', {name: 'todd', age: 2})),
-            concatMap(() => graphPutEdge('friend', 'f1', 'scott', 'todd', {since: new Date().toISOString()})),
-            concatMap(() => graphPutEdge('friend', 'f2', 'todd', 'scott', {since: new Date().toISOString()})),
-            concatMap(() => graphPut('country', 'mexico', {name: 'mexico'})),
-            concatMap(() => graphPutEdge('lives_in', 'li1', 'scott', 'mexico', {}))
+            switchMap(() => login('scott', 'pass')),
+            switchMap(() => graphPut('person', 'scott', {name: 'scott', age: 1})),
+            switchMap(() => graphPut('person', 'todd', {name: 'todd', age: 2})),
+            switchMap(() => graphPutEdge('friend', 'f1', 'scott', 'todd', {since: new Date().toISOString()})),
+            switchMap(() => graphPutEdge('friend', 'f2', 'todd', 'scott', {since: new Date().toISOString()})),
+            switchMap(() => graphPut('country', 'mexico', {name: 'mexico'})),
+            switchMap(() => graphPutEdge('lives_in', 'li1', 'scott', 'mexico', {}))
         ).subscribe()
     }, [])
 

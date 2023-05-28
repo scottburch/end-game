@@ -12,7 +12,7 @@ describe('graph-explorer', () => {
             switchMap(page => page.click('button:text("Graph Explorer")').then(() => page)),
             map(page => page.context().pages()),
             switchMap(pages => pages[1].fill('input', 'person').then(() => pages)),
-            delay(2000),
+            delay(4000),
             switchMap(pages => pages[1].click('button:text("By Node Label")').then(() => pages)),
             switchMap(pages => pages[1].waitForSelector('div:text("(scott)")').then(() => pages)),
             switchMap(pages => pages[1].waitForSelector('div:text("(todd)")').then(() => pages))
@@ -23,7 +23,7 @@ describe('graph-explorer', () => {
         firstValueFrom(compileBrowserTestCode(absPath(import.meta.url, 'graph-explorer-test.tsx'), 1236).pipe(
             switchMap(() => openBrowser({port: 1236})),
             switchMap(page => page.waitForSelector('div:text("scott")').then(() => page)),
-            delay(2000),
+            delay(4000),
             switchMap(page => page.click('button:text("Graph Explorer")').then(() => page)),
             map(page => page.context().pages()),
             switchMap(pages => pages[1].fill('input', 'person').then(() => pages)),
