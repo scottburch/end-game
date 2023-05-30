@@ -62,7 +62,8 @@ const authPutPostHandler: GraphHandler<'putNode'> = ({graph, node}) => {
         return of({graph, node})
     }
     return of((graph as GraphWithAuth).user?.nodeId).pipe(
-        tap(nodeId => console.log('****** this might be it!!!!', node.nodeId, nodeId)),
+        tap(nodeId => console.log('****** this is be it!!!!', node.nodeId, nodeId)),
+        // TODO: Need to fix this, it is trying to add an owned_by for received nodes
         switchMap(nodeId => nodeId ? (
             graphPutEdge(graph, newGraphEdge('', 'owned_by', node.nodeId, nodeId, {}))
         ) : of(undefined)),

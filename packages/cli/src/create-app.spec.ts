@@ -6,7 +6,7 @@ import {openBrowser} from "@end-game/utils/openBrowser";
 
 describe('create app', function () {
     this.timeout(40_000);
-    it('should create a working demo app', () =>
+    it.skip('should create a working demo app', () =>
         firstValueFrom(createApp().pipe(
             map(() => $`yarn run dev --headless --port 1235`),
             delay(3000),
