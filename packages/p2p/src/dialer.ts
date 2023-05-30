@@ -1,5 +1,5 @@
 import {Graph} from "@end-game/graph";
-import {fromEvent, Observable, switchMap, tap} from "rxjs";
+import {first, fromEvent, Observable, switchMap, tap} from "rxjs";
 import WebSocket from "isomorphic-ws";
 import {GraphWithP2p} from "./p2pHandlers.js";
 import {PeerConn, socketManager} from "./socketManager.js";
@@ -35,7 +35,8 @@ export const dialPeer = (graph: Graph, opts: DialerOpts) =>
                     errorSub.unsubscribe();
                     closeSub.unsubscribe();
                     stopping || redial();
-                })
+                }),
+                first()
             ).subscribe()
 
             const errorSub = fromEvent<ErrorEvent>(peerConn.socket, 'error').pipe(

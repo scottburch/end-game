@@ -1,2 +1,2 @@
-export {useDialer, useGraphLogin, useNewAccount, useGraph, useGraphRelationships, useGraphNodesByLabel, useGraphNodesByProp, useGraphPut, useGraphEdge, useGraphPutEdge, useGraphGet, ReactGraph, useAuth} from './react-graph.jsx'
+export {useDialer, useGraphLogin, useNewAccount, useGraph, useGraphRelationships, useGraphNodesByLabel, useGraphNodesByProp, useGraphPut, useGraphEdge, useGraphPutEdge, useGraphNode, ReactGraph, useAuth} from './react-graph.jsx'
 

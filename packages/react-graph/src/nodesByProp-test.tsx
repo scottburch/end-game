@@ -6,7 +6,7 @@ import {switchMap} from "rxjs";
 let accountCreated = false;
 
 renderApp(() => {
-    const nodes = useGraphNodesByProp('person', 'group', 'first');
+    const nodes = useGraphNodesByProp<{group: string, name: string}>('person', 'group', 'first');
     const [count, setCount] = useState(0);
     const graphPut = useGraphPut();
     const newAccount = useNewAccount();

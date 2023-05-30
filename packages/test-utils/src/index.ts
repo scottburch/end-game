@@ -1,12 +1,9 @@
-import type {GraphOpts} from "@end-game/graph";
-import type {Graph} from '@end-game/graph'
-import {graphOpen, graphPutNode, newGraphNode} from "@end-game/graph";
-import {newUid} from "@end-game/graph";
+import type {Graph, GraphOpts} from "@end-game/graph";
+import {graphOpen, graphPutNode, LogLevel, newGraphNode, newUid} from "@end-game/graph";
 import {from, mergeMap, of, scan, skip, switchMap} from "rxjs";
 import {levelStoreHandlers} from "@end-game/level-store";
 import {authHandlers} from "@end-game/pwd-auth";
 import {dialPeer, p2pHandlers} from "@end-game/p2p";
-
 
 
 export const getAGraph = (opts: GraphOpts = {graphId: newUid()}) => graphOpen(opts).pipe(
@@ -21,7 +18,7 @@ export const startTestNet = (nodes: number[][]) =>
     );
 
 
-export const startTestNode = (nodeNo: number, peers: number[] = []) => graphOpen({graphId: `node-${nodeNo}`}).pipe(
+export const startTestNode = (nodeNo: number, peers: number[] = []) => graphOpen({graphId: `node-${nodeNo}`, logLevel: LogLevel.DEBUG}).pipe(
     switchMap(graph => levelStoreHandlers(graph)),
     switchMap(graph => authHandlers(graph)),
     switchMap(graph => p2pHandlers(graph, {listeningPort: 11110 + nodeNo})),

@@ -8,12 +8,13 @@ renderApp(() => {
     const nodes = useGraphNodesByLabel('thing');
 
     useEffect(() => {
-        dial({url: 'ws://localhost:11115'}).subscribe();
+        dial({url: 'ws://localhost:11116'}).subscribe();
     }, [])
 
 
     return (
         <>
+            List of things:
             {nodes.map(node=>  <div key={node.nodeId} id={node.nodeId}>{node.props.name}</div>)}
         </>
     )

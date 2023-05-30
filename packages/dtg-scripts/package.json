@@ -9,7 +9,7 @@
     "dtg-scripts": "lib/index.js"
   },
   "scripts": {
-    "build": "rm -rf lib & tsc"
+    "build": "rm -rf lib & tsc && chmod 755 lib/index.js"
   },
   "dependencies": {
     "@types/mime-types": "^2.1.1",

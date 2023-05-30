@@ -1,14 +1,15 @@
 import type {Graph, GraphHandler, Props} from '@end-game/graph'
-import {graphPutEdge, newGraphEdge} from "@end-game/graph";
 import {first, map, of, switchMap, tap} from "rxjs";
-import {insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "@end-game/rxjs-chain";
-import type {EdgeWithSig, GraphWithAuth, NodeWithSig} from "./auth-utils.js";
+import {insertHandlerBefore, newRxjsChain} from "@end-game/rxjs-chain";
+import type {EdgeWithSig, GraphWithAuth, NodeWithAuth} from "./auth-utils.js";
 import {
     findAuthNode,
     isUserAuthedToWriteEdge,
     isUserLoggedIn,
-    isUserNodeOwner, signGraphEdge,
-    signGraphNode, verifyEdgeSig,
+    isUserNodeOwner,
+    signGraphEdge,
+    signGraphNode,
+    verifyEdgeSig,
     verifyNodeSig
 } from "./auth-utils.js";
 import {notLoggedInError, unauthorizedUserError, userAlreadyExistsError} from "./auth-errors.js";
@@ -16,7 +17,6 @@ import {notLoggedInError, unauthorizedUserError, userAlreadyExistsError} from ".
 
 export const authHandlers = (graph: Graph) => of(graph).pipe(
     tap(graph => insertHandlerBefore(graph.chains.putNode, 'storage', 'auth', authPutAnteHandler)),
-    tap(graph => insertHandlerAfter(graph.chains.putNode, 'storage', 'auth', authPutPostHandler)),
     tap(graph => insertHandlerBefore(graph.chains.putEdge, 'storage', 'auth', authPutEdgeAnteHandler)),
 
     tap(graph => (graph as GraphWithAuth).chains.authChanged = (graph as GraphWithAuth).chains.authChanged || newRxjsChain())
@@ -31,14 +31,20 @@ const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
     }
 
     // verify signature if the node has one
-    if (!!(node as NodeWithSig<Props>).sig) {
-        return verifyNodeSig(graph, node as NodeWithSig<Props>)
+    if (!!(node as NodeWithAuth<Props>).sig) {
+        return verifyNodeSig(graph, node as NodeWithAuth<Props>)
     }
 
-
     return (isUserLoggedIn(graph as GraphWithAuth) ? of({graph, node}) : notLoggedInError(graph)).pipe(
-        switchMap(({graph, node}) => isUserNodeOwner(graph as GraphWithAuth, node as NodeWithSig<Props>)),
-        switchMap(isOwner => isOwner ? signGraphNode(graph as GraphWithAuth, node) : unauthorizedUserError(graph, 'unknown')),
+        switchMap(({graph, node}) => isUserNodeOwner(graph as GraphWithAuth, node as NodeWithAuth<Props>)),
+        switchMap(isOwner => isOwner ? (
+            of(node).pipe(
+                map(node => ({...node, owner: (graph as GraphWithAuth).user?.nodeId})),
+                switchMap(node => signGraphNode(graph as GraphWithAuth, node))
+            )
+        ) : (
+            unauthorizedUserError(graph, 'unknown'))
+        ),
     )
 };
 
@@ -56,17 +62,3 @@ const authPutEdgeAnteHandler: GraphHandler<'putEdge'> = ({graph, edge}) => {
         switchMap(authed => authed ? signGraphEdge(graph as GraphWithAuth, edge) : unauthorizedUserError(graph, (graph as GraphWithAuth).user?.username || 'unknown'))
     );
 }
-
-const authPutPostHandler: GraphHandler<'putNode'> = ({graph, node}) => {
-    if (node.label === 'auth') {
-        return of({graph, node})
-    }
-    return of((graph as GraphWithAuth).user?.nodeId).pipe(
-        tap(nodeId => console.log('****** this is be it!!!!', node.nodeId, nodeId)),
-        // TODO: Need to fix this, it is trying to add an owned_by for received nodes
-        switchMap(nodeId => nodeId ? (
-            graphPutEdge(graph, newGraphEdge('', 'owned_by', node.nodeId, nodeId, {}))
-        ) : of(undefined)),
-        map(() => ({graph, node}))
-    )
-};

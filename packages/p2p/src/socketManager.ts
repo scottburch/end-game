@@ -1,5 +1,4 @@
 import {GraphWithP2p, P2pMsg} from "./p2pHandlers.js";
-import WS from "isomorphic-ws";
 import WebSocket from "isomorphic-ws";
 import {delay, filter, first, fromEvent, map, mergeMap, of, skipWhile, takeUntil, tap} from "rxjs";
 import {deserializer, serializer} from "@end-game/utils/serializer";
@@ -15,7 +14,7 @@ export type PeerConn = {
 type AnnounceMsg = P2pMsg<'announce', { graphId: GraphId }>
 
 export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
-    const isDup = dupCache(peerConn.socket);
+    const isDup = dupMsgCache();
     let connOk = false;
 
     peerConn.socket.send(serializer({
@@ -66,19 +65,22 @@ export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
             graph.peerConnections.add(msg.data.graphId);
             chainNext(graph.chains.reloadGraph, '').subscribe();
             connOk = true;
+            fromEvent(peerConn.socket, 'close').pipe(
+                tap(() => graph.peerConnections.delete(msg.data.graphId)),
+                first()
+            ).subscribe()
         }
     }
 }
 
-const dupCache = (conn: WS.WebSocket, timeout: number = 5000) => {
-
+const dupMsgCache = (timeout: number = 50000) => {
     const cache = new Set<string>();
+
     return (key: string) => {
         const exists = cache.has(key);
         exists || cache.add(key);
         exists || of(key).pipe(
-            delay(5000),
-            takeUntil(fromEvent(conn, 'close')),
+            delay(timeout),
             tap(() => cache.delete(key))
         ).subscribe()
         return exists;

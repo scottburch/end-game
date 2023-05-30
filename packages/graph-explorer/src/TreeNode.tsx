@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {useGraphEdge, useGraphGet, useGraphRelationships} from "@end-game/react-graph";
+import {useGraphEdge, useGraphNode, useGraphRelationships} from "@end-game/react-graph";
 import type {ReactNode} from 'react';
 import {useState} from "react";
 import type {EdgeId, GraphNode, Props} from "@end-game/graph";
@@ -38,7 +38,7 @@ const Opener: React.FC<{ text: ReactNode, children: () => ReactNode }> = ({text,
 
 
 export const TreeNode: React.FC<{ nodeId: string }> = ({nodeId}) => {
-    const node = useGraphGet(nodeId);
+    const node = useGraphNode(nodeId);
 
     return (
         <div style={{color: 'red'}}>

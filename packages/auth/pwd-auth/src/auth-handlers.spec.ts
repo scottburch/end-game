@@ -4,7 +4,7 @@ import type {Props} from "@end-game/graph";
 import {graphGetNode, graphPutEdge, graphPutNode, newGraphEdge, newGraphNode} from "@end-game/graph";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
-import type {NodeWithSig} from "./auth-utils.js";
+import type {NodeWithAuth} from "./auth-utils.js";
 import {addThingNode} from "@end-game/test-utils";
 
 describe('auth handlers', function()  {
@@ -68,7 +68,7 @@ describe('auth handlers', function()  {
         firstValueFrom(graphWithUser().pipe(
             switchMap(graph => graphPutNode(graph, newGraphNode('item', 'person', {name: 'scott'}))),
             switchMap(({graph}) => graphGetNode(graph, 'item')),
-            tap(({node}) => expect((node as NodeWithSig<Props>).sig).not.to.be.undefined)
+            tap(({node}) => expect((node as NodeWithAuth<Props>).sig).not.to.be.undefined)
         ))
     );
 });

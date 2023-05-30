@@ -161,8 +161,8 @@ describe('graph', () => {
                 graphPutNode(graph, newGraphNode('n3', 'person', {name: 'joe', age: 2})),
             ])),
             switchMap(([{graph}]) => combineLatest([
-                nodesByProp(graph, 'person', 'name', 'scott'),
-                nodesByProp(graph, 'person', 'age', 1)
+                nodesByProp<{name: string, age: number}>(graph, 'person', 'name', 'scott'),
+                nodesByProp<{name: string, age: number}>(graph, 'person', 'age', 1)
             ])),
             tap(([{nodes: n1}, {nodes: n2}]) => {
                 expect(n1).to.have.length(1);

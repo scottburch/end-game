@@ -5,7 +5,7 @@ import React from 'react';
 
 export const AddPostPanel: React.FC = () => {
     const graphPut = useGraphPut<Post>();
-    const [values, setValues] = useState<Post>();
+    const [values, setValues] = useState<Omit<Post, 'nodeId'>>();
 
     const addPost = () => {
         graphPut('post', '', values as Post).subscribe();

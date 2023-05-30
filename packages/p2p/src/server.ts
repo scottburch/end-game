@@ -1,10 +1,8 @@
 import type {Graph} from "@end-game/graph";
-import {fromEvent, map, mergeMap, Observable, of, switchMap, tap} from "rxjs";
+import {fromEvent, map, mergeMap, Observable, of, switchMap} from "rxjs";
 import WS from "isomorphic-ws";
-import {chainNext} from "@end-game/rxjs-chain";
 import {GraphWithP2p} from "./p2pHandlers.js";
 import {socketManager} from "./socketManager.js";
-import {LogLevel} from "@end-game/graph";
 
 
 export const startServer = (graph: GraphWithP2p, port: number) => new Observable<Graph>(subscriber => {

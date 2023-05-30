@@ -13,7 +13,7 @@ import {
 import type {PropsWithChildren} from 'react';
 import * as React from "react";
 import {createContext, useContext, useEffect, useState} from "react";
-import {catchError, of, switchMap, tap, throwError} from "rxjs";
+import {catchError, filter, of, switchMap, tap, throwError} from "rxjs";
 import type {GraphWithAuth} from '@end-game/pwd-auth'
 import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 import {newGraphNode} from "@end-game/graph";
@@ -54,7 +54,7 @@ export const useGraphNodesByLabel = <T extends Props>(label: string) => {
 
     useEffect(() => {
         if (graph) {
-            const sub = of(true).pipe(
+            const sub = of(undefined).pipe(
                 switchMap(() => nodesByLabel(graph, label)),
                 tap(({nodes}) => setNodes(nodes as GraphNode<T>[]))
             ).subscribe();
@@ -66,14 +66,14 @@ export const useGraphNodesByLabel = <T extends Props>(label: string) => {
     return nodes;
 }
 
-export const useGraphNodesByProp = <T extends Props>(label: string, key: string, value: any) => {
+export const useGraphNodesByProp = <T extends Props>(label: string, key: keyof T & string, value: any) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
     const graph = useGraph();
 
     useEffect(() => {
         if (graph) {
             const sub = of(true).pipe(
-                switchMap(() => nodesByProp(graph, label, key, value)),
+                switchMap(() => nodesByProp<T>(graph, label, key, value)),
                 tap(({nodes}) => setNodes(nodes as GraphNode<T>[]))
             ).subscribe();
             return () => sub.unsubscribe();
@@ -99,7 +99,7 @@ export const useGraphRelationships = (nodeId: NodeId, rel: string, opts: { rever
 
 }
 
-export const useGraphGet = <T extends Props>(nodeId: NodeId) => {
+export const useGraphNode = <T extends Props>(nodeId: NodeId) => {
     const [node, setNode] = useState<GraphNode<T>>();
     const graph = useGraph();
 
@@ -107,6 +107,7 @@ export const useGraphGet = <T extends Props>(nodeId: NodeId) => {
         !graph && console.error('useGraphGet() called outside of a graph context');
         if (graph && nodeId) {
             const sub = graphGetNode(graph, nodeId).pipe(
+                filter(({node}) => !!node?.nodeId),
                 tap(({node}) => setNode(node as GraphNode<T>))
             ).subscribe();
             return () => sub.unsubscribe();

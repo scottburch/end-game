@@ -9,7 +9,19 @@ import {
     nodesByLabel,
     Props
 } from "@end-game/graph";
-import {combineLatest, delay, filter, firstValueFrom, map, mergeMap, of, range, switchMap, tap, timer} from "rxjs";
+import {
+    combineLatest,
+    delay,
+    filter,
+    firstValueFrom,
+    map,
+    mergeMap,
+    of,
+    range,
+    switchMap,
+    tap,
+    timer
+} from "rxjs";
 import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
@@ -176,6 +188,6 @@ describe('p2p handlers', () => {
                 filter(({node}) => !!node?.nodeId),
                 tap(({node}) => expect(node.props.name).to.equal('thing1')),
             ))
-        )
+        );
     });
 });
