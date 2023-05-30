@@ -2,12 +2,12 @@ import type {Graph, GraphHandler, Props} from '@end-game/graph'
 import {graphPutEdge, newGraphEdge} from "@end-game/graph";
 import {first, map, of, switchMap, tap} from "rxjs";
 import {insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "@end-game/rxjs-chain";
-import type {GraphWithAuth, NodeWithSig} from "./auth-utils.js";
+import type {EdgeWithSig, GraphWithAuth, NodeWithSig} from "./auth-utils.js";
 import {
     findAuthNode,
     isUserAuthedToWriteEdge,
     isUserLoggedIn,
-    isUserNodeOwner,
+    isUserNodeOwner, signGraphEdge,
     signGraphNode,
     verifyNodeSig
 } from "./auth-utils.js";
@@ -43,8 +43,18 @@ const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
 };
 
 const authPutEdgeAnteHandler: GraphHandler<'putEdge'> = ({graph, edge}) => {
+    if((edge as EdgeWithSig).sig) {
+        // TODO: Handle an edge with a sig here
+        return of({graph, edge});
+    }
+
+    if(!isUserLoggedIn(graph as GraphWithAuth))  {
+        return notLoggedInError(graph);
+    }
+
+
     return isUserAuthedToWriteEdge(graph, edge).pipe(
-        switchMap(authed => authed ? of({graph, edge}) : unauthorizedUserError(graph, 'unknown'))
+        switchMap(authed => authed ? signGraphEdge(graph as GraphWithAuth, edge) : unauthorizedUserError(graph, (graph as GraphWithAuth).user?.username || 'unknown'))
     );
 }
 

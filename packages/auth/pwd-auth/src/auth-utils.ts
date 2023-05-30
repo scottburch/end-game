@@ -7,6 +7,7 @@ import {serializer} from "@end-game/utils/serializer";
 import type {RxjsChain} from "@end-game/rxjs-chain";
 import {chainNext} from "@end-game/rxjs-chain";
 import {unauthorizedUserError} from "./auth-errors.js";
+import {textToBytes} from "@end-game/utils/byteUtils";
 
 
 export type UserPass = {
@@ -25,6 +26,8 @@ export type GraphWithAuth = Graph & {
     }
 };
 export type NodeWithSig<T extends Props> = GraphNode<T> & { sig: Uint8Array }
+export type EdgeWithSig<T extends Props = Props> = GraphEdge<T> & {sig: Uint8Array }
+
 export type AuthNode = GraphNode<EncryptedKeyBundle & { username: string }>;
 
 const TIMEOUT = 2000
@@ -53,6 +56,13 @@ export const signGraphNode = (graph: GraphWithAuth, node: GraphNode<any>) =>
         map(node => ({graph, node}))
     );
 
+export const signGraphEdge = (graph: GraphWithAuth, edge: GraphEdge<any>) =>
+    getEdgeSignData(edge).pipe(
+        switchMap(bytes => sign(bytes, graph.user?.auth as KeyBundle)),
+        map(sig => ({...edge, sig})),
+        map(edge => ({graph, edge}))
+    )
+
 export const isUserNodeOwner = (graph: GraphWithAuth, node: NodeWithSig<any>) =>
     graphGetNode(graph, node.nodeId).pipe(
         filter(({node}) => !!node),
@@ -66,14 +76,19 @@ export const isUserNodeOwner = (graph: GraphWithAuth, node: NodeWithSig<any>) =>
 
 export const getNodeSignData = (node: GraphNode<any>) =>
     of(node.nodeId + node.label + serializer(node.props)).pipe(
-        map(str => new TextEncoder().encode(str))
+        map(str => textToBytes(str))
     );
+
+export const getEdgeSignData = (edge: GraphEdge<any>) =>
+    of(edge.edgeId + edge.rel + edge.from + edge.to + serializer(edge.props)).pipe(
+        map(str => textToBytes(str))
+    )
 
 
 const getNodeOnce = (graph: Graph, nodeId: NodeId) =>
     graphGetNode(graph, nodeId).pipe(
         tap(x => x),
-        filter(({node}) => !!node),
+        filter(({node}) => !!node?.nodeId),
         first(),
         timeout({first: TIMEOUT, with: () => of({graph, nodeId, node: undefined})})
     );

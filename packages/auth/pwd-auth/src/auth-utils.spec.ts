@@ -9,19 +9,19 @@ import {graphPutEdge, graphPutNode, newGraphEdge, newGraphNode} from "@end-game/
 describe('auth utils', () => {
 
     describe('findAuthNode()', () => {
-        it('should return a node with an undefined nodeId if not found', () => {
+        it('should return a node with an undefined nodeId if not found', () =>
             firstValueFrom(graphWithAuth().pipe(
                 switchMap(graph => findAuthNode(graph, 'not-here')),
                 tap(({node}) => expect(node.nodeId).to.be.undefined)
             ))
-        });
+        );
 
-        it('should return a auth node if one exists', () => {
+        it('should return a auth node if one exists', () =>
             firstValueFrom(graphWithUser().pipe(
                 switchMap(graph => findAuthNode(graph, 'scott')),
                 tap(({node}) => expect(node.nodeId).to.have.length(12))
             ))
-        });
+        );
 
         it('should work if the node is loaded remotely', () =>
             firstValueFrom(graphWithAuth().pipe(

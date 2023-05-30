@@ -1,37 +1,48 @@
-import {catchError, delay, first, firstValueFrom, of, switchMap, tap} from "rxjs";
+import {catchError, first, firstValueFrom, of, switchMap, tap} from "rxjs";
 import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
-import type {Props} from "@end-game/graph";
-import {graphGetNode, graphPutNode, graphPutEdge, newGraphEdge} from "@end-game/graph";
+import type {GraphEdge, Props} from "@end-game/graph";
+import {graphGetNode, graphPutEdge, graphPutNode, newGraphEdge, newGraphNode} from "@end-game/graph";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
-import {newGraphNode} from "@end-game/graph";
 import type {AuthNode, NodeWithSig} from "./auth-utils.js";
+import {addThingNode} from "@end-game/test-utils";
 
 describe('auth handlers', function()  {
     this.timeout(60_000)
 
-    it('should fail to put a value if no auth if no signature', (done) =>
+    it('should fail to put a node if no auth and no signature', (done) =>
         firstValueFrom(graphWithAuth().pipe(
-            switchMap(graph => graphPutNode(graph, newGraphNode('scott', 'person', {name: 'scott'}))),
+            switchMap(graph => addThingNode(graph, 1)),
             catchError(err => of(err.code).pipe(
                 tap(err => err === 'NOT_LOGGED_IN' && done())
             ))
         ))
     );
 
+    it('should fail to put an edge if no auth and no signature', (done) =>
+        firstValueFrom(graphWithAuth().pipe(
+            switchMap(graph => graphPutEdge(graph, newGraphEdge('edge1', 'rel', 'from', 'to', {}))),
+            catchError(err => of(err.code).pipe(
+                tap(err => err === 'NOT_LOGGED_IN' && done())
+            ))
+        ))
+    )
+
     it('should fail to put a value if the signature does not validate', (done) => {
         firstValueFrom(graphWithAuth().pipe(
-            tap(graph => graphPutNode(graph, {
-                ...newGraphNode<AuthNode['props']>('scott', 'auth', {
+            tap(graph => graphPutNode(graph, newGraphNode<AuthNode['props']>('scott', 'auth', {
                     pub: '',
                     enc: '',
                     priv: '',
                     salt: '',
                     username: 'scott'
                 })
-            }).subscribe()),
+            ).subscribe()),
             tap(graph =>
-                graphPutEdge(graph, newGraphEdge('person-scott', 'owned_by', 'person', 'scott', {})).subscribe()
+                graphPutEdge(graph, {
+                    ...newGraphEdge('person-scott', 'owned_by', 'person', 'scott', {}),
+                    sig: 'aa'
+                } as GraphEdge<Props>).subscribe()
             ),
             tap(graph =>
                 graphPutNode(graph, {

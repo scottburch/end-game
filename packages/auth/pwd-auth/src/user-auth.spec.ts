@@ -46,7 +46,7 @@ describe('graph auth', () => {
         ))
     );
 
-    it('should set the graph user to undefined if unauth called', () => {
+    it('should set the graph user to undefined if unauth called', () =>
         firstValueFrom(graphWithAuth().pipe(
             switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
@@ -54,7 +54,7 @@ describe('graph auth', () => {
             switchMap(({graph}) => graphUnauth(graph)),
             tap(({graph}) => expect((graph as GraphWithAuth).user).to.be.undefined)
         ))
-    });
+    );
 
     it("should notify on chain authChanged when user is changed", (done) => {
          firstValueFrom(graphWithAuth().pipe(
