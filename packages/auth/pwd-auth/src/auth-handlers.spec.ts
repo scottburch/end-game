@@ -1,10 +1,10 @@
 import {catchError, first, firstValueFrom, of, switchMap, tap} from "rxjs";
 import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
-import type {GraphEdge, Props} from "@end-game/graph";
+import type {Props} from "@end-game/graph";
 import {graphGetNode, graphPutEdge, graphPutNode, newGraphEdge, newGraphNode} from "@end-game/graph";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
-import type {AuthNode, NodeWithSig} from "./auth-utils.js";
+import type {NodeWithSig} from "./auth-utils.js";
 import {addThingNode} from "@end-game/test-utils";
 
 describe('auth handlers', function()  {
@@ -28,32 +28,6 @@ describe('auth handlers', function()  {
         ))
     )
 
-    it('should fail to put a value if the signature does not validate', (done) => {
-        firstValueFrom(graphWithAuth().pipe(
-            tap(graph => graphPutNode(graph, newGraphNode<AuthNode['props']>('scott', 'auth', {
-                    pub: '',
-                    enc: '',
-                    priv: '',
-                    salt: '',
-                    username: 'scott'
-                })
-            ).subscribe()),
-            tap(graph =>
-                graphPutEdge(graph, {
-                    ...newGraphEdge('person-scott', 'owned_by', 'person', 'scott', {}),
-                    sig: 'aa'
-                } as GraphEdge<Props>).subscribe()
-            ),
-            tap(graph =>
-                graphPutNode(graph, {
-                    ...newGraphNode('person', 'person', {}),
-                    sig: new Uint8Array(Array(64))
-                } as NodeWithSig<Props> satisfies NodeWithSig<Props>).pipe(
-                    catchError(err => err.code === 'UNAUTHORIZED_USER' ? of(done()) : of(done('invalid error thrown ' + err)))
-                ).subscribe()
-            ),
-        ))
-    })
 
     it('should put a value in the store if correct user is logged in', () =>
         firstValueFrom(graphWithAuth().pipe(

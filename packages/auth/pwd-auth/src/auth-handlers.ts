@@ -8,7 +8,7 @@ import {
     isUserAuthedToWriteEdge,
     isUserLoggedIn,
     isUserNodeOwner, signGraphEdge,
-    signGraphNode,
+    signGraphNode, verifyEdgeSig,
     verifyNodeSig
 } from "./auth-utils.js";
 import {notLoggedInError, unauthorizedUserError, userAlreadyExistsError} from "./auth-errors.js";
@@ -44,8 +44,7 @@ const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
 
 const authPutEdgeAnteHandler: GraphHandler<'putEdge'> = ({graph, edge}) => {
     if((edge as EdgeWithSig).sig) {
-        // TODO: Handle an edge with a sig here
-        return of({graph, edge});
+        return verifyEdgeSig(graph, edge as EdgeWithSig)
     }
 
     if(!isUserLoggedIn(graph as GraphWithAuth))  {
@@ -63,6 +62,7 @@ const authPutPostHandler: GraphHandler<'putNode'> = ({graph, node}) => {
         return of({graph, node})
     }
     return of((graph as GraphWithAuth).user?.nodeId).pipe(
+        tap(nodeId => console.log('****** this might be it!!!!', node.nodeId, nodeId)),
         switchMap(nodeId => nodeId ? (
             graphPutEdge(graph, newGraphEdge('', 'owned_by', node.nodeId, nodeId, {}))
         ) : of(undefined)),

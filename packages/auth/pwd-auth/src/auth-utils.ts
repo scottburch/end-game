@@ -103,6 +103,35 @@ export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
         timeout({first: TIMEOUT * 1.2, with: () => of({graph, nodeId: '', node: {} as AuthNode})}),
     );
 
+export const verifyEdgeSig = <T extends Props>(graph: Graph, edge: EdgeWithSig<T>) =>
+    graphGetOwnerNode(graph, edge.from).pipe(
+        switchMap(({node: authNode}) =>
+            authNode.nodeId ? (
+                combineLatest([
+                    getEdgeSignData(edge),
+                    deserializePubKey(authNode.props.pub)
+                ]).pipe(
+                    switchMap(([data, pubKey]) => verify(data, (edge as EdgeWithSig<Props>).sig, pubKey)),
+                    map(() => ({edge, authNode})),
+                    catchError(err => err.message === 'Invalid keyData' ? unauthorizedUserError(graph, authNode.props.username) : of(err))
+                )
+            ) : of(undefined).pipe(
+                tap(() => chainNext(graph.chains.log, {
+                    graph,
+                    item: {
+                        code: 'EDGE_SIG_VERIFY_ERROR',
+                        level: LogLevel.INFO,
+                        text: 'Unable to verify edge signature, no auth object: ' + edge.edgeId + ':' + edge.from + '-' + edge.to
+                    }
+
+                }))
+            )
+        ),
+        map(() => ({graph, edge}))
+    );
+
+
+
 export const verifyNodeSig = <T extends Props>(graph: Graph, node: NodeWithSig<T>) =>
     graphGetOwnerNode(graph, node.nodeId).pipe(
         switchMap(({node: authNode}) =>
