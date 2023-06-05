@@ -1,6 +1,6 @@
 {
   "name": "@end-game/pwd-auth",
-  "version": "1.0.27",
+  "version": "1.0.28",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -11,9 +11,9 @@
     }
   },
   "dependencies": {
-    "@end-game/pwd-auth": "*",
-    "@end-game/graph": "*",
-    "@end-game/utils": "*",
+    "@end-game/graph": "^1.0.28",
+    "@end-game/pwd-auth": "^1.0.28",
+    "@end-game/utils": "^1.0.28",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.15",
