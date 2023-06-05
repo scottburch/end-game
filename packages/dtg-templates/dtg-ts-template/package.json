@@ -1,7 +1,6 @@
 {
-  "name": "name-here",
+  "name": "@end-game/dtg-ts-template",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "dependencies": {
     "@end-game/dtg-scripts": "^1.0.27",

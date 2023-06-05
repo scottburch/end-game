@@ -24,7 +24,7 @@ const tarTemplate = () =>
             opts: {
                 gzip: true,
                 filter: (path) => !/node_modules/.test(path),
-                cwd: absPath(import.meta.url, '../../../../dtg-templates/dtg-ts-template')
+                cwd: absPath(import.meta.url, '../../../dtg-templates/dtg-ts-template')
             } satisfies CreateOptions,
             files: ['.']
         })),
