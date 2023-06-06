@@ -11,8 +11,8 @@
     }
   },
   "dependencies": {
+    "@end-game/crypto": "^1.0.28",
     "@end-game/graph": "^1.0.28",
-    "@end-game/pwd-auth": "^1.0.28",
     "@end-game/utils": "^1.0.28",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
