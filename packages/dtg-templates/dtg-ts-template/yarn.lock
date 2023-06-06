@@ -157,6 +157,26 @@
     typescript "^5.0.4"
     yarn "^1.22.19"
 
+"@end-game/test-utils@^1.0.28":
+  version "1.0.28"
+  resolved "https://registry.yarnpkg.com/@end-game/test-utils/-/test-utils-1.0.28.tgz#30b294fa116e12546ac55ea02406c620e9eba91a"
+  integrity sha512-4DpVLmFeC9wq1ilws9lmXe6BtbCxIe5KRU0DPxfyTJUbxymeEN2+uAML7gxmayZF3G0OG7C3z5V7UT18UqZ4Xg==
+  dependencies:
+    "@end-game/rxjs-chain" "^1.0.28"
+    "@types/chai" "^4.3.4"
+    "@types/mocha" "^10.0.1"
+    "@types/node" "^18.11.15"
+    abstract-level "^1.0.3"
+    level "^8.0.0"
+    memory-level "^1.0.0"
+    rxjs "^7.8.1"
+    short-unique-id "^4.4.4"
+    ts-loader "^9.4.2"
+    tsdef "^0.0.14"
+    typescript "^5.0.4"
+    webpack "^5.80.0"
+    yarn "^1.22.19"
+
 "@end-game/utils@^1.0.28":
   version "1.0.28"
   resolved "https://registry.yarnpkg.com/@end-game/utils/-/utils-1.0.28.tgz#7706ea59c4d78f6ab105e92954116eb366ca8391"
