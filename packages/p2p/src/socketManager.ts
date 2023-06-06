@@ -73,7 +73,7 @@ export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
     }
 }
 
-const dupMsgCache = (timeout: number = 50000) => {
+const dupMsgCache = (timeout: number = 5000) => {
     const cache = new Set<string>();
 
     return (key: string) => {
