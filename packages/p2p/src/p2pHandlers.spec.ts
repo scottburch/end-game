@@ -1,5 +1,5 @@
 import {
-    GraphEdge, graphGetNode,
+    GraphEdge, graphGetEdge, graphGetNode,
     GraphNode,
     graphOpen,
     graphPutEdge,
@@ -19,7 +19,7 @@ import {
     of,
     range,
     switchMap,
-    tap,
+    tap, timeout,
     timer
 } from "rxjs";
 import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
@@ -27,6 +27,7 @@ import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 import {startTestNet, startTestNode} from "@end-game/test-utils";
+import {serializer} from "@end-game/utils/serializer";
 
 describe('p2p handlers', () => {
     it('should setup peer chains', () =>
@@ -76,6 +77,28 @@ describe('p2p handlers', () => {
                 expect(edge.to).to.equal('node2');
                 expect(edge.rel).to.equal('friend');
             })
+        ))
+    );
+
+    it('should ignore getNode if the local flag is set', () =>
+        firstValueFrom(graphOpen().pipe(
+            switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: 'test'})),
+            tap(graph => (graph as GraphWithP2p).chains.peersOut.pipe(
+                tap(({msg}) => {throw(`should not receive a peersOut - received:\n${serializer(msg)}`)})
+            ).subscribe()),
+            switchMap(graph => graphGetNode<{}>(graph, 'something', {local: true})),
+            timeout({first: 200, with: () => of(undefined)})
+        ))
+    );
+
+    it('should ignore getEdge if the local flag is set', () =>
+        firstValueFrom(graphOpen().pipe(
+            switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: 'test'})),
+            tap(graph => (graph as GraphWithP2p).chains.peersOut.pipe(
+                tap(({msg}) => {throw(`should not receive a peersOut - received:\n${serializer(msg)}`)})
+            ).subscribe()),
+            switchMap(graph => graphGetEdge(graph, 'something', {})),
+            timeout({first: 200, with: () => of(undefined)})
         ))
     );
 
@@ -184,10 +207,11 @@ describe('p2p handlers', () => {
                     map(({graph}) => ({node0, node1: graph}))
                 )),
                 delay(1000),
-                switchMap(({node0, node1}) => graphGetNode(node1, 'thing1')),
+                switchMap(({node0, node1}) => graphGetNode(node1, 'thing1', {})),
                 filter(({node}) => !!node?.nodeId),
                 tap(({node}) => expect(node.props.name).to.equal('thing1')),
             ))
         );
+
     });
 });

@@ -93,12 +93,12 @@ const putEdgeHandler: GraphP2pHandler<'putEdge'> = ({graph, edge}) => {
     return of({graph, edge});
 };
 
-const getNodeHandler: GraphP2pHandler<'getNode'> = ({graph, nodeId, node}) => {
-    chainNext((graph as GraphWithP2p).chains.peersOut, {
+const getNodeHandler: GraphP2pHandler<'getNode'> = ({graph, nodeId, node,opts}) => {
+    opts.local || chainNext((graph as GraphWithP2p).chains.peersOut, {
         graph,
         msg: {cmd: 'getNode', data: nodeId}
     }).subscribe();
-    return of({graph, nodeId, node});
+    return of({graph, nodeId, node, opts});
 };
 
 const getRelationshipsHandler: GraphP2pHandler<'getRelationships'> = ({graph, nodeId, rel, reverse, relationships}) => {
@@ -125,12 +125,12 @@ const nodesByPropHandler: GraphP2pHandler<'nodesByProp'> = ({graph, label, key, 
     return of({graph, label, key, value, nodes});
 }
 
-const getEdgeHandler: GraphP2pHandler<'getEdge'> = ({graph, edgeId, edge}) => {
+const getEdgeHandler: GraphP2pHandler<'getEdge'> = ({graph, edgeId, edge, opts}) => {
     chainNext((graph as GraphWithP2p).chains.peersOut, {
         graph,
         msg: {cmd: 'getEdge', data: edgeId}
     })
-    return of({graph, edgeId, edge});
+    return of({graph, edgeId, edge, opts});
 }
 
 
@@ -163,7 +163,7 @@ const doPutEdgeIn = (graph: Graph, msg: P2pMsg) =>
 
 const doGetNodeIn = (graph: Graph, msg: P2pMsg) =>
     of(msg as P2pMsg<'getNode', NodeId>).pipe(
-        switchMap(msg => graphGetNode(graph, msg.data)),
+        switchMap(msg => graphGetNode(graph, msg.data, {})),
         tap(({node}) => node?.nodeId && chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,
             msg: {cmd: 'putNode', data: node}
@@ -176,7 +176,7 @@ const doGetRelationshipsIn = (graph: Graph, msg: P2pMsg) =>
             map(({relationships}) => ({relationships, msg}))
         )),
         tap(({relationships, msg}) => relationships.forEach(relationship =>
-            graphGetEdge(graph, relationship.edgeId).pipe(
+            graphGetEdge(graph, relationship.edgeId, {}).pipe(
                 switchMap(({edge}) => chainNext((graph as GraphWithP2p).chains.peersOut, {
                             graph,
                             msg: {cmd: 'putEdge', data: edge}
@@ -210,7 +210,7 @@ const doGetNodesByProp = (graph: Graph, msg: P2pMsg) =>
 
 const doGetEdgeIn = (graph: Graph, msg: P2pMsg) =>
     of(msg as P2pMsg<'getEdge', EdgeId>).pipe(
-        switchMap(msg => graphGetEdge(graph, msg.data)),
+        switchMap(msg => graphGetEdge(graph, msg.data, {})),
         tap(({edge}) => edge?.edgeId && chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,
             msg: {cmd: 'putNode', data: edge}

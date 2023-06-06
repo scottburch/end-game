@@ -65,7 +65,7 @@ const NodeRelationships: React.FC<{ node: GraphNode<any> }> = ({node}) => {
 }
 
 const Edge: React.FC<{ edgeId: EdgeId }> = ({edgeId}) => {
-    const edge = useGraphEdge(edgeId);
+    const edge = useGraphEdge(edgeId, {});
 
     return (
         <div style={{display: 'flex', color: 'blue'}}>

@@ -50,7 +50,7 @@ describe('graph', () => {
                     map(({nodeId}) => ({graph, nodeId, nid1}))
                 )),
                 tap(({nid1, nodeId}) => expect(nid1).to.equal(nodeId)),
-                switchMap(({graph, nodeId}) => graphGetNode(graph, nodeId)),
+                switchMap(({graph, nodeId}) => graphGetNode(graph, nodeId, {})),
                 tap(({graph, node}) => {
                     expect(node.props.name).to.equal('scott');
                     expect(node.props.foo).to.equal(2);
@@ -62,11 +62,11 @@ describe('graph', () => {
     it('should get an item from the graph by id', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => graphPutNode(graph, newGraphNode('', 'person', {name: 'scott'}))),
-            switchMap(({graph, nodeId}) => graphGetNode<{ name: string }>(graph, nodeId)),
+            switchMap(({graph, nodeId}) => graphGetNode<{ name: string }>(graph, nodeId, {})),
             tap(({node}) => expect(node.props.name).to.equal('scott')),
             first(),
             switchMap(({graph}) => graphPutNode(graph, newGraphNode('', 'person', {name: 'todd'}))),
-            switchMap(({graph, nodeId}) => graphGetNode<{ name: string }>(graph, nodeId)),
+            switchMap(({graph, nodeId}) => graphGetNode<{ name: string }>(graph, nodeId, {})),
             tap(({node}) => expect(node.props.name).to.equal('todd')),
         ))
     );
@@ -81,7 +81,7 @@ describe('graph', () => {
                 map(({nodeId}) => nodeId),
                 toArray(),
                 switchMap(([n1, n2]) => graphPutEdge(graph, newGraphEdge('e1', 'friend', n1, n2, {foo: 10}))),
-                switchMap(({edge}) => graphGetEdge(graph, edge.edgeId)),
+                switchMap(({edge}) => graphGetEdge(graph, edge.edgeId, {})),
                 tap(({edge}) => {
                     expect(edge?.rel).to.equal('friend');
                     expect(edge?.props).to.deep.equal({foo: 10});
@@ -194,7 +194,7 @@ describe('graph', () => {
         firstValueFrom(getAGraph().pipe(
             tap(graph => graphPutNode(graph, newGraphNode('n1', 'person', {name: 'scott'})).subscribe()),
             tap(graph => setTimeout(() => graphPutNode(graph, newGraphNode('n1', 'person', {name: 'todd'})).subscribe(), 100)),
-            switchMap(graph => graphGetNode(graph, 'n1')),
+            switchMap(graph => graphGetNode(graph, 'n1', {})),
             map(({node}) => node.props.name),
             scan((names, name) => names.add(name), new Set()),
             skipWhile(names => names.size < 2),
@@ -208,7 +208,7 @@ describe('graph', () => {
             tap(({graph}) => setTimeout(() =>
                 graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {foo: 11})).subscribe()
             , 100)),
-            switchMap(({graph}) => graphGetEdge(graph, 'e1')),
+            switchMap(({graph}) => graphGetEdge(graph, 'e1', {})),
             skipWhile(({edge}) => edge.props.foo !== 11),
         ))
     );
@@ -274,9 +274,9 @@ describe('graph', () => {
             }),
             delay(100),
             switchMap(graph => merge(
-                graphGetNode(graph, 'n1'),
-                graphGetNode(graph, 'n2'),
-                graphGetNode(graph, 'n3'),
+                graphGetNode(graph, 'n1', {}),
+                graphGetNode(graph, 'n2', {}),
+                graphGetNode(graph, 'n3', {}),
             )),
             map(({nodeId}) => nodeId),
             bufferCount(3),

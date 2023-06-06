@@ -8,7 +8,7 @@ export const LoginOrSignupPanel: React.FC = () => {
             <div style={{flex: .3}}/>
             <div style={{flex: .3}}>
         {which === 'login' ?
-            <LoginPanel toggleSignup={() => setWhich('signup')}/> : <SignupPanel/>}
+            <LoginPanel toggleSignup={() => setWhich('signup')}/> : <SignupPanel toggleSignup={() => setWhich('login')}/>}
             </div>
             <div style={{flex: .3}}/>
     </div>

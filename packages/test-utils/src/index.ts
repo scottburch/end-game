@@ -1,4 +1,4 @@
-import type {Graph, GraphOpts} from "@end-game/graph";
+import type {Graph, GraphOpts, Props} from "@end-game/graph";
 import {graphOpen, graphPutNode, LogLevel, newGraphNode, newUid} from "@end-game/graph";
 import {from, mergeMap, of, scan, skip, switchMap} from "rxjs";
 import {levelStoreHandlers} from "@end-game/level-store";
@@ -28,7 +28,7 @@ export const startTestNode = (nodeNo: number, peers: number[] = []) => graphOpen
     ) : of({graph}))
 );
 
-export const addThingNode = (graph: Graph, n: number) =>
-    graphPutNode(graph, newGraphNode(`thing${n}`, 'thing', {name: `thing${n}`}));
+export const addThingNode = (graph: Graph, n: number, props: Props = {}) =>
+    graphPutNode(graph, newGraphNode(`thing${n}`, 'thing', {name: `thing${n}`, ...props}));
 
 

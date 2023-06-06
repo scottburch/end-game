@@ -2,8 +2,9 @@ import React, {useState} from 'react'
 import {useGraphLogin, useGraphPut, useNewAccount} from "@end-game/react-graph";
 import {map, switchMap, tap} from "rxjs";
 import {User} from "../types/User.js";
+import {InputField} from "./InputField.jsx";
 
-export const SignupPanel: React.FC = () => {
+export const SignupPanel: React.FC<{toggleSignup: () => void}> = ({toggleSignup}) => {
     const putNode = useGraphPut();
     const login = useGraphLogin();
 
@@ -31,17 +32,15 @@ export const SignupPanel: React.FC = () => {
 
     return (
         <div style={{display: 'flex', flexDirection: 'column'}}>
-            <Input placeholder="Username" name="username" onBlur={username => setValues({...values, username})}/>
-            <Input placeholder="Password" name="password" onBlur={password => setValues({...values, password})}/>
-            <Input placeholder="Display name" name="display" onBlur={display => setValues({...values, display})}/>
+            <InputField placeholder="Username" name="username" onChange={username => setValues({...values, username})}/>
+            <InputField placeholder="Password" name="password" onChange={password => setValues({...values, password})}/>
+            <InputField placeholder="Display name" name="display" onChange={display => setValues({...values, display})}/>
             <textarea id="about-me" style={{width: '100%'}} placeholder="About me" onBlur={ev => setValues({...values, aboutMe: ev.target.value})}/>
-            <button style={{width: 'fit-content'}} onClick={signup}>Signup</button>
+            <div style={{display: 'flex'}}>
+                <button style={{width: 'fit-content'}} onClick={signup}>Signup</button>
+                <a style={{paddingLeft: 10}} href="#" onClick={toggleSignup}>or login</a>
+            </div>
         </div>
     )
 }
 
-const Input: React.FC<{name: string, placeholder: string, onBlur: (v: string) => void}> = ({name, onBlur, placeholder}) => (
-    <div style={{paddingBottom: 5}}>
-        <input style={{width: '100%'}} id={name} placeholder={placeholder} onBlur={ev => onBlur(ev.target.value)}/>
-    </div>
-)

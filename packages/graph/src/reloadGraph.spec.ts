@@ -6,7 +6,7 @@ import {expect} from "chai";
 describe('reloadGraph chain', () => {
     it('should cause getNode to fire again', () =>
         firstValueFrom(graphOpen().pipe(
-            tap(graph => setTimeout(() => graphGetNode(graph, 'my-node').subscribe())),
+            tap(graph => setTimeout(() => graphGetNode(graph, 'my-node', {}).subscribe())),
             tap(graph => setTimeout(() => chainNext(graph.chains.reloadGraph, '').subscribe())),
             switchMap(graph => graph.chains.getNode),
             map(({nodeId}) => nodeId),
@@ -17,7 +17,7 @@ describe('reloadGraph chain', () => {
 
     it('should cause a getEdge() to fire again', () =>
         firstValueFrom(graphOpen().pipe(
-            tap(graph => setTimeout(() => graphGetEdge(graph, 'my-edge').subscribe())),
+            tap(graph => setTimeout(() => graphGetEdge(graph, 'my-edge', {}).subscribe())),
             tap(graph => setTimeout(() => chainNext(graph.chains.reloadGraph, '').subscribe())),
             switchMap(graph => graph.chains.getEdge),
             map(({edgeId}) => edgeId),

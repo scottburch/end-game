@@ -4,10 +4,10 @@
   "license": "MIT",
   "type": "module",
   "private": false,
-  "main": "./src/index.ts",
+  "main": "./lib/index.js",
   "exports": {
     ".": {
-      "default": "./src/index.ts"
+      "default": "./lib/index.js"
     }
   },
   "dependencies": {
@@ -37,6 +37,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "scripts": {
+    "build": "rm -rf ./lib && tsc"
   },
   "devDependencies": {
     "chai": "^4.3.7",

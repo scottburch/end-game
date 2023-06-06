@@ -2,10 +2,9 @@ import React from 'react'
 import {Post} from '../types/Post.js'
 import {NodeWithAuth} from "@end-game/pwd-auth";
 import {Owner} from "./Owner.jsx";
-import {GraphNode} from "@end-game/graph";
+import {GraphNode, NodeId} from "@end-game/graph";
 
 export const PostItem:React.FC<{post: GraphNode<Post>}> = ({post}) => {
-
 
     return (
         <div style={{border: '2px solid black'}}>

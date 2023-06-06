@@ -69,7 +69,7 @@ export const isUserNodeOwner = (graph: GraphWithAuth, node: NodeWithAuth<any>) =
     return node.sig ? checkNodeOwner(TIMEOUT) : checkNodeOwner(100)
 
     function checkNodeOwner(maxWait: number) {
-        return graphGetNode(graph, node.nodeId).pipe(
+        return graphGetNode(graph, node.nodeId, {}).pipe(
             filter(({node}) => !!node),
             switchMap(({node}) => getNodeSignData(node).pipe(
                 switchMap(bytes => verify(bytes, (node as NodeWithAuth<Props>).sig, graph.user?.auth.pubKey as CryptoKey))
@@ -94,7 +94,7 @@ export const getEdgeSignData = (edge: GraphEdge<any>) =>
 
 
 const getNodeOnce = (graph: Graph, nodeId: NodeId) =>
-    graphGetNode(graph, nodeId).pipe(
+    graphGetNode(graph, nodeId, {}).pipe(
         tap(x => x),
         filter(({node}) => !!node?.nodeId),
         first(),
@@ -102,10 +102,10 @@ const getNodeOnce = (graph: Graph, nodeId: NodeId) =>
     );
 
 export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
-    graphGetNode(graph, nodeId).pipe(
+    graphGetNode(graph, nodeId, {}).pipe(
         filter(({node}) => !!node?.nodeId),
         first(),
-        switchMap(({node}) => graphGetNode(graph, (node as NodeWithAuth).owner).pipe(
+        switchMap(({node}) => graphGetNode(graph, (node as NodeWithAuth).owner, {}).pipe(
             filter(({node}) => !!node?.nodeId)
         )),
         timeout({first: TIMEOUT * 1.2, with: () => of({graph, nodeId: '', node: {} as AuthNode})}),

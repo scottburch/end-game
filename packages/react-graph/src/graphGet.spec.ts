@@ -1,5 +1,4 @@
-import {combineLatest, firstValueFrom, switchMap, tap} from "rxjs";
-import {expect} from "chai";
+import {combineLatest, firstValueFrom, switchMap} from "rxjs";
 import {openBrowser} from "@end-game/utils/openBrowser";
 import {compileBrowserTestCode} from "@end-game/utils/testCodeCompiler";
 import {absPath} from "@end-game/utils/absPath";
@@ -13,15 +12,10 @@ describe('graphGet()', () => {
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => page.click('#count').then(() => page)),
             switchMap(page => combineLatest([
-                page.textContent('#node-0'),
-                page.textContent('#node-1'),
-                page.textContent('#node-2'),
-            ])),
-            tap(([n1, n2, n3]) => {
-                expect(n1).to.equal('0:0:person-0');
-                expect(n2).to.equal('1:1:person-1');
-                expect(n3).to.equal('2:2:person-2');
-            })
+                page.textContent('#node-0:text("0:0:person-0")'),
+                page.textContent('#node-1:text("1:1:person-1")'),
+                page.textContent('#node-2:text("2:2:person-2")'),
+            ]))
         ))
     )
 })

@@ -9,7 +9,7 @@ describe('post', () => {
             switchMap(page => of(page).pipe(
                 switchMap(() => page.fill('#post-text', 'post1')),
                 switchMap(() => page.click('button:text("Add post")')),
-                switchMap(() => page.waitForSelector('div:text("Scooter")'))
+                switchMap(() => page.waitForSelector('a:text("Scooter")'))
             )),
         ))
     )

@@ -34,7 +34,7 @@ describe('auth handlers', function()  {
             switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphPutNode(graph, newGraphNode('item', 'person', {name: 'scott'}))),
-            switchMap(({graph, nodeId}) => graphGetNode(graph, nodeId)),
+            switchMap(({graph, nodeId}) => graphGetNode(graph, nodeId, {})),
             tap(({node}) => expect(node.props.name).to.equal('scott'))
         ))
     );
@@ -44,10 +44,10 @@ describe('auth handlers', function()  {
             switchMap(graph => graphNewAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphPutNode(graph, newGraphNode('item', 'person', {name: 'joe'}))),
-            switchMap(({graph}) => graphGetNode(graph, 'item').pipe(first())),
+            switchMap(({graph}) => graphGetNode(graph, 'item', {}).pipe(first())),
             tap(({node}) => expect(node.props.name).to.equal('joe')),
             switchMap(({graph}) => graphPutNode(graph, newGraphNode('item', 'person', {name: 'scott'}))),
-            switchMap(({graph}) => graphGetNode(graph, 'item')),
+            switchMap(({graph}) => graphGetNode(graph, 'item', {})),
             tap(({node}) => expect(node.props.name).to.equal('scott'))
         ))
     );
@@ -67,7 +67,7 @@ describe('auth handlers', function()  {
     it('should send a signed object to storage', () =>
         firstValueFrom(graphWithUser().pipe(
             switchMap(graph => graphPutNode(graph, newGraphNode('item', 'person', {name: 'scott'}))),
-            switchMap(({graph}) => graphGetNode(graph, 'item')),
+            switchMap(({graph}) => graphGetNode(graph, 'item', {})),
             tap(({node}) => expect((node as NodeWithAuth<Props>).sig).not.to.be.undefined)
         ))
     );

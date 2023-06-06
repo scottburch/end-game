@@ -20,6 +20,7 @@ import {newGraphNode} from "@end-game/graph";
 import {levelStoreHandlers} from "@end-game/level-store";
 import {dialPeer, p2pHandlers} from "@end-game/p2p";
 import type {DialerOpts} from "@end-game/p2p";
+import type {GraphHandlerProps} from "@end-game/graph";
 
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);
@@ -32,14 +33,14 @@ export const useDialer = () => {
 }
 
 export const useAuth = () =>  {
-    const [auth, setAuth] = useState<{username: string}>({username: ''});
+    const [auth, setAuth] = useState<{username: string, nodeId: string}>({username: '', nodeId: ''});
     const graph = useGraph();
 
 
     useEffect(() => {
-        setAuth({username: (graph as GraphWithAuth).user?.username || ''});
+        setAuth({nodeId: (graph as GraphWithAuth).user?.nodeId || '', username: (graph as GraphWithAuth).user?.username || ''});
         const authChangedSub = (graph as GraphWithAuth).chains.authChanged.pipe(
-            tap(({graph}) => setAuth({username: (graph as GraphWithAuth).user?.username || ''}))
+            tap(({graph}) => setAuth({nodeId: (graph as GraphWithAuth).user?.nodeId || '', username: (graph as GraphWithAuth).user?.username || ''}))
         ).subscribe()
 
         return () => authChangedSub.unsubscribe();
@@ -106,7 +107,7 @@ export const useGraphNode = <T extends Props>(nodeId: NodeId) => {
     useEffect(() => {
         !graph && console.error('useGraphGet() called outside of a graph context');
         if (graph && nodeId) {
-            const sub = graphGetNode(graph, nodeId).pipe(
+            const sub = graphGetNode(graph, nodeId, {}).pipe(
                 filter(({node}) => !!node?.nodeId),
                 tap(({node}) => setNode(node as GraphNode<T>))
             ).subscribe();
@@ -116,13 +117,13 @@ export const useGraphNode = <T extends Props>(nodeId: NodeId) => {
     return node;
 };
 
-export const useGraphEdge = <T extends Props>(edgeId: EdgeId) => {
+export const useGraphEdge = <T extends Props>(edgeId: EdgeId, opts: GraphHandlerProps<'getEdge'>['opts']) => {
     const [edge, setEdge] = useState<GraphEdge<T>>();
     const graph = useGraph();
 
     useEffect(() => {
         if (graph && edgeId) {
-            const sub = graphGetEdge(graph, edgeId).subscribe(({edge}) => setEdge(edge as GraphEdge<T>))
+            const sub = graphGetEdge(graph, edgeId, opts).subscribe(({edge}) => setEdge(edge as GraphEdge<T>))
             return () => sub.unsubscribe();
         }
     }, [graph, edgeId]);
