@@ -3,7 +3,6 @@ import {$} from 'zx'
 import {createApp} from "./test/testUtils.js";
 import {openBrowser} from "@end-game/utils/openBrowser";
 
-
 describe('create app', function () {
     this.timeout(40_000);
     it.skip('should create a working demo app', () =>
