@@ -1,6 +1,6 @@
 {
   "name": "@end-game/cli",
-  "version": "1.0.33",
+  "version": "1.0.34",
   "main": "lib/index.js",
   "license": "MIT",
   "type": "module",
@@ -9,7 +9,7 @@
     "endgame": "lib/index.js"
   },
   "dependencies": {
-    "@end-game/utils": "^1.0.33",
+    "@end-game/utils": "^1.0.34",
     "@types/node": "^18.11.18",
     "@types/tar": "^6.1.4",
     "commander": "^10.0.0",

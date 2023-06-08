@@ -1,13 +1,13 @@
 {
   "name": "@end-game/dtg-ts-template",
-  "version": "1.0.33",
+  "version": "1.0.34",
   "type": "module",
   "private": false,
   "dependencies": {
-    "@end-game/dtg-scripts": "^1.0.33",
-    "@end-game/graph-explorer": "^1.0.33",
-    "@end-game/react-graph": "^1.0.33",
-    "@end-game/test-utils": "^1.0.33",
+    "@end-game/dtg-scripts": "^1.0.34",
+    "@end-game/graph-explorer": "^1.0.34",
+    "@end-game/react-graph": "^1.0.34",
+    "@end-game/test-utils": "^1.0.34",
     "@types/react": "^18.2.8",
     "@types/react-dom": "^18.2.4",
     "react": "^18.2.0",
