@@ -1,6 +1,6 @@
 {
   "name": "@end-game/dtg-scripts",
-  "version": "1.0.28",
+  "version": "1.0.33",
   "main": "lib/index.js",
   "license": "MIT",
   "private": false,
