@@ -1,10 +1,10 @@
 {
   "name": "@end-game/dtg-ts-template",
-  "version": "1.0.35",
+  "version": "1.0.36",
   "type": "module",
   "private": false,
   "dependencies": {
-    "@end-game/dtg-scripts": "^1.0.35",
+    "@end-game/dtg-scripts": "^1.0.36",
     "@end-game/graph-explorer": "^1.0.34",
     "@end-game/react-graph": "^1.0.34",
     "@end-game/test-utils": "^1.0.34",
