@@ -7,7 +7,6 @@
     "packages/auth/*",
     "packages/loggers/*",
     "packages/stores/*",
-    "packages/tmp/my-app",
     "packages/dtg-templates/dtg-ts-template"
   ],
   "dependencies": {
