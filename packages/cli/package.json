@@ -30,5 +30,6 @@
     "loader": "ts-node/esm",
     "experimental-specifier-resolution": "node",
     "bail": true
-  }
+  },
+  "gitHead": "8bc0a97a6191240300a4e11542689933610a6917"
 }

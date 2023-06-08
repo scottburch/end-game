@@ -2,6 +2,7 @@
   "name": "@end-game/dtg-ts-template",
   "version": "1.0.33",
   "type": "module",
+  "private": false,
   "dependencies": {
     "@end-game/dtg-scripts": "^1.0.33",
     "@end-game/graph-explorer": "^1.0.33",
@@ -44,5 +45,6 @@
     "bail": true,
     "timeout": 100000,
     "async-only": true
-  }
+  },
+  "gitHead": "8bc0a97a6191240300a4e11542689933610a6917"
 }

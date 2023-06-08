@@ -52,5 +52,5 @@
     "build-watch": "yarn build --watch",
     "test": "mocha ./src/**/*.spec.ts"
   },
-  "gitHead": "a01ca1e84d2758a3f85629f5dac3f4d3c0afd984"
+  "gitHead": "8bc0a97a6191240300a4e11542689933610a6917"
 }

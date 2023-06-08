@@ -44,5 +44,6 @@
     "build": "rm -rf lib && webpack",
     "build-watch": "rm -rf lib && webpack --watch",
     "test": "mocha src/**/*.spec.ts"
-  }
+  },
+  "gitHead": "8bc0a97a6191240300a4e11542689933610a6917"
 }
