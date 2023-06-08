@@ -2,11 +2,12 @@ import React, {useEffect, useState} from "react";
 import {useGraphLogin, useGraphPutEdge, useGraphRelationships, useNewAccount} from "./react-graph.jsx";
 import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {switchMap} from "rxjs";
+import {asEdgeId, asGraphId, asNodeId} from "@end-game/graph";
 
 let accountCreated = false;
 
-renderApp(() => {
-    const rels = useGraphRelationships('n1', 'friend', {});
+renderApp(asGraphId('test-graph'), () => {
+    const rels = useGraphRelationships(asNodeId('n1'), 'friend', {});
     const [count, setCount] = useState(0);
     const graphPutEdge = useGraphPutEdge();
     const newAccount = useNewAccount();
@@ -21,7 +22,7 @@ renderApp(() => {
     }, [])
 
     const putNode = () => {
-        graphPutEdge('friend', count.toString(), 'n1', `other-${count}`, {}).subscribe();
+        graphPutEdge('friend', asEdgeId(count.toString()), asNodeId('n1') , asNodeId(`other-${count}`) , {}).subscribe();
         setCount(count + 1);
     }
 

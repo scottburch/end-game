@@ -1,6 +1,6 @@
 {
   "name": "@end-game/pwd-auth",
-  "version": "1.0.29",
+  "version": "1.0.42",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -11,9 +11,9 @@
     }
   },
   "dependencies": {
-    "@end-game/crypto": "^1.0.28",
-    "@end-game/graph": "^1.0.28",
-    "@end-game/utils": "^1.0.28",
+    "@end-game/crypto": "^1.0.38",
+    "@end-game/graph": "^1.0.42",
+    "@end-game/utils": "^1.0.42",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.15",
@@ -45,5 +45,6 @@
     "build": "rm -rf lib && webpack",
     "build-watch": "yarn build --watch",
     "test": "mocha ./src/**/*.spec.ts"
-  }
+  },
+  "gitHead": "8bc0a97a6191240300a4e11542689933610a6917"
 }

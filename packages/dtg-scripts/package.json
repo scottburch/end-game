@@ -1,6 +1,6 @@
 {
   "name": "@end-game/dtg-scripts",
-  "version": "1.0.28",
+  "version": "1.0.42",
   "main": "lib/index.js",
   "license": "MIT",
   "private": false,
@@ -22,5 +22,6 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "gitHead": "96053faf539cd321d88f4ffa16c7582603d585df"
 }

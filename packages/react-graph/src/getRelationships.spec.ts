@@ -1,4 +1,4 @@
-import {combineLatest, delay, firstValueFrom, switchMap, tap} from "rxjs";
+import {combineLatest, firstValueFrom, switchMap, tap} from "rxjs";
 import {openBrowser} from "@end-game/utils/openBrowser";
 import {expect} from "chai";
 import {compileBrowserTestCode} from "@end-game/utils/testCodeCompiler";

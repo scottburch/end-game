@@ -1,4 +1,4 @@
-import {delay, firstValueFrom, map, of, switchMap, tap} from "rxjs";
+import {delay, firstValueFrom, map, of, switchMap} from "rxjs";
 import {$} from 'zx'
 import {createApp} from "./test/testUtils.js";
 import {openBrowser} from "@end-game/utils/openBrowser";
@@ -11,7 +11,7 @@ describe('create app', function () {
             delay(3000),
             switchMap(proc => of(proc).pipe(
                 // test app starts
-                switchMap(() => openBrowser({port: 1235})),
+                switchMap(() => openBrowser({url: 'http://localhost:1235'})),
                 switchMap(page => page.waitForSelector('text=Task:')),
                 switchMap(() => proc.kill()),
             ))

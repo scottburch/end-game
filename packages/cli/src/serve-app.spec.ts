@@ -4,7 +4,6 @@ import {$} from "zx";
 import {openBrowser} from "@end-game/utils/openBrowser";
 
 
-
 describe.skip('serve app', () => {
     it('should serve a built app', () =>
         firstValueFrom(createApp().pipe(
@@ -12,7 +11,7 @@ describe.skip('serve app', () => {
             map(() => $`yarn serve --port 1235`),
             delay(1000),
             switchMap(proc => of(proc).pipe(
-                switchMap(() => openBrowser({port: 1235})),
+                switchMap(() => openBrowser({url: 'http://localhost:1235'})),
                 switchMap(page => page.waitForSelector('text=Task:')),
                 switchMap(() => proc.kill())
             ))

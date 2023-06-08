@@ -2,7 +2,7 @@ import * as React from "react";
 import {of, tap} from "rxjs";
 import {createRoot} from "react-dom/client";
 import {ReactGraph, useAuth} from "@end-game/react-graph";
-import type {Graph} from "@end-game/graph";
+import type {GraphId} from "@end-game/graph";
 
 export const Username: React.FC = () => {
     const auth = useAuth();
@@ -10,10 +10,10 @@ export const Username: React.FC = () => {
 };
 
 
-export const renderApp = (Body: React.FC, graph?: Graph) => {
+export const renderApp = (graphId: GraphId, Body: React.FC) => {
     const MyApp: React.FC = () => {
         return (
-            <ReactGraph graph={graph}>
+            <ReactGraph graphId={graphId}>
                 <Body/>
             </ReactGraph>
         )

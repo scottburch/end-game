@@ -1,6 +1,6 @@
 {
   "name": "@end-game/rxjs-chain",
-  "version": "1.0.31",
+  "version": "1.0.34",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -12,7 +12,7 @@
     }
   },
   "dependencies": {
-    "@end-game/rxjs-chain": "^1.0.31",
+    "@end-game/rxjs-chain": "^1.0.34",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.15",
@@ -41,5 +41,6 @@
     "build": "rm -rf lib && tsc",
     "build-watch": "yarn build --watch",
     "test": "mocha ./src/**/*.spec.ts"
-  }
+  },
+  "gitHead": "8bc0a97a6191240300a4e11542689933610a6917"
 }

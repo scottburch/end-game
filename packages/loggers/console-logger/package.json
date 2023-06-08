@@ -1,6 +1,6 @@
 {
   "name": "@end-game/console-logger",
-  "version": "1.0.28",
+  "version": "1.0.42",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -11,7 +11,7 @@
     }
   },
   "dependencies": {
-    "@end-game/graph": "^1.0.28",
+    "@end-game/graph": "^1.0.42",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.15",
@@ -27,7 +27,8 @@
     "require": "ts-node/register",
     "loader": "ts-node/esm",
     "experimental-specifier-resolution": "node",
-    "bail": true
+    "bail": true,
+    "async-only": true
   },
   "publishConfig": {
     "access": "public"
@@ -42,5 +43,6 @@
     "build": "rm -rf lib && webpack",
     "build-watch": "yarn build --watch",
     "test": "mocha ./src/**/*.spec.ts"
-  }
+  },
+  "gitHead": "8bc0a97a6191240300a4e11542689933610a6917"
 }

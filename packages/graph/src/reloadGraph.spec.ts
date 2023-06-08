@@ -1,12 +1,22 @@
 import {bufferCount, firstValueFrom, map, switchMap, tap} from "rxjs";
-import {graphGetEdge, graphGetNode, graphGetRelationships, graphOpen, nodesByLabel, nodesByProp} from "./graph.js";
+import {
+    getEdge,
+    getNode,
+    getRelationships,
+    graphOpen,
+    asNodeId,
+    nodesByLabel,
+    nodesByProp,
+    asEdgeId,
+    asGraphId
+} from "./graph.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
 
 describe('reloadGraph chain', () => {
     it('should cause getNode to fire again', () =>
-        firstValueFrom(graphOpen().pipe(
-            tap(graph => setTimeout(() => graphGetNode(graph, 'my-node', {}).subscribe())),
+        firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
+            tap(graph => setTimeout(() => getNode(graph, asNodeId('my-node') , {}).subscribe())),
             tap(graph => setTimeout(() => chainNext(graph.chains.reloadGraph, '').subscribe())),
             switchMap(graph => graph.chains.getNode),
             map(({nodeId}) => nodeId),
@@ -16,8 +26,8 @@ describe('reloadGraph chain', () => {
     );
 
     it('should cause a getEdge() to fire again', () =>
-        firstValueFrom(graphOpen().pipe(
-            tap(graph => setTimeout(() => graphGetEdge(graph, 'my-edge', {}).subscribe())),
+        firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
+            tap(graph => setTimeout(() => getEdge(graph, asEdgeId('my-edge'), {}).subscribe())),
             tap(graph => setTimeout(() => chainNext(graph.chains.reloadGraph, '').subscribe())),
             switchMap(graph => graph.chains.getEdge),
             map(({edgeId}) => edgeId),
@@ -27,7 +37,7 @@ describe('reloadGraph chain', () => {
     );
 
     it('should cause a nodesByLabel() to fire again', () =>
-        firstValueFrom(graphOpen().pipe(
+        firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
             tap(graph => setTimeout(() => nodesByLabel(graph, 'a-label').subscribe())),
             tap(graph => setTimeout(() => chainNext(graph.chains.reloadGraph, '').subscribe())),
             switchMap(graph => graph.chains.nodesByLabel),
@@ -38,8 +48,8 @@ describe('reloadGraph chain', () => {
     );
 
     it('should cause a getRelationships() to fire again', () =>
-        firstValueFrom(graphOpen().pipe(
-            tap(graph => setTimeout(() => graphGetRelationships(graph, 'my-node', 'my-rel').subscribe())),
+        firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
+            tap(graph => setTimeout(() => getRelationships(graph, asNodeId('my-node') , 'my-rel').subscribe())),
             tap(graph => setTimeout(() => chainNext(graph.chains.reloadGraph, '').subscribe())),
             switchMap(graph => graph.chains.getRelationships),
             map(({rel}) => rel),
@@ -49,7 +59,7 @@ describe('reloadGraph chain', () => {
     );
 
     it('should cause a nodesByProp() to fire again', () =>
-        firstValueFrom(graphOpen().pipe(
+        firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
             tap(graph => setTimeout(() => nodesByProp(graph, 'my-label', 'a-key', 'a-value').subscribe())),
             tap(graph => setTimeout(() => chainNext(graph.chains.reloadGraph, '').subscribe())),
             switchMap(graph => graph.chains.nodesByProp),

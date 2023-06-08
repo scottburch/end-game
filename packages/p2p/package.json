@@ -1,6 +1,6 @@
 {
   "name": "@end-game/p2p",
-  "version": "1.0.29",
+  "version": "1.0.42",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -12,10 +12,10 @@
     }
   },
   "dependencies": {
-    "@end-game/graph": "^1.0.28",
-    "@end-game/pwd-auth": "^1.0.29",
-    "@end-game/rxjs-chain": "^1.0.28",
-    "@end-game/utils": "^1.0.28",
+    "@end-game/graph": "^1.0.42",
+    "@end-game/pwd-auth": "^1.0.42",
+    "@end-game/rxjs-chain": "^1.0.34",
+    "@end-game/utils": "^1.0.42",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.1.5",
@@ -51,5 +51,6 @@
     "build": "rm -rf lib && webpack",
     "build-watch": "yarn build --watch",
     "test": "mocha ./src/**/*.spec.ts"
-  }
+  },
+  "gitHead": "8bc0a97a6191240300a4e11542689933610a6917"
 }

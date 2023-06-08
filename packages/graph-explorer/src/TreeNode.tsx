@@ -2,7 +2,7 @@ import * as React from 'react'
 import {useGraphEdge, useGraphNode, useGraphRelationships} from "@end-game/react-graph";
 import type {ReactNode} from 'react';
 import {useState} from "react";
-import type {EdgeId, GraphNode, Props} from "@end-game/graph";
+import type {EdgeId, GraphNode, NodeId, Props} from "@end-game/graph";
 
 const Opener: React.FC<{ text: ReactNode, children: () => ReactNode }> = ({text, children}) => {
     const [isOpen, setOpen] = useState(false);
@@ -37,7 +37,7 @@ const Opener: React.FC<{ text: ReactNode, children: () => ReactNode }> = ({text,
 }
 
 
-export const TreeNode: React.FC<{ nodeId: string }> = ({nodeId}) => {
+export const TreeNode: React.FC<{ nodeId: NodeId }> = ({nodeId}) => {
     const node = useGraphNode(nodeId);
 
     return (

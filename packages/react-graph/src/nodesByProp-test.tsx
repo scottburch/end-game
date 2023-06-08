@@ -2,10 +2,11 @@ import React, {useEffect, useState} from "react";
 import {useGraphLogin, useGraphNodesByProp, useGraphPut, useNewAccount} from "./react-graph.jsx";
 import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {switchMap} from "rxjs";
+import {asGraphId, asNodeId} from "@end-game/graph";
 
 let accountCreated = false;
 
-renderApp(() => {
+renderApp(asGraphId('testGraph'), () => {
     const nodes = useGraphNodesByProp<{group: string, name: string}>('person', 'group', 'first');
     const [count, setCount] = useState(0);
     const graphPut = useGraphPut();
@@ -22,7 +23,7 @@ renderApp(() => {
 
 
     const putNode = () => {
-        graphPut('person', count.toString(), {name: 'scott' + count, group: 'first'}).subscribe();
+        graphPut('person', asNodeId(count.toString()) , {name: 'scott' + count, group: 'first'}).subscribe();
         setCount(count + 1);
     }
 

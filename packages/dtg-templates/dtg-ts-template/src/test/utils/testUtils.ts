@@ -1,4 +1,3 @@
-
 import {combineLatest, map, merge, of, switchMap} from "rxjs";
 import {Page} from 'playwright-core'
 import {startTestNet} from "@end-game/test-utils";
@@ -7,12 +6,16 @@ import {openBrowser} from "@end-game/utils/openBrowser";
 export const signupHelper = (page: Page) =>
     of(page).pipe(
         switchMap(page => of(page).pipe(
+            switchMap(() => clickMenu(page)),
             switchMap(() => page.click(':text("signup")')),
-            switchMap(() => page.fill('#username', 'scott')),
-            switchMap(() => page.fill('#password', 'pass')),
-            switchMap(() => page.fill('#display', 'Scooter')),
-            switchMap(() => page.fill('#about-me', 'Here I am')),
-            switchMap(() => page.click('button:text("Signup")')),
+            switchMap(() => page.fill('#signup_username', 'scott')),
+            switchMap(() => page.fill('#signup_password', '12345')),
+            switchMap(() => page.fill('#signup_password2', '12345')),
+            switchMap(() => page.fill('#signup_displayName', 'Scooter')),
+            switchMap(() => page.fill('#signup_nickname', 'scooter')),
+            switchMap(() => page.fill('#signup_aboutMe', 'Here I am')),
+            switchMap(() => page.click('button>:text("Signup")')),
+            switchMap(() => page.waitForSelector('span:text("Welcome scott")')),
             map(() => page)
         ))
     );
@@ -23,8 +26,8 @@ export const startAppNetwork = () =>
         openBrowser(),
         openBrowser()
     ]).pipe(
-        map(([{node0, node1, node2}, page0, page1]) => ({
-            node0, node1, node2, page0, page1
+        map(([{host0, host1, host2}, page0, page1]) => ({
+            host0, host1, host2, page0, page1
         }))
     );
 
@@ -35,7 +38,14 @@ export const connectBrowsers = (page0: Page, page1: Page) =>
     );
 
 export const postHelper = (page: Page, text: string = 'my post') =>
-    of(page.fill('#post-text', text)).pipe(
-        switchMap(() => page.click('button:text("Add Post")'))
-    )
+    of(page).pipe(
+        switchMap(() => clickMenu(page)),
+        switchMap(() => page.waitForSelector(':text("Add Post")')),
+        switchMap(() => page.click(':text("Add Post")')),
+        switchMap(() => page.fill('#add-post_text', text)),
+        switchMap(() => page.click('button>:text("Add post")'))
+    );
+
+export const clickMenu = (page: Page) =>
+    page.click('#menu-btn');
 

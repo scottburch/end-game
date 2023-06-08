@@ -3,13 +3,13 @@ import {useGraphNodesByProp} from "@end-game/react-graph";
 import {NodeWithAuth} from "@end-game/pwd-auth";
 import {Post} from "../types/Post.js";
 import {User} from "../types/User.js";
-import {useShowProfile} from "../hooks/useRight.jsx";
+import {Link} from "react-router-dom";
+
 
 export const Owner: React.FC<{post: NodeWithAuth<Post>}> = ({post}) => {
     const profileNodes = useGraphNodesByProp<User>('user', 'ownerId', post.owner);
-    const showProfile = useShowProfile();
 
     return (
-        <a href="#" onClick={() => showProfile(post.owner)}>{profileNodes[0]?.props.display || 'Loading...'}</a>
+        <Link to={`/profile/${profileNodes[0]?.nodeId}`}>{`${profileNodes[0]?.props.display} (@${profileNodes[0]?.props.nickname})` || 'Loading...'}</Link>
     )
 }

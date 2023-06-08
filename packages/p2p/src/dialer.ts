@@ -1,17 +1,26 @@
-import {Graph} from "@end-game/graph";
+import {GraphId} from "@end-game/graph";
 import {first, fromEvent, Observable, switchMap, tap} from "rxjs";
 import WebSocket from "isomorphic-ws";
-import {GraphWithP2p} from "./p2pHandlers.js";
 import {PeerConn, socketManager} from "./socketManager.js";
+import {Host} from "./host.js";
 
 export type DialerOpts = {
     url: string
     redialInterval?: number
 }
 
+export type P2pMsg<Cmd extends string = string, Data extends Object = Object> = {
+    cmd: Cmd,
+    data: Data
+};
 
-export const dialPeer = (graph: Graph, opts: DialerOpts) =>
-    new Observable<{graph: Graph}>(subscriber => {
+export type DialerMsg<T extends P2pMsg = P2pMsg> = {
+    graphId: GraphId,
+    msg: T
+}
+
+export const dialPeer = (host: Host, opts: DialerOpts) =>
+    new Observable<{host: Host}>(subscriber => {
         let stopping = false;
         let peerConn: PeerConn;
         setTimeout(() => dial());
@@ -26,7 +35,7 @@ export const dialPeer = (graph: Graph, opts: DialerOpts) =>
                 }};
 
             const openSub = fromEvent<WebSocket.Event>(peerConn.socket, 'open').pipe(
-                switchMap(() => socketManager(graph as GraphWithP2p, peerConn))
+                switchMap(() => socketManager(host, peerConn))
             ).subscribe();
 
             const closeSub = fromEvent<WebSocket.CloseEvent>(peerConn.socket, 'close').pipe(
@@ -46,7 +55,7 @@ export const dialPeer = (graph: Graph, opts: DialerOpts) =>
 
         const redial = () => setTimeout(dial, (opts.redialInterval || 30) * 1000);
 
-        subscriber.next({graph});
+        subscriber.next({host});
 
         return () => peerConn?.close()
     });

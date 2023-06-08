@@ -1,34 +1,51 @@
 import type {Graph, GraphOpts, Props} from "@end-game/graph";
-import {graphOpen, graphPutNode, LogLevel, newGraphNode, newUid} from "@end-game/graph";
-import {from, mergeMap, of, scan, skip, switchMap} from "rxjs";
+import {asGraphId, asNodeId, graphOpen, LogLevel, newNode, newUid, putNode} from "@end-game/graph";
+import {from, map, mergeMap, Observable, of, scan, skip, switchMap, timer} from "rxjs";
 import {levelStoreHandlers} from "@end-game/level-store";
 import {authHandlers} from "@end-game/pwd-auth";
-import {dialPeer, p2pHandlers} from "@end-game/p2p";
+import type {Host} from '@end-game/p2p'
+import {asPeerId, dialPeer, newHost, p2pHandlers, startServer} from "@end-game/p2p";
+import detect from 'detect-port'
+import ld from 'lodash'
 
-
-export const getAGraph = (opts: GraphOpts = {graphId: newUid()}) => graphOpen(opts).pipe(
+export const getAGraph = (opts: GraphOpts = {graphId: asGraphId(newUid())}) => graphOpen(opts).pipe(
     switchMap(graph => levelStoreHandlers(graph)),
 );
 
+
 export const startTestNet = (nodes: number[][]) =>
-    from(nodes).pipe(
-        mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers)),
-        scan((nodes, {graph}, idx) => ({...nodes, [`node${idx}`]: graph}), {} as Record<`node${number}`, Graph>),
-        skip(nodes.length - 1),
+    findBasePort(11110).pipe(
+        switchMap(basePort => from(nodes).pipe(
+            mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers, basePort)),
+            scan((nodes, {host}, idx) => ({...nodes, [`host${idx}`]: host}), {} as Record<`host${number}`, Host>),
+            skip(nodes.length - 1),
+        ))
     );
 
 
-export const startTestNode = (nodeNo: number, peers: number[] = []) => graphOpen({graphId: `node-${nodeNo}`, logLevel: LogLevel.DEBUG}).pipe(
-    switchMap(graph => levelStoreHandlers(graph)),
-    switchMap(graph => authHandlers(graph)),
-    switchMap(graph => p2pHandlers(graph, {listeningPort: 11110 + nodeNo})),
-    switchMap(graph => peers.length ? from(peers).pipe(
-        mergeMap(peerNo => dialPeer(graph, {url: `ws://localhost:${11110 + peerNo}`, redialInterval: 1})),
-        skip(peers.length - 1)
-    ) : of({graph}))
-);
+export const startTestNode = (nodeNo: number, peers: number[] = [], basePort: number = 11110) =>
+    graphOpen({graphId: asGraphId('testnet'), logLevel: LogLevel.DEBUG}).pipe(
+        switchMap(graph => levelStoreHandlers(graph)),
+        switchMap(graph => authHandlers(graph)),
+        switchMap(graph => p2pHandlers(graph)),
+        switchMap(graph => startServer(newHost({
+            hostId: asPeerId(`host-${nodeNo}`),
+            graphs: [graph],
+            listeningPort: basePort + nodeNo
+        }))),
+        switchMap(host => peers.length ? from(peers).pipe(
+            mergeMap(peerNo => dialPeer(host, {url: `ws://localhost:${basePort + peerNo}`, redialInterval: 1})),
+            skip(peers.length - 1),
+            map(() => ({host}))
+        ) : of({host}))
+    );
 
 export const addThingNode = (graph: Graph, n: number, props: Props = {}) =>
-    graphPutNode(graph, newGraphNode(`thing${n}`, 'thing', {name: `thing${n}`, ...props}));
+    of(ld.padStart(n.toString(), 4, '0')).pipe(
+        switchMap(padNum =>  putNode(graph, newNode(asNodeId(`thing${padNum}`), 'thing', {name: `thing${padNum}`, ...props})))
+    )
 
 
+const findBasePort = (basePort = 11110): Observable<number> => from(detect(basePort)).pipe(
+    switchMap(port => port === basePort ? of(port) : timer(Math.random() * 1000).pipe(() => findBasePort(basePort + 10)))
+);

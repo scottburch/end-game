@@ -1,24 +1,33 @@
-import type {EdgeId, Graph, GraphEdge, GraphNode, NodeId, Props, Relationship} from '@end-game/graph'
+import type {
+    EdgeId,
+    Graph,
+    GraphEdge,
+    GraphNode,
+    NodeId,
+    Props,
+    RangeOpts,
+    Relationship
+} from '@end-game/graph'
 import {
-    graphGetNode,
-    graphGetEdge,
-    graphGetRelationships,
+    getNode,
+    getEdge,
+    getRelationships,
     graphOpen,
-    graphPutNode,
-    graphPutEdge,
-    newUid,
+    putNode,
+    putEdge,
     nodesByLabel,
-    nodesByProp, newGraphEdge,
+    nodesByProp, newGraphEdge, asGraphId,
 } from "@end-game/graph";
 import type {PropsWithChildren} from 'react';
 import * as React from "react";
 import {createContext, useContext, useEffect, useState} from "react";
 import {catchError, filter, of, switchMap, tap, throwError} from "rxjs";
 import type {GraphWithAuth} from '@end-game/pwd-auth'
-import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
-import {newGraphNode} from "@end-game/graph";
+import {authHandlers, graphAuth, graphNewAuth, graphUnauth} from "@end-game/pwd-auth";
+import {newNode} from "@end-game/graph";
 import {levelStoreHandlers} from "@end-game/level-store";
-import {dialPeer, p2pHandlers} from "@end-game/p2p";
+import type {GraphWithP2p} from '@end-game/p2p'
+import {asPeerId, dialPeer, newHost, p2pHandlers} from "@end-game/p2p";
 import type {DialerOpts} from "@end-game/p2p";
 import type {GraphHandlerProps} from "@end-game/graph";
 
@@ -27,13 +36,17 @@ const GraphContext: React.Context<Graph> = createContext({} as Graph);
 
 export const useGraph = () => useContext(GraphContext);
 
-export const useDialer = () => {
+export const useDialer = (hostId: string) => {
     const graph = useGraph();
-    return (opts: DialerOpts) => dialPeer(graph, opts);
+    return (opts: DialerOpts) => dialPeer(newHost({
+        graphs: [graph as GraphWithP2p],
+        hostId: asPeerId(hostId),
+        listeningPort: 0
+    }), opts);
 }
 
 export const useAuth = () =>  {
-    const [auth, setAuth] = useState<{username: string, nodeId: string}>({username: '', nodeId: ''});
+    const [auth, setAuth] = useState<{username: string, nodeId: NodeId}>({username: '', nodeId: ''});
     const graph = useGraph();
 
 
@@ -49,14 +62,14 @@ export const useAuth = () =>  {
     return auth;
 }
 
-export const useGraphNodesByLabel = <T extends Props>(label: string) => {
+export const useGraphNodesByLabel = <T extends Props>(label: string, opts: RangeOpts = {}) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
     const graph = useGraph();
 
     useEffect(() => {
         if (graph) {
             const sub = of(undefined).pipe(
-                switchMap(() => nodesByLabel(graph, label)),
+                switchMap(() => nodesByLabel(graph, label, opts)),
                 tap(({nodes}) => setNodes(nodes as GraphNode<T>[]))
             ).subscribe();
             return () => {
@@ -67,14 +80,14 @@ export const useGraphNodesByLabel = <T extends Props>(label: string) => {
     return nodes;
 }
 
-export const useGraphNodesByProp = <T extends Props>(label: string, key: keyof T & string, value: any) => {
+export const useGraphNodesByProp = <T extends Props>(label: string, key: keyof T & string, value: any, opts: RangeOpts = {}) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
     const graph = useGraph();
 
     useEffect(() => {
         if (graph) {
             const sub = of(true).pipe(
-                switchMap(() => nodesByProp<T>(graph, label, key, value)),
+                switchMap(() => nodesByProp<T>(graph, label, key, value, opts)),
                 tap(({nodes}) => setNodes(nodes as GraphNode<T>[]))
             ).subscribe();
             return () => sub.unsubscribe();
@@ -90,7 +103,7 @@ export const useGraphRelationships = (nodeId: NodeId, rel: string, opts: { rever
     useEffect(() => {
         if (graph) {
             const sub = of(true).pipe(
-                switchMap(() => graphGetRelationships(graph, nodeId, rel, opts)),
+                switchMap(() => getRelationships(graph, nodeId, rel, opts)),
                 tap(({relationships}) => setRelationships(relationships))
             ).subscribe();
             return () => sub.unsubscribe();
@@ -107,7 +120,7 @@ export const useGraphNode = <T extends Props>(nodeId: NodeId) => {
     useEffect(() => {
         !graph && console.error('useGraphGet() called outside of a graph context');
         if (graph && nodeId) {
-            const sub = graphGetNode(graph, nodeId, {}).pipe(
+            const sub = getNode(graph, nodeId, {}).pipe(
                 filter(({node}) => !!node?.nodeId),
                 tap(({node}) => setNode(node as GraphNode<T>))
             ).subscribe();
@@ -123,7 +136,7 @@ export const useGraphEdge = <T extends Props>(edgeId: EdgeId, opts: GraphHandler
 
     useEffect(() => {
         if (graph && edgeId) {
-            const sub = graphGetEdge(graph, edgeId, opts).subscribe(({edge}) => setEdge(edge as GraphEdge<T>))
+            const sub = getEdge(graph, edgeId, opts).subscribe(({edge}) => setEdge(edge as GraphEdge<T>))
             return () => sub.unsubscribe();
         }
     }, [graph, edgeId]);
@@ -133,9 +146,10 @@ export const useGraphEdge = <T extends Props>(edgeId: EdgeId, opts: GraphHandler
 export const useGraphPut = <T extends Props>() => {
     const graph: Graph = useGraph();
 
-    return (label: string, nodeId: NodeId, props: T) => {
-        return graphPutNode(graph, newGraphNode(nodeId, label, props));
-    }
+    return (label: string, nodeId: NodeId, props: T) =>
+        of(newNode(nodeId, label, props)).pipe(
+            switchMap(node => putNode(graph, node))
+        );
 };
 
 export const useNewAccount = () => {
@@ -149,39 +163,48 @@ export const useNewAccount = () => {
 export const useGraphLogin = () => {
     const graph: Graph = useGraph();
 
-    return (username: string, password: string) => {
-        return graphAuth(graph, username, password)
-    }
+    return (username: string, password: string) =>
+        graphAuth(graph, username, password);
 };
 
+export const useGraphLogout = () => {
+    const graph= useGraph();
+
+    return () => graphUnauth(graph);
+}
 
 
 export const useGraphPutEdge = <T extends Props>() => {
     const graph: Graph = useGraph();
 
     return (rel: string, edgeId: EdgeId, from: NodeId, to: NodeId, props: T) => {
-        return graphPutEdge(graph, newGraphEdge(edgeId, rel, from, to, props)).pipe(
+        return putEdge(graph, newGraphEdge(edgeId, rel, from, to, props)).pipe(
             catchError(err => throwError(err.code || err))
         );
     }
 }
 
-export const ReactGraph: React.FC<PropsWithChildren<{ graph?: Graph }>> = ({graph, children}) => {
+export type ReactGraphProps =  {
+    graphId: string
+    persistent?: boolean
+}
+
+export const ReactGraph: React.FC<PropsWithChildren<ReactGraphProps>> = (props) => {
     const [myGraph, setMyGraph] = useState<Graph>();
 
 
     useEffect(() => {
-        graph ? setMyGraph(graph) : createNewGraph();
+        createNewGraph();
 
         function createNewGraph() {
             const sub = graphOpen({
-                graphId: newUid()
+                graphId: asGraphId(props.graphId)
             }).pipe(
-                switchMap(graph => levelStoreHandlers(graph)),
+                switchMap(graph => levelStoreHandlers(graph, {dir: props.persistent ? 'endgame' : undefined})),
                 switchMap(graph => authHandlers(graph)),
-                switchMap(graph => p2pHandlers(graph, {})),
+                switchMap(graph => p2pHandlers(graph)),
                 tap(graph => setMyGraph(graph)),
-                switchMap(graph => (graph as GraphWithAuth).chains.authChanged),
+                switchMap(graph => (graph as Graph as GraphWithAuth).chains.authChanged),
                 tap(({graph}) => setMyGraph(graph)),
             ).subscribe();
             return () => sub.unsubscribe();
@@ -190,7 +213,7 @@ export const ReactGraph: React.FC<PropsWithChildren<{ graph?: Graph }>> = ({grap
 
     return myGraph?.graphId ? (
         <GraphContext.Provider value={myGraph}>
-            {children}
+            {props.children}
         </GraphContext.Provider>
     ) : <div>'No graph'</div>
 };

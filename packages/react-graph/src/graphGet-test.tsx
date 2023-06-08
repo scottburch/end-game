@@ -3,11 +3,13 @@ import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {useGraphNode, useGraphLogin, useGraphNodesByLabel, useGraphPut, useNewAccount} from "./react-graph.jsx";
 import {useEffect, useRef} from "react";
 import {switchMap} from "rxjs";
+import type {NodeId} from "@end-game/graph";
+import {asGraphId, asNodeId} from "@end-game/graph";
 
 let accountCreated = false;
 
 
-renderApp(() => {
+renderApp(asGraphId('test-graph'),  () => {
     const nodes = useGraphNodesByLabel('person');
     const graphPut = useGraphPut();
     const count = useRef(0);
@@ -25,7 +27,7 @@ renderApp(() => {
 
 
     const addPerson = () => {
-        graphPut('person', count.current.toString(), {name: `person-${count.current}`}).subscribe();
+        graphPut('person', asNodeId(count.current.toString()) , {name: `person-${count.current}`}).subscribe();
         count.current = count.current + 1;
     }
 
@@ -38,7 +40,7 @@ renderApp(() => {
     )
 });
 
-const Person: React.FC<{nodeId: string}> = ({nodeId}) => {
+const Person: React.FC<{nodeId: NodeId}> = ({nodeId}) => {
     const node = useGraphNode(nodeId);
     return (
         <div id={`node-${nodeId}`}>{nodeId}:{node?.nodeId}:{node?.props.name}</div>
