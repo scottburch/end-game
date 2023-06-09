@@ -35,20 +35,17 @@ export type GraphWithLevel = Graph & {
 
 
 export const levelStoreHandlers = (graph: Graph, opts: LevelHandlerOpts = {}) => of(graph).pipe(
-    tap(graph => appendHandler(graph.chains.putNode, 'storage', levelStorePutNodeHandler(opts))),
-    tap(graph => appendHandler(graph.chains.getNode, 'storage', levelStoreGetNodeHandler(opts))),
-    tap(graph => appendHandler(graph.chains.putEdge, 'storage', levelStorePutEdgeHandler(opts))),
-    tap(graph => appendHandler(graph.chains.getEdge, 'storage', levelStoreGetEdgeHandler(opts))),
-    tap(graph => appendHandler(graph.chains.nodesByLabel, 'storage', levelStoreNodesByLabelHandler(opts))),
-    tap(graph => appendHandler(graph.chains.nodesByProp, 'storage', levelStoreNodesByPropHandler(opts))),
-    tap(graph => appendHandler(graph.chains.getRelationships, 'storage', levelStoreGetRelationshipsHandler(opts)))
+    tap(graph => appendHandler(graph.chains.putNode, 'storage', levelStorePutNodeHandler())),
+    tap(graph => appendHandler(graph.chains.getNode, 'storage', levelStoreGetNodeHandler())),
+    tap(graph => appendHandler(graph.chains.putEdge, 'storage', levelStorePutEdgeHandler())),
+    tap(graph => appendHandler(graph.chains.getEdge, 'storage', levelStoreGetEdgeHandler())),
+    tap(graph => appendHandler(graph.chains.nodesByLabel, 'storage', levelStoreNodesByLabelHandler())),
+    tap(graph => appendHandler(graph.chains.nodesByProp, 'storage', levelStoreNodesByPropHandler())),
+    tap(graph => appendHandler(graph.chains.getRelationships, 'storage', levelStoreGetRelationshipsHandler())),
+    tap(graph => (graph as GraphWithLevel).levelStore = opts.dir ? new Level(opts.dir) as LevelStore : new MemoryLevel() as LevelStore)
 );
 
-const getStore = (graph: Graph, handlerOpts: LevelHandlerOpts) => of((graph as GraphWithLevel).levelStore).pipe(
-    map(store => store || (handlerOpts.dir ? new Level(handlerOpts.dir) : new MemoryLevel())),
-    tap(store => (graph as GraphWithLevel).levelStore = store)
-);
-
+const getStore = (graph: Graph) => of((graph as GraphWithLevel).levelStore);
 
 const storeIterator = (store: LevelStore, query: AbstractIteratorOptions<string, string>) => new Observable<Iterator<any, any, any>>(observer => {
     const iterator = store.iterator(query);
@@ -57,15 +54,15 @@ const storeIterator = (store: LevelStore, query: AbstractIteratorOptions<string,
 });
 
 
-export const levelStoreGetNodeHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'getNode'> =>
-    ({graph, nodeId, opts}) => getStore(graph, handlerOpts).pipe(
+export const levelStoreGetNodeHandler = (): GraphHandler<'getNode'> =>
+    ({graph, nodeId, opts}) => getStore(graph).pipe(
         mergeMap(store => store.get([graph.graphId, nodeId].join('.'))),
         map(json => ({graph, node: deserializer<GraphNode>(json), nodeId, opts})),
         catchError(err => err.notFound ? of({graph, nodeId, node: {} as GraphNode, opts}) : throwError(err))
     );
 
-export const levelStorePutNodeHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'putNode'> => {
-    return ({graph, node}) => getStore(graph, handlerOpts).pipe(
+export const levelStorePutNodeHandler = (): GraphHandler<'putNode'> => {
+    return ({graph, node}) => getStore(graph).pipe(
         switchMap(store => of(undefined).pipe(
             switchMap(() => checkState(graph, store, node)),
             switchMap(() => combineLatest([
@@ -92,8 +89,8 @@ const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode)
         last()
     ) : of(undefined);
 
-export const levelStorePutEdgeHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'putEdge'> => {
-    return ({graph, edge}) => getStore(graph, handlerOpts).pipe(
+export const levelStorePutEdgeHandler = (): GraphHandler<'putEdge'> => {
+    return ({graph, edge}) => getStore(graph).pipe(
         switchMap(store => of(undefined).pipe(
             switchMap(() => checkState(graph, store, edge)),
             switchMap(() => merge(
@@ -114,22 +111,22 @@ export const levelStorePutEdgeHandler = (handlerOpts: LevelHandlerOpts): GraphHa
     }
 }
 
-export const levelStoreGetEdgeHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'getEdge'> =>
-    ({graph, edgeId, opts}) => getStore(graph, handlerOpts).pipe(
+export const levelStoreGetEdgeHandler = (): GraphHandler<'getEdge'> =>
+    ({graph, edgeId, opts}) => getStore(graph).pipe(
         switchMap(store => store.get([graph.graphId, edgeId].join('.'))),
         map(json => deserializer<GraphEdge>(json)),
         map(edge => ({graph, edgeId, edge, opts})),
         catchError(err => err.notFound ? of({graph, edgeId, edge: {} as GraphEdge, opts}) : throwError(err))
     );
 
-export const levelStoreNodesByLabelHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'nodesByLabel'> =>
-    ({graph, label}) => getStore(graph, handlerOpts).pipe(
+export const levelStoreNodesByLabelHandler = (): GraphHandler<'nodesByLabel'> =>
+    ({graph, label}) => getStore(graph).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.LABEL, label]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
             map(pair => pair?.[0].split('.')[3]),
-            switchMap(nodeId => levelStoreGetNodeHandler(handlerOpts)({
+            switchMap(nodeId => levelStoreGetNodeHandler()({
                 graph,
                 nodeId: nodeId as string,
                 node: {} as GraphNode,
@@ -141,14 +138,14 @@ export const levelStoreNodesByLabelHandler = (handlerOpts: LevelHandlerOpts): Gr
         map(nodes => ({graph, label, nodes})),
     );
 
-export const levelStoreNodesByPropHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'nodesByProp'> =>
-    ({graph, label, key, value}) => getStore(graph, handlerOpts).pipe(
+export const levelStoreNodesByPropHandler = (): GraphHandler<'nodesByProp'> =>
+    ({graph, label, key, value}) => getStore(graph).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, value.toString()]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
             map(pair => pair?.[0].split('.')[5]),
-            mergeMap(nodeId => levelStoreGetNodeHandler(handlerOpts)({
+            mergeMap(nodeId => levelStoreGetNodeHandler()({
                 graph,
                 nodeId: nodeId as string,
                 node: {} as GraphNode,
@@ -171,8 +168,8 @@ const keySearchCriteria = (segments: string[]) =>
     });
 
 
-export const levelStoreGetRelationshipsHandler = (handlerOpts: LevelHandlerOpts): GraphHandler<'getRelationships'> =>
-    ({graph, nodeId, rel, reverse}) => getStore(graph, handlerOpts).pipe(
+export const levelStoreGetRelationshipsHandler = (): GraphHandler<'getRelationships'> =>
+    ({graph, nodeId, rel, reverse}) => getStore(graph).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, reverse ? IndexTypes.TO_REL : IndexTypes.FROM_REL, nodeId, rel]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
