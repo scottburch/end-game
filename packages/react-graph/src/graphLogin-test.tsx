@@ -5,7 +5,7 @@ import {switchMap} from "rxjs";
 
 
 
-renderApp(() => {
+renderApp('test-graph', () => {
     const newAccount = useNewAccount();
     const login = useGraphLogin();
     const put = useGraphPut();

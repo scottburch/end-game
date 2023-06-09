@@ -3,7 +3,7 @@ import {renderApp} from "./test/reactTestUtils.jsx";
 import {useDialer, useGraphNodesByLabel} from "./react-graph.jsx";
 
 
-renderApp(() => {
+renderApp('test-graph', () => {
     const dial = useDialer();
     const nodes = useGraphNodesByLabel('thing');
 

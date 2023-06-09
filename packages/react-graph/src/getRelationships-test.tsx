@@ -5,7 +5,7 @@ import {switchMap} from "rxjs";
 
 let accountCreated = false;
 
-renderApp(() => {
+renderApp('test-graph', () => {
     const rels = useGraphRelationships('n1', 'friend', {});
     const [count, setCount] = useState(0);
     const graphPutEdge = useGraphPutEdge();

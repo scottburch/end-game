@@ -5,7 +5,7 @@ import {switchMap, tap} from "rxjs";
 
 let accountCreated = false;
 
-renderApp(() => {
+renderApp('testGraph', () => {
     const nodes = useGraphNodesByLabel('thing');
     const graphPut = useGraphPut();
     const newAccount = useNewAccount();

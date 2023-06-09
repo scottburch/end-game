@@ -7,7 +7,7 @@ import {switchMap, of, tap} from "rxjs";
 
 let accountCreated = false;
 
-renderApp(() => {
+renderApp('test-graph', () => {
     const graphPut = useGraphPut();
     const graphPutEdge = useGraphPutEdge();
     const newAccount = useNewAccount();

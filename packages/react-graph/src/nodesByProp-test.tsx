@@ -5,7 +5,7 @@ import {switchMap} from "rxjs";
 
 let accountCreated = false;
 
-renderApp(() => {
+renderApp('testGraph', () => {
     const nodes = useGraphNodesByProp<{group: string, name: string}>('person', 'group', 'first');
     const [count, setCount] = useState(0);
     const graphPut = useGraphPut();

@@ -1,4 +1,4 @@
-import type {EdgeId, Graph, GraphEdge, GraphNode, NodeId, Props, Relationship} from '@end-game/graph'
+import type {EdgeId, Graph, GraphEdge, GraphId, GraphNode, NodeId, Props, Relationship} from '@end-game/graph'
 import {
     graphGetNode,
     graphGetEdge,
@@ -6,7 +6,6 @@ import {
     graphOpen,
     graphPutNode,
     graphPutEdge,
-    newUid,
     nodesByLabel,
     nodesByProp, newGraphEdge,
 } from "@end-game/graph";
@@ -166,23 +165,23 @@ export const useGraphPutEdge = <T extends Props>() => {
     }
 }
 
-export type ReactGraphOpts = {
-    graph?: Graph
+export type ReactGraphOpts =  {
+    graphId: GraphId
     persistent?: boolean
 }
 
-export const ReactGraph: React.FC<PropsWithChildren<ReactGraphOpts>> = ({persistent, graph, children}) => {
+export const ReactGraph: React.FC<PropsWithChildren<ReactGraphOpts>> = (props) => {
     const [myGraph, setMyGraph] = useState<Graph>();
 
 
     useEffect(() => {
-        graph ? setMyGraph(graph) : createNewGraph();
+        createNewGraph();
 
         function createNewGraph() {
             const sub = graphOpen({
-                graphId: newUid()
+                graphId: (props as {graphId: string}).graphId
             }).pipe(
-                switchMap(graph => levelStoreHandlers(graph, {dir: persistent ? 'endgame' : undefined})),
+                switchMap(graph => levelStoreHandlers(graph, {dir: props.persistent ? 'endgame' : undefined})),
                 switchMap(graph => authHandlers(graph)),
                 switchMap(graph => p2pHandlers(graph, {})),
                 tap(graph => setMyGraph(graph)),
@@ -195,7 +194,7 @@ export const ReactGraph: React.FC<PropsWithChildren<ReactGraphOpts>> = ({persist
 
     return myGraph?.graphId ? (
         <GraphContext.Provider value={myGraph}>
-            {children}
+            {props.children}
         </GraphContext.Provider>
     ) : <div>'No graph'</div>
 };

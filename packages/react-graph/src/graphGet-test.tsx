@@ -7,7 +7,7 @@ import {switchMap} from "rxjs";
 let accountCreated = false;
 
 
-renderApp(() => {
+renderApp('test-graph', () => {
     const nodes = useGraphNodesByLabel('person');
     const graphPut = useGraphPut();
     const count = useRef(0);
