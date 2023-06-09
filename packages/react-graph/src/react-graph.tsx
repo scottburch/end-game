@@ -166,7 +166,12 @@ export const useGraphPutEdge = <T extends Props>() => {
     }
 }
 
-export const ReactGraph: React.FC<PropsWithChildren<{ graph?: Graph }>> = ({graph, children}) => {
+export type ReactGraphOpts = {
+    graph?: Graph
+    persistent?: boolean
+}
+
+export const ReactGraph: React.FC<PropsWithChildren<ReactGraphOpts>> = ({persistent, graph, children}) => {
     const [myGraph, setMyGraph] = useState<Graph>();
 
 
@@ -177,7 +182,7 @@ export const ReactGraph: React.FC<PropsWithChildren<{ graph?: Graph }>> = ({grap
             const sub = graphOpen({
                 graphId: newUid()
             }).pipe(
-                switchMap(graph => levelStoreHandlers(graph)),
+                switchMap(graph => levelStoreHandlers(graph, {dir: persistent ? 'endgame' : undefined})),
                 switchMap(graph => authHandlers(graph)),
                 switchMap(graph => p2pHandlers(graph, {})),
                 tap(graph => setMyGraph(graph)),

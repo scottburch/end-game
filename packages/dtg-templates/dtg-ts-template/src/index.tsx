@@ -13,7 +13,7 @@ const renderIt = () => {
     );
     root.render(
         <>
-            <ReactGraph>
+            <ReactGraph persistent={!window.location.href.includes('localhost')}>
                 <GraphExplorerBtn/>
                 <React.StrictMode>
                     <Main/>
