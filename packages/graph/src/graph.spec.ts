@@ -4,10 +4,10 @@ import {
     delay,
     first,
     firstValueFrom,
-    from,
+    from, last,
     map,
-    merge,
-    of,
+    merge, mergeMap,
+    of, range,
     scan,
     skipWhile,
     switchMap,
@@ -21,10 +21,10 @@ import {
     graphOpen,
     graphPutNode,
     graphPutEdge,
-    nodesByProp, newGraphNode, newGraphEdge
+    nodesByProp, newGraphNode, newGraphEdge, nodesByLabel
 } from "./graph.js";
 import {expect} from "chai";
-import {getAGraph} from "@end-game/test-utils";
+import {addThingNode, getAGraph} from "@end-game/test-utils";
 import {newUid} from "./uid.js";
 
 describe('graph', () => {
@@ -283,4 +283,18 @@ describe('graph', () => {
             tap(x => expect(x).to.deep.equal(['n1', 'n2', 'n3']))
         ))
     );
+
+    describe('searching', () => {
+        it('should limit the number of responses', () =>
+            firstValueFrom(getAGraph().pipe(
+                switchMap(graph => range(1,5).pipe(
+                    mergeMap(n => addThingNode(graph, n)),
+                    last(),
+                    map(() => graph)
+                )),
+                switchMap(graph => nodesByLabel(graph, 'thing', {limit: 3})),
+                tap(({nodes}) => expect(nodes.length).to.equal(3))
+            ))
+        )
+    })
 });

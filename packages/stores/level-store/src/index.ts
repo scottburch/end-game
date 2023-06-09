@@ -21,6 +21,7 @@ import {Level} from "level";
 import type {Iterator} from "level";
 import {appendHandler} from "@end-game/rxjs-chain";
 import {deserializer, serializer} from "@end-game/utils/serializer";
+import type {RangeOpts} from "@end-game/graph";
 
 
 type LevelStore = AbstractLevel<string>;
@@ -121,7 +122,7 @@ export const levelStoreGetEdgeHandler = (): GraphHandler<'getEdge'> =>
 
 export const levelStoreNodesByLabelHandler = (): GraphHandler<'nodesByLabel'> =>
     ({graph, label, opts}) => getStore(graph).pipe(
-        switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.LABEL, label]))),
+        switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.LABEL, label], opts))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
@@ -158,13 +159,15 @@ export const levelStoreNodesByPropHandler = (): GraphHandler<'nodesByProp'> =>
     )
 
 
-const keySearchCriteria = (segments: string[]) =>
+const keySearchCriteria = (segments: string[], opts: RangeOpts = {}) =>
     segments[segments.length - 1].includes('*') ? ({
         gte: segments.join('.').replace('*', ''),
-        lt: segments.join('.').replace('*', '') + String.fromCharCode(255)
+        lt: segments.join('.').replace('*', '') + String.fromCharCode(255),
+        limit: opts.limit
     }) : ({
         gt: segments.join('.') + '.',
-        lt: segments.join('.') + '.' + String.fromCharCode(255)
+        lt: segments.join('.') + '.' + String.fromCharCode(255),
+        limit: opts.limit
     });
 
 
