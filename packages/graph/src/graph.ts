@@ -49,6 +49,15 @@ export type GraphLogItem = {
     level: LogLevel
 }
 
+export type RangeOpts = {
+    gt?: string
+    gte?: string
+    lt?: string
+    lte?: string
+    reverse?: boolean
+    limit?: number
+}
+
 export type Graph = {
     graphId: string
     chains: {
@@ -58,7 +67,7 @@ export type Graph = {
         putEdge: RxjsChain<{ graph: Graph, edge: GraphEdge }>
         getEdge: RxjsChain<{ graph: Graph, edgeId: EdgeId, edge: GraphEdge, opts: {local?: boolean }}>
         reloadGraph: RxjsChain<{}>
-        nodesByLabel: RxjsChain<{ graph: Graph, label: string, nodes?: GraphNode[] }>
+        nodesByLabel: RxjsChain<{ graph: Graph, label: string, nodes?: GraphNode[], opts: RangeOpts }>
         nodesByProp: RxjsChain<{ graph: Graph, label: string, key: string, value: string, nodes?: GraphNode[] }>
         getRelationships: RxjsChain<{
             graph: Graph,
@@ -186,11 +195,11 @@ export const graphGetNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts
         }
     });
 
-export const nodesByLabel = <T extends Props>(graph: Graph, label: string) =>
+export const nodesByLabel = <T extends Props>(graph: Graph, label: string, opts: RangeOpts = {}) =>
     new Observable<{ graph: Graph, label: string, nodes: GraphNode<T>[] }>(subscriber => {
         const putSub = graph.chains.putNode.pipe(
             filter(({node}) => node.label === label),
-            mergeMap(() => chainNext(graph.chains.nodesByLabel, {graph, label}))
+            mergeMap(() => chainNext(graph.chains.nodesByLabel, {graph, label, opts}))
         ).subscribe();
 
         const nodesSub = graph.chains.nodesByLabel.pipe(
@@ -199,10 +208,10 @@ export const nodesByLabel = <T extends Props>(graph: Graph, label: string) =>
         ).subscribe();
 
         const reloadSub = graph.chains.reloadGraph.pipe(
-            switchMap(() => chainNext(graph.chains.nodesByLabel, {graph, label}))
+            switchMap(() => chainNext(graph.chains.nodesByLabel, {graph, label, opts}))
         ).subscribe();
 
-        chainNext(graph.chains.nodesByLabel, {graph, label}).subscribe();
+        chainNext(graph.chains.nodesByLabel, {graph, label, opts}).subscribe();
 
         return () => {
             putSub.unsubscribe();

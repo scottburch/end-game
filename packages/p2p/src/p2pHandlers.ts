@@ -109,12 +109,12 @@ const getRelationshipsHandler: GraphP2pHandler<'getRelationships'> = ({graph, no
     return of({graph, nodeId, rel, reverse, relationships});
 };
 
-const nodesByLabelHandler: GraphP2pHandler<'nodesByLabel'> = ({graph, label, nodes}) => {
+const nodesByLabelHandler: GraphP2pHandler<'nodesByLabel'> = ({graph, label, nodes, opts}) => {
     chainNext((graph as GraphWithP2p).chains.peersOut, {
         graph,
         msg: {cmd: 'nodesByLabel', data: {label}}
     }).subscribe()
-    return of({graph, label, nodes})
+    return of({graph, label, nodes, opts})
 };
 
 const nodesByPropHandler: GraphP2pHandler<'nodesByProp'> = ({graph, label, key, value, nodes}) => {

@@ -120,7 +120,7 @@ export const levelStoreGetEdgeHandler = (): GraphHandler<'getEdge'> =>
     );
 
 export const levelStoreNodesByLabelHandler = (): GraphHandler<'nodesByLabel'> =>
-    ({graph, label}) => getStore(graph).pipe(
+    ({graph, label, opts}) => getStore(graph).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.LABEL, label]))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
@@ -135,7 +135,7 @@ export const levelStoreNodesByLabelHandler = (): GraphHandler<'nodesByLabel'> =>
             map(({node}) => node as GraphNode),
             toArray()
         )),
-        map(nodes => ({graph, label, nodes})),
+        map(nodes => ({graph, label, nodes, opts})),
     );
 
 export const levelStoreNodesByPropHandler = (): GraphHandler<'nodesByProp'> =>
