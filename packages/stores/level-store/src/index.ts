@@ -108,7 +108,6 @@ export const levelStorePutEdgeHandler = (handlerOpts: LevelHandlerOpts): GraphHa
     function checkState(graph: Graph, store: LevelStore, edge: GraphEdge) {
         return from(store.get([graph.graphId, edge.edgeId].join('.'))).pipe(
             map(data => deserializer<GraphEdge>(data)),
-            tap(e => console.log(e.state, edge.state, e.state < edge.state)),
             filter(e => e.state < edge.state),
             catchError(err => err.notFound ? of({graph, edge: {} as GraphEdge}) : throwError(err))
         )

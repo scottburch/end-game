@@ -41,7 +41,7 @@ export const findAuthNode = (graph: Graph, username: string) =>
         first()
     );
 
-export const isUserAuthedToWriteEdge = (graph: Graph, edge: GraphEdge<Props>) =>
+export const isUserAuthedToWriteEdge = (graph: Graph, edge: GraphEdge) =>
     getNodeOnce(graph, edge.from).pipe(
         switchMap(({node}) => node ? isUserNodeOwner(graph as GraphWithAuth, node as NodeWithAuth<Props>) : of(true)),
     );

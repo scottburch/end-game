@@ -1,8 +1,8 @@
-import {combineLatest, delay, filter, firstValueFrom, map, merge, of, scan, switchMap, tap} from "rxjs";
+import {combineLatest, delay, firstValueFrom, of, switchMap, tap} from "rxjs";
 import {addThingNode, startTestNet} from "@end-game/test-utils";
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
-import {graphGetEdge, graphGetNode, graphPutEdge, newGraphEdge} from "@end-game/graph";
 import {expect} from "chai";
+import {graphGetEdge, graphGetNode, graphPutEdge, newGraphEdge} from "./graph.js";
 
 describe('node state', () => {
     it('should update nodes according to state', () =>
@@ -34,7 +34,7 @@ describe('node state', () => {
                 switchMap(() => graphPutEdge(node0, newGraphEdge('e1', 'rel', 'from', 'to', {foo: 10}))),
                 delay(6000),
                 switchMap(() => graphPutEdge(node0, newGraphEdge('e1', 'rel', 'from', 'to', {foo: 11}))),
-                delay(1000),
+                delay(6000),
                 switchMap(() => combineLatest([
                     graphGetEdge(node0, 'e1', {}),
                     graphGetEdge(node1, 'e1', {})

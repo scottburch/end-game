@@ -6,8 +6,7 @@ import {
     graphPutNode,
     newGraphEdge,
     newGraphNode,
-    nodesByLabel,
-    Props
+    nodesByLabel
 } from "@end-game/graph";
 import {
     combineLatest,
@@ -58,7 +57,7 @@ describe('p2p handlers', () => {
             switchMap(graph => (graph as GraphWithP2p).chains.peersOut),
             tap(({msg}) => {
                 expect(msg.cmd).to.equal('putNode');
-                expect((msg.data as GraphNode<Props>).label).to.equal('thing')
+                expect((msg.data as GraphNode).label).to.equal('thing')
             })
         ))
     );
@@ -70,7 +69,7 @@ describe('p2p handlers', () => {
                 switchMap(() => graphPutEdge(graph, newGraphEdge('edge1', 'friend', 'node1', 'node2', {name: 'thing1'})))
             ).subscribe()),
             switchMap(graph => (graph as GraphWithP2p).chains.peersOut),
-            map(({msg}) => ({msg, edge: (msg.data as GraphEdge<Props>)})),
+            map(({msg}) => ({msg, edge: (msg.data as GraphEdge)})),
             tap(({msg, edge}) => {
                 expect(msg.cmd).to.equal('putEdge');
                 expect(edge.from).to.equal('node1');

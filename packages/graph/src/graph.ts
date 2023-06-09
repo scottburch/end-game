@@ -53,13 +53,13 @@ export type Graph = {
     graphId: string
     chains: {
         log: RxjsChain<{ graph: Graph, item: GraphLogItem }>
-        putNode: RxjsChain<{ graph: Graph, node: GraphNode<Props> }>
-        getNode: RxjsChain<{ graph: Graph, nodeId: NodeId, node: GraphNode<Props>, opts: {local?: boolean }}>
-        putEdge: RxjsChain<{ graph: Graph, edge: GraphEdge<Props> }>
-        getEdge: RxjsChain<{ graph: Graph, edgeId: EdgeId, edge: GraphEdge<Props>, opts: {local?: boolean }}>
+        putNode: RxjsChain<{ graph: Graph, node: GraphNode }>
+        getNode: RxjsChain<{ graph: Graph, nodeId: NodeId, node: GraphNode, opts: {local?: boolean }}>
+        putEdge: RxjsChain<{ graph: Graph, edge: GraphEdge }>
+        getEdge: RxjsChain<{ graph: Graph, edgeId: EdgeId, edge: GraphEdge, opts: {local?: boolean }}>
         reloadGraph: RxjsChain<{}>
-        nodesByLabel: RxjsChain<{ graph: Graph, label: string, nodes?: GraphNode<Props>[] }>
-        nodesByProp: RxjsChain<{ graph: Graph, label: string, key: string, value: string, nodes?: GraphNode<Props>[] }>
+        nodesByLabel: RxjsChain<{ graph: Graph, label: string, nodes?: GraphNode[] }>
+        nodesByProp: RxjsChain<{ graph: Graph, label: string, key: string, value: string, nodes?: GraphNode[] }>
         getRelationships: RxjsChain<{
             graph: Graph,
             nodeId: NodeId,

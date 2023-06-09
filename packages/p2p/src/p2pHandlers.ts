@@ -1,4 +1,4 @@
-import type {EdgeId, Graph, GraphEdge, GraphId, GraphNode, NodeId, Props} from "@end-game/graph";
+import type {EdgeId, Graph, GraphEdge, GraphId, GraphNode, NodeId} from "@end-game/graph";
 
 import {from, map, of, switchMap, tap} from "rxjs";
 import type {RxjsChain} from "@end-game/rxjs-chain";
@@ -150,12 +150,12 @@ const peerInHandler: GraphP2pHandler<'peerIn'> = ({graph, msg}) =>
 
 
 const doPutNodeIn = (graph: Graph, msg: P2pMsg) =>
-    of(msg as P2pMsg<'putNode', GraphNode<Props>>).pipe(
+    of(msg as P2pMsg<'putNode', GraphNode>).pipe(
         switchMap(msg => graphPutNode(graph, msg.data))
     );
 
 const doPutEdgeIn = (graph: Graph, msg: P2pMsg) =>
-    of(msg as P2pMsg<'putEdge', GraphEdge<Props>>).pipe(
+    of(msg as P2pMsg<'putEdge', GraphEdge>).pipe(
         switchMap(msg =>
             graphPutEdge(graph, msg.data)
         )
