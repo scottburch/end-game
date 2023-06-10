@@ -1,4 +1,14 @@
-import type {EdgeId, Graph, GraphEdge, GraphId, GraphNode, NodeId, Props, Relationship} from '@end-game/graph'
+import type {
+    EdgeId,
+    Graph,
+    GraphEdge,
+    GraphId,
+    GraphNode,
+    NodeId,
+    Props,
+    RangeOpts,
+    Relationship
+} from '@end-game/graph'
 import {
     graphGetNode,
     graphGetEdge,
@@ -48,14 +58,14 @@ export const useAuth = () =>  {
     return auth;
 }
 
-export const useGraphNodesByLabel = <T extends Props>(label: string) => {
+export const useGraphNodesByLabel = <T extends Props>(label: string, opts: RangeOpts) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
     const graph = useGraph();
 
     useEffect(() => {
         if (graph) {
             const sub = of(undefined).pipe(
-                switchMap(() => nodesByLabel(graph, label)),
+                switchMap(() => nodesByLabel(graph, label, opts)),
                 tap(({nodes}) => setNodes(nodes as GraphNode<T>[]))
             ).subscribe();
             return () => {
