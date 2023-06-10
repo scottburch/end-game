@@ -165,9 +165,10 @@ const keySearchCriteria = (segments: string[], opts: RangeOpts = {}) =>
         lt: segments.join('.').replace('*', '') + String.fromCharCode(255),
         limit: opts.limit
     }) : ({
-        gt: segments.join('.') + '.',
-        lt: segments.join('.') + '.' + String.fromCharCode(255),
-        limit: opts.limit
+        [opts.gte ? 'gte' : 'gt']: segments.join('.') + '.' + (opts.gt || opts.gte || ''),
+        [opts.lte ? 'lte' : 'lt']: segments.join('.') + '.' + (opts.lt || opts.lte || String.fromCharCode(255)),
+        limit: opts.limit,
+        reverse: opts.reverse
     });
 
 

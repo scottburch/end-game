@@ -46,7 +46,10 @@ describe('graph', () => {
             firstValueFrom(getAGraph().pipe(
                 switchMap(graph => graphPutNode(graph, newGraphNode('', 'person', {name: 'scott', foo: 1}))),
                 map(({nodeId, graph}) => ({nid1: nodeId, graph, nodeId})),
-                switchMap(({graph, nodeId, nid1}) => graphPutNode(graph, newGraphNode(nodeId, 'person', {name: 'scott', foo: 2})).pipe(
+                switchMap(({graph, nodeId, nid1}) => graphPutNode(graph, newGraphNode(nodeId, 'person', {
+                    name: 'scott',
+                    foo: 2
+                })).pipe(
                     map(({nodeId}) => ({graph, nodeId, nid1}))
                 )),
                 tap(({nid1, nodeId}) => expect(nid1).to.equal(nodeId)),
@@ -161,8 +164,8 @@ describe('graph', () => {
                 graphPutNode(graph, newGraphNode('n3', 'person', {name: 'joe', age: 2})),
             ])),
             switchMap(([{graph}]) => combineLatest([
-                nodesByProp<{name: string, age: number}>(graph, 'person', 'name', 'scott'),
-                nodesByProp<{name: string, age: number}>(graph, 'person', 'age', 1)
+                nodesByProp<{ name: string, age: number }>(graph, 'person', 'name', 'scott'),
+                nodesByProp<{ name: string, age: number }>(graph, 'person', 'age', 1)
             ])),
             tap(([{nodes: n1}, {nodes: n2}]) => {
                 expect(n1).to.have.length(1);
@@ -206,8 +209,8 @@ describe('graph', () => {
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {foo: 10}))),
             tap(({graph}) => setTimeout(() =>
-                graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {foo: 11})).subscribe()
-            , 100)),
+                    graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {foo: 11})).subscribe()
+                , 100)),
             switchMap(({graph}) => graphGetEdge(graph, 'e1', {})),
             skipWhile(({edge}) => edge.props.foo !== 11),
         ))
@@ -285,16 +288,32 @@ describe('graph', () => {
     );
 
     describe('searching', () => {
-        it('should limit the number of responses', () =>
-            firstValueFrom(getAGraph().pipe(
-                switchMap(graph => range(1,5).pipe(
-                    mergeMap(n => addThingNode(graph, n)),
-                    last(),
-                    map(() => graph)
-                )),
-                switchMap(graph => nodesByLabel(graph, 'thing', {limit: 3})),
-                tap(({nodes}) => expect(nodes.length).to.equal(3))
-            ))
-        )
-    })
+        describe('nodesByLabel', () => {
+            it('should limit the number of responses', () =>
+                firstValueFrom(getAGraph().pipe(
+                    switchMap(graph => range(1, 5).pipe(
+                        mergeMap(n => addThingNode(graph, n)),
+                        last(),
+                    )),
+                    switchMap(({graph}) => nodesByLabel(graph, 'thing', {limit: 3})),
+                    tap(({nodes}) => expect(nodes.length).to.equal(3))
+                ))
+            );
+
+            it('should be able to provide gt and lt params', () =>
+                firstValueFrom(getAGraph().pipe(
+                    switchMap(graph => range(1, 5).pipe(
+                        mergeMap(n => addThingNode(graph, n)),
+                        last(),
+                    )),
+                    switchMap(({graph}) => nodesByLabel(graph, 'thing', {gt: 'thing1', lt: 'thing4'})),
+                    tap(({nodes}) => {
+                        expect(nodes.length).to.equal(2);
+                        expect(nodes[0].nodeId).to.equal('thing2');
+                        expect(nodes[1].nodeId).to.equal('thing3');
+                    })
+                ))
+            );
+        });
+    });
 });
