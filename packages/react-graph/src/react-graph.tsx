@@ -58,7 +58,7 @@ export const useAuth = () =>  {
     return auth;
 }
 
-export const useGraphNodesByLabel = <T extends Props>(label: string, opts: RangeOpts) => {
+export const useGraphNodesByLabel = <T extends Props>(label: string, opts: RangeOpts = {}) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
     const graph = useGraph();
 
