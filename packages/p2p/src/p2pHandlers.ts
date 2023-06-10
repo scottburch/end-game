@@ -1,4 +1,4 @@
-import type {EdgeId, Graph, GraphEdge, GraphId, GraphNode, NodeId} from "@end-game/graph";
+import type {EdgeId, Graph, GraphEdge, GraphId, GraphNode, NodeId, RangeOpts} from "@end-game/graph";
 
 import {from, map, of, switchMap, tap} from "rxjs";
 import type {RxjsChain} from "@end-game/rxjs-chain";
@@ -112,7 +112,7 @@ const getRelationshipsHandler: GraphP2pHandler<'getRelationships'> = ({graph, no
 const nodesByLabelHandler: GraphP2pHandler<'nodesByLabel'> = ({graph, label, nodes, opts}) => {
     chainNext((graph as GraphWithP2p).chains.peersOut, {
         graph,
-        msg: {cmd: 'nodesByLabel', data: {label}}
+        msg: {cmd: 'nodesByLabel', data: {label, opts}}
     }).subscribe()
     return of({graph, label, nodes, opts})
 };
@@ -188,8 +188,8 @@ const doGetRelationshipsIn = (graph: Graph, msg: P2pMsg) =>
     );
 
 const doGetNodesByLabel = (graph: Graph, msg: P2pMsg) =>
-    of(msg as P2pMsg<'nodesByLabel', {label: string}>).pipe(
-        switchMap(msg => nodesByLabel(graph, msg.data.label)),
+    of(msg as P2pMsg<'nodesByLabel', {label: string, opts: RangeOpts}>).pipe(
+        switchMap(msg => nodesByLabel(graph, msg.data.label, msg.data.opts)),
         switchMap(({nodes}) => from(nodes)),
         switchMap(node => chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,

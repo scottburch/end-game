@@ -1,4 +1,5 @@
 import {
+    Graph,
     GraphEdge, graphGetEdge, graphGetNode,
     GraphNode,
     graphOpen,
@@ -9,17 +10,18 @@ import {
     nodesByLabel
 } from "@end-game/graph";
 import {
+    bufferCount,
     combineLatest,
     delay,
     filter, first,
     firstValueFrom, last,
-    map,
+    map, merge,
     mergeMap,
     of,
     range, skipWhile,
-    switchMap,
+    switchMap, take,
     tap, timeout,
-    timer
+    timer, toArray
 } from "rxjs";
 import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
@@ -226,17 +228,26 @@ describe('p2p handlers', () => {
 
     describe('searching', () => {
         describe('nodesByLabel', () => {
-            it('should search for nodes by label', () =>
-                firstValueFrom(startTestNet([[1], []]).pipe(
-                    switchMap(({node0, node1}) => of(undefined).pipe(
-                        switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
-                        switchMap(() => graphAuth(node0, 'scott', 'pass')),
+            it('should search for nodes by label', () => {
+                return firstValueFrom(startTestNode(0).pipe(
+                    switchMap(({graph}) => of(undefined).pipe(
+                        switchMap(() => graphNewAuth(graph, 'scott', 'pass')),
+                        switchMap(() => graphAuth(graph, 'scott', 'pass')),
                         switchMap(() => range(1, 5).pipe(
-                            mergeMap(n => addThingNode(node0, n)),
+                            mergeMap(n => addThingNode(graph, n)),
                             last()
                         )),
-                        switchMap(() => nodesByLabel(node1, 'thing', {gt: 'thing1', lt: 'thing4'})),
-                        tap(({nodes}) => console.log(nodes)),
+                        switchMap(() => startTestNode(1, [0])),
+                        switchMap(({graph}) => merge(
+                            testNodeReceived(graph),
+                            testOnlyRequestedNodesSent(graph)
+                        )),
+                        bufferCount(2)
+                    ))
+                ));
+
+                function testNodeReceived(graph: Graph) {
+                    return nodesByLabel(graph, 'thing', {gt: 'thing1', lt: 'thing4'}).pipe(
                         skipWhile(({nodes}) => nodes.length < 2),
                         tap(({nodes}) => {
                             expect(nodes).to.have.length(2);
@@ -244,9 +255,21 @@ describe('p2p handlers', () => {
                             expect(nodes[1].nodeId).to.equal('thing3');
                         }),
                         first()
-                    ))
-                ))
-            );
+                    )
+                }
+
+                function testOnlyRequestedNodesSent(graph: Graph) {
+                    return (graph as GraphWithP2p).chains.peerIn.pipe(
+                        filter(({msg}) => msg.cmd === 'putNode'),
+                        map(({msg}) => (msg.data as any).nodeId),
+                        take(2),
+                        toArray(),
+                        tap(nodeIds => {
+                            expect(nodeIds).to.deep.equal(['thing2', 'thing3']);
+                        })
+                    )
+                }
+            });
         });
     });
 });
