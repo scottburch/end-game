@@ -11,12 +11,12 @@ import {
 import {
     combineLatest,
     delay,
-    filter,
-    firstValueFrom,
+    filter, first,
+    firstValueFrom, last,
     map,
     mergeMap,
     of,
-    range,
+    range, skipWhile,
     switchMap,
     tap, timeout,
     timer
@@ -25,7 +25,7 @@ import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
-import {startTestNet, startTestNode} from "@end-game/test-utils";
+import {addThingNode, startTestNet, startTestNode} from "@end-game/test-utils";
 import {serializer} from "@end-game/utils/serializer";
 
 describe('p2p handlers', () => {
@@ -83,7 +83,9 @@ describe('p2p handlers', () => {
         firstValueFrom(graphOpen().pipe(
             switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: 'test'})),
             tap(graph => (graph as GraphWithP2p).chains.peersOut.pipe(
-                tap(({msg}) => {throw(`should not receive a peersOut - received:\n${serializer(msg)}`)})
+                tap(({msg}) => {
+                    throw(`should not receive a peersOut - received:\n${serializer(msg)}`)
+                })
             ).subscribe()),
             switchMap(graph => graphGetNode<{}>(graph, 'something', {local: true})),
             timeout({first: 200, with: () => of(undefined)})
@@ -94,7 +96,9 @@ describe('p2p handlers', () => {
         firstValueFrom(graphOpen().pipe(
             switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: 'test'})),
             tap(graph => (graph as GraphWithP2p).chains.peersOut.pipe(
-                tap(({msg}) => {throw(`should not receive a peersOut - received:\n${serializer(msg)}`)})
+                tap(({msg}) => {
+                    throw(`should not receive a peersOut - received:\n${serializer(msg)}`)
+                })
             ).subscribe()),
             switchMap(graph => graphGetEdge(graph, 'something', {})),
             timeout({first: 200, with: () => of(undefined)})
@@ -121,8 +125,15 @@ describe('p2p handlers', () => {
         );
 
         it('should send a putNode to more than one remote peer', () =>
-            firstValueFrom(startTestNet([[1,2,3,4,5], [], [], [], [], []]).pipe(
-                switchMap(({node0, node1, node2, node3, node4, node5}) => of({node0, node1, node2, node3, node4, node5}).pipe(
+            firstValueFrom(startTestNet([[1, 2, 3, 4, 5], [], [], [], [], []]).pipe(
+                switchMap(({node0, node1, node2, node3, node4, node5}) => of({
+                    node0,
+                    node1,
+                    node2,
+                    node3,
+                    node4,
+                    node5
+                }).pipe(
                     tap(() => timer(1).pipe(
                         switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
                         switchMap(() => graphAuth(node0, 'scott', 'pass')),
@@ -143,7 +154,6 @@ describe('p2p handlers', () => {
 
                     switchMap(() => nodesByLabel(node5, 'thing')),
                     filter(({nodes}) => !!nodes.length),
-
                 )),
             ))
         );
@@ -212,5 +222,31 @@ describe('p2p handlers', () => {
             ))
         );
 
+    });
+
+    describe('searching', () => {
+        describe('nodesByLabel', () => {
+            it('should search for nodes by label', () =>
+                firstValueFrom(startTestNet([[1], []]).pipe(
+                    switchMap(({node0, node1}) => of(undefined).pipe(
+                        switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
+                        switchMap(() => graphAuth(node0, 'scott', 'pass')),
+                        switchMap(() => range(1, 5).pipe(
+                            mergeMap(n => addThingNode(node0, n)),
+                            last()
+                        )),
+                        switchMap(() => nodesByLabel(node1, 'thing', {gt: 'thing1', lt: 'thing4'})),
+                        tap(({nodes}) => console.log(nodes)),
+                        skipWhile(({nodes}) => nodes.length < 2),
+                        tap(({nodes}) => {
+                            expect(nodes).to.have.length(2);
+                            expect(nodes[0].nodeId).to.equal('thing2');
+                            expect(nodes[1].nodeId).to.equal('thing3');
+                        }),
+                        first()
+                    ))
+                ))
+            );
+        });
     });
 });
