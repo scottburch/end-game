@@ -32,7 +32,7 @@ import {serializer} from "@end-game/utils/serializer";
 
 describe('p2p handlers', () => {
     it('should setup peer chains', () =>
-        firstValueFrom(graphOpen().pipe(
+        firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
                 switchMap(graph => p2pHandlers(graph, {peerId: 'test'})),
                 map(graph => graph as GraphWithP2p),
                 tap(graph => timer(1).pipe(
@@ -51,7 +51,7 @@ describe('p2p handlers', () => {
         ));
 
     it('should put a putNode onto the peersOut', () =>
-        firstValueFrom(graphOpen().pipe(
+        firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
             switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: 'test'})),
             tap(graph => timer(1).pipe(
                 switchMap(() => graphPutNode(graph, newGraphNode('node1', 'thing', {name: 'thing1'})))
@@ -65,7 +65,7 @@ describe('p2p handlers', () => {
     );
 
     it('should put a putEdge onto the peersOut', () =>
-        firstValueFrom(graphOpen().pipe(
+        firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
             switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: 'test'})),
             tap(graph => timer(1).pipe(
                 switchMap(() => graphPutEdge(graph, newGraphEdge('edge1', 'friend', 'node1', 'node2', {name: 'thing1'})))
@@ -82,7 +82,7 @@ describe('p2p handlers', () => {
     );
 
     it('should ignore getNode if the local flag is set', () =>
-        firstValueFrom(graphOpen().pipe(
+        firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
             switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: 'test'})),
             tap(graph => (graph as GraphWithP2p).chains.peersOut.pipe(
                 tap(({msg}) => {
@@ -95,7 +95,7 @@ describe('p2p handlers', () => {
     );
 
     it('should ignore getEdge if the local flag is set', () =>
-        firstValueFrom(graphOpen().pipe(
+        firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
             switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: 'test'})),
             tap(graph => (graph as GraphWithP2p).chains.peersOut.pipe(
                 tap(({msg}) => {

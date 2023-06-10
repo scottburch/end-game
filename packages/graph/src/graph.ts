@@ -84,7 +84,7 @@ export type Graph = {
 export type GraphOpts = Partial<Graph> & Pick<Graph, 'graphId'>
 
 
-export const graphOpen = (opts: GraphOpts = {graphId: newUid()}) => {
+export const graphOpen = (opts: GraphOpts) => {
     const graph = {
         ...opts,
         graphId: opts.graphId || newUid(),
