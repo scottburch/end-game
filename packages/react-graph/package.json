@@ -1,6 +1,6 @@
 {
   "name": "@end-game/react-graph",
-  "version": "1.0.37",
+  "version": "1.0.38",
   "license": "MIT",
   "private": false,
   "type": "module",
@@ -14,10 +14,10 @@
     "./reactTestUtils": "./lib/test/reactTestUtils.jsx"
   },
   "dependencies": {
-    "@end-game/graph": "^1.0.37",
-    "@end-game/level-store": "^1.0.37",
-    "@end-game/p2p": "^1.0.37",
-    "@end-game/pwd-auth": "^1.0.37",
+    "@end-game/graph": "^1.0.38",
+    "@end-game/level-store": "^1.0.38",
+    "@end-game/p2p": "^1.0.38",
+    "@end-game/pwd-auth": "^1.0.38",
     "@end-game/utils": "^1.0.34",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",

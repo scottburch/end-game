@@ -1,6 +1,6 @@
 {
   "name": "@end-game/console-logger",
-  "version": "1.0.37",
+  "version": "1.0.38",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -11,7 +11,7 @@
     }
   },
   "dependencies": {
-    "@end-game/graph": "^1.0.37",
+    "@end-game/graph": "^1.0.38",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.15",

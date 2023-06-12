@@ -1,6 +1,6 @@
 {
   "name": "@end-game/cli",
-  "version": "1.0.37",
+  "version": "1.0.38",
   "main": "lib/index.js",
   "license": "MIT",
   "type": "module",
