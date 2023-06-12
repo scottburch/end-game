@@ -9,6 +9,7 @@
     "endgame": "lib/index.js"
   },
   "dependencies": {
+    "@end-game/graph": "^1.0.38",
     "@end-game/test-utils": "*",
     "@end-game/utils": "^1.0.34",
     "@types/node": "^18.11.18",
