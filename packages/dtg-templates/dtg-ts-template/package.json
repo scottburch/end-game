@@ -2,7 +2,7 @@
   "name": "@end-game/dtg-ts-template",
   "version": "1.0.37",
   "type": "module",
-  "private": false,
+  "private": true,
   "dependencies": {
     "@end-game/dtg-scripts": "^1.0.36",
     "@end-game/graph-explorer": "^1.0.34",
