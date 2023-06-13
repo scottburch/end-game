@@ -1,6 +1,6 @@
-import {catchError, combineLatest, filter, first, map, of, switchMap, tap, timeout} from "rxjs";
+import {catchError, combineLatest, filter, first, map, of, switchMap, tap, throwError, timeout} from "rxjs";
 import type {Graph, GraphEdge, GraphNode, NodeId, Props} from '@end-game/graph'
-import {graphGetNode, LogLevel, nodesByProp} from "@end-game/graph";
+import {graphError, graphGetNode, LogLevel, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
 import {deserializePubKey, sign, verify} from '@end-game/crypto'
 import {serializer} from "@end-game/utils/serializer";
@@ -166,6 +166,11 @@ export const verifyNodeSig = <T extends Props>(graph: Graph, node: NodeWithAuth<
         ),
         map(() => ({graph, node}))
     );
+
+export const asGraphWithAuth = (graph: Graph) =>
+    of(graph as GraphWithAuth).pipe(
+        switchMap(graph => !!graph.user ? of(graph) : throwError(() => graphError(graph, 'INVALID_AUTH_CONVERSION_NO_USER', {text: 'Conversion to GraphWithUser with no user property'})))
+    )
 
 
 

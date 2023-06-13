@@ -1,5 +1,5 @@
 import {firstValueFrom, switchMap} from "rxjs";
-import {signupHelper} from "./utils/signupHelper.js";
+import {signupHelper} from "./utils/testUtils.js";
 import {openBrowser} from "@end-game/utils/openBrowser";
 
 describe('signin', () => {

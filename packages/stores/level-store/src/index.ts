@@ -94,11 +94,11 @@ export const levelStorePutEdgeHandler = (): GraphHandler<'putEdge'> => {
     return ({graph, edge}) => getStore(graph).pipe(
         switchMap(store => of(undefined).pipe(
             switchMap(() => checkState(graph, store, edge)),
-            switchMap(() => merge(
+            switchMap(() => combineLatest([
                 store.put([graph.graphId, edge.edgeId].join('.'), serializer(edge)),
                 store.put([graph.graphId, IndexTypes.FROM_REL, edge.from, edge.rel, edge.to].join('.'), edge.edgeId),
                 store.put([graph.graphId, IndexTypes.TO_REL, edge.to, edge.rel, edge.from].join('.'), edge.edgeId)
-            )),
+            ])),
             map(() => ({graph, edge}))
         ))
     );

@@ -1,6 +1,6 @@
 import {firstValueFrom, of, switchMap} from "rxjs";
-import {signupHelper} from "./utils/signupHelper.js";
 import {openBrowser} from "@end-game/utils/openBrowser";
+import {signupHelper} from "./utils/testUtils.js";
 
 describe('post', () => {
     it('should add a post', () =>

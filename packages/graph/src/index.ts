@@ -2,3 +2,4 @@ export type {Graph, GraphNode, GraphEdge, GraphOpts, NodeId, EdgeId, Props, Grap
 export type {Relationship} from './relationship.js'
 export {IndexTypes, LogLevel, newGraphNode, newGraphEdge, graphGetNode, graphOpen, graphPutNode, nodesByLabel, nodesByProp, graphGetEdge, graphGetRelationships, graphPutEdge} from './graph.js'
 export {newUid, timestampFromUid} from './uid.js'
+export {graphError} from './graphError.js'

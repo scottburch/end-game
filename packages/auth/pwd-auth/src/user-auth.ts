@@ -1,6 +1,5 @@
 import type {Graph} from "@end-game/graph";
 import {graphPutNode} from "@end-game/graph";
-import type {EncryptedKeyBundle} from "@end-game/crypto";
 import {deserializeKeys, generateNewAccount, serializeKeys} from "@end-game/crypto";
 import {catchError, iif, map, of, switchMap, tap, throwError} from "rxjs";
 import type {AuthNode, GraphWithAuth} from "./auth-utils.js";
@@ -19,8 +18,8 @@ export const graphAuth = (graph: Graph, username: string, password: string) =>
         switchMap(({graph, node}) => iif(() => !!node.nodeId, of({node}).pipe(
             map(({node}) => ({nodeId: node.nodeId, auth: node.props})),
             switchMap(({nodeId, auth}) => iif(
-                () => !!(auth as EncryptedKeyBundle).pub,
-                deserializeKeys(auth as EncryptedKeyBundle, password).pipe(
+                () => !!(auth).pub,
+                deserializeKeys(auth, password).pipe(
                     map(auth => ({nodeId, auth, username}))
                 ),
                 of(undefined)
