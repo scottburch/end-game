@@ -4,7 +4,7 @@ import {useGraphNode, useGraphLogin, useGraphNodesByLabel, useGraphPut, useNewAc
 import {useEffect, useRef} from "react";
 import {switchMap} from "rxjs";
 import type {NodeId} from "@end-game/graph";
-import {nodeId} from "@end-game/graph";
+import {asNodeId} from "@end-game/graph";
 
 let accountCreated = false;
 
@@ -27,7 +27,7 @@ renderApp('test-graph', () => {
 
 
     const addPerson = () => {
-        graphPut('person', nodeId(count.current.toString()) , {name: `person-${count.current}`}).subscribe();
+        graphPut('person', asNodeId(count.current.toString()) , {name: `person-${count.current}`}).subscribe();
         count.current = count.current + 1;
     }
 

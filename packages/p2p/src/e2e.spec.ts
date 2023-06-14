@@ -1,7 +1,7 @@
 import {addThingNode, startTestNet} from "@end-game/test-utils";
 import {filter, firstValueFrom, map, of, Subscription, switchMap, tap} from "rxjs";
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
-import {getRelationships, putEdge, newGraphEdge, nodesByLabel, nodesByProp,  nodeId} from "@end-game/graph";
+import {getRelationships, putEdge, newGraphEdge, nodesByLabel, nodesByProp, asNodeId, asEdgeId} from "@end-game/graph";
 import {expect} from "chai";
 import {dialPeer} from "./dialer.js";
 
@@ -35,8 +35,8 @@ describe('end-to-end testing', () => {
                 switchMap(() => graphAuth(node1, 'todd', 'pass')),
                 switchMap(() => addThingNode(node0, 1)),
                 switchMap(() => addThingNode(node0, 2)),
-                switchMap(() => putEdge(node0, newGraphEdge('e1', 'friend', nodeId('thing1') , nodeId('thing2') , {}))),
-                switchMap(() => getRelationships(node1, nodeId('thing1') , 'friend')),
+                switchMap(() => putEdge(node0, newGraphEdge(asEdgeId('e1'), 'friend', asNodeId('thing1') , asNodeId('thing2') , {}))),
+                switchMap(() => getRelationships(node1, asNodeId('thing1') , 'friend')),
                 map(({relationships}) => relationships),
                 filter(relationships => !!relationships.length),
                 tap(relationships => expect(relationships).to.deep.equal([{

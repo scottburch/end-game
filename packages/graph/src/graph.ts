@@ -8,9 +8,6 @@ import type {RxjsChainFn} from '@end-game/rxjs-chain';
 import {chainNext, newRxjsChain} from "@end-game/rxjs-chain";
 import {serializer} from "@end-game/utils/serializer";
 
-export type NodeId = (string & {type: 'nodeId'}) | ''
-export type EdgeId = string
-export type GraphId = string
 
 export type Props = Record<string, any>;
 
@@ -83,7 +80,13 @@ export type Graph = {
 
 export type GraphOpts = Partial<Graph> & Pick<Graph, 'graphId'>
 
-export const nodeId = (nodeId: string) => nodeId as NodeId;
+
+export type NodeId = (string & {type: 'nodeId'}) | ''
+export type EdgeId = (string & {type: 'edgeId'}) | ''
+export type GraphId = string
+
+export const asNodeId = (nodeId: string) => nodeId as NodeId;
+export const asEdgeId = (edgeId: string) => edgeId as EdgeId;
 
 
 export const graphOpen = (opts: GraphOpts) => {
@@ -133,8 +136,8 @@ export const putNode = <T extends Props>(graph: Graph, node: GraphNode<T>) =>
         map(({node}) => ({graph, nodeId: node.nodeId})),
     );
 
-export const newGraphEdge = <T extends Props>(edgeId: string, rel: string, from: NodeId, to: NodeId, props: T) => ({
-        edgeId: edgeId || newUid(), rel, props, from, to, state: Date.now().toString()
+export const newGraphEdge = <T extends Props>(edgeId: EdgeId, rel: string, from: NodeId, to: NodeId, props: T) => ({
+        edgeId: edgeId || asEdgeId(newUid()), rel, props, from, to, state: Date.now().toString()
     } satisfies GraphEdge<T>
 )
 
@@ -143,7 +146,7 @@ export const putEdge = <T extends Props>(graph: Graph, edge: GraphEdge<T>) =>
         map(({edge}) => ({graph, edge}))
     );
 
-export const getEdge = <T extends Props>(graph: Graph, edgeId: string, opts: GraphHandlerProps<'getEdge'>['opts']) =>
+export const getEdge = <T extends Props>(graph: Graph, edgeId: EdgeId, opts: GraphHandlerProps<'getEdge'>['opts']) =>
     new Observable<GraphHandlerProps<'getEdge'>>(subscriber => {
         const putEdgeSub = graph.chains.putEdge.pipe(
             filter(({edge}) => edge.edgeId === edgeId),

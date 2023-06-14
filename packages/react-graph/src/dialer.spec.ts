@@ -4,7 +4,7 @@ import {absPath} from "@end-game/utils/absPath";
 import {startTestNode} from "@end-game/test-utils";
 import {openBrowser} from "@end-game/utils/openBrowser";
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
-import {putNode, newNode, nodeId} from "@end-game/graph";
+import {putNode, newNode, asNodeId} from "@end-game/graph";
 import {expect} from "chai";
 
 describe('dialer', () => {
@@ -13,8 +13,8 @@ describe('dialer', () => {
             switchMap(() => startTestNode(6)),
             switchMap(({graph}) => graphNewAuth(graph, 'scott', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
-            tap(({graph}) => putNode(graph, newNode(nodeId('thing1'), 'thing', {name: 'thing1'})).subscribe()),
-            tap(({graph}) => putNode(graph, newNode(nodeId('thing2'), 'thing', {name: 'thing2'})).subscribe()),
+            tap(({graph}) => putNode(graph, newNode(asNodeId('thing1'), 'thing', {name: 'thing1'})).subscribe()),
+            tap(({graph}) => putNode(graph, newNode(asNodeId('thing2'), 'thing', {name: 'thing2'})).subscribe()),
             switchMap(({graph}) => openBrowser()),
             switchMap(page => combineLatest([
                 page.textContent('#thing1'),

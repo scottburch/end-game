@@ -3,8 +3,7 @@ import {useGraphLogin, useGraphPut, useGraphPutEdge, useNewAccount} from "@end-g
 import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {GraphExplorerBtn} from "./GraphExplorerBtn.jsx";
 import {switchMap, of, tap} from "rxjs";
-import type {NodeId} from "@end-game/graph";
-import {nodeId} from "@end-game/graph";
+import {asEdgeId, asNodeId} from "@end-game/graph";
 
 
 let accountCreated = false;
@@ -21,12 +20,12 @@ renderApp('test-graph', () => {
             switchMap(() => accountCreated ? of(true) :  newAccount('scott', 'pass')),
             tap(() => accountCreated = true),
             switchMap(() => login('scott', 'pass')),
-            switchMap(() => graphPut('person', nodeId('scott'), {name: 'scott', age: 1})),
-            switchMap(() => graphPut('person', nodeId('todd'), {name: 'todd', age: 2})),
-            switchMap(() => graphPutEdge('friend', 'f1', nodeId('scott'), nodeId('todd'), {since: new Date().toISOString()})),
-            switchMap(() => graphPutEdge('friend', 'f2', nodeId('todd'), nodeId('scott'), {since: new Date().toISOString()})),
-            switchMap(() => graphPut('country', nodeId('mexico'), {name: 'mexico'})),
-            switchMap(() => graphPutEdge('lives_in', 'li1', nodeId('scott'), nodeId('mexico'), {}))
+            switchMap(() => graphPut('person', asNodeId('scott'), {name: 'scott', age: 1})),
+            switchMap(() => graphPut('person', asNodeId('todd'), {name: 'todd', age: 2})),
+            switchMap(() => graphPutEdge('friend', asEdgeId('f1'), asNodeId('scott'), asNodeId('todd'), {since: new Date().toISOString()})),
+            switchMap(() => graphPutEdge('friend', asEdgeId('f2'), asNodeId('todd'), asNodeId('scott'), {since: new Date().toISOString()})),
+            switchMap(() => graphPut('country', asNodeId('mexico'), {name: 'mexico'})),
+            switchMap(() => graphPutEdge('lives_in', asEdgeId('li1'), asNodeId('scott'), asNodeId('mexico'), {}))
         ).subscribe()
     }, [])
 
