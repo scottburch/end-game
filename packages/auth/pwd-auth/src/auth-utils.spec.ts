@@ -3,7 +3,7 @@ import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
 import {findAuthNode, graphGetOwnerNode} from "./auth-utils.js";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
-import {graphPutEdge, graphPutNode, newGraphEdge, newGraphNode} from "@end-game/graph";
+import {putEdge, putNode, newGraphEdge, newNode} from "@end-game/graph";
 
 
 describe('auth utils', () => {
@@ -40,10 +40,10 @@ describe('auth utils', () => {
     describe('isUserAuthedToWriteEdge()', () => {
         it('should not allow you to add a edge "from" a node you do not own', (done) => {
             firstValueFrom(graphWithUser().pipe(
-                switchMap(graph => graphPutNode(graph, newGraphNode('item', 'person', {}))),
+                switchMap(graph => putNode(graph, newNode('item', 'person', {}))),
                 switchMap(({graph}) => graphNewAuth(graph, 'todd', 'pass')),
                 switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
-                switchMap(({graph}) => graphPutEdge(graph, newGraphEdge('edge1', 'friend', 'item', 'some', {}))),
+                switchMap(({graph}) => putEdge(graph, newGraphEdge('edge1', 'friend', 'item', 'some', {}))),
                 catchError(err => of(err.code).pipe(
                     tap(err => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
                 ))
@@ -53,11 +53,11 @@ describe('auth utils', () => {
         it('should not allow you to add a edge "from" a node you do not own (with delay)', (done) => {
             firstValueFrom(graphWithUser().pipe(
                 tap(graph => timer(1).pipe(
-                    switchMap(() => graphPutNode(graph, newGraphNode('item', 'person', {})))
+                    switchMap(() => putNode(graph, newNode('item', 'person', {})))
                 ).subscribe()),
                 switchMap(graph => graphNewAuth(graph, 'todd', 'pass')),
                 switchMap(({graph}) => graphAuth(graph, 'todd', 'pass')),
-                switchMap(({graph}) => graphPutEdge(graph, newGraphEdge('edge1', 'friend', 'item', 'some', {}))),
+                switchMap(({graph}) => putEdge(graph, newGraphEdge('edge1', 'friend', 'item', 'some', {}))),
                 catchError(err => of(err.code).pipe(
                     tap(err => err === 'UNAUTHORIZED_USER' ? done() : done(`wrong error thrown: ${err}`))
                 ))
@@ -68,7 +68,7 @@ describe('auth utils', () => {
     describe('getNodeOwner()', () => {
         it('it should return the auth owner node for a given node', () =>
             firstValueFrom(graphWithUser().pipe(
-                switchMap(graph => graphPutNode(graph, newGraphNode('item', 'person', {}))),
+                switchMap(graph => putNode(graph, newNode('item', 'person', {}))),
                 switchMap(({graph, nodeId}) => graphGetOwnerNode(graph, nodeId)),
                 tap(({node}) => {
                     expect(node.nodeId).to.have.length(12);
@@ -80,7 +80,7 @@ describe('auth utils', () => {
         it('should be able to tolerate a delay', () =>
             firstValueFrom(graphWithUser().pipe(
                 tap(graph => timer(1).pipe(
-                    switchMap(() => graphPutNode(graph, newGraphNode('item', 'person', {}))),
+                    switchMap(() => putNode(graph, newNode('item', 'person', {}))),
                 ).subscribe()),
                 delay(100),
                 switchMap(graph => graphGetOwnerNode(graph, 'item')),

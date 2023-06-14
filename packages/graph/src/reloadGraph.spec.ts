@@ -1,12 +1,12 @@
 import {bufferCount, firstValueFrom, map, switchMap, tap} from "rxjs";
-import {graphGetEdge, graphGetNode, graphGetRelationships, graphOpen, nodesByLabel, nodesByProp} from "./graph.js";
+import {getEdge, getNode, getRelationships, graphOpen, nodesByLabel, nodesByProp} from "./graph.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
 
 describe('reloadGraph chain', () => {
     it('should cause getNode to fire again', () =>
         firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
-            tap(graph => setTimeout(() => graphGetNode(graph, 'my-node', {}).subscribe())),
+            tap(graph => setTimeout(() => getNode(graph, 'my-node', {}).subscribe())),
             tap(graph => setTimeout(() => chainNext(graph.chains.reloadGraph, '').subscribe())),
             switchMap(graph => graph.chains.getNode),
             map(({nodeId}) => nodeId),
@@ -17,7 +17,7 @@ describe('reloadGraph chain', () => {
 
     it('should cause a getEdge() to fire again', () =>
         firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
-            tap(graph => setTimeout(() => graphGetEdge(graph, 'my-edge', {}).subscribe())),
+            tap(graph => setTimeout(() => getEdge(graph, 'my-edge', {}).subscribe())),
             tap(graph => setTimeout(() => chainNext(graph.chains.reloadGraph, '').subscribe())),
             switchMap(graph => graph.chains.getEdge),
             map(({edgeId}) => edgeId),
@@ -39,7 +39,7 @@ describe('reloadGraph chain', () => {
 
     it('should cause a getRelationships() to fire again', () =>
         firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
-            tap(graph => setTimeout(() => graphGetRelationships(graph, 'my-node', 'my-rel').subscribe())),
+            tap(graph => setTimeout(() => getRelationships(graph, 'my-node', 'my-rel').subscribe())),
             tap(graph => setTimeout(() => chainNext(graph.chains.reloadGraph, '').subscribe())),
             switchMap(graph => graph.chains.getRelationships),
             map(({rel}) => rel),

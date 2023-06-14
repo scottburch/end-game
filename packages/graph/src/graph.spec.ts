@@ -15,13 +15,13 @@ import {
     toArray
 } from "rxjs";
 import {
-    graphGetNode,
-    graphGetEdge,
-    graphGetRelationships,
+    getNode,
+    getEdge,
+    getRelationships,
     graphOpen,
-    graphPutNode,
-    graphPutEdge,
-    nodesByProp, newGraphNode, newGraphEdge, nodesByLabel
+    putNode,
+    putEdge,
+    nodesByProp, newNode, newGraphEdge, nodesByLabel
 } from "./graph.js";
 import {expect} from "chai";
 import {addThingNode, getAGraph} from "@end-game/test-utils";
@@ -37,23 +37,23 @@ describe('graph', () => {
     describe('storing a node', () => {
         it('should put a value in a graph and assign an id', () =>
             firstValueFrom(getAGraph({graphId: newUid()}).pipe(
-                switchMap(graph => graphPutNode(graph, newGraphNode('', 'person', {name: 'scott'}))),
+                switchMap(graph => putNode(graph, newNode('', 'person', {name: 'scott'}))),
                 tap(({graph, nodeId}) => expect(nodeId).to.have.length(12))
             ))
         );
 
         it('should update a value in a graph at an assigned id', () =>
             firstValueFrom(getAGraph().pipe(
-                switchMap(graph => graphPutNode(graph, newGraphNode('', 'person', {name: 'scott', foo: 1}))),
+                switchMap(graph => putNode(graph, newNode('', 'person', {name: 'scott', foo: 1}))),
                 map(({nodeId, graph}) => ({nid1: nodeId, graph, nodeId})),
-                switchMap(({graph, nodeId, nid1}) => graphPutNode(graph, newGraphNode(nodeId, 'person', {
+                switchMap(({graph, nodeId, nid1}) => putNode(graph, newNode(nodeId, 'person', {
                     name: 'scott',
                     foo: 2
                 })).pipe(
                     map(({nodeId}) => ({graph, nodeId, nid1}))
                 )),
                 tap(({nid1, nodeId}) => expect(nid1).to.equal(nodeId)),
-                switchMap(({graph, nodeId}) => graphGetNode(graph, nodeId, {})),
+                switchMap(({graph, nodeId}) => getNode(graph, nodeId, {})),
                 tap(({graph, node}) => {
                     expect(node.props.name).to.equal('scott');
                     expect(node.props.foo).to.equal(2);
@@ -64,12 +64,12 @@ describe('graph', () => {
 
     it('should get an item from the graph by id', () =>
         firstValueFrom(getAGraph().pipe(
-            switchMap(graph => graphPutNode(graph, newGraphNode('', 'person', {name: 'scott'}))),
-            switchMap(({graph, nodeId}) => graphGetNode<{ name: string }>(graph, nodeId, {})),
+            switchMap(graph => putNode(graph, newNode('', 'person', {name: 'scott'}))),
+            switchMap(({graph, nodeId}) => getNode<{ name: string }>(graph, nodeId, {})),
             tap(({node}) => expect(node.props.name).to.equal('scott')),
             first(),
-            switchMap(({graph}) => graphPutNode(graph, newGraphNode('', 'person', {name: 'todd'}))),
-            switchMap(({graph, nodeId}) => graphGetNode<{ name: string }>(graph, nodeId, {})),
+            switchMap(({graph}) => putNode(graph, newNode('', 'person', {name: 'todd'}))),
+            switchMap(({graph, nodeId}) => getNode<{ name: string }>(graph, nodeId, {})),
             tap(({node}) => expect(node.props.name).to.equal('todd')),
         ))
     );
@@ -77,14 +77,14 @@ describe('graph', () => {
     it('should be able to add a relationship between two nodes', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
-                graphPutNode(graph, newGraphNode('n1', 'person', {name: 'scott'})),
-                graphPutNode(graph, newGraphNode('n2', 'person', {name: 'todd'}))
+                putNode(graph, newNode('n1', 'person', {name: 'scott'})),
+                putNode(graph, newNode('n2', 'person', {name: 'todd'}))
             ]).pipe(
                 switchMap(arr => from(arr)),
                 map(({nodeId}) => nodeId),
                 toArray(),
-                switchMap(([n1, n2]) => graphPutEdge(graph, newGraphEdge('e1', 'friend', n1, n2, {foo: 10}))),
-                switchMap(({edge}) => graphGetEdge(graph, edge.edgeId, {})),
+                switchMap(([n1, n2]) => putEdge(graph, newGraphEdge('e1', 'friend', n1, n2, {foo: 10}))),
+                switchMap(({edge}) => getEdge(graph, edge.edgeId, {})),
                 tap(({edge}) => {
                     expect(edge?.rel).to.equal('friend');
                     expect(edge?.props).to.deep.equal({foo: 10});
@@ -99,14 +99,14 @@ describe('graph', () => {
     it('should be able to find nodes with a given relationship', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest(['scott', 'todd', 'joe'].map((name, idx) =>
-                graphPutNode(graph, newGraphNode(`n${idx}`, 'person', {name}))
+                putNode(graph, newNode(`n${idx}`, 'person', {name}))
             ))),
             switchMap(([{graph}]) => combineLatest([
                 of(graph),
-                graphPutEdge(graph, newGraphEdge('e0', 'friend', 'n0', 'n1', {rank: 5})),
-                graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n0', 'n2', {rank: 10}))
+                putEdge(graph, newGraphEdge('e0', 'friend', 'n0', 'n1', {rank: 5})),
+                putEdge(graph, newGraphEdge('e1', 'friend', 'n0', 'n2', {rank: 10}))
             ])),
-            switchMap(([graph]) => graphGetRelationships(graph, 'n0', 'friend')),
+            switchMap(([graph]) => getRelationships(graph, 'n0', 'friend')),
             tap(({relationships}) => expect(relationships).to.deep.equal([{
                 "edgeId": "e0",
                 "to": "n1",
@@ -116,7 +116,7 @@ describe('graph', () => {
                 "to": "n2",
                 "from": "n0"
             }])),
-            switchMap(({graph}) => graphGetRelationships(graph, 'n1', 'friend', {reverse: true})),
+            switchMap(({graph}) => getRelationships(graph, 'n1', 'friend', {reverse: true})),
             tap(({relationships}) => expect(relationships).to.deep.equal([{
                 "edgeId": "e0",
                 "to": "n1",
@@ -128,12 +128,12 @@ describe('graph', () => {
     it('should be able to find all relationships for a given node', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
-                graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {})),
-                graphPutEdge(graph, newGraphEdge('e2', 'friend', 'n1', 'n3', {})),
-                graphPutEdge(graph, newGraphEdge('e3', 'owns', 'n1', 'n4', {})),
-                graphPutEdge(graph, newGraphEdge('e4', 'owns', 'n1', 'n5', {})),
+                putEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {})),
+                putEdge(graph, newGraphEdge('e2', 'friend', 'n1', 'n3', {})),
+                putEdge(graph, newGraphEdge('e3', 'owns', 'n1', 'n4', {})),
+                putEdge(graph, newGraphEdge('e4', 'owns', 'n1', 'n5', {})),
             ])),
-            switchMap(([{graph}]) => graphGetRelationships(graph, 'n1', '*')),
+            switchMap(([{graph}]) => getRelationships(graph, 'n1', '*')),
             tap(({relationships}) => {
                 expect(relationships).to.deep.equal([{
                     "edgeId": "e1",
@@ -159,9 +159,9 @@ describe('graph', () => {
     it('should be able to find nodes with a given property value', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
-                graphPutNode(graph, newGraphNode('n1', 'person', {name: 'scott', age: 1})),
-                graphPutNode(graph, newGraphNode('n2', 'person', {name: 'todd', age: 1})),
-                graphPutNode(graph, newGraphNode('n3', 'person', {name: 'joe', age: 2})),
+                putNode(graph, newNode('n1', 'person', {name: 'scott', age: 1})),
+                putNode(graph, newNode('n2', 'person', {name: 'todd', age: 1})),
+                putNode(graph, newNode('n3', 'person', {name: 'joe', age: 2})),
             ])),
             switchMap(([{graph}]) => combineLatest([
                 nodesByProp<{ name: string, age: number }>(graph, 'person', 'name', 'scott'),
@@ -181,9 +181,9 @@ describe('graph', () => {
     it('should be able to search for a partial property label', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
-                graphPutNode(graph, newGraphNode('', 'person', {name: 'scott'})),
-                graphPutNode(graph, newGraphNode('', 'person', {name: 'scooter'})),
-                graphPutNode(graph, newGraphNode('', 'person', {name: 'sam'})),
+                putNode(graph, newNode('', 'person', {name: 'scott'})),
+                putNode(graph, newNode('', 'person', {name: 'scooter'})),
+                putNode(graph, newNode('', 'person', {name: 'sam'})),
             ])),
             switchMap(([{graph}]) => nodesByProp(graph, 'person', 'name', 'sc*')),
             tap(({nodes}) => expect(nodes).to.have.length(2)),
@@ -195,9 +195,9 @@ describe('graph', () => {
 
     it('should update a graphGetNode() listener when node props is updated', () =>
         firstValueFrom(getAGraph().pipe(
-            tap(graph => graphPutNode(graph, newGraphNode('n1', 'person', {name: 'scott'})).subscribe()),
-            tap(graph => setTimeout(() => graphPutNode(graph, newGraphNode('n1', 'person', {name: 'todd'})).subscribe(), 100)),
-            switchMap(graph => graphGetNode(graph, 'n1', {})),
+            tap(graph => putNode(graph, newNode('n1', 'person', {name: 'scott'})).subscribe()),
+            tap(graph => setTimeout(() => putNode(graph, newNode('n1', 'person', {name: 'todd'})).subscribe(), 100)),
+            switchMap(graph => getNode(graph, 'n1', {})),
             map(({node}) => node.props.name),
             scan((names, name) => names.add(name), new Set()),
             skipWhile(names => names.size < 2),
@@ -207,11 +207,11 @@ describe('graph', () => {
 
     it('should update a graphGetEdge() when the edge properties is updated', () =>
         firstValueFrom(getAGraph().pipe(
-            switchMap(graph => graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {foo: 10}))),
+            switchMap(graph => putEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {foo: 10}))),
             tap(({graph}) => setTimeout(() =>
-                    graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {foo: 11})).subscribe()
+                    putEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {foo: 11})).subscribe()
                 , 100)),
-            switchMap(({graph}) => graphGetEdge(graph, 'e1', {})),
+            switchMap(({graph}) => getEdge(graph, 'e1', {})),
             skipWhile(({edge}) => edge.props.foo !== 11),
         ))
     );
@@ -219,12 +219,12 @@ describe('graph', () => {
     it('should update a graphGetRelationships() when a relationship is added', () =>
         firstValueFrom(getAGraph().pipe(
                 tap(graph => {
-                    graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {})).subscribe();
-                    graphPutEdge(graph, newGraphEdge('e2', 'friend', 'n1', 'n3', {})).subscribe();
+                    putEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {})).subscribe();
+                    putEdge(graph, newGraphEdge('e2', 'friend', 'n1', 'n3', {})).subscribe();
 
                 }),
-                tap(graph => setTimeout(() => graphPutEdge(graph, newGraphEdge('e3', 'friend', 'n1', 'n4', {})).subscribe())),
-                switchMap(graph => graphGetRelationships(graph, 'n1', 'friend')),
+                tap(graph => setTimeout(() => putEdge(graph, newGraphEdge('e3', 'friend', 'n1', 'n4', {})).subscribe())),
+                switchMap(graph => getRelationships(graph, 'n1', 'friend')),
                 skipWhile(({relationships}) => relationships.length < 3),
             )
         ));
@@ -232,12 +232,12 @@ describe('graph', () => {
     it('should be able to get all relationships', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
-                graphPutEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {})),
-                graphPutEdge(graph, newGraphEdge('e4', 'friend', 'n2', 'n1', {})),
-                graphPutEdge(graph, newGraphEdge('e2', 'friend', 'n1', 'n3', {})),
-                graphPutEdge(graph, newGraphEdge('e3', 'owns', 'n1', 'n4', {}))
+                putEdge(graph, newGraphEdge('e1', 'friend', 'n1', 'n2', {})),
+                putEdge(graph, newGraphEdge('e4', 'friend', 'n2', 'n1', {})),
+                putEdge(graph, newGraphEdge('e2', 'friend', 'n1', 'n3', {})),
+                putEdge(graph, newGraphEdge('e3', 'owns', 'n1', 'n4', {}))
             ])),
-            switchMap(([{graph}]) => graphGetRelationships(graph, 'n1', '*')),
+            switchMap(([{graph}]) => getRelationships(graph, 'n1', '*')),
             skipWhile(({relationships}) => relationships.length < 3),
         ))
     )
@@ -245,7 +245,7 @@ describe('graph', () => {
     it('should update nodesByProp() when a single node is added later', () =>
         firstValueFrom(getAGraph().pipe(
             tap(graph => {
-                setTimeout(() => graphPutNode(graph, newGraphNode('n3', 'person', {group: 'bar'})).subscribe(), 100);
+                setTimeout(() => putNode(graph, newNode('n3', 'person', {group: 'bar'})).subscribe(), 100);
             }),
             switchMap(graph => nodesByProp(graph, 'person', 'group', 'bar')),
             skipWhile(({nodes}) => nodes.length !== 1),
@@ -254,13 +254,13 @@ describe('graph', () => {
 
     it('should update nodesByProp() when a node is added', () =>
         firstValueFrom(getAGraph().pipe(
-            switchMap(graph => graphPutNode(graph, newGraphNode('before1', 'thing', {group: 'bar'}))),
-            switchMap(({graph}) => graphPutNode(graph, newGraphNode('before2', 'thing', {group: 'foo'}))),
-            switchMap(({graph}) => graphPutNode(graph, newGraphNode('before3', 'thing', {group: 'bar'}))),
+            switchMap(graph => putNode(graph, newNode('before1', 'thing', {group: 'bar'}))),
+            switchMap(({graph}) => putNode(graph, newNode('before2', 'thing', {group: 'foo'}))),
+            switchMap(({graph}) => putNode(graph, newNode('before3', 'thing', {group: 'bar'}))),
             tap(({graph}) => {
-                setTimeout(() => graphPutNode(graph, newGraphNode('after1', 'car', {})).subscribe());
-                setTimeout(() => graphPutNode(graph, newGraphNode('after2', 'thing', {group: 'bar'})).subscribe());
-                setTimeout(() => graphPutNode(graph, newGraphNode('after3', 'thing', {group: 'bar'})).subscribe(), 200);
+                setTimeout(() => putNode(graph, newNode('after1', 'car', {})).subscribe());
+                setTimeout(() => putNode(graph, newNode('after2', 'thing', {group: 'bar'})).subscribe());
+                setTimeout(() => putNode(graph, newNode('after3', 'thing', {group: 'bar'})).subscribe(), 200);
             }),
             switchMap(({graph}) => nodesByProp(graph, 'thing', 'group', 'bar')),
             skipWhile(({nodes}) => nodes.length < 4),
@@ -271,15 +271,15 @@ describe('graph', () => {
     it('should allow multiple graphGets in parallel', () =>
         firstValueFrom(getAGraph().pipe(
             tap(graph => {
-                graphPutNode(graph, newGraphNode('n1', 'person', {name: 'p1'})).subscribe()
-                graphPutNode(graph, newGraphNode('n2', 'person', {name: 'p2'})).subscribe()
-                graphPutNode(graph, newGraphNode('n3', 'person', {name: 'p3'})).subscribe()
+                putNode(graph, newNode('n1', 'person', {name: 'p1'})).subscribe()
+                putNode(graph, newNode('n2', 'person', {name: 'p2'})).subscribe()
+                putNode(graph, newNode('n3', 'person', {name: 'p3'})).subscribe()
             }),
             delay(100),
             switchMap(graph => merge(
-                graphGetNode(graph, 'n1', {}),
-                graphGetNode(graph, 'n2', {}),
-                graphGetNode(graph, 'n3', {}),
+                getNode(graph, 'n1', {}),
+                getNode(graph, 'n2', {}),
+                getNode(graph, 'n3', {}),
             )),
             map(({nodeId}) => nodeId),
             bufferCount(3),

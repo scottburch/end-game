@@ -10,12 +10,12 @@ import type {
     Relationship
 } from '@end-game/graph'
 import {
-    graphGetNode,
-    graphGetEdge,
-    graphGetRelationships,
+    getNode,
+    getEdge,
+    getRelationships,
     graphOpen,
-    graphPutNode,
-    graphPutEdge,
+    putNode,
+    putEdge,
     nodesByLabel,
     nodesByProp, newGraphEdge,
 } from "@end-game/graph";
@@ -25,7 +25,7 @@ import {createContext, useContext, useEffect, useState} from "react";
 import {catchError, filter, of, switchMap, tap, throwError} from "rxjs";
 import type {GraphWithAuth} from '@end-game/pwd-auth'
 import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
-import {newGraphNode} from "@end-game/graph";
+import {newNode} from "@end-game/graph";
 import {levelStoreHandlers} from "@end-game/level-store";
 import {dialPeer, p2pHandlers} from "@end-game/p2p";
 import type {DialerOpts} from "@end-game/p2p";
@@ -99,7 +99,7 @@ export const useGraphRelationships = (nodeId: NodeId, rel: string, opts: { rever
     useEffect(() => {
         if (graph) {
             const sub = of(true).pipe(
-                switchMap(() => graphGetRelationships(graph, nodeId, rel, opts)),
+                switchMap(() => getRelationships(graph, nodeId, rel, opts)),
                 tap(({relationships}) => setRelationships(relationships))
             ).subscribe();
             return () => sub.unsubscribe();
@@ -116,7 +116,7 @@ export const useGraphNode = <T extends Props>(nodeId: NodeId) => {
     useEffect(() => {
         !graph && console.error('useGraphGet() called outside of a graph context');
         if (graph && nodeId) {
-            const sub = graphGetNode(graph, nodeId, {}).pipe(
+            const sub = getNode(graph, nodeId, {}).pipe(
                 filter(({node}) => !!node?.nodeId),
                 tap(({node}) => setNode(node as GraphNode<T>))
             ).subscribe();
@@ -132,7 +132,7 @@ export const useGraphEdge = <T extends Props>(edgeId: EdgeId, opts: GraphHandler
 
     useEffect(() => {
         if (graph && edgeId) {
-            const sub = graphGetEdge(graph, edgeId, opts).subscribe(({edge}) => setEdge(edge as GraphEdge<T>))
+            const sub = getEdge(graph, edgeId, opts).subscribe(({edge}) => setEdge(edge as GraphEdge<T>))
             return () => sub.unsubscribe();
         }
     }, [graph, edgeId]);
@@ -143,7 +143,7 @@ export const useGraphPut = <T extends Props>() => {
     const graph: Graph = useGraph();
 
     return (label: string, nodeId: NodeId, props: T) => {
-        return graphPutNode(graph, newGraphNode(nodeId, label, props));
+        return putNode(graph, newNode(nodeId, label, props));
     }
 };
 
@@ -169,7 +169,7 @@ export const useGraphPutEdge = <T extends Props>() => {
     const graph: Graph = useGraph();
 
     return (rel: string, edgeId: EdgeId, from: NodeId, to: NodeId, props: T) => {
-        return graphPutEdge(graph, newGraphEdge(edgeId, rel, from, to, props)).pipe(
+        return putEdge(graph, newGraphEdge(edgeId, rel, from, to, props)).pipe(
             catchError(err => throwError(err.code || err))
         );
     }

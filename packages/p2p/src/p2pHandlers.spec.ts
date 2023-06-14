@@ -1,12 +1,12 @@
 import {
     Graph,
-    GraphEdge, graphGetEdge, graphGetNode,
+    GraphEdge, getEdge, getNode,
     GraphNode,
     graphOpen,
-    graphPutEdge,
-    graphPutNode,
+    putEdge,
+    putNode,
     newGraphEdge,
-    newGraphNode,
+    newNode,
     nodesByLabel
 } from "@end-game/graph";
 import {
@@ -54,7 +54,7 @@ describe('p2p handlers', () => {
         firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
             switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: 'test'})),
             tap(graph => timer(1).pipe(
-                switchMap(() => graphPutNode(graph, newGraphNode('node1', 'thing', {name: 'thing1'})))
+                switchMap(() => putNode(graph, newNode('node1', 'thing', {name: 'thing1'})))
             ).subscribe()),
             switchMap(graph => (graph as GraphWithP2p).chains.peersOut),
             tap(({msg}) => {
@@ -68,7 +68,7 @@ describe('p2p handlers', () => {
         firstValueFrom(graphOpen({graphId: 'my-graph'}).pipe(
             switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: 'test'})),
             tap(graph => timer(1).pipe(
-                switchMap(() => graphPutEdge(graph, newGraphEdge('edge1', 'friend', 'node1', 'node2', {name: 'thing1'})))
+                switchMap(() => putEdge(graph, newGraphEdge('edge1', 'friend', 'node1', 'node2', {name: 'thing1'})))
             ).subscribe()),
             switchMap(graph => (graph as GraphWithP2p).chains.peersOut),
             map(({msg}) => ({msg, edge: (msg.data as GraphEdge)})),
@@ -89,7 +89,7 @@ describe('p2p handlers', () => {
                     throw(`should not receive a peersOut - received:\n${serializer(msg)}`)
                 })
             ).subscribe()),
-            switchMap(graph => graphGetNode<{}>(graph, 'something', {local: true})),
+            switchMap(graph => getNode<{}>(graph, 'something', {local: true})),
             timeout({first: 200, with: () => of(undefined)})
         ))
     );
@@ -102,7 +102,7 @@ describe('p2p handlers', () => {
                     throw(`should not receive a peersOut - received:\n${serializer(msg)}`)
                 })
             ).subscribe()),
-            switchMap(graph => graphGetEdge(graph, 'something', {})),
+            switchMap(graph => getEdge(graph, 'something', {})),
             timeout({first: 200, with: () => of(undefined)})
         ))
     );
@@ -114,7 +114,7 @@ describe('p2p handlers', () => {
                     tap(() => timer(1).pipe(
                         switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
                         switchMap(() => graphAuth(node0, 'scott', 'pass')),
-                        switchMap(() => graphPutNode(node0, newGraphNode('thing1', 'thing', {name: 'thing1'}))),
+                        switchMap(() => putNode(node0, newNode('thing1', 'thing', {name: 'thing1'}))),
                     ).subscribe()),
 
                     switchMap(() => nodesByLabel(node1, 'auth')),
@@ -139,7 +139,7 @@ describe('p2p handlers', () => {
                     tap(() => timer(1).pipe(
                         switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
                         switchMap(() => graphAuth(node0, 'scott', 'pass')),
-                        switchMap(() => graphPutNode(node0, newGraphNode('thing1', 'thing', {name: 'thing1'}))),
+                        switchMap(() => putNode(node0, newNode('thing1', 'thing', {name: 'thing1'}))),
                     ).subscribe()),
 
                     switchMap(() => nodesByLabel(node1, 'auth')),
@@ -167,7 +167,7 @@ describe('p2p handlers', () => {
                     tap(() => timer(1).pipe(
                         switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
                         switchMap(() => graphAuth(node0, 'scott', 'pass')),
-                        switchMap(() => graphPutNode(node0, newGraphNode('thing1', 'thing', {name: 'thing1'})))
+                        switchMap(() => putNode(node0, newNode('thing1', 'thing', {name: 'thing1'})))
                     ).subscribe()),
 
                     switchMap(() => nodesByLabel(node1, 'auth')),
@@ -195,7 +195,7 @@ describe('p2p handlers', () => {
                         switchMap(() => graphAuth(node0, 'scott', 'pass')),
                         tap(() => (global as any).start = Date.now()),
                         switchMap(() => range(1, COUNT).pipe(
-                            mergeMap(idx => graphPutNode(node0, newGraphNode(`thing${idx}`, 'thing', {name: `thing${idx}`})))
+                            mergeMap(idx => putNode(node0, newNode(`thing${idx}`, 'thing', {name: `thing${idx}`})))
                         )),
                     ).subscribe()),
 
@@ -213,12 +213,12 @@ describe('p2p handlers', () => {
             firstValueFrom(startTestNode(0).pipe(
                 switchMap(({graph}) => graphNewAuth(graph, 'scott', 'pass')),
                 switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
-                tap(({graph}) => graphPutNode(graph, newGraphNode('thing1', 'thing', {name: 'thing1'})).subscribe()),
+                tap(({graph}) => putNode(graph, newNode('thing1', 'thing', {name: 'thing1'})).subscribe()),
                 switchMap(({graph: node0}) => startTestNode(1, [0]).pipe(
                     map(({graph}) => ({node0, node1: graph}))
                 )),
                 delay(1000),
-                switchMap(({node0, node1}) => graphGetNode(node1, 'thing1', {})),
+                switchMap(({node0, node1}) => getNode(node1, 'thing1', {})),
                 filter(({node}) => !!node?.nodeId),
                 tap(({node}) => expect(node.props.name).to.equal('thing1')),
             ))

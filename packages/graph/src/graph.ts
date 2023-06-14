@@ -118,7 +118,7 @@ export const graphOpen = (opts: GraphOpts) => {
 }
 
 
-export const newGraphNode = <T extends Props>(nodeId: string, label: string, props: T) => ({
+export const newNode = <T extends Props>(nodeId: string, label: string, props: T) => ({
     nodeId: nodeId || newUid(),
     label,
     props,
@@ -126,7 +126,7 @@ export const newGraphNode = <T extends Props>(nodeId: string, label: string, pro
 } satisfies GraphNode<T>);
 
 
-export const graphPutNode = <T extends Props>(graph: Graph, node: GraphNode<T>) =>
+export const putNode = <T extends Props>(graph: Graph, node: GraphNode<T>) =>
     chainNext(graph.chains.putNode, {graph, node}).pipe(
         map(({node}) => ({graph, nodeId: node.nodeId})),
     );
@@ -136,12 +136,12 @@ export const newGraphEdge = <T extends Props>(edgeId: string, rel: string, from:
     } satisfies GraphEdge<T>
 )
 
-export const graphPutEdge = <T extends Props>(graph: Graph, edge: GraphEdge<T>) =>
+export const putEdge = <T extends Props>(graph: Graph, edge: GraphEdge<T>) =>
     chainNext(graph.chains.putEdge, {graph, edge}).pipe(
         map(({edge}) => ({graph, edge}))
     );
 
-export const graphGetEdge = <T extends Props>(graph: Graph, edgeId: string, opts: GraphHandlerProps<'getEdge'>['opts']) =>
+export const getEdge = <T extends Props>(graph: Graph, edgeId: string, opts: GraphHandlerProps<'getEdge'>['opts']) =>
     new Observable<GraphHandlerProps<'getEdge'>>(subscriber => {
         const putEdgeSub = graph.chains.putEdge.pipe(
             filter(({edge}) => edge.edgeId === edgeId),
@@ -169,7 +169,7 @@ export const graphGetEdge = <T extends Props>(graph: Graph, edgeId: string, opts
     });
 
 
-export const graphGetNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts: GraphHandlerProps<'getEdge'>['opts']) =>
+export const getNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts: GraphHandlerProps<'getEdge'>['opts']) =>
     new Observable<GraphHandlerProps<'getNode'>>(subscriber => {
         const putSub = graph.chains.putNode.pipe(
             filter(({node: n}) => n.nodeId === nodeId),
@@ -220,7 +220,7 @@ export const nodesByLabel = <T extends Props>(graph: Graph, label: string, opts:
         };
     });
 
-export const graphGetRelationships = (graph: Graph, nodeId: NodeId, rel: string, opts: { reverse?: boolean } = {}) =>
+export const getRelationships = (graph: Graph, nodeId: NodeId, rel: string, opts: { reverse?: boolean } = {}) =>
     new Observable<{
         graph: Graph,
         nodeId: NodeId,

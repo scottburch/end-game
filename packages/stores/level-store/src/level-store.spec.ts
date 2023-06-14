@@ -1,5 +1,5 @@
 import {first, firstValueFrom, from, switchMap, tap} from "rxjs";
-import {graphGetNode, graphOpen} from "@end-game/graph";
+import {getNode, graphOpen} from "@end-game/graph";
 import type {GraphWithLevel} from './index.js';
 import {levelStoreHandlers} from "./index.js";
 import {addThingNode} from "@end-game/test-utils";
@@ -12,12 +12,12 @@ describe('level-store', () => {
             switchMap(() => graphOpen({graphId: 'g1'})),
             switchMap(graph => levelStoreHandlers(graph, {dir: 'test-store'})),
             switchMap(graph => addThingNode(graph, 1)),
-            switchMap(({graph}) => graphGetNode(graph, 'thing1', {})),
+            switchMap(({graph}) => getNode(graph, 'thing1', {})),
             switchMap(({graph}) => (graph as GraphWithLevel).levelStore.close()),
             first(),
             switchMap(() => graphOpen({graphId: 'g1'})),
             switchMap(graph => levelStoreHandlers(graph, {dir: 'test-store'})),
-            switchMap(graph=> graphGetNode(graph, 'thing1', {})),
+            switchMap(graph=> getNode(graph, 'thing1', {})),
             tap(({node}) => {
                 expect(node.nodeId).to.equal('thing1')
             }),

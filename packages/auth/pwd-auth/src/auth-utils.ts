@@ -1,6 +1,6 @@
 import {catchError, combineLatest, filter, first, map, of, switchMap, tap, throwError, timeout} from "rxjs";
 import type {Graph, GraphEdge, GraphNode, NodeId, Props} from '@end-game/graph'
-import {graphError, graphGetNode, LogLevel, nodesByProp} from "@end-game/graph";
+import {graphError, getNode, LogLevel, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
 import {deserializePubKey, sign, verify} from '@end-game/crypto'
 import {serializer} from "@end-game/utils/serializer";
@@ -69,7 +69,7 @@ export const isUserNodeOwner = (graph: GraphWithAuth, node: NodeWithAuth<any>) =
     return node.sig ? checkNodeOwner(TIMEOUT) : checkNodeOwner(100)
 
     function checkNodeOwner(maxWait: number) {
-        return graphGetNode(graph, node.nodeId, {}).pipe(
+        return getNode(graph, node.nodeId, {}).pipe(
             filter(({node}) => !!node),
             switchMap(({node}) => getNodeSignData(node).pipe(
                 switchMap(bytes => verify(bytes, (node as NodeWithAuth<Props>).sig, graph.user?.auth.pubKey as CryptoKey))
@@ -94,7 +94,7 @@ export const getEdgeSignData = (edge: GraphEdge<any>) =>
 
 
 const getNodeOnce = (graph: Graph, nodeId: NodeId) =>
-    graphGetNode(graph, nodeId, {}).pipe(
+    getNode(graph, nodeId, {}).pipe(
         tap(x => x),
         filter(({node}) => !!node?.nodeId),
         first(),
@@ -102,10 +102,10 @@ const getNodeOnce = (graph: Graph, nodeId: NodeId) =>
     );
 
 export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
-    graphGetNode(graph, nodeId, {}).pipe(
+    getNode(graph, nodeId, {}).pipe(
         filter(({node}) => !!node?.nodeId),
         first(),
-        switchMap(({node}) => graphGetNode(graph, (node as NodeWithAuth).owner, {}).pipe(
+        switchMap(({node}) => getNode(graph, (node as NodeWithAuth).owner, {}).pipe(
             filter(({node}) => !!node?.nodeId)
         )),
         timeout({first: TIMEOUT * 1.2, with: () => of({graph, nodeId: '', node: {} as AuthNode})}),
@@ -166,17 +166,3 @@ export const verifyNodeSig = <T extends Props>(graph: Graph, node: NodeWithAuth<
         ),
         map(() => ({graph, node}))
     );
-
-export const asGraphWithAuth = (graph: Graph) =>
-    of(graph as GraphWithAuth).pipe(
-        switchMap(graph => !!graph.user ? of(graph) : throwError(() => graphError(graph, 'INVALID_AUTH_CONVERSION_NO_USER', {text: 'Conversion to GraphWithUser with no user property'})))
-    )
-
-
-
-
-
-
-
-
-

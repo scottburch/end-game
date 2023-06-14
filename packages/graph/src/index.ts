@@ -1,5 +1,5 @@
 export type {Graph, GraphNode, GraphEdge, GraphOpts, NodeId, EdgeId, Props, GraphHandler, GraphId, GraphHandlerProps, RangeOpts} from './graph.js'
 export type {Relationship} from './relationship.js'
-export {IndexTypes, LogLevel, newGraphNode, newGraphEdge, graphGetNode, graphOpen, graphPutNode, nodesByLabel, nodesByProp, graphGetEdge, graphGetRelationships, graphPutEdge} from './graph.js'
+export {IndexTypes, LogLevel, newNode, newGraphEdge, getNode, graphOpen, putNode, nodesByLabel, nodesByProp, getEdge, getRelationships, putEdge} from './graph.js'
 export {newUid, timestampFromUid} from './uid.js'
 export {graphError} from './graphError.js'

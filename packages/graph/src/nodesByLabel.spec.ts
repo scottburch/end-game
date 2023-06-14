@@ -1,15 +1,15 @@
 import {combineLatest, first, firstValueFrom, from, map, of, skipWhile, Subject, switchMap, tap, toArray} from "rxjs";
 import {getAGraph} from "@end-game/test-utils";
-import {graphPutNode, newGraphNode, nodesByLabel} from "./graph.js";
+import {putNode, newNode, nodesByLabel} from "./graph.js";
 import {expect} from "chai";
 
 describe('nodesByLabel()', () => {
     it('should be able to find nodes with a given label', () =>
         firstValueFrom(getAGraph().pipe(
-            tap(graph => setTimeout(() => graphPutNode(graph, newGraphNode('', 'person', {name: 'joe'})).subscribe(), 100)),
+            tap(graph => setTimeout(() => putNode(graph, newNode('', 'person', {name: 'joe'})).subscribe(), 100)),
             switchMap(graph => combineLatest([
-                graphPutNode(graph, newGraphNode('', 'person', {name: 'scott'})),
-                graphPutNode(graph, newGraphNode('', 'person', {name: 'todd'}))
+                putNode(graph, newNode('', 'person', {name: 'scott'})),
+                putNode(graph, newNode('', 'person', {name: 'todd'}))
             ])),
             switchMap(([{graph}]) => nodesByLabel<{ name: string }>(graph, 'person')),
             skipWhile(({nodes}) => nodes.length < 3),
@@ -26,9 +26,9 @@ describe('nodesByLabel()', () => {
 
     it('should update a nodesByLabel() when node nodes are updated', () =>
         firstValueFrom(getAGraph().pipe(
-            switchMap(graph => graphPutNode(graph, newGraphNode('', 'person', {name: 'scott'}))),
-            tap(({graph}) => setTimeout(() => graphPutNode(graph, newGraphNode('', 'person', {name: 'todd'})).subscribe())),
-            tap(({graph}) => setTimeout(() => graphPutNode(graph, newGraphNode('', 'person', {name: 'joe'})).subscribe())),
+            switchMap(graph => putNode(graph, newNode('', 'person', {name: 'scott'}))),
+            tap(({graph}) => setTimeout(() => putNode(graph, newNode('', 'person', {name: 'todd'})).subscribe())),
+            tap(({graph}) => setTimeout(() => putNode(graph, newNode('', 'person', {name: 'joe'})).subscribe())),
             switchMap(({graph}) => nodesByLabel(graph, 'person')),
             skipWhile(({nodes}) => nodes.length < 3),
             tap(({nodes}) => {

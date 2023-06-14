@@ -11,15 +11,15 @@ const logLevels = Object.values(LogLevel);
 export const testnet = ({log}: TestnetOpts) =>
     startTestNet([[1], []]).pipe(
         tap(() => console.log('testnet started...')),
-        switchMap(nodes => !!log ? logger(log, Object.values(nodes)) : of(undefined)),
+        switchMap(peers => !!log ? logger(log, Object.values(peers)) : of(undefined)),
         map(() => {}),
         delay(Math.pow(2, 24))
     );
 
-        const logger = (level: string, nodes: Graph[]) =>
+        const logger = (level: string, peers: Graph[]) =>
         merge(
-            nodes[0].chains.log,
-            nodes[1].chains.log
+            peers[0].chains.log,
+            peers[1].chains.log
         ).pipe(
             filter(({item}) => item.level <= logLevels.indexOf(level.toUpperCase())),
             tap(({item}) => console.log(logLevels[item.level], item.code, item.text)),

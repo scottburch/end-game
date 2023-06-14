@@ -1,5 +1,5 @@
 import type {Graph, GraphOpts, Props} from "@end-game/graph";
-import {graphOpen, graphPutNode, LogLevel, newGraphNode, newUid} from "@end-game/graph";
+import {graphOpen, putNode, LogLevel, newNode, newUid} from "@end-game/graph";
 import {from, mergeMap, Observable, of, scan, skip, switchMap, timer} from "rxjs";
 import {levelStoreHandlers} from "@end-game/level-store";
 import {authHandlers} from "@end-game/pwd-auth";
@@ -33,7 +33,7 @@ export const startTestNode = (nodeNo: number, peers: number[] = [], basePort: nu
     );
 
 export const addThingNode = (graph: Graph, n: number, props: Props = {}) =>
-    graphPutNode(graph, newGraphNode(`thing${n}`, 'thing', {name: `thing${n}`, ...props}));
+    putNode(graph, newNode(`thing${n}`, 'thing', {name: `thing${n}`, ...props}));
 
 
 const findBasePort = (basePort = 11110): Observable<number> => from(detect(basePort)).pipe(
