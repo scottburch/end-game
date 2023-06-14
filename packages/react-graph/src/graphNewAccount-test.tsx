@@ -1,11 +1,12 @@
 import * as React from 'react'
 import {renderApp} from "./test/reactTestUtils.jsx";
 import {useGraphNodesByProp, useNewAccount} from "./react-graph.jsx";
+import {asGraphId} from "@end-game/graph";
 
 
 
 
-renderApp('test-graph', () => {
+renderApp(asGraphId('test-graph'), () => {
     const newAccount = useNewAccount();
     const acc = useGraphNodesByProp('auth', 'username', 'scott');
 

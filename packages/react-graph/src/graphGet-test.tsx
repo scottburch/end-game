@@ -4,12 +4,12 @@ import {useGraphNode, useGraphLogin, useGraphNodesByLabel, useGraphPut, useNewAc
 import {useEffect, useRef} from "react";
 import {switchMap} from "rxjs";
 import type {NodeId} from "@end-game/graph";
-import {asNodeId} from "@end-game/graph";
+import {asGraphId, asNodeId} from "@end-game/graph";
 
 let accountCreated = false;
 
 
-renderApp('test-graph', () => {
+renderApp(asGraphId('test-graph'), () => {
     const nodes = useGraphNodesByLabel('person');
     const graphPut = useGraphPut();
     const count = useRef(0);

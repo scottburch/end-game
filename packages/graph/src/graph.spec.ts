@@ -21,7 +21,7 @@ import {
     graphOpen,
     putNode,
     putEdge,
-    nodesByProp, newNode, newGraphEdge, nodesByLabel, asNodeId, asEdgeId
+    nodesByProp, newNode, newGraphEdge, nodesByLabel, asNodeId, asEdgeId, asGraphId
 } from "./graph.js";
 import {expect} from "chai";
 import {addThingNode, getAGraph} from "@end-game/test-utils";
@@ -29,14 +29,14 @@ import {newUid} from "./uid.js";
 
 describe('graph', () => {
     it('should open a graph', () =>
-        firstValueFrom(graphOpen({graphId: newUid()}).pipe(
+        firstValueFrom(graphOpen({graphId: asGraphId(newUid())}).pipe(
             tap(graph => expect(graph).not.to.be.undefined)
         ))
     );
 
     describe('storing a node', () => {
         it('should put a value in a graph and assign an id', () =>
-            firstValueFrom(getAGraph({graphId: newUid()}).pipe(
+            firstValueFrom(getAGraph({graphId: asGraphId(newUid())}).pipe(
                 switchMap(graph => putNode(graph, newNode(asNodeId(''), 'person', {name: 'scott'}))),
                 tap(({graph, nodeId}) => expect(nodeId).to.have.length(12))
             ))

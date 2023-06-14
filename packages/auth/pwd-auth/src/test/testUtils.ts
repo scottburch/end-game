@@ -1,4 +1,5 @@
 import {
+    asGraphId,
     graphOpen,
 } from "@end-game/graph";
 import {map, switchMap} from "rxjs";
@@ -6,7 +7,7 @@ import {authHandlers} from "../auth-handlers.js";
 import {graphAuth, graphNewAuth} from "../user-auth.js";
 import {levelStoreHandlers} from "@end-game/level-store";
 
-export const graphWithAuth = () => graphOpen({graphId: 'my-graph'}).pipe(
+export const graphWithAuth = () => graphOpen({graphId: asGraphId('my-graph')}).pipe(
     switchMap(graph => levelStoreHandlers(graph)),
     switchMap(graph => authHandlers(graph))
 );

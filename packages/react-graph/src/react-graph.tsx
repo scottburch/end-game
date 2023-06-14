@@ -2,7 +2,6 @@ import type {
     EdgeId,
     Graph,
     GraphEdge,
-    GraphId,
     GraphNode,
     NodeId,
     Props,
@@ -17,7 +16,7 @@ import {
     putNode,
     putEdge,
     nodesByLabel,
-    nodesByProp, newGraphEdge,
+    nodesByProp, newGraphEdge, asGraphId,
 } from "@end-game/graph";
 import type {PropsWithChildren} from 'react';
 import * as React from "react";
@@ -176,7 +175,7 @@ export const useGraphPutEdge = <T extends Props>() => {
 }
 
 export type ReactGraphOpts =  {
-    graphId: GraphId
+    graphId: string
     persistent?: boolean
 }
 
@@ -189,7 +188,7 @@ export const ReactGraph: React.FC<PropsWithChildren<ReactGraphOpts>> = (props) =
 
         function createNewGraph() {
             const sub = graphOpen({
-                graphId: (props as {graphId: string}).graphId
+                graphId: asGraphId(props.graphId)
             }).pipe(
                 switchMap(graph => levelStoreHandlers(graph, {dir: props.persistent ? 'endgame' : undefined})),
                 switchMap(graph => authHandlers(graph)),

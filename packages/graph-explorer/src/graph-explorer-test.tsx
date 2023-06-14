@@ -3,12 +3,12 @@ import {useGraphLogin, useGraphPut, useGraphPutEdge, useNewAccount} from "@end-g
 import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {GraphExplorerBtn} from "./GraphExplorerBtn.jsx";
 import {switchMap, of, tap} from "rxjs";
-import {asEdgeId, asNodeId} from "@end-game/graph";
+import {asEdgeId, asGraphId, asNodeId} from "@end-game/graph";
 
 
 let accountCreated = false;
 
-renderApp('test-graph', () => {
+renderApp(asGraphId('test-graph'), () => {
     const graphPut = useGraphPut();
     const graphPutEdge = useGraphPutEdge();
     const newAccount = useNewAccount();

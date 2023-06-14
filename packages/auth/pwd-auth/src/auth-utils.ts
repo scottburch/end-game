@@ -43,7 +43,7 @@ export const findAuthNode = (graph: Graph, username: string) =>
 
 export const isUserAuthedToWriteEdge = (graph: Graph, edge: GraphEdge) =>
     getNodeOnce(graph, edge.from).pipe(
-        switchMap(({node}) => node ? isUserNodeOwner(graph as GraphWithAuth, node as NodeWithAuth<Props>) : of(true)),
+        switchMap(({node}) => node ? isUserNodeOwner(graph as GraphWithAuth, node as NodeWithAuth) : of(true)),
     );
 
 export const isUserLoggedIn = (graph: GraphWithAuth) =>
@@ -72,7 +72,7 @@ export const isUserNodeOwner = (graph: GraphWithAuth, node: NodeWithAuth<any>) =
         return getNode(graph, node.nodeId, {}).pipe(
             filter(({node}) => !!node),
             switchMap(({node}) => getNodeSignData(node).pipe(
-                switchMap(bytes => verify(bytes, (node as NodeWithAuth<Props>).sig, graph.user?.auth.pubKey as CryptoKey))
+                switchMap(bytes => verify(bytes, (node as NodeWithAuth).sig, graph.user?.auth.pubKey as CryptoKey))
             )),
             first(),
             timeout({first: maxWait, with: () => of(true)})
@@ -119,7 +119,7 @@ export const verifyEdgeSig = <T extends Props>(graph: Graph, edge: EdgeWithSig<T
                     getEdgeSignData(edge),
                     deserializePubKey(authNode.props.pub)
                 ]).pipe(
-                    switchMap(([data, pubKey]) => verify(data, (edge as EdgeWithSig<Props>).sig, pubKey)),
+                    switchMap(([data, pubKey]) => verify(data, (edge as EdgeWithSig).sig, pubKey)),
                     map(() => ({edge, authNode})),
                     catchError(err => err.message === 'Invalid keyData' ? unauthorizedUserError(graph, authNode.props.username) : of(err))
                 )
@@ -148,7 +148,7 @@ export const verifyNodeSig = <T extends Props>(graph: Graph, node: NodeWithAuth<
                     getNodeSignData(node),
                     deserializePubKey(authNode.props.pub)
                 ]).pipe(
-                    switchMap(([data, pubKey]) => verify(data, (node as NodeWithAuth<Props>).sig, pubKey)),
+                    switchMap(([data, pubKey]) => verify(data, (node as NodeWithAuth).sig, pubKey)),
                     map(() => ({node, authNode})),
                     catchError(err => err.message === 'Invalid keyData' ? unauthorizedUserError(graph, authNode.props.username) : of(err))
                 )

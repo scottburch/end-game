@@ -56,7 +56,7 @@ export type RangeOpts = {
 }
 
 export type Graph = {
-    graphId: string
+    graphId: GraphId
     chains: {
         log: RxjsChain<{ graph: Graph, item: GraphLogItem }>
         putNode: RxjsChain<{ graph: Graph, node: GraphNode }>
@@ -83,16 +83,16 @@ export type GraphOpts = Partial<Graph> & Pick<Graph, 'graphId'>
 
 export type NodeId = (string & {type: 'nodeId'}) | ''
 export type EdgeId = (string & {type: 'edgeId'}) | ''
-export type GraphId = string
+export type GraphId = (string & {type: 'graphId'}) | ''
 
 export const asNodeId = (nodeId: string) => nodeId as NodeId;
 export const asEdgeId = (edgeId: string) => edgeId as EdgeId;
-
+export const asGraphId = (graphId: string) => graphId as GraphId;
 
 export const graphOpen = (opts: GraphOpts) => {
     const graph = {
         ...opts,
-        graphId: opts.graphId || newUid(),
+        graphId: opts.graphId || asGraphId(newUid()),
         chains: {
             log: opts.chains?.log || newRxjsChain(),
             putNode: opts.chains?.putNode || newRxjsChain({logger: chainLogger('putNode')}),

@@ -1,4 +1,4 @@
-import type {Graph, GraphHandler, Props} from '@end-game/graph'
+import type {Graph, GraphHandler} from '@end-game/graph'
 import {first, map, of, switchMap, tap} from "rxjs";
 import {insertHandlerBefore, newRxjsChain} from "@end-game/rxjs-chain";
 import type {EdgeWithSig, GraphWithAuth, NodeWithAuth} from "./auth-utils.js";
@@ -31,12 +31,12 @@ const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {
     }
 
     // verify signature if the node has one
-    if (!!(node as NodeWithAuth<Props>).sig) {
-        return verifyNodeSig(graph, node as NodeWithAuth<Props>)
+    if (!!(node as NodeWithAuth).sig) {
+        return verifyNodeSig(graph, node as NodeWithAuth)
     }
 
     return (isUserLoggedIn(graph as GraphWithAuth) ? of({graph, node}) : notLoggedInError(graph)).pipe(
-        switchMap(({graph, node}) => isUserNodeOwner(graph as GraphWithAuth, node as NodeWithAuth<Props>)),
+        switchMap(({graph, node}) => isUserNodeOwner(graph as GraphWithAuth, node as NodeWithAuth)),
         switchMap(isOwner => isOwner ? (
             of(node).pipe(
                 map(node => ({...node, owner: (graph as GraphWithAuth).user?.nodeId})),

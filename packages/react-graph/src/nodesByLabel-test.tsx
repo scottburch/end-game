@@ -2,11 +2,11 @@ import React, {useEffect, useRef} from "react";
 import {useGraphLogin, useGraphNodesByLabel, useGraphPut, useNewAccount} from "./react-graph.jsx";
 import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {switchMap, tap} from "rxjs";
-import {asNodeId} from "@end-game/graph";
+import {asGraphId, asNodeId} from "@end-game/graph";
 
 let accountCreated = false;
 
-renderApp('testGraph', () => {
+renderApp(asGraphId('testGraph'), () => {
     const nodes = useGraphNodesByLabel('thing');
     const graphPut = useGraphPut();
     const newAccount = useNewAccount();

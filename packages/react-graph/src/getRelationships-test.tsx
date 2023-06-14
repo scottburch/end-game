@@ -2,11 +2,11 @@ import React, {useEffect, useState} from "react";
 import {useGraphLogin, useGraphPutEdge, useGraphRelationships, useNewAccount} from "./react-graph.jsx";
 import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {switchMap} from "rxjs";
-import {asEdgeId, asNodeId} from "@end-game/graph";
+import {asEdgeId, asGraphId, asNodeId} from "@end-game/graph";
 
 let accountCreated = false;
 
-renderApp('test-graph', () => {
+renderApp(asGraphId('test-graph'), () => {
     const rels = useGraphRelationships(asNodeId('n1'), 'friend', {});
     const [count, setCount] = useState(0);
     const graphPutEdge = useGraphPutEdge();
