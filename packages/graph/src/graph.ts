@@ -8,7 +8,7 @@ import type {RxjsChainFn} from '@end-game/rxjs-chain';
 import {chainNext, newRxjsChain} from "@end-game/rxjs-chain";
 import {serializer} from "@end-game/utils/serializer";
 
-export type NodeId = string
+export type NodeId = (string & {type: 'nodeId'}) | ''
 export type EdgeId = string
 export type GraphId = string
 
@@ -23,7 +23,7 @@ export const IndexTypes = {
 
 
 export type GraphNode<T extends Props = Props> = {
-    nodeId: string
+    nodeId: NodeId
     label: string
     state: string
     props: T
@@ -83,6 +83,8 @@ export type Graph = {
 
 export type GraphOpts = Partial<Graph> & Pick<Graph, 'graphId'>
 
+export const nodeId = (nodeId: string) => nodeId as NodeId;
+
 
 export const graphOpen = (opts: GraphOpts) => {
     const graph = {
@@ -118,8 +120,8 @@ export const graphOpen = (opts: GraphOpts) => {
 }
 
 
-export const newNode = <T extends Props>(nodeId: string, label: string, props: T) => ({
-    nodeId: nodeId || newUid(),
+export const newNode = <T extends Props>(nodeId: NodeId, label: string, props: T) => ({
+    nodeId: nodeId || newUid() as NodeId,
     label,
     props,
     state: Date.now().toString()

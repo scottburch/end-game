@@ -6,7 +6,6 @@ import {
     catchError, combineLatest,
     concatMap, filter, from, last,
     map,
-    merge,
     mergeMap, Observable,
     of,
     range,
@@ -129,7 +128,7 @@ export const levelStoreNodesByLabelHandler = (): GraphHandler<'nodesByLabel'> =>
             map(pair => pair?.[0].split('.')[3]),
             switchMap(nodeId => levelStoreGetNodeHandler()({
                 graph,
-                nodeId: nodeId as string,
+                nodeId,
                 node: {} as GraphNode,
                 opts: {}
             })),
@@ -148,7 +147,7 @@ export const levelStoreNodesByPropHandler = (): GraphHandler<'nodesByProp'> =>
             map(pair => pair?.[0].split('.')[5]),
             mergeMap(nodeId => levelStoreGetNodeHandler()({
                 graph,
-                nodeId: nodeId as string,
+                nodeId,
                 node: {} as GraphNode,
                 opts: {}
             })),

@@ -171,7 +171,7 @@ const doGetNodeIn = (graph: Graph, msg: P2pMsg) =>
     );
 
 const doGetRelationshipsIn = (graph: Graph, msg: P2pMsg) =>
-    of(msg as P2pMsg<'getRelationships', { nodeId: string, rel: string, reverse: boolean, relationships: [] }>).pipe(
+    of(msg as P2pMsg<'getRelationships', { nodeId: NodeId, rel: string, reverse: boolean, relationships: [] }>).pipe(
         switchMap(msg => getRelationships(graph, msg.data.nodeId, msg.data.rel, {reverse: msg.data.reverse}).pipe(
             map(({relationships}) => ({relationships, msg}))
         )),

@@ -1,6 +1,6 @@
-import {catchError, combineLatest, filter, first, map, of, switchMap, tap, throwError, timeout} from "rxjs";
+import {catchError, combineLatest, filter, first, map, of, switchMap, tap, timeout} from "rxjs";
 import type {Graph, GraphEdge, GraphNode, NodeId, Props} from '@end-game/graph'
-import {graphError, getNode, LogLevel, nodesByProp} from "@end-game/graph";
+import {getNode, LogLevel, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
 import {deserializePubKey, sign, verify} from '@end-game/crypto'
 import {serializer} from "@end-game/utils/serializer";

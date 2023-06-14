@@ -1,4 +1,4 @@
-import {combineLatest, first, firstValueFrom, from, map, of, skipWhile, Subject, switchMap, tap, toArray} from "rxjs";
+import {combineLatest, first, firstValueFrom, from, map, skipWhile, switchMap, tap, toArray} from "rxjs";
 import {getAGraph} from "@end-game/test-utils";
 import {putNode, newNode, nodesByLabel} from "./graph.js";
 import {expect} from "chai";

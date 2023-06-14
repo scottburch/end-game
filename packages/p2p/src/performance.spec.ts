@@ -1,7 +1,7 @@
 import {firstValueFrom, map, mergeMap, of, range, skip, switchMap, tap} from "rxjs";
 import {addThingNode, startTestNet} from "@end-game/test-utils";
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
-import {getNode} from "@end-game/graph";
+import {getNode, nodeId} from "@end-game/graph";
 import {expect} from "chai";
 
 
@@ -22,7 +22,7 @@ describe('p2p performance', () => {
                     start = Date.now();
                 }),
                 switchMap(() => range(0, count)),
-                mergeMap(n => getNode(node1, `thing${n}`, {})),
+                mergeMap(n => getNode(node1, nodeId(`thing${n}`), {})),
                 map(({node}, idx) => expect(node.props.name).to.equal(`thing${idx}`)),
                 skip(count - 1),
                 tap(() => {

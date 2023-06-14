@@ -3,6 +3,7 @@ import {useGraphLogin, useGraphPut, useNewAccount} from "@end-game/react-graph";
 import {map, switchMap, tap} from "rxjs";
 import {User} from "../types/User.js";
 import {InputField} from "./InputField.jsx";
+import {nodeId} from "@end-game/graph";
 
 export const SignupPanel: React.FC<{toggleSignup: () => void}> = ({toggleSignup}) => {
     const putNode = useGraphPut();
@@ -21,7 +22,7 @@ export const SignupPanel: React.FC<{toggleSignup: () => void}> = ({toggleSignup}
             switchMap(({nodeId: authId}) => login(values.username, values.password).pipe(
                 map(() => authId)
             )),
-            switchMap(authId => putNode('user', '', {
+            switchMap(authId => putNode('user', nodeId(''), {
                 display: values.display,
                 aboutMe: values.aboutMe,
                 ownerId: authId

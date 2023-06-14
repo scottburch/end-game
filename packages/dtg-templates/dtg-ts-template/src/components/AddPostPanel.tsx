@@ -2,13 +2,14 @@ import {useGraphPut} from "@end-game/react-graph";
 import type {Post} from "../types/Post.js";
 import {useRef, useState} from "react";
 import React from 'react';
+import {nodeId, NodeId} from "@end-game/graph";
 
 export const AddPostPanel: React.FC = () => {
     const graphPut = useGraphPut<Post>();
     const [values, setValues] = useState<Omit<Post, 'nodeId'>>({text: ''});
 
     const addPost = () => {
-        graphPut('post', Date.now().toString(), values as Post).subscribe();
+        graphPut('post', nodeId(Date.now().toString()), values as Post).subscribe();
         setValues({text: ''});
     }
 
