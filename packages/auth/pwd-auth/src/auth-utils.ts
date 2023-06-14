@@ -25,6 +25,9 @@ export type GraphWithAuth = Graph & {
         authChanged: RxjsChain<{ graph: Graph }>
     }
 };
+
+export const asGraphWithAuth = (graph: Graph) => graph as GraphWithAuth
+
 export type NodeWithAuth<T extends Props = Props> = GraphNode<T> & { sig: Uint8Array, owner: NodeId }
 export type EdgeWithSig<T extends Props = Props> = GraphEdge<T> & {sig: Uint8Array }
 
@@ -43,7 +46,7 @@ export const findAuthNode = (graph: Graph, username: string) =>
 
 export const isUserAuthedToWriteEdge = (graph: Graph, edge: GraphEdge) =>
     getNodeOnce(graph, edge.from).pipe(
-        switchMap(({node}) => node ? isUserNodeOwner(graph as GraphWithAuth, node as NodeWithAuth) : of(true)),
+        switchMap(({node}) => node ? isUserNodeOwner(asGraphWithAuth(graph), node as NodeWithAuth) : of(true)),
     );
 
 export const isUserLoggedIn = (graph: GraphWithAuth) =>
