@@ -1,4 +1,4 @@
-import {P2pMsg, PeerId} from "./p2pHandlers.js";
+import {P2pGraphMsg, PeerId} from "./p2pHandlers.js";
 import WebSocket from "isomorphic-ws";
 import {delay, filter, first, fromEvent, map, mergeMap, of, skipWhile, takeUntil, tap} from "rxjs";
 import {deserializer, serializer} from "@end-game/utils/serializer";
@@ -12,7 +12,7 @@ export type PeerConn = {
     close: () => void
 }
 
-type AnnounceMsg = P2pMsg<'announce', { peerId: PeerId}>
+type AnnounceMsg = P2pGraphMsg<'announce', { peerId: PeerId}>
 
 export const socketManager = (dialer: Dialer, peerConn: PeerConn) => {
     const isDup = dupMsgCache();
@@ -37,7 +37,7 @@ export const socketManager = (dialer: Dialer, peerConn: PeerConn) => {
         takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
         map(ev => ev.data),
         filter(msg => !isDup(msg)),
-        map(msg => deserializer<P2pMsg>(msg)),
+        map(msg => deserializer<P2pGraphMsg>(msg)),
         tap(msg => msg.cmd === 'announce' && checkDupConn(msg as AnnounceMsg)),
         skipWhile(() => !connOk),
         mergeMap(msg => chainNext(dialer.graph.chains.peerIn, {graph: dialer.graph, msg})),
