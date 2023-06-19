@@ -11,7 +11,7 @@ describe('dialer', () => {
     it('should dial a peer', () =>
         firstValueFrom(compileBrowserTestCode(absPath(import.meta.url, 'dialer-test.tsx')).pipe(
             switchMap(() => startTestNode(6)),
-            switchMap(({graph}) => graphNewAuth(graph, 'scott', 'pass')),
+            switchMap(({host}) => graphNewAuth(host.graphs[0], 'scott', 'pass')),
             switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
             tap(({graph}) => putNode(graph, newNode(asNodeId('thing1'), 'thing', {name: 'thing1'})).subscribe()),
             tap(({graph}) => putNode(graph, newNode(asNodeId('thing2'), 'thing', {name: 'thing2'})).subscribe()),

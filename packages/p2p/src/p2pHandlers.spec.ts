@@ -211,11 +211,11 @@ describe('p2p handlers', () => {
 
         it('should get a node from a peer', () =>
             firstValueFrom(startTestNode(0).pipe(
-                switchMap(({graph}) => graphNewAuth(graph, 'scott', 'pass')),
+                switchMap(({host}) => graphNewAuth(host.graphs[0], 'scott', 'pass')),
                 switchMap(({graph}) => graphAuth(graph, 'scott', 'pass')),
                 tap(({graph}) => putNode(graph, newNode(asNodeId('thing1'), 'thing', {name: 'thing1'})).subscribe()),
                 switchMap(({graph: node0}) => startTestNode(1, [0]).pipe(
-                    map(({graph}) => ({node0, node1: graph}))
+                    map(({host}) => ({node0, node1: host.graphs[0]}))
                 )),
                 delay(1000),
                 switchMap(({node0, node1}) => getNode(node1, asNodeId('thing1') , {})),
@@ -230,17 +230,17 @@ describe('p2p handlers', () => {
         describe('nodesByLabel', () => {
             it('should search for nodes by label', () => {
                 return firstValueFrom(startTestNode(0).pipe(
-                    switchMap(({graph}) => of(undefined).pipe(
-                        switchMap(() => graphNewAuth(graph, 'scott', 'pass')),
-                        switchMap(() => graphAuth(graph, 'scott', 'pass')),
+                    switchMap(({host}) => of(undefined).pipe(
+                        switchMap(() => graphNewAuth(host.graphs[0], 'scott', 'pass')),
+                        switchMap(() => graphAuth(host.graphs[0], 'scott', 'pass')),
                         switchMap(() => range(1, 5).pipe(
-                            mergeMap(n => addThingNode(graph, n)),
+                            mergeMap(n => addThingNode(host.graphs[0], n)),
                             last()
                         )),
                         switchMap(() => startTestNode(1, [0])),
-                        switchMap(({graph}) => merge(
-                            testNodeReceived(graph),
-                            testOnlyRequestedNodesSent(graph)
+                        switchMap(({host}) => merge(
+                            testNodeReceived(host.graphs[0]),
+                            testOnlyRequestedNodesSent(host.graphs[0])
                         )),
                         bufferCount(2)
                     ))
