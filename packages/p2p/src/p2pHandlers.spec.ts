@@ -23,7 +23,7 @@ import {
     tap, timeout,
     timer, toArray
 } from "rxjs";
-import {asPeerId, GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
+import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
@@ -33,7 +33,7 @@ import {serializer} from "@end-game/utils/serializer";
 describe('p2p handlers', () => {
     it('should setup peer chains', () =>
         firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
-                switchMap(graph => p2pHandlers(graph, {peerId: asPeerId('test')})),
+                switchMap(graph => p2pHandlers(graph)),
                 map(graph => graph as GraphWithP2p),
                 tap(graph => timer(1).pipe(
                     switchMap(() => chainNext(graph.chains.peerIn, {graph, msg: {cmd: 'peer-in', data: {}}})),
@@ -52,7 +52,7 @@ describe('p2p handlers', () => {
 
     it('should put a putNode onto the peersOut', () =>
         firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
-            switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: asPeerId('test')})),
+            switchMap((graph) => p2pHandlers(graph)),
             tap(graph => timer(1).pipe(
                 switchMap(() => putNode(graph, newNode(asNodeId('node1'), 'thing', {name: 'thing1'})))
             ).subscribe()),
@@ -66,7 +66,7 @@ describe('p2p handlers', () => {
 
     it('should put a putEdge onto the peersOut', () =>
         firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
-            switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: asPeerId('test')})),
+            switchMap((graph) => p2pHandlers(graph)),
             tap(graph => timer(1).pipe(
                 switchMap(() => putEdge(graph, newGraphEdge(asEdgeId('edge1'), 'friend', asNodeId('node1') , asNodeId('node2') , {name: 'thing1'})))
             ).subscribe()),
@@ -83,7 +83,7 @@ describe('p2p handlers', () => {
 
     it('should ignore getNode if the local flag is set', () =>
         firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
-            switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: asPeerId('test')})),
+            switchMap((graph) => p2pHandlers(graph)),
             tap(graph => (graph as GraphWithP2p).chains.peersOut.pipe(
                 tap(({msg}) => {
                     throw(`should not receive a peersOut - received:\n${serializer(msg)}`)
@@ -96,7 +96,7 @@ describe('p2p handlers', () => {
 
     it('should ignore getEdge if the local flag is set', () =>
         firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
-            switchMap((graph) => p2pHandlers(graph, {listeningPort: 11110, peerId: asPeerId('test')})),
+            switchMap((graph) => p2pHandlers(graph)),
             tap(graph => (graph as GraphWithP2p).chains.peersOut.pipe(
                 tap(({msg}) => {
                     throw(`should not receive a peersOut - received:\n${serializer(msg)}`)

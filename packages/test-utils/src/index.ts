@@ -1,11 +1,12 @@
 import type {Graph, GraphOpts, Props} from "@end-game/graph";
 import {graphOpen, putNode, LogLevel, newNode, newUid, asNodeId, asGraphId} from "@end-game/graph";
-import {from, mergeMap, Observable, of, scan, skip, switchMap, timer} from "rxjs";
+import {from, map, mergeMap, Observable, of, scan, skip, switchMap, timer} from "rxjs";
 import {levelStoreHandlers} from "@end-game/level-store";
 import {authHandlers} from "@end-game/pwd-auth";
 import type {GraphWithP2p} from '@end-game/p2p'
-import {asPeerId, dialPeer, newDialer, p2pHandlers} from "@end-game/p2p";
+import {asPeerId, dialPeer, newDialer, p2pHandlers, startServer} from "@end-game/p2p";
 import detect from 'detect-port'
+import {newHost} from "@end-game/p2p";
 
 export const getAGraph = (opts: GraphOpts = {graphId: asGraphId(newUid())}) => graphOpen(opts).pipe(
     switchMap(graph => levelStoreHandlers(graph)),
@@ -26,7 +27,14 @@ export const startTestNode = (nodeNo: number, peers: number[] = [], basePort: nu
     graphOpen({graphId: asGraphId('testnet'), logLevel: LogLevel.DEBUG}).pipe(
         switchMap(graph => levelStoreHandlers(graph)),
         switchMap(graph => authHandlers(graph)),
-        switchMap(graph => p2pHandlers(graph, {peerId: asPeerId(`peer-${nodeNo}`), listeningPort: basePort + nodeNo})),
+        switchMap(graph => p2pHandlers(graph)),
+        switchMap(graph => startServer(newHost({
+            hostId: asPeerId(`peer-${nodeNo}`),
+            graphs: [graph],
+            listeningPort: basePort + nodeNo
+        })).pipe(
+            map(() => graph)
+        )),
         switchMap(graph => peers.length ? from(peers).pipe(
             mergeMap(peerNo => dialPeer(newDialer(graph as GraphWithP2p, asPeerId(`peer-${nodeNo}`)), {url: `ws://localhost:${basePort + peerNo}`, redialInterval: 1})),
             skip(peers.length - 1)

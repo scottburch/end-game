@@ -3,7 +3,6 @@ import type {EdgeId, Graph, GraphEdge,  GraphNode, NodeId, RangeOpts} from "@end
 import {from, map, of, switchMap, tap} from "rxjs";
 import type {RxjsChain} from "@end-game/rxjs-chain";
 import {appendHandler, chainNext, newRxjsChain, RxjsChainFn} from "@end-game/rxjs-chain";
-import {startServer} from "./server.js";
 import {
     getNode,
     getEdge,
@@ -17,11 +16,6 @@ import ld from "lodash";
 import {P2pMsg} from "./dialer.js";
 
 export type PeerId = string & {type: 'peerId'};
-
-export type P2pOpts = {
-    listeningPort?: number,
-    peerId: PeerId
-}
 
 export const asPeerId = (peerId: string) => peerId as PeerId;
 
@@ -40,11 +34,10 @@ export type GraphWithP2p = Graph & {
 
 // *** Stuff to output
 
-export const p2pHandlers = (graph: Graph, opts: P2pOpts) =>
+export const p2pHandlers = (graph: Graph) =>
     of(graph as GraphWithP2p).pipe(
         tap(graph => graph.peerConnections = graph.peerConnections || new Set()),
         tap(addChainsToGraph),
-        switchMap(graph => opts.listeningPort ? startServer(graph, opts.listeningPort, opts.peerId) : of(graph)),
         tap(graph => {
             appendHandler((graph as GraphWithP2p).chains.peerIn, 'p2p', peerInHandler);
             appendHandler(graph.chains.putNode, 'p2p', putNodeHandler);

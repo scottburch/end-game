@@ -194,9 +194,9 @@ export const ReactGraph: React.FC<PropsWithChildren<ReactGraphOpts>> = (props) =
             }).pipe(
                 switchMap(graph => levelStoreHandlers(graph, {dir: props.persistent ? 'endgame' : undefined})),
                 switchMap(graph => authHandlers(graph)),
-                switchMap(graph => p2pHandlers(graph, {peerId: asPeerId(props.peerId)})),
+                switchMap(graph => p2pHandlers(graph)),
                 tap(graph => setMyGraph(graph)),
-                switchMap(graph => (graph as GraphWithAuth).chains.authChanged),
+                switchMap(graph => (graph as Graph as GraphWithAuth).chains.authChanged),
                 tap(({graph}) => setMyGraph(graph)),
             ).subscribe();
             return () => sub.unsubscribe();
