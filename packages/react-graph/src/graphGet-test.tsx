@@ -5,11 +5,12 @@ import {useEffect, useRef} from "react";
 import {switchMap} from "rxjs";
 import type {NodeId} from "@end-game/graph";
 import {asGraphId, asNodeId} from "@end-game/graph";
+import {asPeerId} from "@end-game/p2p";
 
 let accountCreated = false;
 
 
-renderApp(asGraphId('test-graph'), () => {
+renderApp(asGraphId('test-graph'), asPeerId('my-peer'), () => {
     const nodes = useGraphNodesByLabel('person');
     const graphPut = useGraphPut();
     const count = useRef(0);

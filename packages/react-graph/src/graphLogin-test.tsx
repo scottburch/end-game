@@ -3,10 +3,11 @@ import {renderApp} from "./test/reactTestUtils.jsx";
 import {useGraphNode, useGraphLogin, useGraphPut, useNewAccount} from "./react-graph.jsx";
 import {switchMap} from "rxjs";
 import {asGraphId, asNodeId} from "@end-game/graph";
+import {asPeerId} from "@end-game/p2p";
 
 
 
-renderApp(asGraphId('test-graph'), () => {
+renderApp(asGraphId('test-graph'), asPeerId('my-peer'), () => {
     const newAccount = useNewAccount();
     const login = useGraphLogin();
     const put = useGraphPut();

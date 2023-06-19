@@ -26,7 +26,7 @@ import type {GraphWithAuth} from '@end-game/pwd-auth'
 import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 import {newNode} from "@end-game/graph";
 import {levelStoreHandlers} from "@end-game/level-store";
-import {dialPeer, p2pHandlers} from "@end-game/p2p";
+import {asPeerId, dialPeer, p2pHandlers} from "@end-game/p2p";
 import type {DialerOpts} from "@end-game/p2p";
 import type {GraphHandlerProps} from "@end-game/graph";
 
@@ -177,6 +177,7 @@ export const useGraphPutEdge = <T extends Props>() => {
 export type ReactGraphOpts =  {
     graphId: string
     persistent?: boolean
+    peerId: string
 }
 
 export const ReactGraph: React.FC<PropsWithChildren<ReactGraphOpts>> = (props) => {
@@ -192,7 +193,7 @@ export const ReactGraph: React.FC<PropsWithChildren<ReactGraphOpts>> = (props) =
             }).pipe(
                 switchMap(graph => levelStoreHandlers(graph, {dir: props.persistent ? 'endgame' : undefined})),
                 switchMap(graph => authHandlers(graph)),
-                switchMap(graph => p2pHandlers(graph, {})),
+                switchMap(graph => p2pHandlers(graph, {peerId: asPeerId(props.peerId)})),
                 tap(graph => setMyGraph(graph)),
                 switchMap(graph => (graph as GraphWithAuth).chains.authChanged),
                 tap(({graph}) => setMyGraph(graph)),

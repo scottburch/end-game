@@ -1,4 +1,4 @@
-import type {EdgeId, Graph, GraphEdge, GraphId, GraphNode, NodeId, RangeOpts} from "@end-game/graph";
+import type {EdgeId, Graph, GraphEdge,  GraphNode, NodeId, RangeOpts} from "@end-game/graph";
 
 import {from, map, of, switchMap, tap} from "rxjs";
 import type {RxjsChain} from "@end-game/rxjs-chain";
@@ -15,10 +15,14 @@ import {
 
 import ld from "lodash";
 
+export type PeerId = string & {type: 'peerId'};
+
 export type P2pOpts = {
     listeningPort?: number,
-    peerId?: string,
+    peerId: PeerId
 }
+
+export const asPeerId = (peerId: string) => peerId as PeerId;
 
 export type P2pMsg<Cmd extends string = string, Data extends Object = Object> = {
     cmd: Cmd,
@@ -29,8 +33,8 @@ export type GraphP2pHandler<T extends keyof GraphWithP2p['chains']> = RxjsChainF
 
 
 export type GraphWithP2p = Graph & {
-    peerId: string
-    peerConnections: Set<GraphId>
+    peerId: PeerId
+    peerConnections: Set<PeerId>
     chains: Graph['chains'] & {
         peerIn: RxjsChain<{ graph: Graph, msg: P2pMsg }>
         peersOut: RxjsChain<{ graph: Graph, msg: P2pMsg }>
@@ -42,7 +46,7 @@ export type GraphWithP2p = Graph & {
 
 export const p2pHandlers = (graph: Graph, opts: P2pOpts) =>
     of(graph as GraphWithP2p).pipe(
-        tap(graph => graph.peerId = opts.peerId || graph.graphId),
+        tap(graph => graph.peerId = opts.peerId),
         tap(graph => graph.peerConnections = graph.peerConnections || new Set()),
         tap(addChainsToGraph),
         switchMap(graph => opts.listeningPort ? startServer(graph, opts.listeningPort) : of(graph)),

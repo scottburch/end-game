@@ -1,9 +1,9 @@
-import {GraphWithP2p, P2pMsg} from "./p2pHandlers.js";
+import {GraphWithP2p, P2pMsg, PeerId} from "./p2pHandlers.js";
 import WebSocket from "isomorphic-ws";
 import {delay, filter, first, fromEvent, map, mergeMap, of, skipWhile, takeUntil, tap} from "rxjs";
 import {deserializer, serializer} from "@end-game/utils/serializer";
 import {chainNext} from "@end-game/rxjs-chain";
-import {GraphId, LogLevel} from "@end-game/graph";
+import {LogLevel} from "@end-game/graph";
 
 
 export type PeerConn = {
@@ -11,7 +11,7 @@ export type PeerConn = {
     close: () => void
 }
 
-type AnnounceMsg = P2pMsg<'announce', { graphId: GraphId }>
+type AnnounceMsg = P2pMsg<'announce', { peerId: PeerId}>
 
 export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
     const isDup = dupMsgCache();
@@ -20,7 +20,7 @@ export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
     peerConn.socket.send(serializer({
         cmd: 'announce',
         data: {
-            graphId: graph.graphId
+            peerId: graph.peerId
         }
     } satisfies AnnounceMsg))
 
@@ -43,7 +43,7 @@ export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
     );
 
     function checkDupConn(msg: AnnounceMsg) {
-        graph.peerConnections.has(msg.data.graphId) ? stopDupConnection() : addNewConnection();
+        graph.peerConnections.has(msg.data.peerId) ? stopDupConnection() : addNewConnection();
 
         function stopDupConnection() {
             peerConn?.close();
@@ -51,7 +51,7 @@ export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
                 graph,
                 item: {
                     code: 'DUPLICATE_CONNECTION',
-                    text: 'Duplicate connection to ' + msg.data.graphId,
+                    text: 'Duplicate connection to ' + msg.data.peerId,
                     level: LogLevel.INFO
                 }
             }).subscribe()
@@ -62,11 +62,11 @@ export const socketManager = (graph: GraphWithP2p, peerConn: PeerConn) => {
                 graph,
                 item: {code: 'NEW_PEER_CONNECTION', text: `New connection`, level: LogLevel.INFO}
             }).subscribe();
-            graph.peerConnections.add(msg.data.graphId);
+            graph.peerConnections.add(msg.data.peerId);
             chainNext(graph.chains.reloadGraph, '').subscribe();
             connOk = true;
             fromEvent(peerConn.socket, 'close').pipe(
-                tap(() => graph.peerConnections.delete(msg.data.graphId)),
+                tap(() => graph.peerConnections.delete(msg.data.peerId)),
                 first()
             ).subscribe()
         }

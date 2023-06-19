@@ -13,7 +13,7 @@ export const Username: React.FC = () => {
 export const renderApp = (graphId: GraphId, Body: React.FC) => {
     const MyApp: React.FC = () => {
         return (
-            <ReactGraph graphId={graphId}>
+            <ReactGraph graphId={graphId} peerId="my-peer">
                 <Body/>
             </ReactGraph>
         )

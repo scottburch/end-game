@@ -5,7 +5,7 @@ import {getNode, asNodeId} from "@end-game/graph";
 import {expect} from "chai";
 
 
-describe('p2p performance', () => {
+describe('p2p performance', function()  {
     it('should perform well', () => {
         let start: number;
         const count = 1000;

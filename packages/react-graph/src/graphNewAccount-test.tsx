@@ -2,11 +2,12 @@ import * as React from 'react'
 import {renderApp} from "./test/reactTestUtils.jsx";
 import {useGraphNodesByProp, useNewAccount} from "./react-graph.jsx";
 import {asGraphId} from "@end-game/graph";
+import {asPeerId} from "@end-game/p2p";
 
 
 
 
-renderApp(asGraphId('test-graph'), () => {
+renderApp(asGraphId('test-graph'), asPeerId('my-peer'), () => {
     const newAccount = useNewAccount();
     const acc = useGraphNodesByProp('auth', 'username', 'scott');
 

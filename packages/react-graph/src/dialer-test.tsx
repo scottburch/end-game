@@ -1,9 +1,11 @@
 import React, {useEffect} from "react";
 import {renderApp} from "./test/reactTestUtils.jsx";
 import {useDialer, useGraphNodesByLabel} from "./react-graph.jsx";
+import {asGraphId} from "@end-game/graph";
+import {asPeerId} from "@end-game/p2p";
 
 
-renderApp('test-graph', () => {
+renderApp(asGraphId('test-graph'), asPeerId('my-peer'), () => {
     const dial = useDialer();
     const nodes = useGraphNodesByLabel('thing');
 
