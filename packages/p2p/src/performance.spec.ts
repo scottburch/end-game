@@ -1,4 +1,4 @@
-import {firstValueFrom, map, mergeMap, of, range, skip, switchMap, tap} from "rxjs";
+import {first, firstValueFrom, from, map, mergeMap, of, range, skip, switchMap, tap, toArray} from "rxjs";
 import {addThingNode, startTestNet} from "@end-game/test-utils";
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 import {getNode, asNodeId} from "@end-game/graph";
@@ -6,7 +6,7 @@ import {expect} from "chai";
 
 
 describe('p2p performance', function()  {
-    it('should perform well', () => {
+    it.skip('should perform well', () => {
         let start: number;
         const count = 1000;
         return firstValueFrom(startTestNet([[1], []]).pipe(

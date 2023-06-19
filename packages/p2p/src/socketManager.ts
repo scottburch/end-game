@@ -4,7 +4,7 @@ import {delay, filter, first, fromEvent, map, mergeMap, of, skipWhile, takeUntil
 import {deserializer, serializer} from "@end-game/utils/serializer";
 import {chainNext} from "@end-game/rxjs-chain";
 import {LogLevel} from "@end-game/graph";
-import {Dialer, P2pMsg} from "./dialer.js";
+import {Dialer, DialerMsg, P2pMsg} from "./dialer.js";
 
 
 export type PeerConn = {
@@ -19,16 +19,22 @@ export const socketManager = (dialer: Dialer, peerConn: PeerConn) => {
     let connOk = false;
 
     peerConn.socket.send(serializer({
-        cmd: 'announce',
-        data: {
-            peerId: dialer.peerId
+        graphId: '',
+        msg: {
+            cmd: 'announce',
+            data: {
+                peerId: dialer.peerId
+            }
         }
-    } satisfies AnnounceMsg))
+    } satisfies DialerMsg<AnnounceMsg>))
 
     dialer.graph.chains.peersOut.pipe(
         skipWhile(() => !connOk),
         takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
-        map(({msg}) => serializer(msg)),
+        map(({msg}) => serializer({
+            graphId: dialer.graph.graphId,
+            msg
+        } satisfies DialerMsg)),
         filter(msg => !isDup(msg)),
         tap(msg => peerConn.socket.send(msg))
     ).subscribe();
@@ -37,10 +43,10 @@ export const socketManager = (dialer: Dialer, peerConn: PeerConn) => {
         takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
         map(ev => ev.data),
         filter(msg => !isDup(msg)),
-        map(msg => deserializer<P2pMsg>(msg)),
-        tap(msg => msg.cmd === 'announce' && checkDupConn(msg as AnnounceMsg)),
+        map(msg => deserializer<DialerMsg<P2pMsg>>(msg)),
+        tap(msg => msg.msg.cmd === 'announce' && checkDupConn(msg.msg as AnnounceMsg)),
         skipWhile(() => !connOk),
-        mergeMap(msg => chainNext(dialer.graph.chains.peerIn, {graph: dialer.graph, msg})),
+        mergeMap(msg => chainNext(dialer.graph.chains.peerIn, {graph: dialer.graph, msg: msg.msg})),
     );
 
     function checkDupConn(msg: AnnounceMsg) {

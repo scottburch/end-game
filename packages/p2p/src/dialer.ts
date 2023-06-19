@@ -19,9 +19,10 @@ export type P2pMsg<Cmd extends string = string, Data extends Object = Object> = 
     data: Data
 };
 
-export type DialerMsg = {
+// TODO: Wrap messages in a DialerMsg
+export type DialerMsg<T extends P2pMsg = P2pMsg> = {
     graphId: GraphId,
-    msg: P2pMsg
+    msg: T
 }
 
 export const newDialer = (graph: GraphWithP2p, peerId: PeerId) => ({graph, peerId} satisfies Dialer);
