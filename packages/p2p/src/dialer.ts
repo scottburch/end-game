@@ -9,8 +9,13 @@ export type DialerOpts = {
     redialInterval?: number
 }
 
+export type Dialer = {
+    graph: GraphWithP2p
+}
 
-export const dialPeer = (graph: Graph, opts: DialerOpts) =>
+export const newDialer = (graph: GraphWithP2p) => ({graph});
+
+export const dialPeer = (dialer: Dialer, opts: DialerOpts) =>
     new Observable<{graph: Graph}>(subscriber => {
         let stopping = false;
         let peerConn: PeerConn;
@@ -26,7 +31,7 @@ export const dialPeer = (graph: Graph, opts: DialerOpts) =>
                 }};
 
             const openSub = fromEvent<WebSocket.Event>(peerConn.socket, 'open').pipe(
-                switchMap(() => socketManager(graph as GraphWithP2p, peerConn))
+                switchMap(() => socketManager(dialer.graph, peerConn))
             ).subscribe();
 
             const closeSub = fromEvent<WebSocket.CloseEvent>(peerConn.socket, 'close').pipe(
@@ -46,7 +51,7 @@ export const dialPeer = (graph: Graph, opts: DialerOpts) =>
 
         const redial = () => setTimeout(dial, (opts.redialInterval || 30) * 1000);
 
-        subscriber.next({graph});
+        subscriber.next({graph: dialer.graph});
 
         return () => peerConn?.close()
     });

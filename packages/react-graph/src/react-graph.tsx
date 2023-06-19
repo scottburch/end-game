@@ -26,7 +26,8 @@ import type {GraphWithAuth} from '@end-game/pwd-auth'
 import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 import {newNode} from "@end-game/graph";
 import {levelStoreHandlers} from "@end-game/level-store";
-import {asPeerId, dialPeer, p2pHandlers} from "@end-game/p2p";
+import type {GraphWithP2p} from '@end-game/p2p'
+import {asPeerId, dialPeer, newDialer, p2pHandlers} from "@end-game/p2p";
 import type {DialerOpts} from "@end-game/p2p";
 import type {GraphHandlerProps} from "@end-game/graph";
 
@@ -37,7 +38,7 @@ export const useGraph = () => useContext(GraphContext);
 
 export const useDialer = () => {
     const graph = useGraph();
-    return (opts: DialerOpts) => dialPeer(graph, opts);
+    return (opts: DialerOpts) => dialPeer(newDialer(graph as GraphWithP2p), opts);
 }
 
 export const useAuth = () =>  {

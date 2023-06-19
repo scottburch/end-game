@@ -3,7 +3,8 @@ import {filter, firstValueFrom, map, of, Subscription, switchMap, tap} from "rxj
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 import {getRelationships, putEdge, newGraphEdge, nodesByLabel, nodesByProp, asNodeId, asEdgeId} from "@end-game/graph";
 import {expect} from "chai";
-import {dialPeer} from "./dialer.js";
+import {dialPeer, newDialer} from "./dialer.js";
+import {GraphWithP2p} from "./p2pHandlers.js";
 
 describe('end-to-end testing', () => {
     it('should handle basic auth and updating across peers', () =>
@@ -60,8 +61,8 @@ describe('end-to-end testing', () => {
                 switchMap(() => graphAuth(node1, 'todd', 'pass')),
                 switchMap(() => addThingNode(node0, 1)),
                 tap(() => setTimeout(() => {
-                    peer0Sub = dialPeer(node0, {url: 'ws://localhost:11112'}).subscribe();
-                    peer1Sub = dialPeer(node1, {url: 'ws://localhost:11112'}).subscribe();
+                    peer0Sub = dialPeer(newDialer(node0 as GraphWithP2p), {url: 'ws://localhost:11112'}).subscribe();
+                    peer1Sub = dialPeer(newDialer(node1 as GraphWithP2p), {url: 'ws://localhost:11112'}).subscribe();
                 })),
                 switchMap(() => nodesByLabel(node1, 'thing')),
                 map(({nodes}) => nodes),
@@ -88,8 +89,8 @@ describe('end-to-end testing', () => {
                 switchMap(() => graphAuth(node1, 'todd', 'pass')),
                 switchMap(() => addThingNode(node0, 1)),
                 tap(() => setTimeout(() => {
-                    peer0Sub = dialPeer(node0, {url: 'ws://localhost:11112'}).subscribe();
-                    peer1Sub = dialPeer(node1, {url: 'ws://localhost:11112'}).subscribe();
+                    peer0Sub = dialPeer(newDialer(node0 as GraphWithP2p), {url: 'ws://localhost:11112'}).subscribe();
+                    peer1Sub = dialPeer(newDialer(node1 as GraphWithP2p), {url: 'ws://localhost:11112'}).subscribe();
                 })),
                 switchMap(() => nodesByProp(node1, 'thing', 'name', 'thing1')),
                 map(({nodes}) => nodes),
