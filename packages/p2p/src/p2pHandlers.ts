@@ -14,6 +14,7 @@ import {
 } from "@end-game/graph";
 
 import ld from "lodash";
+import {P2pMsg} from "./dialer.js";
 
 export type PeerId = string & {type: 'peerId'};
 
@@ -24,10 +25,6 @@ export type P2pOpts = {
 
 export const asPeerId = (peerId: string) => peerId as PeerId;
 
-export type P2pGraphMsg<Cmd extends string = string, Data extends Object = Object> = {
-    cmd: Cmd,
-    data: Data
-};
 
 export type GraphP2pHandler<T extends keyof GraphWithP2p['chains']> = RxjsChainFn<GraphWithP2p['chains'][T]['type']>
 
@@ -35,8 +32,8 @@ export type GraphP2pHandler<T extends keyof GraphWithP2p['chains']> = RxjsChainF
 export type GraphWithP2p = Graph & {
     peerConnections: Set<PeerId>
     chains: Graph['chains'] & {
-        peerIn: RxjsChain<{ graph: Graph, msg: P2pGraphMsg }>
-        peersOut: RxjsChain<{ graph: Graph, msg: P2pGraphMsg }>
+        peerIn: RxjsChain<{ graph: Graph, msg: P2pMsg }>
+        peersOut: RxjsChain<{ graph: Graph, msg: P2pMsg }>
     }
 }
 
@@ -151,20 +148,20 @@ const peerInHandler: GraphP2pHandler<'peerIn'> = ({graph, msg}) =>
     )
 
 
-const doPutNodeIn = (graph: Graph, msg: P2pGraphMsg) =>
-    of(msg as P2pGraphMsg<'putNode', GraphNode>).pipe(
+const doPutNodeIn = (graph: Graph, msg: P2pMsg) =>
+    of(msg as P2pMsg<'putNode', GraphNode>).pipe(
         switchMap(msg => putNode(graph, msg.data))
     );
 
-const doPutEdgeIn = (graph: Graph, msg: P2pGraphMsg) =>
-    of(msg as P2pGraphMsg<'putEdge', GraphEdge>).pipe(
+const doPutEdgeIn = (graph: Graph, msg: P2pMsg) =>
+    of(msg as P2pMsg<'putEdge', GraphEdge>).pipe(
         switchMap(msg =>
             putEdge(graph, msg.data)
         )
     );
 
-const doGetNodeIn = (graph: Graph, msg: P2pGraphMsg) =>
-    of(msg as P2pGraphMsg<'getNode', NodeId>).pipe(
+const doGetNodeIn = (graph: Graph, msg: P2pMsg) =>
+    of(msg as P2pMsg<'getNode', NodeId>).pipe(
         switchMap(msg => getNode(graph, msg.data, {})),
         tap(({node}) => node?.nodeId && chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,
@@ -172,8 +169,8 @@ const doGetNodeIn = (graph: Graph, msg: P2pGraphMsg) =>
         }).subscribe())
     );
 
-const doGetRelationshipsIn = (graph: Graph, msg: P2pGraphMsg) =>
-    of(msg as P2pGraphMsg<'getRelationships', { nodeId: NodeId, rel: string, reverse: boolean, relationships: [] }>).pipe(
+const doGetRelationshipsIn = (graph: Graph, msg: P2pMsg) =>
+    of(msg as P2pMsg<'getRelationships', { nodeId: NodeId, rel: string, reverse: boolean, relationships: [] }>).pipe(
         switchMap(msg => getRelationships(graph, msg.data.nodeId, msg.data.rel, {reverse: msg.data.reverse}).pipe(
             map(({relationships}) => ({relationships, msg}))
         )),
@@ -189,8 +186,8 @@ const doGetRelationshipsIn = (graph: Graph, msg: P2pGraphMsg) =>
         ))
     );
 
-const doGetNodesByLabel = (graph: Graph, msg: P2pGraphMsg) =>
-    of(msg as P2pGraphMsg<'nodesByLabel', {label: string, opts: RangeOpts}>).pipe(
+const doGetNodesByLabel = (graph: Graph, msg: P2pMsg) =>
+    of(msg as P2pMsg<'nodesByLabel', {label: string, opts: RangeOpts}>).pipe(
         switchMap(msg => nodesByLabel(graph, msg.data.label, msg.data.opts)),
         switchMap(({nodes}) => from(nodes)),
         switchMap(node => chainNext((graph as GraphWithP2p).chains.peersOut, {
@@ -199,8 +196,8 @@ const doGetNodesByLabel = (graph: Graph, msg: P2pGraphMsg) =>
         })),
     );
 
-const doGetNodesByProp = (graph: Graph, msg: P2pGraphMsg) =>
-    of(msg as P2pGraphMsg<'nodesByProp', {label: string, key: string, value: string}>).pipe(
+const doGetNodesByProp = (graph: Graph, msg: P2pMsg) =>
+    of(msg as P2pMsg<'nodesByProp', {label: string, key: string, value: string}>).pipe(
         switchMap(msg => nodesByProp(graph, msg.data.label, msg.data.key, msg.data.value)),
         switchMap(({nodes}) => from(nodes)),
         switchMap(node => chainNext((graph as GraphWithP2p).chains.peersOut, {
@@ -210,8 +207,8 @@ const doGetNodesByProp = (graph: Graph, msg: P2pGraphMsg) =>
 
     )
 
-const doGetEdgeIn = (graph: Graph, msg: P2pGraphMsg) =>
-    of(msg as P2pGraphMsg<'getEdge', EdgeId>).pipe(
+const doGetEdgeIn = (graph: Graph, msg: P2pMsg) =>
+    of(msg as P2pMsg<'getEdge', EdgeId>).pipe(
         switchMap(msg => getEdge(graph, msg.data, {})),
         tap(({edge}) => edge?.edgeId && chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,

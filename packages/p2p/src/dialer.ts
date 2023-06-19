@@ -1,4 +1,4 @@
-import {Graph} from "@end-game/graph";
+import {Graph, GraphId} from "@end-game/graph";
 import {first, fromEvent, Observable, switchMap, tap} from "rxjs";
 import WebSocket from "isomorphic-ws";
 import {GraphWithP2p, PeerId} from "./p2pHandlers.js";
@@ -12,6 +12,16 @@ export type DialerOpts = {
 export type Dialer = {
     graph: GraphWithP2p
     peerId: PeerId
+}
+
+export type P2pMsg<Cmd extends string = string, Data extends Object = Object> = {
+    cmd: Cmd,
+    data: Data
+};
+
+export type DialerMsg = {
+    graphId: GraphId,
+    msg: P2pMsg
 }
 
 export const newDialer = (graph: GraphWithP2p, peerId: PeerId) => ({graph, peerId} satisfies Dialer);
