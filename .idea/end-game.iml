@@ -8,6 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/old/core/endgame-db" />
       <excludeFolder url="file://$MODULE_DIR$/old/core/src-old" />
       <excludeFolder url="file://$MODULE_DIR$/packages/auth/pwd-auth/lib" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/p2p/lib" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

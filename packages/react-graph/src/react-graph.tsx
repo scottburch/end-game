@@ -36,9 +36,9 @@ const GraphContext: React.Context<Graph> = createContext({} as Graph);
 
 export const useGraph = () => useContext(GraphContext);
 
-export const useDialer = () => {
+export const useDialer = (peerId: string) => {
     const graph = useGraph();
-    return (opts: DialerOpts) => dialPeer(newDialer(graph as GraphWithP2p), opts);
+    return (opts: DialerOpts) => dialPeer(newDialer(graph as GraphWithP2p, asPeerId(peerId)), opts);
 }
 
 export const useAuth = () =>  {

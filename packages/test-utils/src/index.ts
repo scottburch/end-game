@@ -28,7 +28,7 @@ export const startTestNode = (nodeNo: number, peers: number[] = [], basePort: nu
         switchMap(graph => authHandlers(graph)),
         switchMap(graph => p2pHandlers(graph, {peerId: asPeerId(`peer-${nodeNo}`), listeningPort: basePort + nodeNo})),
         switchMap(graph => peers.length ? from(peers).pipe(
-            mergeMap(peerNo => dialPeer(newDialer(graph as GraphWithP2p), {url: `ws://localhost:${basePort + peerNo}`, redialInterval: 1})),
+            mergeMap(peerNo => dialPeer(newDialer(graph as GraphWithP2p, asPeerId(`peer-${nodeNo}`)), {url: `ws://localhost:${basePort + peerNo}`, redialInterval: 1})),
             skip(peers.length - 1)
         ) : of({graph}))
     );
