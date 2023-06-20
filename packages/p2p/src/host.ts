@@ -1,6 +1,6 @@
 import {GraphWithP2p, PeerId} from "./p2pHandlers.js";
 import {Subject} from "rxjs";
-import {LogLevel, NodeId} from "@end-game/graph";
+import {LogLevel} from "@end-game/graph";
 
 export type LogEntry = {
     code: string,
