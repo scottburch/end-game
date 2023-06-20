@@ -12,7 +12,7 @@ export type PeerConn = {
     close: () => void
 }
 
-type AnnounceMsg = P2pMsg<'announce', { peerId: PeerId}>
+type AnnounceMsg = P2pMsg<'announce', { hostId: PeerId}>
 
 export const socketManager = (dialer: Dialer, peerConn: PeerConn) => {
     const isDup = dupMsgCache();
@@ -23,7 +23,7 @@ export const socketManager = (dialer: Dialer, peerConn: PeerConn) => {
         msg: {
             cmd: 'announce',
             data: {
-                peerId: dialer.peerId
+                hostId: dialer.peerId
             }
         }
     } satisfies DialerMsg<AnnounceMsg>))
@@ -50,7 +50,7 @@ export const socketManager = (dialer: Dialer, peerConn: PeerConn) => {
     );
 
     function checkDupConn(msg: AnnounceMsg) {
-        dialer.graph.peerConnections.has(msg.data.peerId) ? stopDupConnection() : addNewConnection();
+        dialer.graph.peerConnections.has(msg.data.hostId) ? stopDupConnection() : addNewConnection();
 
         function stopDupConnection() {
             peerConn?.close();
@@ -58,7 +58,7 @@ export const socketManager = (dialer: Dialer, peerConn: PeerConn) => {
                 graph: dialer.graph,
                 item: {
                     code: 'DUPLICATE_CONNECTION',
-                    text: 'Duplicate connection to ' + msg.data.peerId,
+                    text: 'Duplicate connection to ' + msg.data.hostId,
                     level: LogLevel.INFO
                 }
             }).subscribe()
@@ -69,11 +69,11 @@ export const socketManager = (dialer: Dialer, peerConn: PeerConn) => {
                 graph: dialer.graph,
                 item: {code: 'NEW_PEER_CONNECTION', text: `New connection`, level: LogLevel.INFO}
             }).subscribe();
-            dialer.graph.peerConnections.add(msg.data.peerId);
+            dialer.graph.peerConnections.add(msg.data.hostId);
             chainNext(dialer.graph.chains.reloadGraph, '').subscribe();
             connOk = true;
             fromEvent(peerConn.socket, 'close').pipe(
-                tap(() => dialer.graph.peerConnections.delete(msg.data.peerId)),
+                tap(() => dialer.graph.peerConnections.delete(msg.data.hostId)),
                 first()
             ).subscribe()
         }
