@@ -110,17 +110,17 @@ describe('p2p handlers', () => {
     describe('full network tests', () => {
         it('should send a putNode to a remote peer', () =>
             firstValueFrom(startTestNet([[1], []]).pipe(
-                switchMap(({node0, node1}) => of({node0, node1}).pipe(
+                switchMap(({host0, host1}) => of(undefined).pipe(
                     tap(() => timer(1).pipe(
-                        switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
-                        switchMap(() => graphAuth(node0, 'scott', 'pass')),
-                        switchMap(() => putNode(node0, newNode(asNodeId('thing1'), 'thing', {name: 'thing1'}))),
+                        switchMap(() => graphNewAuth(host0.graphs[0], 'scott', 'pass')),
+                        switchMap(() => graphAuth(host0.graphs[0], 'scott', 'pass')),
+                        switchMap(() => putNode(host0.graphs[0], newNode(asNodeId('thing1'), 'thing', {name: 'thing1'}))),
                     ).subscribe()),
 
-                    switchMap(() => nodesByLabel(node1, 'auth')),
+                    switchMap(() => nodesByLabel(host1.graphs[0], 'auth')),
                     filter(({nodes}) => !!nodes.length),
 
-                    switchMap(() => nodesByLabel(node1, 'thing')),
+                    switchMap(() => nodesByLabel(host1.graphs[0], 'thing')),
                     filter(({nodes}) => !!nodes.length),
                 )),
             ))
@@ -128,33 +128,26 @@ describe('p2p handlers', () => {
 
         it('should send a putNode to more than one remote peer', () =>
             firstValueFrom(startTestNet([[1, 2, 3, 4, 5], [], [], [], [], []]).pipe(
-                switchMap(({node0, node1, node2, node3, node4, node5}) => of({
-                    node0,
-                    node1,
-                    node2,
-                    node3,
-                    node4,
-                    node5
-                }).pipe(
+                switchMap(({host0, host1, host2, host3, host4, host5}) => of(undefined).pipe(
                     tap(() => timer(1).pipe(
-                        switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
-                        switchMap(() => graphAuth(node0, 'scott', 'pass')),
-                        switchMap(() => putNode(node0, newNode(asNodeId('thing1'), 'thing', {name: 'thing1'}))),
+                        switchMap(() => graphNewAuth(host0.graphs[0], 'scott', 'pass')),
+                        switchMap(() => graphAuth(host0.graphs[0], 'scott', 'pass')),
+                        switchMap(() => putNode(host0.graphs[0], newNode(asNodeId('thing1'), 'thing', {name: 'thing1'}))),
                     ).subscribe()),
 
-                    switchMap(() => nodesByLabel(node1, 'auth')),
+                    switchMap(() => nodesByLabel(host1.graphs[0], 'auth')),
                     filter(({nodes}) => !!nodes.length),
 
-                    switchMap(() => nodesByLabel(node2, 'thing')),
+                    switchMap(() => nodesByLabel(host2.graphs[0], 'thing')),
                     filter(({nodes}) => !!nodes.length),
 
-                    switchMap(() => nodesByLabel(node3, 'thing')),
+                    switchMap(() => nodesByLabel(host3.graphs[0], 'thing')),
                     filter(({nodes}) => !!nodes.length),
 
-                    switchMap(() => nodesByLabel(node4, 'thing')),
+                    switchMap(() => nodesByLabel(host4.graphs[0], 'thing')),
                     filter(({nodes}) => !!nodes.length),
 
-                    switchMap(() => nodesByLabel(node5, 'thing')),
+                    switchMap(() => nodesByLabel(host5.graphs[0], 'thing')),
                     filter(({nodes}) => !!nodes.length),
                 )),
             ))
@@ -163,23 +156,23 @@ describe('p2p handlers', () => {
 
         it('should send a putNode through a middle peer', () =>
             firstValueFrom(startTestNet([[1], [2], []]).pipe(
-                switchMap(({node0, node1, node2}) => of({node0, node1, node2}).pipe(
+                switchMap(({host0, host1, host2}) => of(undefined).pipe(
                     tap(() => timer(1).pipe(
-                        switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
-                        switchMap(() => graphAuth(node0, 'scott', 'pass')),
-                        switchMap(() => putNode(node0, newNode(asNodeId('thing1'), 'thing', {name: 'thing1'})))
+                        switchMap(() => graphNewAuth(host0.graphs[0], 'scott', 'pass')),
+                        switchMap(() => graphAuth(host0.graphs[0], 'scott', 'pass')),
+                        switchMap(() => putNode(host0.graphs[0], newNode(asNodeId('thing1'), 'thing', {name: 'thing1'})))
                     ).subscribe()),
 
-                    switchMap(() => nodesByLabel(node1, 'auth')),
+                    switchMap(() => nodesByLabel(host1.graphs[0], 'auth')),
                     filter(({nodes}) => !!nodes.length),
 
-                    switchMap(() => nodesByLabel(node1, 'thing')),
+                    switchMap(() => nodesByLabel(host1.graphs[0], 'thing')),
                     filter(({nodes}) => !!nodes.length),
 
-                    switchMap(() => nodesByLabel(node2, 'auth')),
+                    switchMap(() => nodesByLabel(host2.graphs[0], 'auth')),
                     filter(({nodes}) => !!nodes.length),
 
-                    switchMap(() => nodesByLabel(node2, 'thing')),
+                    switchMap(() => nodesByLabel(host2.graphs[0], 'thing')),
                     filter(({nodes}) => !!nodes.length),
                 )),
             ))
@@ -189,20 +182,20 @@ describe('p2p handlers', () => {
             this.timeout(15000);
             const COUNT = 20;
             return firstValueFrom(startTestNet([[1], []]).pipe(
-                switchMap(({node0, node1}) => of({node0, node1}).pipe(
+                switchMap(({host0, host1}) => of(undefined).pipe(
                     tap(() => timer(1).pipe(
-                        switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
-                        switchMap(() => graphAuth(node0, 'scott', 'pass')),
+                        switchMap(() => graphNewAuth(host0.graphs[0], 'scott', 'pass')),
+                        switchMap(() => graphAuth(host0.graphs[0], 'scott', 'pass')),
                         tap(() => (global as any).start = Date.now()),
                         switchMap(() => range(1, COUNT).pipe(
-                            mergeMap(idx => putNode(node0, newNode(asNodeId(`thing${idx}`), 'thing', {name: `thing${idx}`})))
+                            mergeMap(idx => putNode(host0.graphs[0], newNode(asNodeId(`thing${idx}`), 'thing', {name: `thing${idx}`})))
                         )),
                     ).subscribe()),
 
-                    switchMap(() => nodesByLabel(node1, 'auth')),
+                    switchMap(() => nodesByLabel(host1.graphs[0], 'auth')),
                     filter(({nodes}) => !!nodes.length),
 
-                    switchMap(() => nodesByLabel(node1, 'thing')),
+                    switchMap(() => nodesByLabel(host1.graphs[0], 'thing')),
                     filter(({nodes}) => nodes.length === COUNT),
                     tap(() => console.log(Date.now() - (global as any).start))
                 )),

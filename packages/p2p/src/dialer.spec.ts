@@ -38,9 +38,9 @@ describe("dialer", () => {
 
     it('should reject duplicate connections', () =>
         firstValueFrom(startTestNet([[1], [0]]).pipe(
-            switchMap(({node0, node1}) => merge(
-                node0.chains.log,
-                node1.chains.log
+            switchMap(({host0, host1}) => merge(
+                host0.graphs[0].chains.log,
+                host1.graphs[0].chains.log
             )),
             filter(({item}) => item.code === 'DUPLICATE_CONNECTION'),
             take(2)

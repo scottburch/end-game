@@ -9,13 +9,13 @@ import {asPeerId, GraphWithP2p} from "./p2pHandlers.js";
 describe('end-to-end testing', () => {
     it('should handle basic auth and updating across peers', () =>
         firstValueFrom(startTestNet([[2], [2], []]).pipe(
-            switchMap(({node0, node1}) => of(undefined).pipe(
-                switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
-                switchMap(() => graphAuth(node0, 'scott', 'pass')),
-                switchMap(() => graphNewAuth(node1, 'todd', 'pass')),
-                switchMap(() => graphAuth(node1, 'todd', 'pass')),
-                switchMap(() => addThingNode(node0, 1)),
-                switchMap(() => nodesByLabel(node1, 'thing')),
+            switchMap(({host0, host1}) => of(undefined).pipe(
+                switchMap(() => graphNewAuth(host0.graphs[0], 'scott', 'pass')),
+                switchMap(() => graphAuth(host0.graphs[0], 'scott', 'pass')),
+                switchMap(() => graphNewAuth(host1.graphs[0], 'todd', 'pass')),
+                switchMap(() => graphAuth(host1.graphs[0], 'todd', 'pass')),
+                switchMap(() => addThingNode(host0.graphs[0], 1)),
+                switchMap(() => nodesByLabel(host1.graphs[0], 'thing')),
                 map(({nodes}) => nodes),
                 filter(nodes => !!nodes.length),
                 tap(([node]) => {
@@ -29,15 +29,15 @@ describe('end-to-end testing', () => {
 
     it('should handle sending edges between peers', () =>
         firstValueFrom(startTestNet([[2], [2], []]).pipe(
-            switchMap(({node0, node1}) => of(undefined).pipe(
-                switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
-                switchMap(() => graphAuth(node0, 'scott', 'pass')),
-                switchMap(() => graphNewAuth(node1, 'todd', 'pass')),
-                switchMap(() => graphAuth(node1, 'todd', 'pass')),
-                switchMap(() => addThingNode(node0, 1)),
-                switchMap(() => addThingNode(node0, 2)),
-                switchMap(() => putEdge(node0, newGraphEdge(asEdgeId('e1'), 'friend', asNodeId('thing1') , asNodeId('thing2') , {}))),
-                switchMap(() => getRelationships(node1, asNodeId('thing1') , 'friend')),
+            switchMap(({host0, host1}) => of(undefined).pipe(
+                switchMap(() => graphNewAuth(host0.graphs[0], 'scott', 'pass')),
+                switchMap(() => graphAuth(host0.graphs[0], 'scott', 'pass')),
+                switchMap(() => graphNewAuth(host1.graphs[0], 'todd', 'pass')),
+                switchMap(() => graphAuth(host1.graphs[0], 'todd', 'pass')),
+                switchMap(() => addThingNode(host0.graphs[0], 1)),
+                switchMap(() => addThingNode(host0.graphs[0], 2)),
+                switchMap(() => putEdge(host0.graphs[0], newGraphEdge(asEdgeId('e1'), 'friend', asNodeId('thing1') , asNodeId('thing2') , {}))),
+                switchMap(() => getRelationships(host1.graphs[0], asNodeId('thing1') , 'friend')),
                 map(({relationships}) => relationships),
                 filter(relationships => !!relationships.length),
                 tap(relationships => expect(relationships).to.deep.equal([{
@@ -54,17 +54,17 @@ describe('end-to-end testing', () => {
         let peer1Sub: Subscription;
 
         return firstValueFrom(startTestNet([[], [], []]).pipe(
-            switchMap(({node0, node1}) => of(undefined).pipe(
-                switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
-                switchMap(() => graphAuth(node0, 'scott', 'pass')),
-                switchMap(() => graphNewAuth(node1, 'todd', 'pass')),
-                switchMap(() => graphAuth(node1, 'todd', 'pass')),
-                switchMap(() => addThingNode(node0, 1)),
+            switchMap(({host0, host1}) => of(undefined).pipe(
+                switchMap(() => graphNewAuth(host0.graphs[0], 'scott', 'pass')),
+                switchMap(() => graphAuth(host0.graphs[0], 'scott', 'pass')),
+                switchMap(() => graphNewAuth(host1.graphs[0], 'todd', 'pass')),
+                switchMap(() => graphAuth(host1.graphs[0], 'todd', 'pass')),
+                switchMap(() => addThingNode(host0.graphs[0], 1)),
                 tap(() => setTimeout(() => {
-                    peer0Sub = dialPeer(newDialer(node0 as GraphWithP2p, asPeerId('peer0')), {url: 'ws://localhost:11112'}).subscribe();
-                    peer1Sub = dialPeer(newDialer(node1 as GraphWithP2p, asPeerId('peer1')), {url: 'ws://localhost:11112'}).subscribe();
+                    peer0Sub = dialPeer(newDialer(host0.graphs[0] as GraphWithP2p, asPeerId('peer0')), {url: 'ws://localhost:11112'}).subscribe();
+                    peer1Sub = dialPeer(newDialer(host1.graphs[0] as GraphWithP2p, asPeerId('peer1')), {url: 'ws://localhost:11112'}).subscribe();
                 })),
-                switchMap(() => nodesByLabel(node1, 'thing')),
+                switchMap(() => nodesByLabel(host1.graphs[0], 'thing')),
                 map(({nodes}) => nodes),
                 filter(nodes => !!nodes.length),
                 tap(([node]) => {
@@ -82,17 +82,17 @@ describe('end-to-end testing', () => {
         let peer0Sub: Subscription;
         let peer1Sub: Subscription;
         return firstValueFrom(startTestNet([[], [], []]).pipe(
-            switchMap(({node0, node1}) => of(undefined).pipe(
-                switchMap(() => graphNewAuth(node0, 'scott', 'pass')),
-                switchMap(() => graphAuth(node0, 'scott', 'pass')),
-                switchMap(() => graphNewAuth(node1, 'todd', 'pass')),
-                switchMap(() => graphAuth(node1, 'todd', 'pass')),
-                switchMap(() => addThingNode(node0, 1)),
+            switchMap(({host0, host1}) => of(undefined).pipe(
+                switchMap(() => graphNewAuth(host0.graphs[0], 'scott', 'pass')),
+                switchMap(() => graphAuth(host0.graphs[0], 'scott', 'pass')),
+                switchMap(() => graphNewAuth(host1.graphs[0], 'todd', 'pass')),
+                switchMap(() => graphAuth(host1.graphs[0], 'todd', 'pass')),
+                switchMap(() => addThingNode(host0.graphs[0], 1)),
                 tap(() => setTimeout(() => {
-                    peer0Sub = dialPeer(newDialer(node0 as GraphWithP2p, asPeerId('peer-0')), {url: 'ws://localhost:11112'}).subscribe();
-                    peer1Sub = dialPeer(newDialer(node1 as GraphWithP2p, asPeerId('peer-1')), {url: 'ws://localhost:11112'}).subscribe();
+                    peer0Sub = dialPeer(newDialer(host0.graphs[0] as GraphWithP2p, asPeerId('peer-0')), {url: 'ws://localhost:11112'}).subscribe();
+                    peer1Sub = dialPeer(newDialer(host1.graphs[0] as GraphWithP2p, asPeerId('peer-1')), {url: 'ws://localhost:11112'}).subscribe();
                 })),
-                switchMap(() => nodesByProp(node1, 'thing', 'name', 'thing1')),
+                switchMap(() => nodesByProp(host1.graphs[0], 'thing', 'name', 'thing1')),
                 map(({nodes}) => nodes),
                 filter(nodes => !!nodes.length),
                 tap(([node]) => {
