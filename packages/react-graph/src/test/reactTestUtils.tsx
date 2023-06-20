@@ -10,12 +10,12 @@ export const Username: React.FC = () => {
     return <div id="username">{auth.username}</div>;
 };
 
-export const renderApp = (graphId: GraphId, peerId: PeerId, Body: React.FC) => {
+export const renderApp = (graphId: GraphId, hostId: PeerId, Body: React.FC) => {
     const MyApp: React.FC = () => {
         return (
             <>
             <React.StrictMode>
-            <ReactGraph graphId={graphId} peerId={peerId}>
+            <ReactGraph graphId={graphId} hostId={hostId}>
                 <Body/>
             </ReactGraph>
             </React.StrictMode>

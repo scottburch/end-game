@@ -175,13 +175,13 @@ export const useGraphPutEdge = <T extends Props>() => {
     }
 }
 
-export type ReactGraphOpts =  {
+export type ReactGraphProps =  {
     graphId: string
     persistent?: boolean
-    peerId: string
+    hostId: string
 }
 
-export const ReactGraph: React.FC<PropsWithChildren<ReactGraphOpts>> = (props) => {
+export const ReactGraph: React.FC<PropsWithChildren<ReactGraphProps>> = (props) => {
     const [myGraph, setMyGraph] = useState<Graph>();
 
 
