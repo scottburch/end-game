@@ -3,6 +3,7 @@ import {first, fromEvent, Observable, switchMap, tap} from "rxjs";
 import WebSocket from "isomorphic-ws";
 import {GraphWithP2p, PeerId} from "./p2pHandlers.js";
 import {PeerConn, socketManager} from "./socketManager.js";
+import {Host} from "./host.js";
 
 export type DialerOpts = {
     url: string
@@ -19,7 +20,6 @@ export type P2pMsg<Cmd extends string = string, Data extends Object = Object> = 
     data: Data
 };
 
-// TODO: Wrap messages in a DialerMsg
 export type DialerMsg<T extends P2pMsg = P2pMsg> = {
     graphId: GraphId,
     msg: T
@@ -27,7 +27,7 @@ export type DialerMsg<T extends P2pMsg = P2pMsg> = {
 
 export const newDialer = (graph: GraphWithP2p, peerId: PeerId) => ({graph, peerId} satisfies Dialer);
 
-export const dialPeer = (dialer: Dialer, opts: DialerOpts) =>
+export const dialPeer = (host: Host, opts: DialerOpts) =>
     new Observable<{graph: Graph}>(subscriber => {
         let stopping = false;
         let peerConn: PeerConn;
@@ -43,7 +43,7 @@ export const dialPeer = (dialer: Dialer, opts: DialerOpts) =>
                 }};
 
             const openSub = fromEvent<WebSocket.Event>(peerConn.socket, 'open').pipe(
-                switchMap(() => socketManager(dialer, peerConn))
+                switchMap(() => socketManager(newDialer(host.graphs[0], host.hostId), peerConn))
             ).subscribe();
 
             const closeSub = fromEvent<WebSocket.CloseEvent>(peerConn.socket, 'close').pipe(
@@ -63,7 +63,7 @@ export const dialPeer = (dialer: Dialer, opts: DialerOpts) =>
 
         const redial = () => setTimeout(dial, (opts.redialInterval || 30) * 1000);
 
-        subscriber.next({graph: dialer.graph});
+        subscriber.next({graph: host.graphs[0]});
 
         return () => peerConn?.close()
     });

@@ -3,8 +3,7 @@ import {filter, firstValueFrom, map, of, Subscription, switchMap, tap} from "rxj
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 import {getRelationships, putEdge, newGraphEdge, nodesByLabel, nodesByProp, asNodeId, asEdgeId} from "@end-game/graph";
 import {expect} from "chai";
-import {dialPeer, newDialer} from "./dialer.js";
-import {asPeerId, GraphWithP2p} from "./p2pHandlers.js";
+import {dialPeer} from "./dialer.js";
 
 describe('end-to-end testing', () => {
     it('should handle basic auth and updating across peers', () =>
@@ -61,8 +60,8 @@ describe('end-to-end testing', () => {
                 switchMap(() => graphAuth(host1.graphs[0], 'todd', 'pass')),
                 switchMap(() => addThingNode(host0.graphs[0], 1)),
                 tap(() => setTimeout(() => {
-                    peer0Sub = dialPeer(newDialer(host0.graphs[0] as GraphWithP2p, asPeerId('peer0')), {url: 'ws://localhost:11112'}).subscribe();
-                    peer1Sub = dialPeer(newDialer(host1.graphs[0] as GraphWithP2p, asPeerId('peer1')), {url: 'ws://localhost:11112'}).subscribe();
+                    peer0Sub = dialPeer(host0, {url: 'ws://localhost:11112'}).subscribe();
+                    peer1Sub = dialPeer(host1, {url: 'ws://localhost:11112'}).subscribe();
                 })),
                 switchMap(() => nodesByLabel(host1.graphs[0], 'thing')),
                 map(({nodes}) => nodes),
@@ -89,8 +88,8 @@ describe('end-to-end testing', () => {
                 switchMap(() => graphAuth(host1.graphs[0], 'todd', 'pass')),
                 switchMap(() => addThingNode(host0.graphs[0], 1)),
                 tap(() => setTimeout(() => {
-                    peer0Sub = dialPeer(newDialer(host0.graphs[0] as GraphWithP2p, asPeerId('peer-0')), {url: 'ws://localhost:11112'}).subscribe();
-                    peer1Sub = dialPeer(newDialer(host1.graphs[0] as GraphWithP2p, asPeerId('peer-1')), {url: 'ws://localhost:11112'}).subscribe();
+                    peer0Sub = dialPeer(host0, {url: 'ws://localhost:11112'}).subscribe();
+                    peer1Sub = dialPeer(host1, {url: 'ws://localhost:11112'}).subscribe();
                 })),
                 switchMap(() => nodesByProp(host1.graphs[0], 'thing', 'name', 'thing1')),
                 map(({nodes}) => nodes),
