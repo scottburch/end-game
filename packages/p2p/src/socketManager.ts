@@ -60,7 +60,7 @@ export const socketManager = (host: Host, peerConn: PeerConn) => {
 
     function checkDupConn(msg: AnnounceMsg) {
         // TODO: Move peerConnections to host
-        host.graphs[0].peerConnections.has(msg.data.hostId) ? stopDupConnection() : addNewConnection();
+        host.peerConnections.has(msg.data.hostId) ? stopDupConnection() : addNewConnection();
 
         function stopDupConnection() {
             peerConn?.close();
@@ -73,11 +73,11 @@ export const socketManager = (host: Host, peerConn: PeerConn) => {
 
         function addNewConnection() {
             host.log.next({code: 'NEW_PEER_CONNECTION', text: `New connection`, level: LogLevel.INFO});
-            host.graphs[0].peerConnections.add(msg.data.hostId);
+            host.peerConnections.add(msg.data.hostId);
             host.graphs.forEach(graph => chainNext(graph.chains.reloadGraph, '').subscribe())
             connOk = true;
             fromEvent(peerConn.socket, 'close').pipe(
-                tap(() => host.graphs[0].peerConnections.delete(msg.data.hostId)),
+                tap(() => host.peerConnections.delete(msg.data.hostId)),
                 first()
             ).subscribe()
         }

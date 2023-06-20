@@ -24,7 +24,6 @@ export type GraphP2pHandler<T extends keyof GraphWithP2p['chains']> = RxjsChainF
 
 
 export type GraphWithP2p = Graph & {
-    peerConnections: Set<PeerId>
     chains: Graph['chains'] & {
         peerIn: RxjsChain<{ graph: Graph, msg: P2pMsg }>
         peersOut: RxjsChain<{ graph: Graph, msg: P2pMsg }>
@@ -36,7 +35,6 @@ export type GraphWithP2p = Graph & {
 
 export const p2pHandlers = (graph: Graph) =>
     of(graph as GraphWithP2p).pipe(
-        tap(graph => graph.peerConnections = graph.peerConnections || new Set()),
         tap(addChainsToGraph),
         tap(graph => {
             appendHandler((graph as GraphWithP2p).chains.peerIn, 'p2p', peerInHandler);
