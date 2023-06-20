@@ -3,11 +3,10 @@ import {useGraphLogin, useGraphPutEdge, useGraphRelationships, useNewAccount} fr
 import {renderApp, Username} from "./test/reactTestUtils.jsx";
 import {switchMap} from "rxjs";
 import {asEdgeId, asGraphId, asNodeId} from "@end-game/graph";
-import {asPeerId} from "@end-game/p2p";
 
 let accountCreated = false;
 
-renderApp(asGraphId('test-graph'), asPeerId('my-peer'), () => {
+renderApp(asGraphId('test-graph'), () => {
     const rels = useGraphRelationships(asNodeId('n1'), 'friend', {});
     const [count, setCount] = useState(0);
     const graphPutEdge = useGraphPutEdge();

@@ -1,10 +1,11 @@
-import {PeerId} from "./p2pHandlers.js";
+import {GraphWithP2p, PeerId} from "./p2pHandlers.js";
 import WebSocket from "isomorphic-ws";
 import {delay, filter, first, fromEvent, map, mergeMap, of, skipWhile, takeUntil, tap} from "rxjs";
 import {deserializer, serializer} from "@end-game/utils/serializer";
 import {chainNext} from "@end-game/rxjs-chain";
-import {LogLevel} from "@end-game/graph";
-import {Dialer, DialerMsg, P2pMsg} from "./dialer.js";
+import {GraphId, LogLevel} from "@end-game/graph";
+import {DialerMsg, P2pMsg} from "./dialer.js";
+import {Host} from "./host.js";
 
 
 export type PeerConn = {
@@ -14,30 +15,37 @@ export type PeerConn = {
 
 type AnnounceMsg = P2pMsg<'announce', { hostId: PeerId}>
 
-export const socketManager = (dialer: Dialer, peerConn: PeerConn) => {
+export const socketManager = (host: Host, peerConn: PeerConn) => {
     const isDup = dupMsgCache();
     let connOk = false;
+
+    const graphTable = host.graphs.reduce((table, graph) => ({
+        ...table,
+        [graph.graphId]: graph
+    }), {} as Record<GraphId, GraphWithP2p>)
 
     peerConn.socket.send(serializer({
         graphId: '',
         msg: {
             cmd: 'announce',
             data: {
-                hostId: dialer.peerId
+                hostId: host.hostId
             }
         }
     } satisfies DialerMsg<AnnounceMsg>))
 
-    dialer.graph.chains.peersOut.pipe(
-        skipWhile(() => !connOk),
-        takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
-        map(({msg}) => serializer({
-            graphId: dialer.graph.graphId,
-            msg
-        } satisfies DialerMsg)),
-        filter(msg => !isDup(msg)),
-        tap(msg => peerConn.socket.send(msg))
-    ).subscribe();
+    host.graphs.forEach(graph =>
+        graph.chains.peersOut.pipe(
+            skipWhile(() => !connOk),
+            takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
+            map(({msg}) => serializer({
+                graphId: graph.graphId,
+                msg
+            } satisfies DialerMsg)),
+            filter(msg => !isDup(msg)),
+            tap(msg => peerConn.socket.send(msg))
+        ).subscribe()
+    )
 
     return fromEvent<MessageEvent>(peerConn.socket, 'message').pipe(
         takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
@@ -46,34 +54,30 @@ export const socketManager = (dialer: Dialer, peerConn: PeerConn) => {
         map(msg => deserializer<DialerMsg<P2pMsg>>(msg)),
         tap(msg => msg.msg.cmd === 'announce' && checkDupConn(msg.msg as AnnounceMsg)),
         skipWhile(() => !connOk),
-        mergeMap(msg => chainNext(dialer.graph.chains.peerIn, {graph: dialer.graph, msg: msg.msg})),
+        filter(msg => !!graphTable[msg.graphId]),
+        mergeMap(msg => chainNext(graphTable[msg.graphId].chains.peerIn, {graph: graphTable[msg.graphId], msg: msg.msg})),
     );
 
     function checkDupConn(msg: AnnounceMsg) {
-        dialer.graph.peerConnections.has(msg.data.hostId) ? stopDupConnection() : addNewConnection();
+        // TODO: Move peerConnections to host
+        host.graphs[0].peerConnections.has(msg.data.hostId) ? stopDupConnection() : addNewConnection();
 
         function stopDupConnection() {
             peerConn?.close();
-            chainNext(dialer.graph.chains.log, {
-                graph: dialer.graph,
-                item: {
+            host.log.next({
                     code: 'DUPLICATE_CONNECTION',
                     text: 'Duplicate connection to ' + msg.data.hostId,
                     level: LogLevel.INFO
-                }
-            }).subscribe()
+            })
         }
 
         function addNewConnection() {
-            chainNext(dialer.graph.chains.log, {
-                graph: dialer.graph,
-                item: {code: 'NEW_PEER_CONNECTION', text: `New connection`, level: LogLevel.INFO}
-            }).subscribe();
-            dialer.graph.peerConnections.add(msg.data.hostId);
-            chainNext(dialer.graph.chains.reloadGraph, '').subscribe();
+            host.log.next({code: 'NEW_PEER_CONNECTION', text: `New connection`, level: LogLevel.INFO});
+            host.graphs[0].peerConnections.add(msg.data.hostId);
+            host.graphs.forEach(graph => chainNext(graph.chains.reloadGraph, '').subscribe())
             connOk = true;
             fromEvent(peerConn.socket, 'close').pipe(
-                tap(() => dialer.graph.peerConnections.delete(msg.data.hostId)),
+                tap(() => host.graphs[0].peerConnections.delete(msg.data.hostId)),
                 first()
             ).subscribe()
         }

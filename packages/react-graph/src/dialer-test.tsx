@@ -5,8 +5,8 @@ import {asGraphId} from "@end-game/graph";
 import {asPeerId} from "@end-game/p2p";
 
 
-renderApp(asGraphId('test-graph'), asPeerId('my-peer'), () => {
-    const dial = useDialer();
+renderApp(asGraphId('testnet'), () => {
+    const dial = useDialer(asPeerId('my-peer'));
     const nodes = useGraphNodesByLabel('thing');
 
     useEffect(() => {

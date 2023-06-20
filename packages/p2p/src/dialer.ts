@@ -43,7 +43,7 @@ export const dialPeer = (host: Host, opts: DialerOpts) =>
                 }};
 
             const openSub = fromEvent<WebSocket.Event>(peerConn.socket, 'open').pipe(
-                switchMap(() => socketManager(newDialer(host.graphs[0], host.hostId), peerConn))
+                switchMap(() => socketManager(host, peerConn))
             ).subscribe();
 
             const closeSub = fromEvent<WebSocket.CloseEvent>(peerConn.socket, 'close').pipe(

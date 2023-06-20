@@ -182,7 +182,6 @@ export const useGraphPutEdge = <T extends Props>() => {
 export type ReactGraphProps =  {
     graphId: string
     persistent?: boolean
-    hostId: string
 }
 
 export const ReactGraph: React.FC<PropsWithChildren<ReactGraphProps>> = (props) => {

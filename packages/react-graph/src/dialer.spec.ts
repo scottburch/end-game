@@ -22,5 +22,5 @@ describe('dialer', () => {
             ])),
             tap(things => expect(things).to.deep.equal(['thing1', 'thing2'])),
         ))
-    )
-})
+    );
+});
