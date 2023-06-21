@@ -1,9 +1,10 @@
 import React, {useState} from "react";
 import {useDialer} from "@end-game/react-graph";
 import {tap} from "rxjs";
+import {newUid} from "@end-game/graph";
 
 const ConnectBtn: React.FC<{n: number}> = ({n}) => {
-    const dial = useDialer();
+    const dial = useDialer(newUid());
     const [dialState, setDialState] = useState(false);
 
     const dialPeer = () => dial({url: `ws://localhost:1111${n}`, redialInterval: 1}).pipe(

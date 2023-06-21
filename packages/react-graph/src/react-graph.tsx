@@ -162,9 +162,8 @@ export const useNewAccount = () => {
 export const useGraphLogin = () => {
     const graph: Graph = useGraph();
 
-    return (username: string, password: string) => {
-        return graphAuth(graph, username, password)
-    }
+    return (username: string, password: string) =>
+        graphAuth(graph, username, password);
 };
 
 

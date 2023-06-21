@@ -4,8 +4,9 @@ import {map, switchMap, tap} from "rxjs";
 import {User} from "../types/User.js";
 import {InputField} from "./InputField.jsx";
 import {asNodeId} from "@end-game/graph";
+import {Link} from "react-router-dom";
 
-export const SignupPanel: React.FC<{toggleSignup: () => void}> = ({toggleSignup}) => {
+export const SignupPanel: React.FC = () => {
     const putNode = useGraphPut();
     const login = useGraphLogin();
 
@@ -37,10 +38,7 @@ export const SignupPanel: React.FC<{toggleSignup: () => void}> = ({toggleSignup}
             <InputField placeholder="Password" name="password" onChange={password => setValues({...values, password})}/>
             <InputField placeholder="Display name" name="display" onChange={display => setValues({...values, display})}/>
             <textarea id="about-me" style={{width: '100%'}} placeholder="About me" onBlur={ev => setValues({...values, aboutMe: ev.target.value})}/>
-            <div style={{display: 'flex'}}>
-                <button style={{width: 'fit-content'}} onClick={signup}>Signup</button>
-                <a style={{paddingLeft: 10}} href="#" onClick={toggleSignup}>or login</a>
-            </div>
+            <button style={{width: 'fit-content'}} onClick={signup}>Signup</button>
         </div>
     )
 }

@@ -23,8 +23,8 @@ export const startAppNetwork = () =>
         openBrowser(),
         openBrowser()
     ]).pipe(
-        map(([{node0, node1, node2}, page0, page1]) => ({
-            node0, node1, node2, page0, page1
+        map(([{host0, host1, host2}, page0, page1]) => ({
+            host0, host1, host2, page0, page1
         }))
     );
 

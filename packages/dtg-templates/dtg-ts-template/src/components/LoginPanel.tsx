@@ -1,22 +1,48 @@
-import React, {useRef} from 'react'
+import React from 'react'
 import {useGraphLogin} from "@end-game/react-graph";
+import {Button, Form, Input, message} from "antd";
 import {tap} from "rxjs";
-import {InputField} from "./InputField.jsx";
 
-export const LoginPanel: React.FC<{toggleSignup: () => void}> = ({toggleSignup}) => {
+export const LoginPanel: React.FC = () => {
     const login = useGraphLogin();
-    const username = useRef('');
-    let password = useRef('');
 
-    const doLogin = () =>
-        login(username.current, password.current).pipe(tap(console.log)).subscribe();
+    const doLogin = (values: any) =>
+        login(values.username, values.password).pipe(
+            tap(({node}) => node.nodeId || message.error('Invalid login'))
+        ).subscribe();
 
     return (
-        <>
-            <InputField name="username" placeholder="username" onChange={v => username.current = v}/>
-            <InputField name="password" placeholder="password" type="password" onChange={v => password.current = v}/>
-            <button onClick={doLogin}>Login</button>
-            <a style={{paddingLeft: 10}} href="#" onClick={toggleSignup}>or signup</a>
-        </>
+        <Form
+            name="basic"
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
+            style={{ maxWidth: 600 }}
+            initialValues={{ remember: true }}
+            onFinish={doLogin}
+            autoComplete="off"
+        >
+            <Form.Item
+                label="Username"
+                name="username"
+                rules={[{ required: true, message: 'Please input your username!' }]}
+
+            >
+                <Input />
+            </Form.Item>
+
+            <Form.Item
+                label="Password"
+                name="password"
+                rules={[{ required: true, message: 'Please input your password!' }]}
+            >
+                <Input.Password />
+            </Form.Item>
+
+            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                <Button type="primary" htmlType="submit">
+                    Login
+                </Button>
+            </Form.Item>
+        </Form>
     )
 }
