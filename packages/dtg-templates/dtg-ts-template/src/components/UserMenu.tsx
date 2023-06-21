@@ -10,7 +10,7 @@ export const UserMenu: React.FC = () => {
 
     return (
         <>
-            <Space style={{cursor: 'pointer'}} onClick={() => setOpen(!open)}>{auth.username}<UserOutlined reversed={true} rev=""/></Space>
+            <Space id="user-menu-btn" style={{cursor: 'pointer'}} onClick={() => setOpen(!open)}>{auth.username}<UserOutlined reversed={true} rev=""/></Space>
         <Drawer
             title={`Welcome ${auth.username}`}
             placement="left"
@@ -20,6 +20,7 @@ export const UserMenu: React.FC = () => {
             key="user-menu-drawer"
         >
             <Menu onSelect={() => setOpen(false)}>
+                <Menu.Item><Link to="/logout">Logout</Link></Menu.Item>
                 <Menu.Item><Link to="/my-profile">My Profile</Link></Menu.Item>
             </Menu>
         </Drawer>

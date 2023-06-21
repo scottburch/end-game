@@ -1,5 +1,5 @@
 import {firstValueFrom, of, switchMap} from "rxjs";
-import {signupHelper} from "./utils/testUtils.js";
+import {clickUserMenu, signupHelper} from "./utils/testUtils.js";
 import {openBrowser} from "@end-game/utils/openBrowser";
 
 describe('signin', () => {
@@ -7,9 +7,9 @@ describe('signin', () => {
         firstValueFrom(openBrowser().pipe(
             switchMap(page => of(undefined).pipe(
                 switchMap(() => signupHelper(page)),
-                switchMap(() => page.waitForSelector(':text("Welcome")')),
+                switchMap(() => clickUserMenu(page)),
                 switchMap(() => page.click(':text("Logout")')),
-                switchMap(() => page.waitForSelector(':text("Welcome")', {state: 'detached'})),
+                switchMap(() => page.waitForSelector(':text("Login")')),
             ))
         ))
     );

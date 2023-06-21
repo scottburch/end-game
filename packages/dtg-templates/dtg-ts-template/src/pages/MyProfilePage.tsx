@@ -1,29 +1,55 @@
-import React, {useEffect, useState} from 'react'
-import {InputField} from "../components/InputField.js";
-import {useUser} from "../hooks/useUser.js";
+import React from 'react'
+import {useUser} from "../hooks/useUser.jsx";
 import {useGraphPut} from "@end-game/react-graph";
 import {User} from "../types/User.js";
+import {Button, Form, Input} from "antd";
 
 
 export const MyProfilePage: React.FC = () => {
     const user = useUser();
-    const [values, setValues] = useState({display: user.display, aboutMe: user.aboutMe})
     const put = useGraphPut<User>()
 
-    const updateProfile = () => {
-        console.log(user.nodeId);
+    const updateProfile = (values: any) => {
         put('user', user.nodeId, {ownerId: user.ownerId, ...values}).subscribe();
     }
 
-    useEffect(() => {
-        user.ownerId && setValues(user);
-    }, [user])
 
     return (
-        <div style={{display:'flex', flexDirection: 'column'}}>
-            <InputField value={values.display} placeholder="Display name" name="display" onChange={display => setValues({...values, display})}/>
-            <textarea id="about-me" value={values.aboutMe} placeholder="About me" onChange={ev => setValues({...values, aboutMe: ev.target.value})}/>
-            <button onClick={updateProfile}>Update profile</button>
-        </div>
+            <Form
+                key={user.display || 'empty'}
+                name="my-profile"
+                labelCol={{span: 8}}
+                wrapperCol={{span: 16}}
+                style={{maxWidth: 600}}
+                initialValues={{remember: true}}
+                onFinish={updateProfile}
+                autoComplete="off"
+            >
+
+                <Form.Item
+                    label="Display Name"
+                    name="display"
+                    rules={[
+                        {required: true, message: 'Please enter a display name'}
+                    ]}
+                    initialValue={user.display}
+                >
+                    <Input/>
+                </Form.Item>
+
+                <Form.Item
+                    label="About Me"
+                    name="aboutMe"
+                    initialValue={user.aboutMe}
+                >
+                    <Input.TextArea />
+                </Form.Item>
+
+                <Form.Item wrapperCol={{offset: 8, span: 16}}>
+                    <Button type="primary" htmlType="submit">
+                        Update Profile
+                    </Button>
+                </Form.Item>
+            </Form>
     )
 }

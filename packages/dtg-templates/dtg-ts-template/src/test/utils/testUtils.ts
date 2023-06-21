@@ -14,6 +14,7 @@ export const signupHelper = (page: Page) =>
             switchMap(() => page.fill('#signup_displayName', 'Scooter')),
             switchMap(() => page.fill('#signup_aboutMe', 'Here I am')),
             switchMap(() => page.click('button>:text("Signup")')),
+            switchMap(() => page.waitForSelector('div:text("scott")')),
             map(() => page)
         ))
     );
@@ -39,4 +40,7 @@ export const postHelper = (page: Page, text: string = 'my post') =>
     of(page.fill('#post-text', text)).pipe(
         switchMap(() => page.click('button:text("Add Post")'))
     )
+
+export const clickUserMenu = (page: Page) =>
+    page.click('#user-menu-btn');
 

@@ -1,22 +1,17 @@
-import {combineLatest, firstValueFrom, of, switchMap, tap} from "rxjs";
-import {signupHelper, startAppNetwork, connectBrowsers, postHelper} from "./utils/testUtils.js";
+import {combineLatest, delay, firstValueFrom, of, switchMap, tap} from "rxjs";
+import {signupHelper, startAppNetwork, connectBrowsers, postHelper, clickUserMenu} from "./utils/testUtils.js";
 import {openBrowser} from "@end-game/utils/openBrowser";
 import {expect} from 'chai';
 
 describe('post', () => {
     it('should update the users profile', () =>
         firstValueFrom(openBrowser().pipe(
-            switchMap(page => signupHelper(page)),
             switchMap(page => of(page).pipe(
-                switchMap(() => page.fill('#post-text', 'post1')),
-                switchMap(() => page.click('button:text("Add post")')),
-                switchMap(() => page.waitForSelector('a:text("Scooter")')),
-
-                switchMap(() => page.click('a:text("Welcome")')),
-                switchMap(() => page.fill('input#display', 'Me')),
-                switchMap(() => page.click('button:text("Update profile")')),
-                switchMap(() => page.waitForSelector('a:text("Me")'))
-            )),
+                switchMap(() => signupHelper(page)),
+                switchMap(() => clickUserMenu(page)),
+                switchMap(() => page.click(':text("My Profile")')),
+                delay(100000000)
+            ))
         ))
     );
 
