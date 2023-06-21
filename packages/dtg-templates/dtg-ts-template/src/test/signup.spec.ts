@@ -6,7 +6,7 @@ describe('signin', () => {
     it('should sign in', () =>
         firstValueFrom(openBrowser().pipe(
             switchMap(page => signupHelper(page)),
-            switchMap(page => page.waitForSelector(':text("Add a post")'))
+            switchMap(page => page.waitForSelector(':text("Welcome")'))
         ))
     )
 });

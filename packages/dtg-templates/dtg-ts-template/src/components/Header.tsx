@@ -10,7 +10,10 @@ export const Header: React.FC = () => {
         <div style={{background: 'black', color: 'white', display: 'flex'}}>
             <div style={{flex: 1}}>Reach</div>
             {auth.username ? (
-                <Link to="/my-profile" style={{color: 'white', paddingRight: 10}} >{auth.username ? 'Welcome ' + auth.username : ''}</Link>
+                <>
+                    <Link to="/my-profile" style={{color: 'white', paddingRight: 10}} >{'Welcome ' + auth.username}</Link>
+                    <Link to="/logout" style={{color: 'white', paddingRight: 10}}>Logout</Link>
+                </>
             ) : (
                 <div style={{color: 'white', paddingRight: 10}}>
                     <Link to="/login" style={{color: "white"}}>Login</Link>

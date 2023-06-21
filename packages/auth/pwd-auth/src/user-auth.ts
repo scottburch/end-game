@@ -25,10 +25,10 @@ export const graphAuth = (graph: Graph, username: string, password: string) =>
                 of(undefined)
             )),
             tap(u => (asGraphWithAuth(graph)).user = u),
-            map(() => ({graph: asGraphWithAuth(graph), node: {} as AuthNode})),
+            map(() => ({graph: asGraphWithAuth(graph)})),
             tap(({graph}) => chainNext(graph.chains.authChanged, {graph}).subscribe()),
-            catchError(err => err.cause.message.includes('bad decrypt') ? of({graph: asGraphWithAuth(graph), node: {} as AuthNode}) : throwError(() => err))
-        ), of({graph: asGraphWithAuth(graph), node}))),
+            catchError(err => err.cause.message.includes('bad decrypt') ? of({graph: asGraphWithAuth(graph)}) : throwError(() => err))
+        ), of({graph: asGraphWithAuth(graph)}))),
     );
 
 export const graphUnauth = (graph: Graph) => of(graph).pipe(

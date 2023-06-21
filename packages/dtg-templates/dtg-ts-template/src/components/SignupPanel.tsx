@@ -1,30 +1,23 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {useGraphLogin, useGraphPut, useNewAccount} from "@end-game/react-graph";
 import {map, switchMap, tap} from "rxjs";
 import {User} from "../types/User.js";
-import {InputField} from "./InputField.jsx";
 import {asNodeId} from "@end-game/graph";
-import {Link} from "react-router-dom";
+import {Button, Form, Input} from "antd";
+
 
 export const SignupPanel: React.FC = () => {
     const putNode = useGraphPut();
     const login = useGraphLogin();
-
-    const [values, setValues] = useState({
-        username: '',
-        password: '',
-        display: '',
-        aboutMe: ''
-    });
     const newAccount = useNewAccount();
 
-    const signup = () =>
+    const doSignup = (values: any) =>
         newAccount(values.username, values.password).pipe(
             switchMap(({nodeId: authId}) => login(values.username, values.password).pipe(
                 map(() => authId)
             )),
             switchMap(authId => putNode('user', asNodeId(''), {
-                display: values.display,
+                display: values.displayName,
                 aboutMe: values.aboutMe,
                 ownerId: authId
             } satisfies User)),
@@ -33,13 +26,76 @@ export const SignupPanel: React.FC = () => {
 
 
     return (
-        <div style={{display: 'flex', flexDirection: 'column'}}>
-            <InputField placeholder="Username" name="username" onChange={username => setValues({...values, username})}/>
-            <InputField placeholder="Password" name="password" onChange={password => setValues({...values, password})}/>
-            <InputField placeholder="Display name" name="display" onChange={display => setValues({...values, display})}/>
-            <textarea id="about-me" style={{width: '100%'}} placeholder="About me" onBlur={ev => setValues({...values, aboutMe: ev.target.value})}/>
-            <button style={{width: 'fit-content'}} onClick={signup}>Signup</button>
-        </div>
+            <Form
+                name="signup"
+                labelCol={{span: 8}}
+                wrapperCol={{span: 16}}
+                style={{maxWidth: 600}}
+                initialValues={{remember: true}}
+                onFinish={doSignup}
+                autoComplete="off"
+            >
+                <Form.Item
+                    label="Username"
+                    name="username"
+                    rules={[
+                        {required: true, message: 'Please input your username'},
+                        {min: 4, message: 'Must be at least 4 characters'}
+                    ]}
+                >
+                    <Input/>
+                </Form.Item>
+
+                <Form.Item
+                    label="Password"
+                    name="password"
+                    rules={[
+                        {required: true, message: 'Please input your password'},
+                        {min: 5, message: 'Password must be at least 5 characters'}
+                    ]}
+                >
+                    <Input.Password/>
+                </Form.Item>
+
+                <Form.Item
+                    label="Confirm Password"
+                    name="password2"
+                    dependencies={['password']}
+                    rules={[({getFieldValue}) => ({
+                        validator(_, value) {
+                            if (!value || getFieldValue('password') === value) {
+                                return Promise.resolve();
+                            }
+                            return Promise.reject(new Error('Password does not match'));
+                        },
+                    })]}
+                >
+                    <Input.Password/>
+                </Form.Item>
+
+                <Form.Item
+                    label="Display Name"
+                    name="displayName"
+                    rules={[
+                        {required: true, message: 'Please enter a display name'}
+                    ]}
+                >
+                    <Input/>
+                </Form.Item>
+
+                <Form.Item
+                    label="About Me"
+                    name="aboutMe"
+                >
+                    <Input.TextArea />
+                </Form.Item>
+
+                <Form.Item wrapperCol={{offset: 8, span: 16}}>
+                    <Button type="primary" htmlType="submit">
+                        Signup
+                    </Button>
+                </Form.Item>
+            </Form>
     )
 }
 

@@ -8,11 +8,12 @@ export const signupHelper = (page: Page) =>
     of(page).pipe(
         switchMap(page => of(page).pipe(
             switchMap(() => page.click(':text("signup")')),
-            switchMap(() => page.fill('#username', 'scott')),
-            switchMap(() => page.fill('#password', 'pass')),
-            switchMap(() => page.fill('#display', 'Scooter')),
-            switchMap(() => page.fill('#about-me', 'Here I am')),
-            switchMap(() => page.click('button:text("Signup")')),
+            switchMap(() => page.fill('#signup_username', 'scott')),
+            switchMap(() => page.fill('#signup_password', '12345')),
+            switchMap(() => page.fill('#signup_password2', '12345')),
+            switchMap(() => page.fill('#signup_displayName', 'Scooter')),
+            switchMap(() => page.fill('#signup_aboutMe', 'Here I am')),
+            switchMap(() => page.click('button>:text("Signup")')),
             map(() => page)
         ))
     );
