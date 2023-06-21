@@ -3,7 +3,7 @@ import {useGraphLogin} from "@end-game/react-graph";
 import {Button, Form, Input, message} from "antd";
 import {tap} from "rxjs";
 
-export const LoginPanel: React.FC = () => {
+export const LoginPage: React.FC = () => {
     const login = useGraphLogin();
 
     const doLogin = (values: any) =>

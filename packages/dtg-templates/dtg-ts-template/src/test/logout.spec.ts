@@ -8,8 +8,9 @@ describe('signin', () => {
             switchMap(page => of(undefined).pipe(
                 switchMap(() => signupHelper(page)),
                 switchMap(() => page.waitForSelector(':text("Welcome")')),
-                switchMap(() => page.click(':text("Logout")'))
+                switchMap(() => page.click(':text("Logout")')),
+                switchMap(() => page.waitForSelector(':text("Welcome")', {state: 'detached'})),
             ))
         ))
-    )
+    );
 });

@@ -6,7 +6,7 @@ import {asNodeId} from "@end-game/graph";
 import {Button, Form, Input} from "antd";
 
 
-export const SignupPanel: React.FC = () => {
+export const SignupPage: React.FC = () => {
     const putNode = useGraphPut();
     const login = useGraphLogin();
     const newAccount = useNewAccount();

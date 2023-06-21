@@ -23,7 +23,7 @@ import * as React from "react";
 import {createContext, useContext, useEffect, useState} from "react";
 import {catchError, filter, of, switchMap, tap, throwError} from "rxjs";
 import type {GraphWithAuth} from '@end-game/pwd-auth'
-import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
+import {authHandlers, graphAuth, graphNewAuth, graphUnauth} from "@end-game/pwd-auth";
 import {newNode} from "@end-game/graph";
 import {levelStoreHandlers} from "@end-game/level-store";
 import type {GraphWithP2p} from '@end-game/p2p'
@@ -166,6 +166,11 @@ export const useGraphLogin = () => {
         graphAuth(graph, username, password);
 };
 
+export const useGraphLogout = () => {
+    const graph= useGraph();
+
+    return () => graphUnauth(graph);
+}
 
 
 export const useGraphPutEdge = <T extends Props>() => {

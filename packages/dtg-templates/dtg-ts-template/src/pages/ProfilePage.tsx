@@ -3,7 +3,7 @@ import {NodeId} from "@end-game/graph";
 import {useGraphNodesByProp} from "@end-game/react-graph";
 import {User} from "../types/User.js";
 
-export const ProfilePanel: React.FC<{authId: NodeId}> = ({authId}) => {
+export const ProfilePage: React.FC<{authId: NodeId}> = ({authId}) => {
     const [user] = useGraphNodesByProp<User>('user', 'ownerId', authId);
 
     return (

@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react'
-import {InputField} from "./InputField.jsx";
-import {useUser} from "../hooks/useUser.jsx";
+import {InputField} from "../components/InputField.js";
+import {useUser} from "../hooks/useUser.js";
 import {useGraphPut} from "@end-game/react-graph";
 import {User} from "../types/User.js";
 
 
-export const MyProfilePanel: React.FC = () => {
+export const MyProfilePage: React.FC = () => {
     const user = useUser();
     const [values, setValues] = useState({display: user.display, aboutMe: user.aboutMe})
     const put = useGraphPut<User>()

@@ -4,7 +4,7 @@ import {useRef, useState} from "react";
 import React from 'react';
 import {asNodeId, NodeId} from "@end-game/graph";
 
-export const AddPostPanel: React.FC = () => {
+export const AddPostPage: React.FC = () => {
     const graphPut = useGraphPut<Post>();
     const [values, setValues] = useState<Omit<Post, 'nodeId'>>({text: ''});
 
