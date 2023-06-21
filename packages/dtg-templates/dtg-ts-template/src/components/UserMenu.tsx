@@ -22,6 +22,7 @@ export const UserMenu: React.FC = () => {
             <Menu onSelect={() => setOpen(false)}>
                 <Menu.Item><Link to="/logout">Logout</Link></Menu.Item>
                 <Menu.Item><Link to="/my-profile">My Profile</Link></Menu.Item>
+                <Menu.Item><Link to="/add-post">Add Post</Link></Menu.Item>
             </Menu>
         </Drawer>
         </>

@@ -8,6 +8,7 @@ import {SignupPage} from "./pages/SignupPage.jsx";
 import {useLocation, useNavigate} from "react-router-dom";
 import {LogoutPage} from "./pages/LogoutPage.jsx";
 import {MyProfilePage} from "./pages/MyProfilePage.jsx";
+import {AddPostPage} from "./pages/AddPostPage.jsx";
 
 export const Main: React.FC = () => {
     const auth = useAuth();
@@ -19,6 +20,7 @@ export const Main: React.FC = () => {
         auth.username && location.pathname.includes('signup') && goto('/');
         !auth.username && location.pathname.includes('logout') && goto('/');
         !auth.username && location.pathname.includes('my-profile') && goto('/');
+        !auth.username && location.pathname.includes('add-post') && goto('/');
     })
 
     return (
@@ -30,6 +32,7 @@ export const Main: React.FC = () => {
                         <Route path="/signup" element={<SignupPage/>}/>
                         <Route path="/logout" element={<LogoutPage/>}/>
                         <Route path="/my-profile" element={<MyProfilePage/>}/>
+                        <Route path="/add-post" element={<AddPostPage/>}/>
                     </Routes>
                 </div>
             </div>

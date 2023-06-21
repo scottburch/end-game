@@ -1,23 +1,51 @@
 import {useGraphPut} from "@end-game/react-graph";
 import type {Post} from "../types/Post.js";
-import {useRef, useState} from "react";
-import React from 'react';
-import {asNodeId, NodeId} from "@end-game/graph";
+import React, {useState} from 'react';
+import {asNodeId} from "@end-game/graph";
+import {Button, Form, Input} from "antd";
+import {tap} from "rxjs";
+import {useNavigate} from "react-router-dom";
 
 export const AddPostPage: React.FC = () => {
     const graphPut = useGraphPut<Post>();
-    const [values, setValues] = useState<Omit<Post, 'nodeId'>>({text: ''});
+    const [savingPost, setSavingPost] = useState(false);
+    const navigate = useNavigate();
 
-    const addPost = () => {
-        graphPut('post', asNodeId(Date.now().toString()), values as Post).subscribe();
-        setValues({text: ''});
+    const addPost = (values: Post) => {
+        setSavingPost(true);
+        graphPut('post', asNodeId(Date.now().toString()), {
+            ...values
+        }).pipe(
+            tap(() => navigate('/'))
+        ).subscribe();
     }
 
     return (
         <>
-            <div>Add a post</div>
-            <textarea value={values.text} id="post-text" onChange={ev => setValues({...values, text: ev.target.value})}/>
-            <div><button onClick={addPost}>Add Post</button></div>
+            <Form
+                disabled={savingPost}
+                name="add-post"
+                labelCol={{span: 8}}
+                wrapperCol={{span: 16}}
+                style={{maxWidth: 600}}
+                initialValues={{remember: true}}
+                onFinish={addPost}
+                autoComplete="off"
+            >
+
+                <Form.Item
+                    label="Post Text"
+                    name="text"
+                >
+                    <Input.TextArea />
+                </Form.Item>
+
+                <Form.Item wrapperCol={{offset: 8, span: 16}}>
+                    <Button type="primary" htmlType="submit">
+                        Add Post
+                    </Button>
+                </Form.Item>
+            </Form>
         </>
     );
 }
