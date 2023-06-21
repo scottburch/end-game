@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
+    "@ant-design/icons": "^5.1.4",
     "@end-game/dtg-scripts": "^1.0.36",
     "@end-game/graph-explorer": "^1.0.34",
     "@end-game/react-graph": "^1.0.34",

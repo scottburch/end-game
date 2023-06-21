@@ -14,7 +14,6 @@ export const Main: React.FC = () => {
     const goto = useNavigate()
 
     useEffect(() => {
-        console.log(auth);
         auth.username && location.pathname.includes('login') && goto('/');
         auth.username && location.pathname.includes('signup') && goto('/');
         !auth.username && location.pathname.includes('logout') && goto('/');
@@ -23,7 +22,7 @@ export const Main: React.FC = () => {
     return (
             <div style={styles.main}>
                 <Header/>
-                <div style={{padding: 30, textAlign: 'center'}}>
+                <div id="body" style={{padding: 30, textAlign: 'center'}}>
                     <Routes>
                         <Route path="/login" element={<LoginPage/>}/>
                         <Route path="/signup" element={<SignupPage/>}/>
@@ -36,7 +35,7 @@ export const Main: React.FC = () => {
 
 const styles: Record<string, CSSProperties> = {
     main: {
-        backgroundColor: '#eee',
+        backgroundColor: '#e9ecff',
         height: '100%',
     }
 }

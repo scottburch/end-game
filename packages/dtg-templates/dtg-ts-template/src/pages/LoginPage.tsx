@@ -8,7 +8,6 @@ export const LoginPage: React.FC = () => {
 
     const doLogin = (values: any) =>
         login(values.username, values.password).pipe(
-            tap((x) => console.log(x)),
             tap(({graph}) => graph.user?.username || message.error('Invalid login'))
         ).subscribe();
 
