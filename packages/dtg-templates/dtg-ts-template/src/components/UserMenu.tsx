@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Drawer, Menu, Space} from "antd";
+import {Drawer, List, Space} from "antd";
 import {UserOutlined} from "@ant-design/icons";
 import {useAuth} from "@end-game/react-graph";
 import {Link} from "react-router-dom";
@@ -19,11 +19,11 @@ export const UserMenu: React.FC = () => {
             onClose={() => setOpen(false)}
             key="user-menu-drawer"
         >
-            <Menu onSelect={() => setOpen(false)}>
-                <Menu.Item><Link to="/logout">Logout</Link></Menu.Item>
-                <Menu.Item><Link to="/my-profile">My Profile</Link></Menu.Item>
-                <Menu.Item><Link to="/add-post">Add Post</Link></Menu.Item>
-            </Menu>
+            <List>
+                <List.Item onClick={() => setOpen(false)}><Link to="/logout">Logout</Link></List.Item>
+                <List.Item onClick={() => setOpen(false)}><Link to="/my-profile">My Profile</Link></List.Item>
+                <List.Item onClick={() => setOpen(false)}><Link to="/add-post">Add Post</Link></List.Item>
+            </List>
         </Drawer>
         </>
     )

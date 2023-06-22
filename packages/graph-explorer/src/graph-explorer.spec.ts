@@ -7,7 +7,7 @@ import {openBrowser} from "@end-game/utils/openBrowser";
 describe('graph-explorer', () => {
     it('should open a graph explorer', () =>
         firstValueFrom(compileBrowserTestCode(absPath(import.meta.url, 'graph-explorer-test.tsx'), 1236).pipe(
-            switchMap(() => openBrowser({port: 1236})),
+            switchMap(() => openBrowser({url: 'http://localhost:1236'})),
             switchMap(page => page.waitForSelector('div:text("scott")').then(() => page)),
             switchMap(page => page.click('button:text("Graph Explorer")').then(() => page)),
             map(page => page.context().pages()),
@@ -21,7 +21,7 @@ describe('graph-explorer', () => {
 
     it('should open a layer with the properties/relationships of a node', () =>
         firstValueFrom(compileBrowserTestCode(absPath(import.meta.url, 'graph-explorer-test.tsx'), 1236).pipe(
-            switchMap(() => openBrowser({port: 1236})),
+            switchMap(() => openBrowser({url: 'http://localhost:1236'})),
             switchMap(page => page.waitForSelector('div:text("scott")').then(() => page)),
             delay(4000),
             switchMap(page => page.click('button:text("Graph Explorer")').then(() => page)),

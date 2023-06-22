@@ -32,7 +32,6 @@ export const AddPostPage: React.FC = () => {
                 onFinish={addPost}
                 autoComplete="off"
             >
-
                 <Form.Item
                     label="Post Text"
                     name="text"

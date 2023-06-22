@@ -1,4 +1,3 @@
-
 import {combineLatest, map, merge, of, switchMap} from "rxjs";
 import {Page} from 'playwright-core'
 import {startTestNet} from "@end-game/test-utils";
@@ -37,9 +36,13 @@ export const connectBrowsers = (page0: Page, page1: Page) =>
     );
 
 export const postHelper = (page: Page, text: string = 'my post') =>
-    of(page.fill('#post-text', text)).pipe(
-        switchMap(() => page.click('button:text("Add Post")'))
-    )
+    of(page).pipe(
+        switchMap(() => clickUserMenu(page)),
+        switchMap(() => page.waitForSelector(':text("Add Post")')),
+        switchMap(() => page.click(':text("Add Post")')),
+        switchMap(() => page.fill('#add-post_text', text)),
+        switchMap(() => page.click('button>:text("Add post")'))
+    );
 
 export const clickUserMenu = (page: Page) =>
     page.click('#user-menu-btn');

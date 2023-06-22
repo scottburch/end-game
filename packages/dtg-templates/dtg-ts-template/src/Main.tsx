@@ -9,6 +9,8 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {LogoutPage} from "./pages/LogoutPage.jsx";
 import {MyProfilePage} from "./pages/MyProfilePage.jsx";
 import {AddPostPage} from "./pages/AddPostPage.jsx";
+import {PostsPage} from "./pages/PostsPage.jsx";
+import {GraphExplorerBtn} from "@end-game/graph-explorer";
 
 export const Main: React.FC = () => {
     const auth = useAuth();
@@ -33,6 +35,8 @@ export const Main: React.FC = () => {
                         <Route path="/logout" element={<LogoutPage/>}/>
                         <Route path="/my-profile" element={<MyProfilePage/>}/>
                         <Route path="/add-post" element={<AddPostPage/>}/>
+                        <Route path="/posts" element={<PostsPage/>}/>
+                        <Route path="/" element={<PostsPage/>}/>
                     </Routes>
                 </div>
             </div>
