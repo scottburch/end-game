@@ -20,8 +20,7 @@ export const SignupPage: React.FC = () => {
                 display: values.displayName,
                 aboutMe: values.aboutMe,
                 ownerId: authId
-            } satisfies User)),
-            tap(() => console.log('signed up'))
+            } satisfies User))
         ).subscribe();
 
 

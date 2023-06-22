@@ -15,7 +15,7 @@ export const renderApp = (graphId: GraphId, Body: React.FC) => {
         return (
             <>
             <React.StrictMode>
-            <ReactGraph graphId={graphId}>
+            <ReactGraph graphId={graphId} persistent={window.location.href.includes('127.0.0.1')}>
                 <Body/>
             </ReactGraph>
             </React.StrictMode>
