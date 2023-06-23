@@ -10,7 +10,7 @@ import {LogoutPage} from "./pages/LogoutPage.jsx";
 import {MyProfilePage} from "./pages/MyProfilePage.jsx";
 import {AddPostPage} from "./pages/AddPostPage.jsx";
 import {PostsPage} from "./pages/PostsPage.jsx";
-import {GraphExplorerBtn} from "@end-game/graph-explorer";
+import {ProfilePage} from "./pages/ProfilePage.jsx";
 
 export const Main: React.FC = () => {
     const auth = useAuth();
@@ -34,6 +34,7 @@ export const Main: React.FC = () => {
                         <Route path="/signup" element={<SignupPage/>}/>
                         <Route path="/logout" element={<LogoutPage/>}/>
                         <Route path="/my-profile" element={<MyProfilePage/>}/>
+                        <Route path="/profile/:userId" element={<ProfilePage/>}/>
                         <Route path="/add-post" element={<AddPostPage/>}/>
                         <Route path="/posts" element={<PostsPage/>}/>
                         <Route path="/" element={<PostsPage/>}/>

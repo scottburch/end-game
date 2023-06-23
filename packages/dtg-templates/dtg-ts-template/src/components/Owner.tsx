@@ -10,6 +10,6 @@ export const Owner: React.FC<{post: NodeWithAuth<Post>}> = ({post}) => {
     const profileNodes = useGraphNodesByProp<User>('user', 'ownerId', post.owner);
 
     return (
-        <Link to={`profile/${post.owner}`}>{profileNodes[0]?.props.display || 'Loading...'}</Link>
+        <Link to={`profile/${profileNodes[0]?.nodeId}`}>{profileNodes[0]?.props.display || 'Loading...'}</Link>
     )
 }

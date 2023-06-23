@@ -1,10 +1,18 @@
 import React from 'react';
-import {NodeId} from "@end-game/graph";
-import {useGraphNodesByProp} from "@end-game/react-graph";
+import {useGraphNode} from "@end-game/react-graph";
 import {User} from "../types/User.js";
+import {useParams} from "react-router";
+import {asNodeId} from "@end-game/graph";
 
-export const ProfilePage: React.FC<{authId: NodeId}> = ({authId}) => {
-    const [user] = useGraphNodesByProp<User>('user', 'ownerId', authId);
+export const ProfilePage: React.FC = () => {
+    const {userId} = useParams();
+
+    return userId ? <Profile userId={userId || ''}/> : <h3>User Unknown: ${userId}</h3>;
+}
+
+
+const Profile: React.FC<{userId: string}> = ({userId}) => {
+    const user = useGraphNode<User>(asNodeId(userId));
 
     return (
         <div>
@@ -12,4 +20,5 @@ export const ProfilePage: React.FC<{authId: NodeId}> = ({authId}) => {
             <div>{user?.props.aboutMe}</div>
         </div>
     )
+
 }

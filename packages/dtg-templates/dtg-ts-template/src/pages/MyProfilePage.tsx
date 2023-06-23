@@ -1,21 +1,29 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {useUser} from "../hooks/useUser.jsx";
 import {useGraphPut} from "@end-game/react-graph";
 import {User} from "../types/User.js";
 import {Button, Form, Input} from "antd";
+import {tap} from "rxjs";
+import {useNavigate} from "react-router-dom";
 
 
 export const MyProfilePage: React.FC = () => {
     const user = useUser();
-    const put = useGraphPut<User>()
+    const put = useGraphPut<User>();
+    const [updating, setUpdating] = useState(false);
+    const navigate = useNavigate();
 
     const updateProfile = (values: any) => {
-        put('user', user.nodeId, {ownerId: user.ownerId, ...values}).subscribe();
+        setUpdating(true);
+        put('user', user.nodeId, {ownerId: user.ownerId, ...values}).pipe(
+            tap(() => navigate('/'))
+        ).subscribe();
     }
 
 
     return (
             <Form
+                disabled={updating}
                 key={user.display || 'empty'}
                 name="my-profile"
                 labelCol={{span: 8}}
