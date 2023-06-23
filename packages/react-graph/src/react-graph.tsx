@@ -146,9 +146,10 @@ export const useGraphEdge = <T extends Props>(edgeId: EdgeId, opts: GraphHandler
 export const useGraphPut = <T extends Props>() => {
     const graph: Graph = useGraph();
 
-    return (label: string, nodeId: NodeId, props: T) => {
-        return putNode(graph, newNode(nodeId, label, props));
-    }
+    return (label: string, nodeId: NodeId, props: T) =>
+        of(newNode(nodeId, label, props)).pipe(
+            switchMap(node => putNode(graph, node))
+        );
 };
 
 export const useNewAccount = () => {

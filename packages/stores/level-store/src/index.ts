@@ -122,11 +122,11 @@ export const levelStoreGetEdgeHandler = (): GraphHandler<'getEdge'> =>
 export const levelStoreNodesByLabelHandler = (): GraphHandler<'nodesByLabel'> =>
     ({graph, label, opts}) => getStore(graph).pipe(
         switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.LABEL, label], opts))),
-        switchMap(iterator => range(1, 1000).pipe(
+        switchMap(iterator => range(1, 100).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
             map(pair => pair?.[0].split('.')[3]),
-            switchMap(nodeId => levelStoreGetNodeHandler()({
+            mergeMap(nodeId => levelStoreGetNodeHandler()({
                 graph,
                 nodeId,
                 node: {} as GraphNode,

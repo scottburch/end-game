@@ -3,7 +3,7 @@ import type {Post} from "../types/Post.js";
 import React, {useState} from 'react';
 import {asNodeId} from "@end-game/graph";
 import {Button, Form, Input} from "antd";
-import {tap} from "rxjs";
+import {delay, map, of, switchMap, tap} from "rxjs";
 import {useNavigate} from "react-router-dom";
 
 export const AddPostPage: React.FC = () => {
@@ -13,9 +13,9 @@ export const AddPostPage: React.FC = () => {
 
     const addPost = (values: Post) => {
         setSavingPost(true);
-        graphPut('post', asNodeId(Date.now().toString()), {
-            ...values
-        }).pipe(
+        of(Date.now().toString()).pipe(
+            map(id => asNodeId(id)),
+            switchMap(id => graphPut('post', id, values)),
             tap(() => navigate('/'))
         ).subscribe();
     }

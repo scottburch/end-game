@@ -13,7 +13,7 @@
     "@end-game/level-store": "*",
     "@end-game/p2p": "*",
     "@end-game/test-utils": "*",
-    "@end-game/utils": "^1.0.34",
+    "@end-game/utils": "*",
     "@types/node": "^18.11.18",
     "@types/tar": "^6.1.4",
     "commander": "^10.0.0",
