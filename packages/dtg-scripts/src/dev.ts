@@ -10,7 +10,7 @@ export const devCmd = (opts: {headless: boolean, port: number}) => {
             static: {
                 directory: resolve('./public')
             },
-            historyApiFallback: true,   // Here to make it a single-page-app
+            historyApiFallback: {index: 'index.html'},   // Here to make it a single-page-app
             port: opts.port || 1234,
             open: !opts.headless,
             headers: {
