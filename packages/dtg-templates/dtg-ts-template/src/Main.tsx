@@ -28,7 +28,7 @@ export const Main: React.FC = () => {
     return (
             <div style={styles.main}>
                 <Header/>
-                <div id="body" style={{padding: 30, textAlign: 'center'}}>
+                <div id="body" style={{padding: 30}}>
                     <Routes>
                         <Route path="/login" element={<LoginPage/>}/>
                         <Route path="/signup" element={<SignupPage/>}/>

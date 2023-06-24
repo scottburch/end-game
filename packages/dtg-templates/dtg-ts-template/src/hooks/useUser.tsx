@@ -7,7 +7,7 @@ import {filter, map, tap} from "rxjs";
 
 export const useUser = () => {
     const auth = useAuth();
-    const [user, setUser] = useState<User & {nodeId: NodeId}>({display: '', aboutMe: '', ownerId: asNodeId(''), nodeId: asNodeId('')});
+    const [user, setUser] = useState<User & {nodeId: NodeId}>({display: '', nickname: '', aboutMe: '', ownerId: asNodeId(''), nodeId: asNodeId('')});
     const graph = useGraph();
 
     useEffect(() => {
@@ -19,5 +19,4 @@ export const useUser = () => {
     }, [auth]);
 
     return user;
-
 }

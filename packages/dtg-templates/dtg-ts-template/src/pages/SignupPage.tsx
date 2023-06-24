@@ -1,6 +1,6 @@
 import React from 'react'
 import {useGraphLogin, useGraphPut, useNewAccount} from "@end-game/react-graph";
-import {map, switchMap, tap} from "rxjs";
+import {map, switchMap} from "rxjs";
 import {User} from "../types/User.js";
 import {asNodeId} from "@end-game/graph";
 import {Button, Form, Input} from "antd";
@@ -18,6 +18,7 @@ export const SignupPage: React.FC = () => {
             )),
             switchMap(authId => putNode('user', asNodeId(''), {
                 display: values.displayName,
+                nickname: values.nickname,
                 aboutMe: values.aboutMe,
                 ownerId: authId
             } satisfies User))
@@ -81,6 +82,17 @@ export const SignupPage: React.FC = () => {
                 >
                     <Input/>
                 </Form.Item>
+
+                <Form.Item
+                    label="Nickname"
+                    name="nickname"
+                    rules={[
+                        {required: true, message: 'Please enter a nickname'},
+                        {pattern: /^[a-z1-9]*$/, message: 'Lower case and numbers only'}
+                    ]}>
+                    <Input/>
+                </Form.Item>
+
 
                 <Form.Item
                     label="About Me"

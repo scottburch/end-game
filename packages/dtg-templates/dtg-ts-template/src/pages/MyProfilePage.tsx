@@ -46,6 +46,18 @@ export const MyProfilePage: React.FC = () => {
                 </Form.Item>
 
                 <Form.Item
+                    label="Nickname"
+                    name="nickname"
+                    rules={[
+                        {required: true, message: 'Please enter a nickname'},
+                        {pattern: /^[a-z1-9]*$/, message: 'Lower case and numbers only'}
+                    ]}
+                    initialValue={user.nickname}>
+                    <Input/>
+                </Form.Item>
+
+
+                <Form.Item
                     label="About Me"
                     name="aboutMe"
                     initialValue={user.aboutMe}

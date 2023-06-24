@@ -20,6 +20,7 @@ export const UserMenu: React.FC = () => {
             key="user-menu-drawer"
         >
             <List>
+                <List.Item onClick={() => setOpen(false)}><Link to="/">Home</Link></List.Item>
                 <List.Item onClick={() => setOpen(false)}><Link to="/logout">Logout</Link></List.Item>
                 <List.Item onClick={() => setOpen(false)}><Link to="/my-profile">My Profile</Link></List.Item>
                 <List.Item onClick={() => setOpen(false)}><Link to="/add-post">Add Post</Link></List.Item>

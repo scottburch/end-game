@@ -5,10 +5,10 @@ import {PostItem} from "./PostItem.jsx";
 import {List} from "antd";
 
 export const PostList: React.FC = () => {
-    const posts = useGraphNodesByLabel<Post>('post');
+    const posts = useGraphNodesByLabel<Post>('post', {reverse: true});
 
     return (
-        <List>
+        <List bordered>
             {posts?.map(post => (
                 <div key={post.nodeId}>
                     <PostItem post={post}/>

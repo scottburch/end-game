@@ -11,6 +11,7 @@ export const signupHelper = (page: Page) =>
             switchMap(() => page.fill('#signup_password', '12345')),
             switchMap(() => page.fill('#signup_password2', '12345')),
             switchMap(() => page.fill('#signup_displayName', 'Scooter')),
+            switchMap(() => page.fill('#signup_nickname', 'scooter')),
             switchMap(() => page.fill('#signup_aboutMe', 'Here I am')),
             switchMap(() => page.click('button>:text("Signup")')),
             switchMap(() => page.waitForSelector('div:text("scott")')),
