@@ -219,8 +219,9 @@ describe('graph', () => {
                 addThingNode(graph, 3, {a: 'acc'}),
                 addThingNode(graph, 4, {a: 'add'}),
             ])),
-            switchMap(([{graph}]) => nodesByProp(graph, 'thing', 'a', '', {gt: 'abb'})),
-            tap(({nodes}) => nodes)
+            switchMap(([{graph}]) => nodesByProp<{a: string}>(graph, 'thing', 'a', '', {gt: 'abb'})),
+            map(({nodes}) => nodes.map(node => node.props.a)),
+            tap(values => expect(values).to.deep.equal(['acc', 'add']))
         ))
     )
 

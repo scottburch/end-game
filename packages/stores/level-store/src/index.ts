@@ -172,8 +172,11 @@ export const levelStoreNodesByPropHandler = (): GraphHandler<'nodesByProp'> =>
     )
 
 
-const keySearchCriteria = (segments: string[], opts: RangeOpts = {}) =>
-    segments[segments.length - 1].includes('*') ? ({
+const keySearchCriteria = (segments: string[], opts: RangeOpts = {}) => {
+    if(opts.gt && segments.indexOf('') !== -1) {
+        opts.gt = opts.gt.slice(0, -1) + String.fromCharCode(opts.gt.slice(-1).charCodeAt(0) + 1)
+    }
+    return segments[segments.length - 1].includes('*') ? ({
         gte: segments.join('.').replace('*', ''),
         lt: segments.join('.').replace('*', '') + String.fromCharCode(255),
         limit: opts.limit
@@ -183,6 +186,7 @@ const keySearchCriteria = (segments: string[], opts: RangeOpts = {}) =>
         limit: opts.limit,
         reverse: opts.reverse
     });
+}
 
 
 export const levelStoreGetRelationshipsHandler = (): GraphHandler<'getRelationships'> =>
