@@ -211,7 +211,7 @@ describe('graph', () => {
         ))
     );
 
-    it.skip("should pass range options to nodesByProp", () =>
+    it("should pass range options to nodesByProp", () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
                 addThingNode(graph, 1, {a: 'aaa'}),
@@ -219,7 +219,7 @@ describe('graph', () => {
                 addThingNode(graph, 3, {a: 'acc'}),
                 addThingNode(graph, 4, {a: 'add'}),
             ])),
-            switchMap(([{graph}]) => nodesByProp(graph, 'thing', 'a', 'ab', {gt: 'abb'})),
+            switchMap(([{graph}]) => nodesByProp(graph, 'thing', 'a', '', {gt: 'abb'})),
             tap(({nodes}) => nodes)
         ))
     )

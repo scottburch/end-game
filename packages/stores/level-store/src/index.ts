@@ -97,7 +97,9 @@ const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode)
     }
 
     function standardPropIdx(label: string, key: string, prop: any) {
-        return store.put([graph.graphId, IndexTypes.PROP, label, key, prop, node.nodeId].join('.'), '')
+        return of([graph.graphId, IndexTypes.PROP, label, key, prop, node.nodeId].join('.')).pipe(
+            switchMap(key => store.put(key, ''))
+        )
     }
 }
 
@@ -176,8 +178,8 @@ const keySearchCriteria = (segments: string[], opts: RangeOpts = {}) =>
         lt: segments.join('.').replace('*', '') + String.fromCharCode(255),
         limit: opts.limit
     }) : ({
-        [opts.gte ? 'gte' : 'gt']: segments.join('.') + '.' + (opts.gt || opts.gte || ''),
-        [opts.lte ? 'lte' : 'lt']: segments.join('.') + '.' + (opts.lt || opts.lte || String.fromCharCode(255)),
+        [opts.gte ? 'gte' : 'gt']: segments.filter(seg => seg).join('.') + '.' + (opts.gt || opts.gte || ''),
+        [opts.lte ? 'lte' : 'lt']: segments.filter(seg => seg).join('.') + '.' + (opts.lt || opts.lte || String.fromCharCode(255)),
         limit: opts.limit,
         reverse: opts.reverse
     });
