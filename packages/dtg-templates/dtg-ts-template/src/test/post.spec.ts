@@ -1,4 +1,4 @@
-import {bufferCount, concatMap, delay, firstValueFrom, last, mergeMap, of, range, switchMap, tap, toArray} from "rxjs";
+import {concatMap, delay, firstValueFrom, last, mergeMap, of, range, switchMap} from "rxjs";
 import {openBrowser} from "@end-game/utils/openBrowser";
 import {postHelper, signupHelper} from "./utils/testUtils.js";
 
@@ -19,5 +19,5 @@ describe('post', () => {
                 ))
             ))
         ))
-    )
-})
+    );
+});

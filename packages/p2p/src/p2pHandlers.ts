@@ -107,12 +107,12 @@ const nodesByLabelHandler: GraphP2pHandler<'nodesByLabel'> = ({graph, label, nod
     return of({graph, label, nodes, opts})
 };
 
-const nodesByPropHandler: GraphP2pHandler<'nodesByProp'> = ({graph, label, key, value, nodes}) => {
+const nodesByPropHandler: GraphP2pHandler<'nodesByProp'> = ({graph, label, key, value, nodes, opts}) => {
     chainNext((graph as GraphWithP2p).chains.peersOut, {
         graph,
         msg: {cmd: 'nodesByProp', data: {label, key, value}}
     }).subscribe()
-    return of({graph, label, key, value, nodes});
+    return of({graph, label, key, value, nodes, opts});
 }
 
 const getEdgeHandler: GraphP2pHandler<'getEdge'> = ({graph, edgeId, edge, opts}) => {
