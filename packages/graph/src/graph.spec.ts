@@ -211,6 +211,20 @@ describe('graph', () => {
         ))
     );
 
+    it.skip("should pass range options to nodesByProp", () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph => combineLatest([
+                addThingNode(graph, 1, {a: 'aaa'}),
+                addThingNode(graph, 2, {a: 'abb'}),
+                addThingNode(graph, 3, {a: 'acc'}),
+                addThingNode(graph, 4, {a: 'add'}),
+            ])),
+            switchMap(([{graph}]) => nodesByProp(graph, 'thing', 'a', 'ab', {gt: 'abb'})),
+            tap(({nodes}) => nodes)
+        ))
+    )
+
+
     it('should update a graphGetNode() listener when node props is updated', () =>
         firstValueFrom(getAGraph().pipe(
             tap(graph => putNode(graph, newNode(asNodeId('n1'), 'person', {name: 'scott'})).subscribe()),

@@ -152,7 +152,7 @@ export const levelStoreNodesByLabelHandler = (): GraphHandler<'nodesByLabel'> =>
 
 export const levelStoreNodesByPropHandler = (): GraphHandler<'nodesByProp'> =>
     ({graph, label, key, value, opts}) => getStore(graph).pipe(
-        switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, value.toString()]))),
+        switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, value.toString()], opts))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),
