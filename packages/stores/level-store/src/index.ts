@@ -83,11 +83,23 @@ export const levelStorePutNodeHandler = (): GraphHandler<'putNode'> => {
     }
 }
 
-const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode) =>
-    Object.keys(node.props).length ? from(Object.keys(node.props)).pipe(
-        switchMap(key => store.put([graph.graphId, IndexTypes.PROP, node.label, key, node.props[key].toString(), node.nodeId].join('.'), '')),
+const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode) => {
+    return Object.keys(node.props).length ? from(Object.keys(node.props)).pipe(
+        switchMap(key => Array.isArray(node.props[key]) ? arrayPropIdx(node.label, key, node.props[key]) : standardPropIdx(node.label, key, node.props[key])),
         last()
     ) : of(undefined);
+
+    function arrayPropIdx(label: string, key: string, propArr: any[]) {
+        return from(propArr).pipe(
+            mergeMap(prop => standardPropIdx(label, key, prop)),
+            last()
+        );
+    }
+
+    function standardPropIdx(label: string, key: string, prop: any) {
+        return store.put([graph.graphId, IndexTypes.PROP, label, key, prop, node.nodeId].join('.'), '')
+    }
+}
 
 export const levelStorePutEdgeHandler = (): GraphHandler<'putEdge'> => {
     return ({graph, edge}) => getStore(graph).pipe(
