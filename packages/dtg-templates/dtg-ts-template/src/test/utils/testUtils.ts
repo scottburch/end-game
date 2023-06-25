@@ -6,6 +6,7 @@ import {openBrowser} from "@end-game/utils/openBrowser";
 export const signupHelper = (page: Page) =>
     of(page).pipe(
         switchMap(page => of(page).pipe(
+            switchMap(() => clickMenu(page)),
             switchMap(() => page.click(':text("signup")')),
             switchMap(() => page.fill('#signup_username', 'scott')),
             switchMap(() => page.fill('#signup_password', '12345')),
@@ -14,7 +15,7 @@ export const signupHelper = (page: Page) =>
             switchMap(() => page.fill('#signup_nickname', 'scooter')),
             switchMap(() => page.fill('#signup_aboutMe', 'Here I am')),
             switchMap(() => page.click('button>:text("Signup")')),
-            switchMap(() => page.waitForSelector('div:text("scott")')),
+            switchMap(() => page.waitForSelector('span:text("Welcome scott")')),
             map(() => page)
         ))
     );
@@ -38,13 +39,13 @@ export const connectBrowsers = (page0: Page, page1: Page) =>
 
 export const postHelper = (page: Page, text: string = 'my post') =>
     of(page).pipe(
-        switchMap(() => clickUserMenu(page)),
+        switchMap(() => clickMenu(page)),
         switchMap(() => page.waitForSelector(':text("Add Post")')),
         switchMap(() => page.click(':text("Add Post")')),
         switchMap(() => page.fill('#add-post_text', text)),
         switchMap(() => page.click('button>:text("Add post")'))
     );
 
-export const clickUserMenu = (page: Page) =>
-    page.click('#user-menu-btn');
+export const clickMenu = (page: Page) =>
+    page.click('#menu-btn');
 

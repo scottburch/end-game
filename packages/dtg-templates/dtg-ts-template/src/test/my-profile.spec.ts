@@ -1,5 +1,5 @@
 import {firstValueFrom, of, switchMap} from "rxjs";
-import {clickUserMenu, postHelper, signupHelper} from "./utils/testUtils.js";
+import {clickMenu, postHelper, signupHelper} from "./utils/testUtils.js";
 import {openBrowser} from "@end-game/utils/openBrowser";
 
 describe('profile', () => {
@@ -8,7 +8,7 @@ describe('profile', () => {
             switchMap(page => of(page).pipe(
                 switchMap(() => signupHelper(page)),
                 switchMap(() => postHelper(page)),
-                switchMap(() => clickUserMenu(page)),
+                switchMap(() => clickMenu(page)),
                 switchMap(() => page.click(':text("My Profile")')),
                 switchMap(() => page.fill('#my-profile_display', 'Another')),
                 switchMap(() => page.fill('#my-profile_aboutMe', 'Changed about me')),
