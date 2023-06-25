@@ -223,7 +223,21 @@ describe('graph', () => {
             map(({nodes}) => nodes.map(node => node.props.a)),
             tap(values => expect(values).to.deep.equal(['acc', 'add']))
         ))
-    )
+    );
+
+    it('should pass range options to nodesByProp and work with array values', () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph => combineLatest([
+                addThingNode(graph, 1, {a: ['aaa']}),
+                addThingNode(graph, 2, {a: ['abb']}),
+                addThingNode(graph, 3, {a: ['acc']}),
+                addThingNode(graph, 4, {a: ['add']}),
+            ])),
+            switchMap(([{graph}]) => nodesByProp<{a: string}>(graph, 'thing', 'a', '', {gt: 'abb'})),
+            map(({nodes}) => nodes.map(node => node.props.a)),
+            tap(values => expect(values).to.deep.equal([['acc'], ['add']]))
+        ))
+    );
 
 
     it('should update a graphGetNode() listener when node props is updated', () =>
