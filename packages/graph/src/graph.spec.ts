@@ -181,12 +181,20 @@ describe('graph', () => {
     it('should be able to find a node whose property is an array by one of the values', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph =>
-                putNode(graph, newNode(asNodeId('n1'), 'thing', {name: 'thing1', arr: ['one', 'two', 'three']})),
+                addThingNode(graph, 1, {arr: ['one', 'two', 'three']}),
             ),
             switchMap(({graph}) => nodesByProp<{name: string, arr: string[]}>(graph, 'thing', 'arr', 'one')),
             tap(({nodes}) => nodes)
         ))
     );
+
+    it('should be able to store a node with a property that is an empty array', () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph =>
+                addThingNode(graph, 0, {arr: []})
+            ),
+        ))
+    )
 
     it('should be able to search for a partial property label', () =>
         firstValueFrom(getAGraph().pipe(

@@ -1,11 +1,10 @@
-import {useGraphNodesByLabel} from "@end-game/react-graph";
 import React from 'react';
 import {Post} from "../types/Post.js";
 import {PostItem} from "./PostItem.jsx";
 import {List} from "antd";
+import {GraphNode} from "@end-game/graph";
 
-export const PostList: React.FC = () => {
-    const posts = useGraphNodesByLabel<Post>('post', {reverse: true});
+export const PostList: React.FC<{posts: GraphNode<Post>[]}> = ({posts}) => {
 
     return (
         <List bordered>

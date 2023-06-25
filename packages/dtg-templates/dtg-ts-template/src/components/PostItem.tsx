@@ -13,7 +13,7 @@ export const PostItem:React.FC<{post: GraphNode<Post>}> = ({post}) => {
         <List.Item>
             <List.Item.Meta
                 title={<Space><Owner post={(post as NodeWithAuth<Post>)}/> <DateFromNow date={new Date(post.props.timestamp)}/></Space>}
-                description={replaceMentionsAndTagsWithLinks(post.props.text)}
+                description={replaceMentionsAndTagsWithLinks(post.props.text).map((part, idx) => <span key={idx}>{part}</span>)}
             />
         </List.Item>
     )

@@ -90,10 +90,10 @@ const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode)
     ) : of(undefined);
 
     function arrayPropIdx(label: string, key: string, propArr: any[]) {
-        return from(propArr).pipe(
+        return propArr.length ? from(propArr).pipe(
             mergeMap(prop => standardPropIdx(label, key, prop)),
             last()
-        );
+        ) : of(undefined);
     }
 
     function standardPropIdx(label: string, key: string, prop: any) {

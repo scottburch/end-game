@@ -1,32 +1,25 @@
-import {useGraphPut, useGraphPutEdge} from "@end-game/react-graph";
+import {useGraphPut} from "@end-game/react-graph";
 import type {Post} from "../types/Post.js";
 import React, {useState} from 'react';
 import {asNodeId} from "@end-game/graph";
 import {Button, Form, Mentions} from "antd";
-import {combineLatest, from, last, map, merge, mergeMap, of, switchMap, tap, toArray} from "rxjs";
+import {combineLatest, of, switchMap, tap} from "rxjs";
 import {useNavigate} from "react-router-dom";
 import {findTagsFromPost} from "../utils/postUtils.js";
 
 export const AddPostPage: React.FC = () => {
     const graphPut = useGraphPut<Post>();
-    const edgePut = useGraphPutEdge();
 
     const [savingPost, setSavingPost] = useState(false);
     const navigate = useNavigate();
 
     const addPost = (values: Omit<Post, 'timestamp'>) => {
         setSavingPost(true);
-        of(Date.now().toString()).pipe(
-            map(id => asNodeId(id)),
-            switchMap(id => graphPut('post', id, {...values, timestamp: new Date})),
-            switchMap(({nodeId}) => combineLatest([
-                of(nodeId),
-                findTagsFromPost(values.text)
-            ])),
-            switchMap(([postId, tags]) => from(tags).pipe(
-                mergeMap(tag => edgePut('tag', '', postId, tag, {tag})),
-                last()
-            )),
+        combineLatest([
+            of(asNodeId(Date.now().toString())),
+            findTagsFromPost(values.text)
+        ]).pipe(
+            switchMap(([id, tags]) => graphPut('post', id, {...values, tags, timestamp: new Date()})),
             tap(() => navigate('/'))
         ).subscribe();
     }
