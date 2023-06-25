@@ -14,7 +14,7 @@ describe('post', () => {
                     last()
                 )),
                 concatMap(() => range(1, 10).pipe(
-                    mergeMap(n => page.waitForSelector(`div:text("post-${n}")`)),
+                    mergeMap(n => page.waitForSelector(`span:text("post-${n}")`)),
                     last()
                 ))
             ))
