@@ -11,6 +11,7 @@ import {MyProfilePage} from "./pages/MyProfilePage.jsx";
 import {AddPostPage} from "./pages/AddPostPage.jsx";
 import {PostsPage} from "./pages/PostsPage.jsx";
 import {ProfilePage} from "./pages/ProfilePage.jsx";
+import {PostsByTagPage} from "./pages/PostsByTagPage.jsx";
 
 export const Main: React.FC = () => {
     const auth = useAuth();
@@ -37,6 +38,7 @@ export const Main: React.FC = () => {
                         <Route path="/profile/:userId" element={<ProfilePage/>}/>
                         <Route path="/add-post" element={<AddPostPage/>}/>
                         <Route path="/posts" element={<PostsPage/>}/>
+                        <Route path="/posts/tag/:tag" element={<PostsByTagPage/>}/>
                         <Route path="/" element={<PostsPage/>}/>
                     </Routes>
                 </div>
