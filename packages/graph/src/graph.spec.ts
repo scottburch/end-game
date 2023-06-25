@@ -194,7 +194,7 @@ describe('graph', () => {
                 addThingNode(graph, 0, {arr: []})
             ),
         ))
-    )
+    );
 
     it('should be able to search for a partial property label', () =>
         firstValueFrom(getAGraph().pipe(

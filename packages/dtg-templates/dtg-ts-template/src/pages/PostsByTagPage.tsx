@@ -11,7 +11,5 @@ export const PostsByTagPage: React.FC = () => {
 
 const PostsListByTag: React.FC<{tag: string}> = ({tag}) => {
     const posts = useGraphNodesByProp<Post>('post', 'tags', tag);
-
-
     return <PostList posts={posts}/>
 }
