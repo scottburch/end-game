@@ -353,11 +353,11 @@ describe('graph', () => {
                         mergeMap(n => addThingNode(graph, n)),
                         last(),
                     )),
-                    switchMap(({graph}) => nodesByLabel(graph, 'thing', {gt: 'thing1', lt: 'thing4'})),
+                    switchMap(({graph}) => nodesByLabel(graph, 'thing', {gt: 'thing0001', lt: 'thing0004'})),
                     tap(({nodes}) => {
                         expect(nodes.length).to.equal(2);
-                        expect(nodes[0].nodeId).to.equal('thing2');
-                        expect(nodes[1].nodeId).to.equal('thing3');
+                        expect(nodes[0].nodeId).to.equal('thing0002');
+                        expect(nodes[1].nodeId).to.equal('thing0003');
                     })
                 ))
             );

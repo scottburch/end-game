@@ -6,6 +6,7 @@ import {authHandlers} from "@end-game/pwd-auth";
 import type {Host} from '@end-game/p2p'
 import {asPeerId, dialPeer, newHost, p2pHandlers, startServer} from "@end-game/p2p";
 import detect from 'detect-port'
+import ld from 'lodash'
 
 export const getAGraph = (opts: GraphOpts = {graphId: asGraphId(newUid())}) => graphOpen(opts).pipe(
     switchMap(graph => levelStoreHandlers(graph)),
@@ -40,7 +41,9 @@ export const startTestNode = (nodeNo: number, peers: number[] = [], basePort: nu
     );
 
 export const addThingNode = (graph: Graph, n: number, props: Props = {}) =>
-    putNode(graph, newNode(asNodeId(`thing${n}`), 'thing', {name: `thing${n}`, ...props}));
+    of(ld.padStart(n.toString(), 4, '0')).pipe(
+        switchMap(padNum =>  putNode(graph, newNode(asNodeId(`thing${padNum}`), 'thing', {name: `thing${padNum}`, ...props})))
+    )
 
 
 const findBasePort = (basePort = 11110): Observable<number> => from(detect(basePort)).pipe(

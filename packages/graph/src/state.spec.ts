@@ -15,8 +15,8 @@ describe('node state', () => {
                 switchMap(() => addThingNode(host0.graphs[0], 1, {foo: 11})),
                 delay(1000),
                 switchMap(() => combineLatest([
-                    getNode(host0.graphs[0], asNodeId('thing1') , {}),
-                    getNode(host1.graphs[0], asNodeId('thing1') , {})
+                    getNode(host0.graphs[0], asNodeId('thing0001') , {}),
+                    getNode(host1.graphs[0], asNodeId('thing0001') , {})
                 ])),
                 tap(([{node:n0}, {node:n1}]) => {
                     expect(n0.props.foo).to.equal(11);

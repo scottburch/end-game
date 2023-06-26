@@ -240,12 +240,12 @@ describe('p2p handlers', () => {
                 ));
 
                 function testNodeReceived(graph: Graph) {
-                    return nodesByLabel(graph, 'thing', {gt: 'thing1', lt: 'thing4'}).pipe(
+                    return nodesByLabel(graph, 'thing', {gt: 'thing0001', lt: 'thing0004'}).pipe(
                         skipWhile(({nodes}) => nodes.length < 2),
                         tap(({nodes}) => {
                             expect(nodes).to.have.length(2);
-                            expect(nodes[0].nodeId).to.equal('thing2');
-                            expect(nodes[1].nodeId).to.equal('thing3');
+                            expect(nodes[0].nodeId).to.equal('thing0002');
+                            expect(nodes[1].nodeId).to.equal('thing0003');
                         }),
                         first()
                     )
@@ -258,7 +258,7 @@ describe('p2p handlers', () => {
                         take(2),
                         toArray(),
                         tap(nodeIds => {
-                            expect(nodeIds).to.deep.equal(['thing2', 'thing3']);
+                            expect(nodeIds).to.deep.equal(['thing0002', 'thing0003']);
                         })
                     )
                 }

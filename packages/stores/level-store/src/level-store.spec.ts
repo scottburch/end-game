@@ -5,6 +5,7 @@ import {levelStoreHandlers} from "./index.js";
 import {addThingNode} from "@end-game/test-utils";
 import {rm} from "fs/promises";
 import {expect} from 'chai';
+import ld from 'lodash'
 
 
 describe('level-store', () => {
@@ -21,21 +22,21 @@ describe('level-store', () => {
             switchMap(() => graphOpen({graphId: asGraphId('g1')})),
             switchMap(graph => levelStoreHandlers(graph, {dir: 'test-store'})),
             switchMap(graph => range(1, 10).pipe(
-                mergeMap(n => getNode(graph, asNodeId(`thing${n}`), {}).pipe(first())),
+                mergeMap(n => getNode(graph, asNodeId(`thing${ld.padStart(n.toString(), 4, '0')}`), {}).pipe(first())),
                 map(({nodeId}) => nodeId),
                 toArray()
             )),
             tap(ids => expect(ids.sort()).to.deep.equal([
-                "thing1",
-                "thing10",
-                "thing2",
-                "thing3",
-                "thing4",
-                "thing5",
-                "thing6",
-                "thing7",
-                "thing8",
-                "thing9"
+                "thing0001",
+                "thing0002",
+                "thing0003",
+                "thing0004",
+                "thing0005",
+                "thing0006",
+                "thing0007",
+                "thing0008",
+                "thing0009",
+                "thing0010"
             ]))
         ))
     )

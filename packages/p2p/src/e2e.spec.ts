@@ -18,9 +18,9 @@ describe('end-to-end testing', () => {
                 map(({nodes}) => nodes),
                 filter(nodes => !!nodes.length),
                 tap(([node]) => {
-                    expect(node.nodeId).to.equal('thing1');
-                    expect(node.props.name).to.equal('thing1');
-                    expect(node.nodeId).to.equal('thing1');
+                    expect(node.nodeId).to.equal('thing0001');
+                    expect(node.props.name).to.equal('thing0001');
+                    expect(node.nodeId).to.equal('thing0001');
                 })
             ))
         ))
@@ -67,9 +67,9 @@ describe('end-to-end testing', () => {
                 map(({nodes}) => nodes),
                 filter(nodes => !!nodes.length),
                 tap(([node]) => {
-                    expect(node.nodeId).to.equal('thing1');
-                    expect(node.props.name).to.equal('thing1');
-                    expect(node.nodeId).to.equal('thing1');
+                    expect(node.nodeId).to.equal('thing0001');
+                    expect(node.props.name).to.equal('thing0001');
+                    expect(node.nodeId).to.equal('thing0001');
                     peer0Sub.unsubscribe();
                     peer1Sub.unsubscribe();
                 })
@@ -91,13 +91,13 @@ describe('end-to-end testing', () => {
                     peer0Sub = dialPeer(host0, {url: 'ws://localhost:11112'}).subscribe();
                     peer1Sub = dialPeer(host1, {url: 'ws://localhost:11112'}).subscribe();
                 })),
-                switchMap(() => nodesByProp(host1.graphs[0], 'thing', 'name', 'thing1')),
+                switchMap(() => nodesByProp(host1.graphs[0], 'thing', 'name', 'thing0001')),
                 map(({nodes}) => nodes),
                 filter(nodes => !!nodes.length),
                 tap(([node]) => {
-                    expect(node.nodeId).to.equal('thing1');
-                    expect(node.props.name).to.equal('thing1');
-                    expect(node.nodeId).to.equal('thing1');
+                    expect(node.nodeId).to.equal('thing0001');
+                    expect(node.props.name).to.equal('thing0001');
+                    expect(node.nodeId).to.equal('thing0001');
                     peer0Sub.unsubscribe();
                     peer1Sub.unsubscribe();
                 }),
