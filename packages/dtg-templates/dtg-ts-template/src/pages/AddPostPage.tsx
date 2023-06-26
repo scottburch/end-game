@@ -51,10 +51,19 @@ export const AddPostPage: React.FC = () => {
                     toArray()
                 )),
                 first(),
-                tap(suggestions => setSuggestions(suggestions)),
+                tap(suggestions => setSuggestions(suggestions))
             ).subscribe();
         }
         function lookupMentions(text: string){
+            nodesByProp(graph, 'user', 'nickname', `${text}*`).pipe(
+                switchMap(({nodes}) => from(nodes).pipe(
+                    map(node => node.props.nickname),
+                    map(key => ({key, label: key, value: key})),
+                    toArray()
+                )),
+                first(),
+                tap(suggestions => setSuggestions(suggestions))
+            ).subscribe()
         }
     }
 
