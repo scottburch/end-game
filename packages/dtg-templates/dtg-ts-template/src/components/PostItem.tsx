@@ -33,7 +33,7 @@ const replaceMentionsAndTagsWithLinks = (post: GraphNode<Post>) => {
     function getTagOrMentionLink(post: GraphNode<Post>, tagOrMention: string) {
         return /^#/.test(tagOrMention) ? (
             <Link to={`/posts/tag/${tagOrMention.replace('#', '')}`}>{tagOrMention}</Link>) : (
-            <Link to={`/posts/owner/${post.props.owner}`}>{tagOrMention}</Link>
+            <Link to={`/posts/by-nick/${tagOrMention.replace('@', '')}`}>{tagOrMention}</Link>
         )
     }
 }
