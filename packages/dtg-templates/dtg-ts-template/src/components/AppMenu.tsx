@@ -10,7 +10,7 @@ export const AppMenu: React.FC = () => {
 
     return (
         <>
-            <Space id="menu-btn" style={{cursor: 'pointer'}} onClick={() => setOpen(!open)}><MenuOutlined reversed={true} rev=""/></Space>
+            <Space id="menu-btn" style={{cursor: 'pointer'}} onClick={() => setOpen(!open)}><MenuOutlined  rev="" style={{fontSize: 20}}/></Space>
         <Drawer
             title={`Welcome ${auth.username}`}
             placement="left"

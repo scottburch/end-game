@@ -12,6 +12,7 @@ import {AddPostPage} from "./pages/AddPostPage.jsx";
 import {PostsPage} from "./pages/PostsPage.jsx";
 import {ProfilePage} from "./pages/ProfilePage.jsx";
 import {PostsByTagPage} from "./pages/PostsByTagPage.jsx";
+import {Layout} from "antd";
 
 export const Main: React.FC = () => {
     const auth = useAuth();
@@ -27,9 +28,11 @@ export const Main: React.FC = () => {
     })
 
     return (
-            <div style={styles.main}>
-                <Header/>
-                <div id="body" style={{padding: 30}}>
+            <Layout style={{height: '100%'}}>
+                <Layout.Header style={styles.header}>
+                    <Header/>
+                </Layout.Header>
+                <Layout.Content id="body" style={{padding: 30, height: 'calc(100% - 50px)', overflow: 'auto'}}>
                     <Routes>
                         <Route path="/login" element={<LoginPage/>}/>
                         <Route path="/signup" element={<SignupPage/>}/>
@@ -41,16 +44,19 @@ export const Main: React.FC = () => {
                         <Route path="/posts/tag/:tag" element={<PostsByTagPage/>}/>
                         <Route path="/" element={<PostsPage/>}/>
                     </Routes>
-                </div>
-            </div>
+                </Layout.Content>
+            </Layout>
     );
 };
 
-const styles: Record<string, CSSProperties> = {
-    main: {
-        backgroundColor: '#e9ecff',
-        height: '100%',
-    }
+const styles: Record<'header', CSSProperties> = {
+    header: {
+        display: 'flex',
+        background: '#0057df',
+        color: 'white',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1}
 }
 
 

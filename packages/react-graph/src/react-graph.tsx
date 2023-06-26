@@ -80,14 +80,14 @@ export const useGraphNodesByLabel = <T extends Props>(label: string, opts: Range
     return nodes;
 }
 
-export const useGraphNodesByProp = <T extends Props>(label: string, key: keyof T & string, value: any) => {
+export const useGraphNodesByProp = <T extends Props>(label: string, key: keyof T & string, value: any, opts: RangeOpts = {}) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
     const graph = useGraph();
 
     useEffect(() => {
         if (graph) {
             const sub = of(true).pipe(
-                switchMap(() => nodesByProp<T>(graph, label, key, value)),
+                switchMap(() => nodesByProp<T>(graph, label, key, value, opts)),
                 tap(({nodes}) => setNodes(nodes as GraphNode<T>[]))
             ).subscribe();
             return () => sub.unsubscribe();

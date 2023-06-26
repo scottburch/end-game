@@ -3,7 +3,7 @@ import type {Post} from "../types/Post.js";
 import React, {useState} from 'react';
 import {asNodeId, nodesByProp} from "@end-game/graph";
 import {Button, Form, Mentions} from "antd";
-import {catchError, combineLatest, from, map, mergeMap, of, switchMap, tap, throwError, toArray} from "rxjs";
+import {catchError, combineLatest, first, from, map, mergeMap, of, switchMap, tap, throwError, toArray} from "rxjs";
 import {useNavigate} from "react-router-dom";
 import {findTagsFromPost} from "../utils/postUtils.js";
 import {MentionsOptionProps} from "antd/es/mentions/index.js";
@@ -50,10 +50,12 @@ export const AddPostPage: React.FC = () => {
                     map(key => ({key, label: key, value: key})),
                     toArray()
                 )),
-                tap(suggestions => setSuggestions(suggestions))
+                first(),
+                tap(suggestions => setSuggestions(suggestions)),
             ).subscribe();
         }
-        function lookupMentions(text: string){}
+        function lookupMentions(text: string){
+        }
     }
 
     return (
