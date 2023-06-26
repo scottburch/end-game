@@ -1,6 +1,7 @@
-import {firstValueFrom, last, mergeMap, of, range, switchMap, tap} from "rxjs";
+import {delay, first, firstValueFrom, last, mergeMap, of, range, skipWhile, switchMap, tap} from "rxjs";
 import {addThingNode, getAGraph} from "@end-game/test-utils";
 import {nodesByLabel} from "./graph.js";
+import {expect} from "chai";
 
 describe('paging', () => {
     it('should allow paging for nodesByLabel', () =>
@@ -10,8 +11,17 @@ describe('paging', () => {
                     mergeMap(n => addThingNode(graph, n)),
                     last()
                 )),
-                switchMap(() => nodesByLabel(graph, 'thing', {limit: 5})),
-                tap(({nodes}) => nodes)
+                switchMap(() => nodesByLabel(graph, 'thing', {limit: 5}).pipe(first())),
+                tap(({nodes}) => {
+                    expect(nodes[0].nodeId).to.equal('thing0001');
+                    expect(nodes[4].nodeId).to.equal('thing0005');
+                }),
+                delay(1),
+                switchMap(() => nodesByLabel(graph, 'thing', {limit: 5, gt: 'thing0005'})),
+                tap(({nodes}) => {
+                    expect(nodes[0].nodeId).to.equal('thing0006');
+                    expect(nodes[4].nodeId).to.equal('thing0010');
+                })
             ))
         ))
     )
