@@ -12,9 +12,6 @@ export const PostsByNickPage: React.FC = () => {
 
 const UserForNick: React.FC<{nick: string}> = ({nick}) => {
     const [user] = useGraphNodesByProp<User>('user', 'nickname', nick);
-
-    console.log('user', user);
-
     return user ? <PostsListByOwner owner={user.props.ownerId} /> : 'Loading...'
 }
 
