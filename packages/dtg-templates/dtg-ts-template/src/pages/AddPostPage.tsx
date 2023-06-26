@@ -1,14 +1,20 @@
-import {useGraphPut} from "@end-game/react-graph";
+import {useGraph,  useGraphPut} from "@end-game/react-graph";
 import type {Post} from "../types/Post.js";
 import React, {useState} from 'react';
-import {asNodeId} from "@end-game/graph";
+import {asNodeId, nodesByProp} from "@end-game/graph";
 import {Button, Form, Mentions} from "antd";
-import {combineLatest, of, switchMap, tap} from "rxjs";
+import {catchError, combineLatest, from, map, mergeMap, of, switchMap, tap, throwError, toArray} from "rxjs";
 import {useNavigate} from "react-router-dom";
 import {findTagsFromPost} from "../utils/postUtils.js";
+import {MentionsOptionProps} from "antd/es/mentions/index.js";
+
+
 
 export const AddPostPage: React.FC = () => {
-    const graphPut = useGraphPut<Post>();
+    const graphPut = useGraphPut<Post | {name: string}>();
+    const graph = useGraph();
+
+    const [suggestions, setSuggestions] = useState<MentionsOptionProps[]>([]);
 
     const [savingPost, setSavingPost] = useState(false);
     const navigate = useNavigate();
@@ -17,15 +23,37 @@ export const AddPostPage: React.FC = () => {
         setSavingPost(true);
         combineLatest([
             of(asNodeId(Date.now().toString())),
-            findTagsFromPost(values.text)
+            findTagsFromPost(values.text),
         ]).pipe(
-            switchMap(([id, tags]) => graphPut('post', id, {...values, tags, timestamp: new Date()})),
+            switchMap(([id, tags]) => combineLatest([
+                graphPut('post', id, {...values, tags, timestamp: new Date()}),
+                from(tags).pipe(
+                    mergeMap(tag => graphPut('tag', asNodeId(tag), {name: tag})),
+                    catchError(err => err.code === 'UNAUTHORIZED_USER' ? of(undefined) : throwError(err))
+                )
+            ])),
             tap(() => navigate('/'))
         ).subscribe();
     }
 
-    const loadMention = (...args: any[]) => {
-        console.log(args)
+    const loadSuggestions = (text: string, prefix: string) => {
+        if(text.length < 2) {
+            setSuggestions([]);
+        } else {
+            prefix === '#' ? lookupTags(text) : lookupMentions(text);
+        }
+
+        function lookupTags(text: string) {
+            nodesByProp(graph, 'tag', 'name', `${text}*`).pipe(
+                switchMap(({nodes}) => from(nodes).pipe(
+                    map(node => node.props.name),
+                    map(key => ({key, label: key, value: key})),
+                    toArray()
+                )),
+                tap(suggestions => setSuggestions(suggestions))
+            ).subscribe();
+        }
+        function lookupMentions(text: string){}
     }
 
     return (
@@ -44,7 +72,7 @@ export const AddPostPage: React.FC = () => {
                     label="Post Text"
                     name="text"
                 >
-                    <Mentions prefix={['#', '@']} onSearch={loadMention} rows={3}/>
+                    <Mentions prefix={['#', '@']} onSearch={loadSuggestions} rows={3} options={suggestions}/>
                 </Form.Item>
 
                 <Form.Item wrapperCol={{offset: 8, span: 16}}>
