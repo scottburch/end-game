@@ -27,10 +27,10 @@ export const AddPostPage: React.FC = () => {
         ]).pipe(
             switchMap(([id, tags]) => combineLatest([
                 graphPut('post', id, {...values, tags, timestamp: new Date()}),
-                from(tags).pipe(
+                tags.length ? from(tags).pipe(
                     mergeMap(tag => graphPut('tag', '', {name: tag})),
                     catchError(err => err.code === 'UNAUTHORIZED_USER' ? of(undefined) : throwError(err))
-                )
+                ) : of(undefined)
             ])),
             tap(() => navigate('/'))
         ).subscribe();
