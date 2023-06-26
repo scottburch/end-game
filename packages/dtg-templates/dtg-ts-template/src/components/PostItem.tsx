@@ -17,23 +17,23 @@ export const PostItem:React.FC<{post: GraphNode<Post>}> = ({post}) => {
                     <Owner post={(post as NodeWithAuth<Post>)}/>
                     <span style={{fontSize: 11}}><DateFromNow date={new Date(post.props.timestamp)}/></span>
                 </Space>}
-                description={replaceMentionsAndTagsWithLinks(post.props.text).map((part, idx) => <span key={idx}>{part}</span>)}
+                description={replaceMentionsAndTagsWithLinks(post).map((part, idx) => <span key={idx}>{part}</span>)}
             />
         </List.Item>
     )
 }
 
-const replaceMentionsAndTagsWithLinks = (text: string = '') => {
-    const tagOrMentions = text.match(/[@#][a-z0-9\-]*/g);
-    const betweens = text.split(/[@#][a-z0-9\-]*/g);
+const replaceMentionsAndTagsWithLinks = (post: GraphNode<Post>) => {
+    const tagOrMentions = post.props.text.match(/[@#][a-z0-9\-]*/g);
+    const betweens = post.props.text.split(/[@#][a-z0-9\-]*/g);
     return betweens.reduce((result, it, idx) =>
-        tagOrMentions?.[idx] ? [...result, ...[betweens[idx], getTagOrMentionLink(tagOrMentions[idx])]] : [...result, betweens[idx]], [] as any[]
+        tagOrMentions?.[idx] ? [...result, ...[betweens[idx], getTagOrMentionLink(post, tagOrMentions[idx])]] : [...result, betweens[idx]], [] as any[]
     )
 
-    function getTagOrMentionLink(tagOrMention: string) {
+    function getTagOrMentionLink(post: GraphNode<Post>, tagOrMention: string) {
         return /^#/.test(tagOrMention) ? (
             <Link to={`/posts/tag/${tagOrMention.replace('#', '')}`}>{tagOrMention}</Link>) : (
-            <Link to={`/user/profile-by-nick/${tagOrMention.replace('@', '')}`}>{tagOrMention}</Link>
+            <Link to={`/posts/owner/${post.props.owner}`}>{tagOrMention}</Link>
         )
     }
 }
