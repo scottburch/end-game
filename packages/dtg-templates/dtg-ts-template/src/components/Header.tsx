@@ -2,6 +2,7 @@ import React from "react";
 import {useAuth} from "@end-game/react-graph";
 import {Space} from "antd";
 import {AppMenu} from "./AppMenu.jsx";
+import {ConnectBtns} from "./ConnectBtns.jsx";
 
 export const Header: React.FC = () => {
     const auth = useAuth();
@@ -14,7 +15,7 @@ export const Header: React.FC = () => {
             <AppMenu/>
             </Space>
             <div style={{paddingLeft: 10}}/>
-            {/*<div><ConnectBtns/></div>*/}
+            <div><ConnectBtns/></div>
         </>
     )
 }

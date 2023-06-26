@@ -1,25 +1,31 @@
 import React, {useState} from "react";
 import {useDialer} from "@end-game/react-graph";
-import {tap} from "rxjs";
+import {Subscription} from "rxjs";
 import {newUid} from "@end-game/graph";
+import {Button, Space} from "antd";
 
 const ConnectBtn: React.FC<{n: number}> = ({n}) => {
     const dial = useDialer(newUid());
-    const [dialState, setDialState] = useState(false);
+    const [dialSub, setDialSub] = useState<Subscription>();
 
-    const dialPeer = () => dial({url: `ws://localhost:1111${n}`, redialInterval: 1}).pipe(
-        tap(() => setDialState(true))
-    ).subscribe();
+    const toggleDial = () => {
+        if(!!dialSub) {
+            dialSub.unsubscribe();
+            setDialSub(undefined);
+        } else {
+            setDialSub(dial({url: `ws://localhost:1111${n}`, redialInterval: 1}).subscribe())
+        }
+    }
 
     return (
-        <button style={{fontWeight: dialState ? 'bold' : 'normal'}} onClick={dialPeer}>Peer {n} {dialState ? '*': ' '}</button>
+        <Button onClick={toggleDial}>Peer {n} {!!dialSub ? '*': ' '}</Button>
     )
 };
 
 export const ConnectBtns: React.FC = () => (
-    <div>
+    <Space>
         <ConnectBtn n={0}/>
         <ConnectBtn n={1}/>
-    </div>
+    </Space>
 )
 
