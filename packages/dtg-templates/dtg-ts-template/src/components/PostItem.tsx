@@ -12,7 +12,11 @@ export const PostItem:React.FC<{post: GraphNode<Post>}> = ({post}) => {
     return (
         <List.Item>
             <List.Item.Meta
-                title={<Space><Owner post={(post as NodeWithAuth<Post>)}/> <DateFromNow date={new Date(post.props.timestamp)}/></Space>}
+                title={
+                <Space>
+                    <Owner post={(post as NodeWithAuth<Post>)}/>
+                    <span style={{fontSize: 11}}><DateFromNow date={new Date(post.props.timestamp)}/></span>
+                </Space>}
                 description={replaceMentionsAndTagsWithLinks(post.props.text).map((part, idx) => <span key={idx}>{part}</span>)}
             />
         </List.Item>
