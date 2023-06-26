@@ -1,4 +1,4 @@
-import {useGraph,  useGraphPut} from "@end-game/react-graph";
+import {useAuth, useGraph, useGraphPut} from "@end-game/react-graph";
 import type {Post} from "../types/Post.js";
 import React, {useState} from 'react';
 import {asNodeId, nodesByProp} from "@end-game/graph";
@@ -13,6 +13,7 @@ import {MentionsOptionProps} from "antd/es/mentions/index.js";
 export const AddPostPage: React.FC = () => {
     const graphPut = useGraphPut<Post | {name: string}>();
     const graph = useGraph();
+    const auth = useAuth();
 
     const [suggestions, setSuggestions] = useState<MentionsOptionProps[]>([]);
 
@@ -26,7 +27,7 @@ export const AddPostPage: React.FC = () => {
             findTagsFromPost(values.text),
         ]).pipe(
             switchMap(([id, tags]) => combineLatest([
-                graphPut('post', id, {...values, tags, timestamp: new Date()}),
+                graphPut('post', id, {...values, tags, timestamp: new Date(), owner: auth.nodeId}),
                 tags.length ? from(tags).pipe(
                     mergeMap(tag => graphPut('tag', '', {name: tag})),
                     catchError(err => err.code === 'UNAUTHORIZED_USER' ? of(undefined) : throwError(err))

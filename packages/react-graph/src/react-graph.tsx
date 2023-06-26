@@ -46,7 +46,7 @@ export const useDialer = (hostId: string) => {
 }
 
 export const useAuth = () =>  {
-    const [auth, setAuth] = useState<{username: string, nodeId: string}>({username: '', nodeId: ''});
+    const [auth, setAuth] = useState<{username: string, nodeId: NodeId}>({username: '', nodeId: ''});
     const graph = useGraph();
 
 

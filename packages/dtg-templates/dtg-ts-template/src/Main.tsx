@@ -13,6 +13,7 @@ import {PostsPage} from "./pages/PostsPage.jsx";
 import {ProfilePage} from "./pages/ProfilePage.jsx";
 import {PostsByTagPage} from "./pages/PostsByTagPage.jsx";
 import {Layout} from "antd";
+import {PostsByOwnerPage} from "./pages/postsByOwnerPage.jsx";
 
 export const Main: React.FC = () => {
     const auth = useAuth();
@@ -42,6 +43,7 @@ export const Main: React.FC = () => {
                         <Route path="/add-post" element={<AddPostPage/>}/>
                         <Route path="/posts" element={<PostsPage/>}/>
                         <Route path="/posts/tag/:tag" element={<PostsByTagPage/>}/>
+                        <Route path="/posts/owner/:owner" element={<PostsByOwnerPage/>}/>
                         <Route path="/" element={<PostsPage/>}/>
                     </Routes>
                 </Layout.Content>
