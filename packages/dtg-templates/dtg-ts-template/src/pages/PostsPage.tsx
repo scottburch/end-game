@@ -27,7 +27,7 @@ export const PostsPage: React.FC = () => {
     return (
         <>
             <PostList posts={posts}/>
-            {posts.length && <Button onClick={() => loadPosts(posts[posts.length - 1].nodeId)}>Load More</Button>}
+            {posts.length ? <Button onClick={() => loadPosts(posts[posts.length - 1].nodeId)}>Load More</Button> : null}
         </>
     )
 }

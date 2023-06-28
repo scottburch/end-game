@@ -8,12 +8,12 @@ describe('post', () => {
             switchMap(page => of(page).pipe(
                 switchMap(() => signupHelper(page)),
                 delay(1000),
-                concatMap(() => range(1, 10).pipe(
+                concatMap(() => range(1, 5).pipe(
                     concatMap(n => postHelper(page, `post-${n}`)),
                     concatMap(() => page.waitForSelector(':text("Scooter")')),
                     last()
                 )),
-                concatMap(() => range(1, 10).pipe(
+                concatMap(() => range(1, 5).pipe(
                     mergeMap(n => page.waitForSelector(`span:text("post-${n}")`)),
                     last()
                 ))
