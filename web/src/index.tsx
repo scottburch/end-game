@@ -12,7 +12,7 @@ const renderIt = () => {
     );
     root.render(
         <React.StrictMode>
-            <ReactGraph>
+            <ReactGraph graphId='endgame-web'>
                 <Main/>
             </ReactGraph>
         </React.StrictMode>

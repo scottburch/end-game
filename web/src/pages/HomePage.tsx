@@ -2,6 +2,7 @@ import React, {CSSProperties} from 'react'
 import {EndgamePyramid} from "../components/EndgamePyramid.jsx";
 import triangleImg from '../images/eg-triangle.svg'
 import {Svg} from "../components/Svg.jsx";
+import {List} from "antd";
 
 export const HomePage: React.FC = () => {
     return (
@@ -13,38 +14,14 @@ export const HomePage: React.FC = () => {
             </h3>
             <h1>Endgame product stack</h1>
             <EndgamePyramid/>
-            <dl style={styles.descList}>
-                <dt style={styles.descTitle}>Reactive Graph</dt>
-                <dd style={styles.descBody}>
-                    Supporting everything else is the Reactive Graph (RG). RG is a graph data structure with reactivity.
-                    This means that your code gets notified automatically whenever data that you care about changes.
-                    That means that Reactive Graph works great as a state store for reactive UI frameworks such as React.
-                </dd>
-
-                <dt style={styles.descTitle}>Reactive UI</dt>
-                <dd style={styles.descBody}>
-                    This layer is a group of adapters for various reactive UI frameworks.  Currently, there is one built in for React.
-                </dd>
-
-                <dt style={styles.descTitle}>Authentication</dt>
-                <dd style={styles.descBody}>
-                    The authentication layer uses a combination of public/private key encryption along with a symetric key to allow
-                    secure authentication and identification on a public network.
-                </dd>
-
-                <dt style={styles.descTitle}>DTG</dt>
-                <dd style={styles.descBody}>
-                    The Distributed Trustless Graph layer provides communication between nodes to update, query and register for updates
-                    in the shared graph.
-                </dd>
-
-                <dt style={styles.descTitle}>Payments</dt>
-                <dd style={styles.descBody}>
-                    The payments layer allows for payments for products, data storage or services
-                </dd>
-
-
-            </dl>
+            <List style={{width: 'calc(100% - 40px)'}} dataSource={listData} renderItem={(item, idx) =>
+                <List.Item>
+                    <List.Item.Meta title={item.title} description={
+                        <div style={{paddingLeft: 30}}>{item.description}</div>
+                    }/>
+                </List.Item>
+            }>
+            </List>
         </div>
     )
 }
@@ -59,4 +36,28 @@ const styles: Record<'descList' | 'descTitle' | 'descBody', CSSProperties> = {
     descBody: {
         marginBottom: 20
     }
-}
+};
+
+const listData = [{
+    title: 'Reactive Graph',
+    description: 'Supporting everything else is the Reactive Graph (RG). RG is a graph data structure with reactivity.\n' +
+        '        This means that your code gets notified automatically whenever data that you care about changes.\n' +
+        '        That means that Reactive Graph works great as a state store for reactive UI frameworks such as\n' +
+        '        React.',
+}, {
+    title: 'Reactive UI',
+    description: 'This layer is a group of adapters for various reactive UI frameworks. Currently, there is one built in for React.'
+}, {
+    title: 'Authentication',
+    description: '        The authentication layer uses a combination of public/private key encryption along with a symetric\n' +
+        '        key to allow\n' +
+        '        secure authentication and identification on a public network.\n'
+}, {
+    title: 'DTG',
+    description: '        The Distributed Trustless Graph layer provides communication between nodes to update, query and\n' +
+        '        register for updates\n' +
+        '        in the shared graph.\n'
+}, {
+    title: 'Payments',
+    description: 'The payments layer allows for payments for products, data storage or services'
+}];

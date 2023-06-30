@@ -80,7 +80,7 @@ describe('graph', () => {
                 putNode(graph, newNode(asNodeId('n1'), 'person', {name: 'scott'})),
                 putNode(graph, newNode(asNodeId('n2'), 'person', {name: 'todd'}))
             ]).pipe(
-                switchMap(arr => from(arr)),
+                switchMap(arr => arr),
                 map(({nodeId}) => nodeId),
                 toArray(),
                 switchMap(([n1, n2]) => putEdge(graph, newGraphEdge(asEdgeId('e1'), 'friend', n1, n2, {foo: 10}))),
@@ -205,7 +205,7 @@ describe('graph', () => {
             ])),
             switchMap(([{graph}]) => nodesByProp(graph, 'person', 'name', 'sc*')),
             tap(({nodes}) => expect(nodes).to.have.length(2)),
-            switchMap(({nodes}) => from(nodes || [])),
+            switchMap(({nodes}) => nodes || []),
             tap(({props}) => expect(['scooter', 'scott']).to.include(props.name)),
             bufferCount(2)
         ))

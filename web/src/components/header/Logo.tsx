@@ -1,5 +1,5 @@
 import React from 'react'
-import logo from './logo.png'
+import logo from './logo-white.png'
 
 export const Logo:React.FC = () => (
     <div style={{display: 'flex'}}>
