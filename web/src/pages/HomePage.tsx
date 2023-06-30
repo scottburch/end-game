@@ -2,16 +2,29 @@ import React, {CSSProperties} from 'react'
 import {EndgamePyramid} from "../components/EndgamePyramid.jsx";
 import triangleImg from '../images/eg-triangle.svg'
 import {Svg} from "../components/Svg.jsx";
-import {List} from "antd";
+import {List, Space} from "antd";
 
 export const HomePage: React.FC = () => {
     return (
-        <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
+        <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', padding: 30, paddingTop: 0}}>
             <h2>Welcome to the new decentralized internet!</h2>
             <Svg src={triangleImg}/>
             <h3>
                 Endgame products make developing P2P internet applications faster, easier and cheaper.
             </h3>
+            <Space>
+                {
+                    'Distributed Trustless Graph'
+                        .split(' ')
+                        .map(item => (
+                                        <span>
+                                            <span style={{color: 'blue', fontSize: '1.5em'}}>{item.slice(0, 1)}</span>
+                                            {item.slice(1)}
+                                        </span>
+
+                        ))
+                }
+            </Space>
             <h1>Endgame product stack</h1>
             <EndgamePyramid/>
             <List style={{width: 'calc(100% - 40px)'}} dataSource={listData} renderItem={(item, idx) =>
@@ -25,18 +38,6 @@ export const HomePage: React.FC = () => {
         </div>
     )
 }
-
-const styles: Record<'descList' | 'descTitle' | 'descBody', CSSProperties> = {
-    descList: {
-        width: '80%'
-    },
-    descTitle: {
-        fontWeight: 'bold'
-    },
-    descBody: {
-        marginBottom: 20
-    }
-};
 
 const listData = [{
     title: 'Reactive Graph',
