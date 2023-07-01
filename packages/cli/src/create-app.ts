@@ -13,7 +13,9 @@ export const createAppCmd = (dest: string) => {
         tap(() => console.log(`You have successfully created a template for ${dest}`)),
         tap(() => console.log('Next steps\n----------')),
         tap(() => console.log(`type "cd ${dest}"`)),
-        tap(() => console.log(`type "yarn dev" to start the development environment`)),
+        tap(() => console.log('type "yarn dev" to start the development environment')),
+        tap(() => console.log('--------------------------')),
+        tap(() => console.log('To run a two node testnet type "endgame testnet"'))
     ).subscribe()
 };
 
