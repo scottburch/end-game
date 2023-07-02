@@ -5,8 +5,8 @@ import {HomePage} from "./pages/HomePage.jsx";
 import {GettingStarted} from "./pages/GettingStarted.jsx";
 import {ConfigProvider} from "antd";
 import {DocsIntroPage} from "./pages/docs/DocsIntroPage.jsx";
-import {DocsPage} from "./pages/docs/DocsPage.jsx";
 import {DocsLayout} from "./components/DocsLayout.jsx";
+import {DocsPage} from "./pages/docs/DocsPage.jsx";
 
 
 export const Main: React.FC = () => {
