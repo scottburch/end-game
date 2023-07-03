@@ -4,9 +4,11 @@ import propertyGraph from '../property-graph.png'
 
 export const Introduction: React.FC = () => (
     <DocsSection title="introduction" anchor="index" >
-            <p>
+            <>
                 <a id="intro"/>
+                <p>
                 Endgame helps you write networked P2P apps simply.
+                </p>
                 <ul>
                     <li>All networking is taken care of for you - no need for servers during development</li>
                     <li>Clients are nodes on the network - data is spread around the network for redundancy and resiliency</li>
@@ -15,7 +17,7 @@ export const Introduction: React.FC = () => (
                     <li>Automatic indexing for searching/paging on object properties stored in DB</li>
                     <li>Provides a full property graph where nodes and edges can both contain properties</li>
                 </ul>
-            </p>
+            </>
             <h4>What is a property graph?</h4>
             <p>
                 A property graph consists of nodes and edges.  Nodes contain data objects and edges are relationships between nodes.

@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {Outlet} from "react-router";
 import {Menu, MenuProps} from "antd";
+import {getApiDocItems} from "./ApiDocs.jsx";
 
 export const DocsLayout:React.FC = () => {
     const [anchor, setAnchor] = useState(location.pathname.split('#')[1] || 'intro')
@@ -29,8 +30,8 @@ const getMenuItems = () => [{
     key: 'api',
     label: 'API',
     type: 'group',
-    children: [{
-        key: 'api-graph-open',
-        label: 'graphOpen()'
-    }],
+    children: getApiDocItems().map(item => ({
+        key: `api-${item.method}`,
+        label: `${item.method}()`
+    }))
 }] satisfies MenuProps['items'];
