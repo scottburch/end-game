@@ -1,17 +1,18 @@
-import React, {CSSProperties} from "react";
+import React, {CSSProperties, ReactElement} from "react";
 import {DocsSection} from "./DocsSection.jsx";
 
 export type ApiType = {
     name: string,
     type: string,
     optional: boolean,
-    description: string
+    description: string | ReactElement
 }
 
 export type ApiDocFn = {
     method: string,
     description: string,
-    args: ApiType[]
+    args: ApiType[],
+    returns: string
 }
 
 const typesTable: Record<string, ApiType[]> = {
@@ -19,7 +20,7 @@ const typesTable: Record<string, ApiType[]> = {
         name: 'graphId',
         optional: false,
         type: 'GraphId',
-        description: 'The id associated with this graph'
+        description: <>The id associated with this graph - create with <code>asGraphId(id: string)</code></>
     }, {
         name: 'logLevel',
         optional: true,
@@ -36,7 +37,28 @@ export const getApiDocItems = () => [{
         optional: false,
         type: 'GraphOpts',
         description: ''
-    }]
+    }],
+    returns: 'Graph'
+}, {
+    method: 'newNode',
+    description: 'creates a new node object',
+    args: [{
+        name: 'nodeId',
+        optional: false,
+        type: 'NodeId',
+        description: <></>
+    }, {
+        name: 'label',
+        optional: false,
+        type: 'string',
+        description: '',
+    }, {
+        name: 'props',
+        optional: false,
+        type: 'Object',
+        description: <></>
+    }],
+    returns: 'GraphNode'
 }] satisfies ApiDocFn[];
 
 
@@ -48,7 +70,9 @@ export const ApiDocs: React.FC = () => (
                     <h4 key={item.method}>{item.method}({fnArgs(item.args)})</h4>
                     <div style={{paddingLeft: 50}}>
                         {item.description}
-                        <div>{typeTables(item)}</div>
+                        <div style={{marginBottom: 10}}>{typeTable('args', item.args)}</div>
+                        <div style={{marginBottom: 10}}>{typeTables(item)}</div>
+                        <div><strong>Returns:</strong> {item.returns}</div>
                     </div>
                 </div>
             ))}
