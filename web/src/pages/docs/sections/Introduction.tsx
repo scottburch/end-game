@@ -2,6 +2,8 @@ import React from "react";
 import {DocsSection} from "../DocsSection.jsx";
 import propertyGraph from '../property-graph.png'
 
+
+
 export const Introduction: React.FC = () => (
     <DocsSection title="introduction" anchor="index" >
             <>
