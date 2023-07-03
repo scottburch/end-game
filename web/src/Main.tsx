@@ -4,9 +4,8 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {HomePage} from "./pages/HomePage.jsx";
 import {GettingStarted} from "./pages/GettingStarted.jsx";
 import {ConfigProvider} from "antd";
-import {DocsIntroPage} from "./pages/docs/DocsIntroPage.jsx";
-import {DocsLayout} from "./components/DocsLayout.jsx";
 import {DocsPage} from "./pages/docs/DocsPage.jsx";
+import {DocsLayout} from "./pages/docs/DocsLayout.jsx";
 
 
 export const Main: React.FC = () => {
@@ -20,7 +19,6 @@ export const Main: React.FC = () => {
                             <Route path="/getting-started" element={<GettingStarted/>}/>
                             <Route path="/docs" element={<DocsLayout/>}>
                                 <Route index element={<DocsPage/>}/>
-                                <Route path="intro" element={<DocsIntroPage/>}/>
                             </Route>
                         </Routes>
                 </ConfigProvider>
