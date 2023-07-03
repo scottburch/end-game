@@ -1,6 +1,5 @@
 import React from "react";
 import {DocsSection} from "../DocsSection.jsx";
-import {Typography} from "antd";
 import propertyGraph from '../property-graph.png'
 
 export const Introduction: React.FC = () => (
@@ -10,6 +9,7 @@ export const Introduction: React.FC = () => (
                 Endgame helps you write networked P2P apps simply.
                 <ul>
                     <li>All networking is taken care of for you - no need for servers during development</li>
+                    <li>Clients are nodes on the network - data is spread around the network for redundancy and resiliency</li>
                     <li>Full stack framework - get apps up and running quickly</li>
                     <li>Simple API for NodeJS/Browser and React library for Browser</li>
                     <li>Automatic indexing for searching/paging on object properties stored in DB</li>
@@ -22,7 +22,7 @@ export const Introduction: React.FC = () => (
                 Edges can also contain properties that can contain information about the relationship.
             </p>
             <div style={{textAlign: 'center'}}>
-                <img src={propertyGraph} style={{height: 300}}/>
+                <img alt="property-graph" src={propertyGraph} style={{height: 300}}/>
             </div>
     </DocsSection>
 
