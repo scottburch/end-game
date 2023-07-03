@@ -46,12 +46,12 @@ export const getApiDocItems = () => [{
         name: 'nodeId',
         optional: false,
         type: 'NodeId',
-        description: <></>
+        description: <>use <code>asNodeId('your-nodeId')</code> to create a NodeId</>
     }, {
         name: 'label',
         optional: false,
         type: 'string',
-        description: '',
+        description: 'The label ',
     }, {
         name: 'props',
         optional: false,
@@ -59,6 +59,21 @@ export const getApiDocItems = () => [{
         description: <></>
     }],
     returns: 'GraphNode'
+}, {
+    method: 'putNode',
+    description: 'put a node in the graph',
+    args: [{
+        name: 'graph',
+        optional: false,
+        type: 'Graph',
+        description: 'the graph to insert the node into'
+    }, {
+        name: 'node',
+        optional: false,
+        type: 'GraphNode',
+        description: 'The node to insert',
+    }],
+    returns: '{graph: Graph, nodeId: NodeId}'
 }] satisfies ApiDocFn[];
 
 
@@ -66,7 +81,8 @@ export const ApiDocs: React.FC = () => (
     <DocsSection title="Graph API" anchor="graph-api">
         <>
             {getApiDocItems().map(item => (
-                <div key={item.method}>
+                <div key={item.method} style={{marginBottom: 50}}>
+                    <a id={`api-${item.method}`}/>
                     <h4 key={item.method}>{item.method}({fnArgs(item.args)})</h4>
                     <div style={{paddingLeft: 50}}>
                         {item.description}

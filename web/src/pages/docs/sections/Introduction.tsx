@@ -18,6 +18,7 @@ export const Introduction: React.FC = () => (
                     <li>Simple API for NodeJS/Browser and React library for Browser</li>
                     <li>Automatic indexing for searching/paging on object properties stored in DB</li>
                     <li>Provides a full property graph where nodes and edges can both contain properties</li>
+                    <li>Rapid prototyping</li>
                 </ul>
             </>
             <h4>What is a property graph?</h4>
