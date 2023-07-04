@@ -75,11 +75,92 @@ export const getApiDocItems = () => [{
     }],
     returns: '{graph: Graph, nodeId: NodeId}'
 }, {
+    method: 'getNode',
+    description: 'get a node from the graph by ID',
+    args: [{
+        name: 'graph',
+        optional: false,
+        type: 'Graph',
+        description: 'the graph to get the node from'
+    }, {
+        name: 'nodeId',
+        optional: false,
+        type: 'NodeId',
+        description: 'Id of node to get from the graph'
+    }, {
+        name: 'opts',
+        optional: false,
+        type: '{local: boolean}',
+        description: 'Restrict retrieval to local host only.'
+    }],
+    returns: '{graph: Graph, nodeId: NodeId, node: GraphNode}'
+}, {
     method: 'newEdge',
     description: 'Creates a new graph edge',
-    args: [],
+    args: [{
+        name: 'edgeId',
+        optional: false,
+        type: 'EdgeId',
+        description: <>Edge id.  Use <code>asEdgeId('my-edge-id')</code> to create a new edge id.</>
+    }, {
+        name: 'rel',
+        optional: false,
+        type: 'string',
+        description: 'The name of the relationship eg. "is_friend"'
+    }, {
+        name: 'from',
+        optional: false,
+        type: 'NodeId',
+        description: 'The node ID for the from node'
+    }, {
+        name: 'to',
+        optional: false,
+        type: 'NodeId',
+        description: 'The node ID for the to node'
+    }, {
+        name: 'props',
+        optional: false,
+        type: 'Object',
+        description: 'Properties to be stored in the edge'
+    }],
     returns: '{graph: Graph, edgeId: EdgeId}'
+}, {
+    method: 'putEdge',
+    description: 'Put an edge into the graph',
+    args: [{
+        name: 'graph',
+        optional: false,
+        type: 'Graph',
+        description: 'graph to put the edge into'
+    }, {
+        name: 'edge',
+        optional: false,
+        type: 'GraphEdge',
+        description: 'Edge to insert into the graph'
+    }],
+    returns: '{graph: Graph, edgeId: EdgeId}'
+}, {
+    method: 'getEdge',
+    description: 'get an edge from the graph by ID',
+    args: [{
+        name: 'graph',
+        optional: false,
+        type: 'Graph',
+        description: 'the graph to get the edge from'
+    }, {
+        name: 'edgeId',
+        optional: false,
+        type: 'EdgeId',
+        description: 'Id of edge to get from the graph'
+    }, {
+        name: 'opts',
+        optional: false,
+        type: '{local: boolean}',
+        description: 'Restrict retrieval to local host only.'
+    }],
+    returns: '{graph: Graph, edgeId: EdgeId, edge: GraphEdge}'
 }] satisfies ApiDocFn[];
+
 
 
 export const ApiDocs: React.FC = () => (
