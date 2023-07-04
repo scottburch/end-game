@@ -26,6 +26,53 @@ const typesTable: Record<string, ApiType[]> = {
         optional: true,
         type: 'LogLevel',
         description: 'The log level for this graph'
+    }],
+    RangeOpts: [{
+        name: 'gt',
+        optional: true,
+        type: 'string',
+        description: '> value'
+    }, {
+        name: 'gte',
+        optional: true,
+        type: 'string',
+        description: '>= value'
+    }, {
+        name: 'lt',
+        optional: true,
+        type: 'string',
+        description: '< value'
+    }, {
+        name: 'lte',
+        optional: true,
+        type: 'string',
+        description: '<= value'
+    }, {
+        name: 'reverse',
+        optional: true,
+        type: 'boolean',
+        description: 'reverse results'
+    }, {
+        name: 'limit',
+        optional: true,
+        type: 'number',
+        description: 'limit the number of results'
+    }],
+    Relationship: [{
+        name: 'from',
+        type: 'NodeId',
+        optional: false,
+        description: 'From node of relationship'
+    }, {
+        name: 'to',
+        type: 'NodeId',
+        optional: false,
+        description: 'To node of relationship'
+    }, {
+        name: 'edgeId',
+        type: 'EdgeId',
+        optional: false,
+        description: 'Id of edge for relationship'
     }]
 }
 
@@ -159,6 +206,51 @@ export const getApiDocItems = () => [{
         description: 'Restrict retrieval to local host only.'
     }],
     returns: '{graph: Graph, edgeId: EdgeId, edge: GraphEdge}'
+}, {
+    method: 'nodesByLabel',
+    description: 'retrieve nodes with a provided label',
+    args: [{
+        name: 'graph',
+        type: 'Graph',
+        optional: false,
+        description: 'graph to retrieve nodes from'
+    }, {
+        name: 'label',
+        type: 'string',
+        optional: false,
+        description: 'label of nodes to retrieve'
+    }, {
+        name: 'opts',
+        type: 'RangeOpts',
+        optional: true,
+        description: 'range criteria of results to retrieve'
+    }],
+    returns: '{graph: Graph, label: string, nodes: GraphNode[], opts: RangeOpts}'
+}, {
+    method: 'getRelationships',
+    description: 'get relationships from the graph',
+    args: [{
+        name: 'graph',
+        optional: false,
+        type: 'Graph',
+        description: 'Graph to get the relationships from'
+    }, {
+        name: 'nodeId',
+        optional: false,
+        type: 'NodeId',
+        description: 'Id of node to get relationships for'
+    }, {
+        name: 'rel',
+        optional: false,
+        type: 'string',
+        description: 'Relationship type'
+    }, {
+        name: 'opts',
+        optional: false,
+        type: '{reverse: boolean}',
+        description: 'reverse = reverse the relationship. Provide relationships to this node instead of from this node'
+    }],
+    returns: '{graph: Graph, nodeId: NodeId, rel: string, relationships: Relationship[]}'
 }] satisfies ApiDocFn[];
 
 
