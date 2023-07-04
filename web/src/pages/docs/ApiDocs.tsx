@@ -251,6 +251,36 @@ export const getApiDocItems = () => [{
         description: 'reverse = reverse the relationship. Provide relationships to this node instead of from this node'
     }],
     returns: '{graph: Graph, nodeId: NodeId, rel: string, relationships: Relationship[]}'
+}, {
+    method: 'nodesByProp',
+    description: 'retrieves nodes by a property and value',
+    args: [{
+        name: 'graph',
+        type: 'Graph',
+        optional: false,
+        description: 'graph to retrieve nodes on'
+    }, {
+        name: 'label',
+        type: 'string',
+        optional: false,
+        description: 'label of nodes to retrieve'
+    }, {
+        name: 'key',
+        type: 'string',
+        optional: false,
+        description: 'property name to query'
+    }, {
+        name: 'value',
+        type: 'any',
+        optional: false,
+        description: 'value to query'
+    }, {
+        name: 'opts',
+        type: 'RangeOpts',
+        optional: true,
+        description: 'Range query'
+    }],
+    returns: '{graph: Graph, label: string, key: string, value: any, nodes: GraphNode[]}'
 }] satisfies ApiDocFn[];
 
 
