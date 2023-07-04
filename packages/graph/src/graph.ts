@@ -136,7 +136,7 @@ export const putNode = <T extends Props>(graph: Graph, node: GraphNode<T>) =>
         map(({node}) => ({graph, nodeId: node.nodeId})),
     );
 
-export const newGraphEdge = <T extends Props>(edgeId: EdgeId, rel: string, from: NodeId, to: NodeId, props: T) => ({
+export const newEdge = <T extends Props>(edgeId: EdgeId, rel: string, from: NodeId, to: NodeId, props: T) => ({
         edgeId: edgeId || asEdgeId(newUid()), rel, props, from, to, state: Date.now().toString()
     } satisfies GraphEdge<T>
 )

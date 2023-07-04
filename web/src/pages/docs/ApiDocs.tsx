@@ -74,6 +74,11 @@ export const getApiDocItems = () => [{
         description: 'The node to insert',
     }],
     returns: '{graph: Graph, nodeId: NodeId}'
+}, {
+    method: 'newEdge',
+    description: 'Creates a new graph edge',
+    args: [],
+    returns: '{graph: Graph, edgeId: EdgeId}'
 }] satisfies ApiDocFn[];
 
 

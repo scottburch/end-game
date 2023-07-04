@@ -16,7 +16,7 @@ import {
     putNode,
     putEdge,
     nodesByLabel,
-    nodesByProp, newGraphEdge, asGraphId,
+    nodesByProp, asGraphId, newEdge,
 } from "@end-game/graph";
 import type {PropsWithChildren} from 'react';
 import * as React from "react";
@@ -178,7 +178,7 @@ export const useGraphPutEdge = <T extends Props>() => {
     const graph: Graph = useGraph();
 
     return (rel: string, edgeId: EdgeId, from: NodeId, to: NodeId, props: T) => {
-        return putEdge(graph, newGraphEdge(edgeId, rel, from, to, props)).pipe(
+        return putEdge(graph, newEdge(edgeId, rel, from, to, props)).pipe(
             catchError(err => throwError(err.code || err))
         );
     }

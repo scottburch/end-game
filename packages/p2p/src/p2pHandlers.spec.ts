@@ -5,9 +5,8 @@ import {
     graphOpen,
     putEdge,
     putNode,
-    newGraphEdge,
     newNode,
-    nodesByLabel, asNodeId, asEdgeId, asGraphId
+    nodesByLabel, asNodeId, asEdgeId, asGraphId, newEdge
 } from "@end-game/graph";
 import {
     bufferCount,
@@ -68,7 +67,7 @@ describe('p2p handlers', () => {
         firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
             switchMap((graph) => p2pHandlers(graph)),
             tap(graph => timer(1).pipe(
-                switchMap(() => putEdge(graph, newGraphEdge(asEdgeId('edge1'), 'friend', asNodeId('node1') , asNodeId('node2') , {name: 'thing1'})))
+                switchMap(() => putEdge(graph, newEdge(asEdgeId('edge1'), 'friend', asNodeId('node1') , asNodeId('node2') , {name: 'thing1'})))
             ).subscribe()),
             switchMap(graph => (graph as GraphWithP2p).chains.peersOut),
             map(({msg}) => ({msg, edge: (msg.data as GraphEdge)})),

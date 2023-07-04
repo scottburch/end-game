@@ -21,7 +21,7 @@ import {
     graphOpen,
     putNode,
     putEdge,
-    nodesByProp, newNode, newGraphEdge, nodesByLabel, asNodeId, asEdgeId, asGraphId
+    nodesByProp, newNode, newEdge, nodesByLabel, asNodeId, asEdgeId, asGraphId
 } from "./graph.js";
 import {expect} from "chai";
 import {addThingNode, getAGraph} from "@end-game/test-utils";
@@ -83,7 +83,7 @@ describe('graph', () => {
                 switchMap(arr => arr),
                 map(({nodeId}) => nodeId),
                 toArray(),
-                switchMap(([n1, n2]) => putEdge(graph, newGraphEdge(asEdgeId('e1'), 'friend', n1, n2, {foo: 10}))),
+                switchMap(([n1, n2]) => putEdge(graph, newEdge(asEdgeId('e1'), 'friend', n1, n2, {foo: 10}))),
                 switchMap(({edge}) => getEdge(graph, edge.edgeId, {})),
                 tap(({edge}) => {
                     expect(edge?.rel).to.equal('friend');
@@ -103,8 +103,8 @@ describe('graph', () => {
             ))),
             switchMap(([{graph}]) => combineLatest([
                 of(graph),
-                putEdge(graph, newGraphEdge(asEdgeId('e0'), 'friend', asNodeId('n0'), asNodeId('n1'), {rank: 5})),
-                putEdge(graph, newGraphEdge(asEdgeId('e1'), 'friend', asNodeId('n0'), asNodeId('n2'), {rank: 10}))
+                putEdge(graph, newEdge(asEdgeId('e0'), 'friend', asNodeId('n0'), asNodeId('n1'), {rank: 5})),
+                putEdge(graph, newEdge(asEdgeId('e1'), 'friend', asNodeId('n0'), asNodeId('n2'), {rank: 10}))
             ])),
             switchMap(([graph]) => getRelationships(graph, asNodeId('n0'), 'friend')),
             tap(({relationships}) => expect(relationships).to.deep.equal([{
@@ -128,10 +128,10 @@ describe('graph', () => {
     it('should be able to find all relationships for a given node', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
-                putEdge(graph, newGraphEdge(asEdgeId('e1'), 'friend', asNodeId('n1'), asNodeId('n2'), {})),
-                putEdge(graph, newGraphEdge(asEdgeId('e2'), 'friend', asNodeId('n1'), asNodeId('n3'), {})),
-                putEdge(graph, newGraphEdge(asEdgeId('e3'), 'owns', asNodeId('n1'), asNodeId('n4'), {})),
-                putEdge(graph, newGraphEdge(asEdgeId('e4'), 'owns', asNodeId('n1'), asNodeId('n5'), {})),
+                putEdge(graph, newEdge(asEdgeId('e1'), 'friend', asNodeId('n1'), asNodeId('n2'), {})),
+                putEdge(graph, newEdge(asEdgeId('e2'), 'friend', asNodeId('n1'), asNodeId('n3'), {})),
+                putEdge(graph, newEdge(asEdgeId('e3'), 'owns', asNodeId('n1'), asNodeId('n4'), {})),
+                putEdge(graph, newEdge(asEdgeId('e4'), 'owns', asNodeId('n1'), asNodeId('n5'), {})),
             ])),
             switchMap(([{graph}]) => getRelationships(graph, asNodeId('n1') , '*')),
             tap(({relationships}) => {
@@ -254,9 +254,9 @@ describe('graph', () => {
 
     it('should update a graphGetEdge() when the edge properties is updated', () =>
         firstValueFrom(getAGraph().pipe(
-            switchMap(graph => putEdge(graph, newGraphEdge(asEdgeId('e1'), 'friend', asNodeId('n1') , asNodeId('n2') , {foo: 10}))),
+            switchMap(graph => putEdge(graph, newEdge(asEdgeId('e1'), 'friend', asNodeId('n1') , asNodeId('n2') , {foo: 10}))),
             tap(({graph}) => setTimeout(() =>
-                    putEdge(graph, newGraphEdge(asEdgeId('e1'), 'friend', asNodeId('n1') , asNodeId('n2') , {foo: 11})).subscribe()
+                    putEdge(graph, newEdge(asEdgeId('e1'), 'friend', asNodeId('n1') , asNodeId('n2') , {foo: 11})).subscribe()
                 , 100)),
             switchMap(({graph}) => getEdge(graph, asEdgeId('e1'), {})),
             skipWhile(({edge}) => edge.props.foo !== 11),
@@ -266,11 +266,11 @@ describe('graph', () => {
     it('should update a graphGetRelationships() when a relationship is added', () =>
         firstValueFrom(getAGraph().pipe(
                 tap(graph => {
-                    putEdge(graph, newGraphEdge(asEdgeId('e1'), 'friend', asNodeId('n1') , asNodeId('n2') , {})).subscribe();
-                    putEdge(graph, newGraphEdge(asEdgeId('e2'), 'friend', asNodeId('n1') , asNodeId('n3') , {})).subscribe();
+                    putEdge(graph, newEdge(asEdgeId('e1'), 'friend', asNodeId('n1') , asNodeId('n2') , {})).subscribe();
+                    putEdge(graph, newEdge(asEdgeId('e2'), 'friend', asNodeId('n1') , asNodeId('n3') , {})).subscribe();
 
                 }),
-                tap(graph => setTimeout(() => putEdge(graph, newGraphEdge(asEdgeId('e3'), 'friend', asNodeId('n1') , asNodeId('n4') , {})).subscribe())),
+                tap(graph => setTimeout(() => putEdge(graph, newEdge(asEdgeId('e3'), 'friend', asNodeId('n1') , asNodeId('n4') , {})).subscribe())),
                 switchMap(graph => getRelationships(graph, asNodeId('n1') , 'friend')),
                 skipWhile(({relationships}) => relationships.length < 3),
             )
@@ -279,10 +279,10 @@ describe('graph', () => {
     it('should be able to get all relationships', () =>
         firstValueFrom(getAGraph().pipe(
             switchMap(graph => combineLatest([
-                putEdge(graph, newGraphEdge(asEdgeId('e1'), 'friend', asNodeId('n1') , asNodeId('n2') , {})),
-                putEdge(graph, newGraphEdge(asEdgeId('e4'), 'friend', asNodeId('n2') , asNodeId('n1') , {})),
-                putEdge(graph, newGraphEdge(asEdgeId('e2'), 'friend', asNodeId('n1') , asNodeId('n3') , {})),
-                putEdge(graph, newGraphEdge(asEdgeId('e3'), 'owns', asNodeId('n1') , asNodeId('n4') , {}))
+                putEdge(graph, newEdge(asEdgeId('e1'), 'friend', asNodeId('n1') , asNodeId('n2') , {})),
+                putEdge(graph, newEdge(asEdgeId('e4'), 'friend', asNodeId('n2') , asNodeId('n1') , {})),
+                putEdge(graph, newEdge(asEdgeId('e2'), 'friend', asNodeId('n1') , asNodeId('n3') , {})),
+                putEdge(graph, newEdge(asEdgeId('e3'), 'owns', asNodeId('n1') , asNodeId('n4') , {}))
             ])),
             switchMap(([{graph}]) => getRelationships(graph, asNodeId('n1') , '*')),
             skipWhile(({relationships}) => relationships.length < 3),

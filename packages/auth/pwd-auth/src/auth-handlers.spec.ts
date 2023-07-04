@@ -1,6 +1,6 @@
 import {catchError, first, firstValueFrom, of, switchMap, tap} from "rxjs";
 import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
-import {getNode, putEdge, putNode, newGraphEdge, newNode, asNodeId, asEdgeId} from "@end-game/graph";
+import {getNode, putEdge, putNode, newEdge, newNode, asNodeId, asEdgeId} from "@end-game/graph";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
 import type {NodeWithAuth} from "./auth-utils.js";
@@ -20,7 +20,7 @@ describe('auth handlers', function()  {
 
     it('should fail to put an edge if no auth and no signature', (done) =>
         firstValueFrom(graphWithAuth().pipe(
-            switchMap(graph => putEdge(graph, newGraphEdge(asEdgeId('edge1'), 'rel', asNodeId('from'), asNodeId('to'), {}))),
+            switchMap(graph => putEdge(graph, newEdge(asEdgeId('edge1'), 'rel', asNodeId('from'), asNodeId('to'), {}))),
             catchError(err => of(err.code).pipe(
                 tap(err => err === 'NOT_LOGGED_IN' && done())
             ))
