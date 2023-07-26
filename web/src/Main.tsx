@@ -6,6 +6,7 @@ import {GettingStarted} from "./pages/GettingStarted.jsx";
 import {ConfigProvider} from "antd";
 import {DocsPage} from "./pages/docs/DocsPage.jsx";
 import {DocsLayout} from "./pages/docs/DocsLayout.jsx";
+import {Intro} from "./video/Intro.jsx";
 
 
 export const Main: React.FC = () => {
@@ -20,6 +21,7 @@ export const Main: React.FC = () => {
                             <Route path="/docs" element={<DocsLayout/>}>
                                 <Route index element={<DocsPage/>}/>
                             </Route>
+                            <Route path="/video/intro" element={<Intro/>}/>
                         </Routes>
                 </ConfigProvider>
             </BrowserRouter>
