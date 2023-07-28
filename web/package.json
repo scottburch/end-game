@@ -10,6 +10,7 @@
     "@types/react-dom": "^18.2.2",
     "@types/snapsvg": "^0.5.3",
     "antd": "^5.6.3",
+    "keyshapejs": "^1.2.1",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

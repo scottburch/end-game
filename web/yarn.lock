@@ -2142,6 +2142,11 @@ jsonfile@^6.0.1:
   optionalDependencies:
     graceful-fs "^4.1.6"
 
+keyshapejs@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/keyshapejs/-/keyshapejs-1.2.1.tgz#7ebdfec7f6fb15a5453406f0719d5f0dcd626217"
+  integrity sha512-rDObG0P8po/GtrNhl0LgOG/pVsOOMm+yXSgZluKCex1CrzRU4DaPZNC3Mr2d2GfL8fj7KGDSImwcIGg4fp+n5Q==
+
 launch-editor@^2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/launch-editor/-/launch-editor-2.6.0.tgz#4c0c1a6ac126c572bd9ff9a30da1d2cae66defd7"
