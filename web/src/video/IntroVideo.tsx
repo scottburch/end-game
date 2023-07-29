@@ -13,11 +13,9 @@ export const IntroVideo: React.FC = () => {
         tap(tl => tl.range(start, end)),
         tap(tl => tl.play()),
         switchMap(tl => new Observable(sub =>
-            tl.onfinish = () => {
-                sub.next();
-                sub.complete();
-            }
-        ))
+            tl.onfinish = () => sub.next()
+        )),
+        first()
     );
 
     return (
