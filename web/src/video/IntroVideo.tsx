@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 // @ts-ignore
 import * as KeyshapeJS from 'keyshapejs'
-import {concatMap, Observable, of, range, switchMap, tap} from "rxjs";
+import {bufferCount, concatMap, first, interval, map, Observable, of, race, range, repeat, switchMap, tap} from "rxjs";
 
 (window as any).ks = KeyshapeJS;
 
@@ -24,15 +24,23 @@ export const IntroVideo: React.FC = () => {
         <>
             <div style={{height: 300, width: '100%', textAlign: 'center'}} dangerouslySetInnerHTML={{__html: svg()}}/>
             <button onClick={() => {
-                range(1, 3).pipe(
-                    concatMap(() => play('serverToServerData', 'serverToComputerStart')),
-                ).subscribe();
+                race(
+                    speak(text1),
+                    play('serverToServerData', 'serverToComputerStart').pipe(
+                        concatMap(() => play('serverToServerData', 'serverToComputerStart')),
+                        repeat(),
+                        bufferCount(1000)
+                    )
+                ).pipe(
+                    first()
+                ).subscribe()
             }}>Play</button>
         </>
 
     );
 }
 
+const text1 = 'A brief history of the internet.  In the beginning, the internet was used for server-to-server communication'
 
 const svgJS = () => {
     if(KeyshapeJS.version.indexOf('1.')!=0)throw Error('Expected KeyshapeJS v1.*.*');(window as any).ks=(document as any).ks=KeyshapeJS;(function(ks){
@@ -55,7 +63,7 @@ const svgJS = () => {
 }
 
 const svg = () =>
-    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="endgame" viewBox="0 0 261.86974 161.72449" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" height="161.724" width="261.87" style="white-space: pre;">\n' +
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="endgame" viewBox="0 0 261.86974 161.72449" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" height="100%" width="100%" style="white-space: pre;">\n' +
     '    <defs>\n' +
     '        <symbol id="Internet Cloud" preserveAspectRatio="none" width="264.287" height="162.745" viewBox="0 0 264.287 162.745" overflow="visible" style="white-space: preserve-spaces;">\n' +
     '            <g id="Internet Cloud-2" transform="translate(132.376,81.5949) translate(-130.685,-80.6123)">\n' +
@@ -249,3 +257,13 @@ const svg = () =>
     'if(document.location.search.substr(1).split(\'&\').indexOf(\'global=paused\')>=0)ks.globalPause();})(KeyshapeJS);\n' +
     ']]></script>\n' +
     '</svg>\n'
+
+
+const speak = (text: string) => of(text).pipe(
+    map(text => new SpeechSynthesisUtterance(text)),
+    tap(uterance => window.speechSynthesis.speak(uterance)),
+    switchMap(uterance => new Observable(sub=>
+        uterance.onend = () => sub.next()
+    )),
+    first()
+)
