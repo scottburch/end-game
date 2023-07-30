@@ -1,81 +1,6 @@
-import React, {useEffect} from 'react'
-// @ts-ignore
-import * as KeyshapeJS from 'keyshapejs'
-import {bufferCount, concatMap, first, interval, map, Observable, of, race, range, repeat, switchMap, tap} from "rxjs";
-
-(global.window as any).ks = KeyshapeJS;
-const window = global.window as any;
-const document = global.document as any;
-
-export const IntroVideo: React.FC = () => {
-
-    useEffect(svgJS, []);
-
-    const play = <T extends string | number>(start: T, end: T) => of(KeyshapeJS.timelines()[0]).pipe(
-        tap(tl => tl.range(start, end)),
-        tap(tl => tl.play()),
-        switchMap(tl => new Observable(sub =>
-            tl.onfinish = () => sub.next()
-        )),
-        first()
-    );
-
-    const serverToServerPart = () => race(
-        speak(text1),
-        play('serverToServerStart', 'serverToServerData').pipe(
-            concatMap(() => play('serverToServerData', 'serverToComputerStart').pipe(
-                repeat()
-            )),
-            bufferCount(1000)
-        )
-    ).pipe(
-        first()
-    );
-
-    // const serverToComputerPart = () => race(
-    //     speak(text2),
-    //     play('serverToComputer')
-    // )
-
-
-    return (
-        <>
-            <div style={{height: 300, width: '100%', textAlign: 'center'}} dangerouslySetInnerHTML={{__html: svg()}}/>
-            <button onClick={() => {
-                serverToServerPart().pipe(
-
-                ).subscribe();
-            }}>Play</button>
-        </>
-
-    );
-}
-
-const text1 = 'A brief history of the internet.  In the beginning, the internet was used for server-to-server communication'
-
-const svgJS = () => {
-    if(KeyshapeJS.version.indexOf('1.')!=0)throw Error('Expected KeyshapeJS v1.*.*');window.ks=document.ks=KeyshapeJS;(function(ks){
-        var tl=ks.animate("#_a0",[{p:'visibility',t:[0,6000,8000],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
-            "#_a1",[{p:'visibility',t:[0,3000,4000],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
-            "#_a2",[{p:'visibility',t:[0,1000,2000],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
-            "#topServer",[{p:'visibility',t:[0,6000],v:['hidden','visible'],e:[[3,1],[3,1]],fill:[2,'hidden']}],
-            "#boy",[{p:'visibility',t:[0,6000],v:['hidden','visible'],e:[[3,1],[3,1]],fill:[2,'hidden']}],
-            "#_a3",[{p:'visibility',t:[0,9500,10000],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
-            "#data",[{p:'mpath',t:[1000,2000,3000,4000,6000,6900,7000,8000,8900,9000,9500],v:['0%','13.666631%','27.347432%','41.07897%','55.323999%','63.286329%','70.884362%','78.333742%','86.940535%','95.573017%','100%'],e:[[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]],mp:"M63.5185,70.022C105.367,31.3271,151.325,31.305,201.567,71.5943C152.705,31.083,106.82,31.2451,63.833,70.9654C106.259,31.2152,152.536,31.9611,202.511,71.5943C154.709,30.7847,106.91,30.6869,59.116,73.481C109.788,39.5257,102.829,21.3834,127.983,18.7647L62.2607,73.1666C84.6066,51.4433,91.5083,42.7668,126.096,19.3936C151.148,37.9885,178.21,55.3374,207.542,71.2798L125.467,19.7081L175.152,21.2804"},{p:'visibility',t:[1000,2000,2998,4000,6000,6900,7000,8900,9000,10000],v:['visible','hidden','visible','hidden','visible','hidden','visible','hidden','visible','hidden'],e:[[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
-            "#internetCloud",[{p:'mpath',t:[0,500],v:['0%','100%'],e:[[1,0,0,0.58,1],[0]],mp:"M130.611,-26.0847C132.939,36.6095,131,81,130.935,80.8622"}],
-            "#Right Server",[{p:'mpath',t:[200,1000,2000,3000],v:['0%','56.035063%','56.385989%','100%'],e:[[0],[0],[1,0,0,1,1],[0]],mp:"M296.791,90.8221L204.274,85.282L204.715,84.9046L276.6,90.9423"}],
-            "#Left Server",[{p:'mpath',t:[0,1000,4000,5000],v:['0%','51.779933%','51.779933%','100%'],e:[[0],[0],[0],[0]],mp:"M-19.8111,84.5902L56.5046,84.7135L56.5046,84.7135L-14.5638,84.399"}],
-            "#leftComputer",[{p:'mpath',t:[5000,6000],v:['0%','100%'],e:[[0],[0]],mp:"M-20.1255,87.1059L51.5717,88.3637"}],
-            "#rightComputer",[{p:'mpath',t:[2000,3000],v:['0%','100%'],e:[[0],[0]],mp:"M286.789,87.322L207.428,86.3786"}],
-            "#leftConnector",[{p:'visibility',t:[1000,10000],v:['visible','hidden'],e:[[3,1],[3,1]],fill:[2,'hidden']}],
-            "#rightConnector",[{p:'visibility',t:[1000,10000],v:['visible','hidden'],e:[[3,1],[3,1]],fill:[2,'hidden']}],
-            "#girl",[{p:'visibility',t:[0,3000],v:['hidden','visible'],e:[[3,1],[3,1]],fill:[2,'hidden']}],
-            {autoremove:false,autoplay:false,markers:{"serverToServerStart":{time: 0},"serverToServerData":{time: 1000},"serverToComputerStart":{time: 2000},"serverToComputerData":{time: 3000},"serverToComputerEnd":{time: 4000},"computerToComputerData":{time: 6000}}}).range(0,10000);
-        if(document.location.search.substr(1).split('&').indexOf('global=paused')>=0)ks.globalPause();})(KeyshapeJS);
-
-}
-
-const svg = () => '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="endgame" viewBox="0 0 261.86974 161.72449" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" height="100%" width="100%" style="white-space: pre;">\n' +
+export const svg = () => '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' +
+    '<!-- Created with Keyshape -->\n' +
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="endgame" viewBox="0 0 261.86974 161.72449" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" height="161.724" width="261.87" style="white-space: pre;">\n' +
     '    <defs>\n' +
     '        <symbol id="Internet Cloud" preserveAspectRatio="none" width="264.287" height="162.745" viewBox="0 0 264.287 162.745" overflow="visible" style="white-space: preserve-spaces;">\n' +
     '            <g id="Internet Cloud-2" transform="translate(132.376,81.5949) translate(-130.685,-80.6123)">\n' +
@@ -250,14 +175,24 @@ const svg = () => '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://w
     '            </g>\n' +
     '        </g>\n' +
     '    </g>\n' +
+    '    <script xlink:href="keyshapejs-1.2.1.min.js"/>\n' +
+    '    <script><![CDATA[if(KeyshapeJS.version.indexOf(\'1.\')!=0)throw Error(\'Expected KeyshapeJS v1.*.*\');window.ks=document.ks=KeyshapeJS;(function(ks){\n' +
+    'var tl=ks.animate("#_a0",[{p:\'visibility\',t:[0,6000,8000],v:[\'hidden\',\'visible\',\'hidden\'],e:[[3,1],[3,1],[3,1]],fill:[2,\'hidden\']}],\n' +
+    '"#_a1",[{p:\'visibility\',t:[0,3000,4000],v:[\'hidden\',\'visible\',\'hidden\'],e:[[3,1],[3,1],[3,1]],fill:[2,\'hidden\']}],\n' +
+    '"#_a2",[{p:\'visibility\',t:[0,1000,2000],v:[\'hidden\',\'visible\',\'hidden\'],e:[[3,1],[3,1],[3,1]],fill:[2,\'hidden\']}],\n' +
+    '"#topServer",[{p:\'visibility\',t:[0,6000],v:[\'hidden\',\'visible\'],e:[[3,1],[3,1]],fill:[2,\'hidden\']}],\n' +
+    '"#boy",[{p:\'visibility\',t:[0,6000],v:[\'hidden\',\'visible\'],e:[[3,1],[3,1]],fill:[2,\'hidden\']}],\n' +
+    '"#_a3",[{p:\'visibility\',t:[0,9500,10000],v:[\'hidden\',\'visible\',\'hidden\'],e:[[3,1],[3,1],[3,1]],fill:[2,\'hidden\']}],\n' +
+    '"#data",[{p:\'mpath\',t:[1000,2000,3000,4000,6000,6900,7000,8000,8900,9000,9500],v:[\'0%\',\'13.666631%\',\'27.347432%\',\'41.07897%\',\'55.323999%\',\'63.286329%\',\'70.884362%\',\'78.333742%\',\'86.940535%\',\'95.573017%\',\'100%\'],e:[[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]],mp:"M63.5185,70.022C105.367,31.3271,151.325,31.305,201.567,71.5943C152.705,31.083,106.82,31.2451,63.833,70.9654C106.259,31.2152,152.536,31.9611,202.511,71.5943C154.709,30.7847,106.91,30.6869,59.116,73.481C109.788,39.5257,102.829,21.3834,127.983,18.7647L62.2607,73.1666C84.6066,51.4433,91.5083,42.7668,126.096,19.3936C151.148,37.9885,178.21,55.3374,207.542,71.2798L125.467,19.7081L175.152,21.2804"},{p:\'visibility\',t:[1000,2000,2998,4000,6000,6900,7000,8900,9000,10000],v:[\'visible\',\'hidden\',\'visible\',\'hidden\',\'visible\',\'hidden\',\'visible\',\'hidden\',\'visible\',\'hidden\'],e:[[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1]],fill:[2,\'hidden\']}],\n' +
+    '"#internetCloud",[{p:\'mpath\',t:[0,500],v:[\'0%\',\'100%\'],e:[[1,0,0,0.58,1],[0]],mp:"M130.611,-26.0847C132.939,36.6095,131,81,130.935,80.8622"}],\n' +
+    '"#Right Server",[{p:\'mpath\',t:[200,1000,2000,3000],v:[\'0%\',\'56.035063%\',\'56.385989%\',\'100%\'],e:[[0],[0],[1,0,0,1,1],[0]],mp:"M296.791,90.8221L204.274,85.282L204.715,84.9046L276.6,90.9423"}],\n' +
+    '"#Left Server",[{p:\'mpath\',t:[0,1000,4000,5000],v:[\'0%\',\'51.779933%\',\'51.779933%\',\'100%\'],e:[[0],[0],[0],[0]],mp:"M-19.8111,84.5902L56.5046,84.7135L56.5046,84.7135L-14.5638,84.399"}],\n' +
+    '"#leftComputer",[{p:\'mpath\',t:[5000,6000],v:[\'0%\',\'100%\'],e:[[0],[0]],mp:"M-20.1255,87.1059L51.5717,88.3637"}],\n' +
+    '"#rightComputer",[{p:\'mpath\',t:[2000,3000],v:[\'0%\',\'100%\'],e:[[0],[0]],mp:"M286.789,87.322L207.428,86.3786"}],\n' +
+    '"#leftConnector",[{p:\'visibility\',t:[1000,10000],v:[\'visible\',\'hidden\'],e:[[3,1],[3,1]],fill:[2,\'hidden\']}],\n' +
+    '"#rightConnector",[{p:\'visibility\',t:[1000,10000],v:[\'visible\',\'hidden\'],e:[[3,1],[3,1]],fill:[2,\'hidden\']}],\n' +
+    '"#girl",[{p:\'visibility\',t:[0,3000],v:[\'hidden\',\'visible\'],e:[[3,1],[3,1]],fill:[2,\'hidden\']}],\n' +
+    '{autoremove:false,autoplay:false,markers:{"serverToServerStart":{time: 0},"serverToServerData":{time: 1000},"serverToComputerStart":{time: 2000},"serverToComputerData":{time: 3000},"serverToComputerEnd":{time: 4000},"computerToComputerData":{time: 6000}}}).range(0,10000);\n' +
+    'if(document.location.search.substr(1).split(\'&\').indexOf(\'global=paused\')>=0)ks.globalPause();})(KeyshapeJS);\n' +
+    ']]></script>\n' +
     '</svg>\n'
-
-
-const speak = (text: string) => of(text).pipe(
-    map(text => new SpeechSynthesisUtterance(text)),
-    tap(uterance => window.speechSynthesis.speak(uterance)),
-    switchMap(uterance => new Observable(sub=>
-        uterance.onend = () => sub.next()
-    )),
-    first()
-)

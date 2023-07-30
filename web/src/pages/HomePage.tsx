@@ -3,7 +3,7 @@ import {EndgamePyramid} from "../components/EndgamePyramid.jsx";
 import triangleImg from '../images/eg-triangle.svg'
 import {Svg} from "../components/Svg.jsx";
 import {List, Space} from "antd";
-import {IntroVideo} from "../video/IntroVideo.jsx";
+import {IntroVideo} from "../video/endgame-intro/IntroVideo.jsx";
 
 export const HomePage: React.FC = () => {
     return (
