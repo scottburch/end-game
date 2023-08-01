@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react'
-import {bufferCount, concatMap, first, race, repeat} from "rxjs";
+import {bufferCount, concatMap, delay, first, race, repeat, switchMap} from "rxjs";
 import {svg} from "./introSvg.js";
 
 import {svgJS} from "./introJS.js";
@@ -12,7 +12,7 @@ export const IntroVideo: React.FC = () => {
 
 
     const serverToServerPart = () => race(
-        speak(text1),
+        speak(text.in_the_beginning),
         playSvg('serverToServerStart', 'serverToServerData').pipe(
             concatMap(() => playSvg('serverToServerData', 'serverToComputerStart').pipe(
                 repeat()
@@ -23,11 +23,26 @@ export const IntroVideo: React.FC = () => {
         first()
     );
 
+    const serverToPersonPart = () => race(
+        speak(text.computerToPerson),
+        playSvg('serverToComputerStart', 'serverToComputerData').pipe(
+            concatMap(() => playSvg('serverToComputerData', 'serverToComputerDataEnd').pipe(
+                repeat()
+            )),
+            bufferCount(1000)
+        )
+    )
+
     return (
         <>
             <div style={{height: 300, width: '100%', textAlign: 'center'}} dangerouslySetInnerHTML={{__html: svg()}}/>
             <button onClick={() => {
                 serverToServerPart().pipe(
+                    delay(500),
+                    switchMap(() => serverToPersonPart()),
+                    delay(500),
+
+
 
                 ).subscribe();
             }}>Play</button>
@@ -36,7 +51,11 @@ export const IntroVideo: React.FC = () => {
     );
 }
 
-const text1 = 'A brief history of the internet.  In the beginning, the internet was used for server-to-server communication'
+const text = {
+    in_the_beginning: 'A brief history of the internet.  In the beginning, the internet was used for computer to computer communication',
+    computerToPerson: 'Then came the Web with computer to person communication. For this model to continue, the owner of the content provider must continually create new content to be consumed.'
+
+};
 
 
 
