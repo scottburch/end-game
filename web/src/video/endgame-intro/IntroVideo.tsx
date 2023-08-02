@@ -14,7 +14,7 @@ export const IntroVideo: React.FC = () => {
     const serverToServerPart = () => race(
         speak(text.in_the_beginning),
         playSvg('serverToServerStart', 'serverToServerData').pipe(
-            concatMap(() => playSvg('serverToServerData', 'serverToComputerStart').pipe(
+            concatMap(() => playSvg('serverToServerData', 'serverToServerDataEnd').pipe(
                 repeat()
             )),
             bufferCount(1000)
