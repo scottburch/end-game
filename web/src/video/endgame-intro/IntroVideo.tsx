@@ -31,6 +31,15 @@ export const IntroVideo: React.FC = () => {
             )),
             bufferCount(1000)
         )
+    );
+
+    const socialNetworkPart = () => race(
+        playSvg('socialNetworkStart', 'socialNetworkDataStart').pipe(
+            concatMap(() => playSvg('socialNetworkDataStart', 'socialNetworkDataEnd').pipe(
+                repeat()
+            )),
+            bufferCount(1000)
+        )
     )
 
     return (
@@ -41,6 +50,8 @@ export const IntroVideo: React.FC = () => {
                     delay(500),
                     switchMap(() => serverToPersonPart()),
                     delay(500),
+                    switchMap(() => socialNetworkPart()),
+                    delay(10000)
 
 
 
