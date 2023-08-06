@@ -1,4 +1,4 @@
-import {first, map, Observable, of, switchMap, tap} from "rxjs";
+import {first, Observable, of, switchMap, tap} from "rxjs";
 
 export const speak = (utterance: SpeechSynthesisUtterance) => of(utterance).pipe(
     tap(uterance => window.speechSynthesis.speak(uterance)),
