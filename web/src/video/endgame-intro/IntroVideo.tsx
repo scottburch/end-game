@@ -87,11 +87,16 @@ const socialNetworkPart = () => race(
         )),
         bufferCount(1000)
     )
-)
+);
 
 const endgamePart = () => race(
     getVoice(text.endgame).pipe(switchMap(speak)),
-)
+    playSvg('endgame', 'endgameEnd').pipe(
+        repeat(),
+        bufferCount(1000)
+    ))
+
+
 
 
 
