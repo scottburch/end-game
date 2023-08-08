@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react'
-import {bufferCount, concatMap, delay, last, Observable, of, race, range, repeat, switchMap, tap} from "rxjs";
+import {bufferCount, concatMap, delay, last, Observable, race, range, repeat, switchMap, tap} from "rxjs";
 import {svg} from "./introSvg.js";
 
 import {svgJS} from "./introJS.js";
@@ -94,9 +94,12 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<() => Observab
     );
 }
 
+const videoPart = (audio: () => string, videoCmds: () => Observable<unknown>) => () => race(
+    getVoice(audio()).pipe(switchMap(speak)),
+    videoCmds()
+)
 
-const serverToServerPart = () => race(
-    getVoice(text.in_the_beginning).pipe(switchMap(speak)),
+const serverToServerPart = videoPart(() => text.in_the_beginning, () =>
     playSvg('serverToServerStart', 'serverToServerData').pipe(
         concatMap(() => playSvg('serverToServerData', 'serverToServerDataEnd').pipe(
             repeat()
@@ -105,8 +108,7 @@ const serverToServerPart = () => race(
     )
 );
 
-const serverToPersonPart = () => race(
-    getVoice(text.computerToPerson).pipe(switchMap(speak)),
+const serverToPersonPart = videoPart(() => text.computerToPerson, () =>
     playSvg('serverToComputerStart', 'serverToComputerData').pipe(
         concatMap(() => playSvg('serverToComputerData', 'serverToComputerDataEnd').pipe(
             repeat()
@@ -115,8 +117,7 @@ const serverToPersonPart = () => race(
     )
 );
 
-const socialNetworkPart = () => race(
-    getVoice(text.serviceToPerson).pipe(switchMap(speak)),
+const socialNetworkPart = videoPart(() => text.serviceToPerson, () =>
     playSvg('socialNetworkStart', 'socialNetworkDataStart').pipe(
         concatMap(() => playSvg('socialNetworkDataStart', 'socialNetworkDataEnd').pipe(
             repeat()
@@ -125,8 +126,7 @@ const socialNetworkPart = () => race(
     )
 );
 
-const endgamePart = () => race(
-    getVoice(text.endgame).pipe(switchMap(speak)),
+const endgamePart = videoPart(() => text.endgame, () =>
     playSvg('endgame', 'endgameEnd').pipe(
         repeat(),
         bufferCount(1000)
