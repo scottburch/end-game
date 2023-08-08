@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {svgJS} from "./endgame-intro/introJS.js";
-import {concatMap, delay, from, last, Observable, race, switchMap, tap} from "rxjs";
+import {delay, map, Observable, race, switchMap, tap} from "rxjs";
 import {Button, Segmented} from "antd";
 import {CaretRightOutlined, PauseOutlined} from "@ant-design/icons";
 // @ts-ignore
@@ -19,36 +19,61 @@ export const videoPart = (audio: string, videoCmds: Observable<unknown>) => () =
 );
 
 
+export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> }> = ({svg, sections}) => {
+    const [state, setState] = useState<'stopped' | 'playing' | 'paused'>('stopped');
+    const [currentSection, setCurrentSection] = useState<VideoSection>()
 
-export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection>}> = ({svg, sections}) => {
-    const [playing, setPlaying] = useState(false);
-    const started = useRef(false);
+    const findNextSection = () => {
+        if (currentSection) {
+            const idx = sections.findIndex(s => currentSection.label === s.label);
+            return idx > -1 && sections[idx + 1] ? sections[idx + 1] : undefined
+        } else {
+            return sections[0];
+        }
+    }
+
 
     useEffect(svgJS, []);
 
+    useEffect(() => {
+        currentSection?.part().pipe(
+            delay(1000),
+            map(() => findNextSection()),
+            tap(nextSection => nextSection ? setCurrentSection(nextSection) : stop())
+        ).subscribe()
+    }, [currentSection])
+
+    useEffect(() => {
+        if (state === 'playing') {
+            window.speechSynthesis.resume();
+            KeyshapeJS.globalPlay();
+        }
+        if(state === 'paused') {
+            window.speechSynthesis.pause();
+            KeyshapeJS.globalPause()
+        }
+    }, [state])
+
+    const stop = () => {
+        setState('stopped');
+        setCurrentSection(undefined);
+    }
+
     const onBtnClick = () => {
-        playing ? pause() : play();
+        state === 'playing' ? pause() : play();
 
         function pause() {
-            setPlaying(false);
+            setState('paused');
             window.speechSynthesis.pause();
             KeyshapeJS.globalPause();
         }
 
         function play() {
-            setPlaying(true);
-            if (started.current) {
-                window.speechSynthesis.resume();
-                KeyshapeJS.globalPlay();
-            } else {
-                started.current = true;
-                from(sections).pipe(
-                    concatMap(section => section.part().pipe(delay(1000))),
-                    last(),
-                    tap(() => started.current = false),
-                    tap(() => setPlaying(false))
-                ).subscribe()
+            if (!currentSection) {
+                setCurrentSection(findNextSection());
             }
+            setState('playing')
+
         }
     }
 
@@ -58,7 +83,7 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection>}
                 <div style={{
                     textAlign: 'center',
                     position: 'absolute',
-                    display: !playing && !started.current ? 'block' : 'none',
+                    display: state === 'playing' ? 'none' : 'block',
                     height: '100%',
                     width: '100%',
                     border: '1px solid red'
@@ -71,11 +96,12 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection>}
                      dangerouslySetInnerHTML={{__html: svg}}/>
             </div>
             <div style={{display: 'flex'}}>
-                <Button onClick={onBtnClick}>{playing ? <PauseOutlined/> : <CaretRightOutlined/>}</Button>
+                <Button onClick={onBtnClick}>{state === 'playing' ? <PauseOutlined/> : <CaretRightOutlined/>}</Button>
                 <div style={{flex: 1}}>
                     <Segmented
                         block
                         options={sections.map(section => section.label)}
+                        value={currentSection?.label}
                     />
                 </div>
             </div>
