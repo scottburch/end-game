@@ -11,20 +11,25 @@ import {CaretRightOutlined, PauseOutlined} from '@ant-design/icons'
 import * as KeyshapeJS from 'keyshapejs'
 
 
+export type VideoSection = {
+    label: string
+    part: () => Observable<unknown>
+}
+
 export const IntroVideo: React.FC = () => {
 
     return <VideoPlayer
         sections={[
-            serverToServerPart,
-            serverToPersonPart,
-            socialNetworkPart,
-            endgamePart
+            {label: 'in the beginning', part: serverToServerPart},
+            {label: 'web', part: serverToPersonPart},
+            {label: 'social', part: socialNetworkPart},
+            {label: 'endgame', part: endgamePart}
         ]}
         svg={svg()}
     />
 }
 
-export const VideoPlayer: React.FC<{ svg: string, sections: Array<() => Observable<unknown>> }> = ({svg, sections}) => {
+export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection>}> = ({svg, sections}) => {
     const [playing, setPlaying] = useState(false);
     const started = useRef(false);
 
@@ -47,7 +52,7 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<() => Observab
             } else {
                 started.current = true;
                 range(0, sections.length).pipe(
-                    concatMap(n => sections[n]().pipe(delay(1000))),
+                    concatMap(n => sections[n].part().pipe(delay(1000))),
                     last(),
                     tap(() => started.current = false),
                     tap(() => setPlaying(false))
@@ -79,13 +84,7 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<() => Observab
                 <div style={{flex: 1}}>
                     <Segmented
                         block
-                        options={[
-                            'Daily',
-                            {label: 'Weekly', value: 'Weekly', disabled: true},
-                            'Monthly',
-                            {label: 'Quarterly', value: 'Quarterly', disabled: true},
-                            'Yearly',
-                        ]}
+                        options={sections.map(section => section.label)}
                     />
                 </div>
             </div>
