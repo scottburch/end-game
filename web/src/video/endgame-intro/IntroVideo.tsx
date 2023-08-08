@@ -1,24 +1,12 @@
-import React, {useEffect, useRef, useState} from 'react'
-import {bufferCount, concatMap, delay, last, Observable, race, range, repeat, switchMap, tap} from "rxjs";
+import React from 'react'
+import {bufferCount, concatMap, last, repeat} from "rxjs";
 import {svg} from "./introSvg.js";
-
-import {svgJS} from "./introJS.js";
 import {playSvg} from "../play.js";
-import {getVoice, speak} from "../speak.js";
-import {Button, Segmented} from "antd";
-import {CaretRightOutlined, PauseOutlined} from '@ant-design/icons'
-// @ts-ignore
-import * as KeyshapeJS from 'keyshapejs'
+import {videoPart, VideoPlayer} from "../VideoPlayer.jsx";
 
 
-export type VideoSection = {
-    label: string
-    part: () => Observable<unknown>
-}
-
-export const IntroVideo: React.FC = () => {
-
-    return <VideoPlayer
+export const IntroVideo: React.FC = () => (
+    <VideoPlayer
         sections={[
             {label: 'in the beginning', part: serverToServerPart},
             {label: 'web', part: serverToPersonPart},
@@ -27,83 +15,17 @@ export const IntroVideo: React.FC = () => {
         ]}
         svg={svg()}
     />
-}
+);
 
-export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection>}> = ({svg, sections}) => {
-    const [playing, setPlaying] = useState(false);
-    const started = useRef(false);
 
-    useEffect(svgJS, []);
 
-    const onBtnClick = () => {
-        playing ? pause() : play();
-
-        function pause() {
-            setPlaying(false);
-            window.speechSynthesis.pause();
-            KeyshapeJS.globalPause();
-        }
-
-        function play() {
-            setPlaying(true);
-            if (started.current) {
-                window.speechSynthesis.resume();
-                KeyshapeJS.globalPlay();
-            } else {
-                started.current = true;
-                range(0, sections.length).pipe(
-                    concatMap(n => sections[n].part().pipe(delay(1000))),
-                    last(),
-                    tap(() => started.current = false),
-                    tap(() => setPlaying(false))
-                ).subscribe()
-            }
-        }
-    }
-
-    return (
-        <div style={{border: '1px solid black', borderCollapse: 'collapse'}}>
-            <div style={{position: 'relative'}}>
-                <div style={{
-                    textAlign: 'center',
-                    position: 'absolute',
-                    display: !playing && !started.current ? 'block' : 'none',
-                    height: '100%',
-                    width: '100%',
-                    border: '1px solid red'
-                }}>
-                    <div style={{paddingTop: 100}}>
-                        <Button onClick={onBtnClick}>Play video</Button>
-                    </div>
-                </div>
-                <div style={{height: 300, width: 'fit-content', textAlign: 'center', border: '1px solid black'}}
-                     dangerouslySetInnerHTML={{__html: svg}}/>
-            </div>
-            <div style={{display: 'flex'}}>
-                <Button onClick={onBtnClick}>{playing ? <PauseOutlined/> : <CaretRightOutlined/>}</Button>
-                <div style={{flex: 1}}>
-                    <Segmented
-                        block
-                        options={sections.map(section => section.label)}
-                    />
-                </div>
-            </div>
-        </div>
-
-    );
-}
-
-export const videoPart = (audio: string, videoCmds: Observable<unknown>) => () => race(
-    getVoice(audio).pipe(switchMap(speak)),
-    videoCmds
-)
 
 const serverToServerPart = videoPart(text().in_the_beginning,
     playSvg('serverToServerStart', 'serverToServerData').pipe(
         concatMap(() => playSvg('serverToServerData', 'serverToServerDataEnd').pipe(
             repeat()
         )),
-        bufferCount(1000)
+        last()
     )
 );
 
@@ -112,7 +34,7 @@ const serverToPersonPart = videoPart(text().computerToPerson,
         concatMap(() => playSvg('serverToComputerData', 'serverToComputerDataEnd').pipe(
             repeat()
         )),
-        bufferCount(1000)
+        last()
     )
 );
 
@@ -121,14 +43,14 @@ const socialNetworkPart = videoPart(text().serviceToPerson,
         concatMap(() => playSvg('socialNetworkDataStart', 'socialNetworkDataEnd').pipe(
             repeat()
         )),
-        bufferCount(1000)
+        last()
     )
 );
 
 const endgamePart = videoPart(text().endgame,
     playSvg('endgame', 'endgameEnd').pipe(
         repeat(),
-        bufferCount(1000)
+        last()
     ))
 
 
