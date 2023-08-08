@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react'
-import {bufferCount, concatMap, delay, race, repeat, switchMap, tap} from "rxjs";
+import {bufferCount, concatMap, delay, last, Observable, of, race, range, repeat, switchMap, tap} from "rxjs";
 import {svg} from "./introSvg.js";
 
 import {svgJS} from "./introJS.js";
@@ -12,11 +12,23 @@ import * as KeyshapeJS from 'keyshapejs'
 
 
 export const IntroVideo: React.FC = () => {
+
+    return <VideoPlayer
+        sections={[
+            serverToServerPart,
+            serverToPersonPart,
+            socialNetworkPart,
+            endgamePart
+        ]}
+        svg={svg()}
+    />
+}
+
+export const VideoPlayer: React.FC<{ svg: string, sections: Array<() => Observable<unknown>> }> = ({svg, sections}) => {
     const [playing, setPlaying] = useState(false);
     const started = useRef(false);
 
     useEffect(svgJS, []);
-
 
     const onBtnClick = () => {
         playing ? pause() : play();
@@ -34,17 +46,12 @@ export const IntroVideo: React.FC = () => {
                 KeyshapeJS.globalPlay();
             } else {
                 started.current = true;
-                serverToServerPart().pipe(
-                    delay(1000),
-                    switchMap(() => serverToPersonPart()),
-                    delay(1000),
-                    switchMap(() => socialNetworkPart()),
-                    delay(1000),
-                    switchMap(() => endgamePart()),
-                    delay(1000),
+                range(0, sections.length).pipe(
+                    concatMap(n => sections[n]().pipe(delay(1000))),
+                    last(),
                     tap(() => started.current = false),
                     tap(() => setPlaying(false))
-                ).subscribe();
+                ).subscribe()
             }
         }
     }
@@ -52,13 +59,20 @@ export const IntroVideo: React.FC = () => {
     return (
         <div style={{border: '1px solid black', borderCollapse: 'collapse'}}>
             <div style={{position: 'relative'}}>
-                <div style={{textAlign: 'center', position: 'absolute', display: !playing && !started.current ? 'block' : 'none', height: '100%', width: '100%', border: '1px solid red'}}>
+                <div style={{
+                    textAlign: 'center',
+                    position: 'absolute',
+                    display: !playing && !started.current ? 'block' : 'none',
+                    height: '100%',
+                    width: '100%',
+                    border: '1px solid red'
+                }}>
                     <div style={{paddingTop: 100}}>
                         <Button onClick={onBtnClick}>Play video</Button>
                     </div>
                 </div>
                 <div style={{height: 300, width: 'fit-content', textAlign: 'center', border: '1px solid black'}}
-                     dangerouslySetInnerHTML={{__html: svg()}}/>
+                     dangerouslySetInnerHTML={{__html: svg}}/>
             </div>
             <div style={{display: 'flex'}}>
                 <Button onClick={onBtnClick}>{playing ? <PauseOutlined/> : <CaretRightOutlined/>}</Button>
