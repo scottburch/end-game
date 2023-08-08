@@ -5,7 +5,7 @@ import {svg} from "./introSvg.js";
 import {svgJS} from "./introJS.js";
 import {playSvg} from "../play.js";
 import {getVoice, speak} from "../speak.js";
-import {Button} from "antd";
+import {Button, Segmented} from "antd";
 import {CaretRightOutlined, PauseOutlined} from '@ant-design/icons'
 // @ts-ignore
 import * as KeyshapeJS from 'keyshapejs'
@@ -14,44 +14,66 @@ import * as KeyshapeJS from 'keyshapejs'
 export const IntroVideo: React.FC = () => {
     const [playing, setPlaying] = useState(false);
     const started = useRef(false);
+
     useEffect(svgJS, []);
 
+
+    const onBtnClick = () => {
+        playing ? pause() : play();
+
+        function pause() {
+            setPlaying(false);
+            window.speechSynthesis.pause();
+            KeyshapeJS.globalPause();
+        }
+
+        function play() {
+            setPlaying(true);
+            if (started.current) {
+                window.speechSynthesis.resume();
+                KeyshapeJS.globalPlay();
+            } else {
+                started.current = true;
+                serverToServerPart().pipe(
+                    delay(1000),
+                    switchMap(() => serverToPersonPart()),
+                    delay(1000),
+                    switchMap(() => socialNetworkPart()),
+                    delay(1000),
+                    switchMap(() => endgamePart()),
+                    delay(1000),
+                    tap(() => started.current = false),
+                    tap(() => setPlaying(false))
+                ).subscribe();
+            }
+        }
+    }
+
     return (
-        <div>
-            <div style={{border: '1px solid black', borderCollapse: 'collapse'}}>
+        <div style={{border: '1px solid black', borderCollapse: 'collapse'}}>
+            <div style={{position: 'relative'}}>
+                <div style={{textAlign: 'center', position: 'absolute', display: !playing && !started.current ? 'block' : 'none', height: '100%', width: '100%', border: '1px solid red'}}>
+                    <div style={{paddingTop: 100}}>
+                        <Button onClick={onBtnClick}>Play video</Button>
+                    </div>
+                </div>
                 <div style={{height: 300, width: 'fit-content', textAlign: 'center', border: '1px solid black'}}
                      dangerouslySetInnerHTML={{__html: svg()}}/>
-                <Button onClick={() => {
-                    playing ? pause() : play();
-
-                    function pause() {
-                        setPlaying(false);
-                        window.speechSynthesis.pause();
-                        KeyshapeJS.globalPause();
-                    }
-
-                    function play() {
-                        setPlaying(true);
-                        if(started.current) {
-                            window.speechSynthesis.resume();
-                            KeyshapeJS.globalPlay();
-                        } else {
-                            started.current = true;
-                            serverToServerPart().pipe(
-                                delay(1000),
-                                switchMap(() => serverToPersonPart()),
-                                delay(1000),
-                                switchMap(() => socialNetworkPart()),
-                                delay(1000),
-                                switchMap(() => endgamePart()),
-                                delay(1000),
-                                tap(() => started.current = false),
-                                tap(() => setPlaying(false))
-                            ).subscribe();
-                        }
-                    }
-                }
-                }>{playing ? <PauseOutlined/> : <CaretRightOutlined/>}</Button>
+            </div>
+            <div style={{display: 'flex'}}>
+                <Button onClick={onBtnClick}>{playing ? <PauseOutlined/> : <CaretRightOutlined/>}</Button>
+                <div style={{flex: 1}}>
+                    <Segmented
+                        block
+                        options={[
+                            'Daily',
+                            {label: 'Weekly', value: 'Weekly', disabled: true},
+                            'Monthly',
+                            {label: 'Quarterly', value: 'Quarterly', disabled: true},
+                            'Yearly',
+                        ]}
+                    />
+                </div>
             </div>
         </div>
 
@@ -97,9 +119,6 @@ const endgamePart = () => race(
     ))
 
 
-
-
-
 const text = {
     in_the_beginning: 'A brief history of the internet.  In the beginning, the internet was used for computer to ' +
         'computer communication',
@@ -110,7 +129,11 @@ const text = {
         'creation of content to their users, guaranteeing a large amount of content, without the need to create it. ' +
         'This also allows a small group of people to decide what, and with whom, your content can be shared. ' +
         'This means that Social networking companies own and control your data, you, do not! ',
-    endgame: 'Now, you can!  '
+    endgame: 'Now, you can!  Endgame is the first full-stack development platform to allow anyone to quickly ' +
+        'and easily write applications with distributed data. ' +
+        'data is shared and stored across the network by peers to ' +
+        'ensure that data is available to peers on the network.  Using encryption, data is also secure. ' +
+        'You, control who can see your data! '
 };
 
 
