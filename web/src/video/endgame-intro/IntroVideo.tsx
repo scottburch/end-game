@@ -1,5 +1,5 @@
 import React from 'react'
-import {bufferCount, concatMap, last, repeat} from "rxjs";
+import {last, repeat, switchMap} from "rxjs";
 import {svg} from "./introSvg.js";
 import {playSvg} from "../play.js";
 import {videoPart, VideoPlayer} from "../VideoPlayer.jsx";
@@ -18,11 +18,9 @@ export const IntroVideo: React.FC = () => (
 );
 
 
-
-
 const serverToServerPart = videoPart(text().in_the_beginning,
     playSvg('serverToServerStart', 'serverToServerData').pipe(
-        concatMap(() => playSvg('serverToServerData', 'serverToServerDataEnd').pipe(
+        switchMap(() => playSvg('serverToServerData', 'serverToServerDataEnd').pipe(
             repeat()
         )),
         last()
@@ -31,7 +29,7 @@ const serverToServerPart = videoPart(text().in_the_beginning,
 
 const serverToPersonPart = videoPart(text().computerToPerson,
     playSvg('serverToComputerStart', 'serverToComputerData').pipe(
-        concatMap(() => playSvg('serverToComputerData', 'serverToComputerDataEnd').pipe(
+        switchMap(() => playSvg('serverToComputerData', 'serverToComputerDataEnd').pipe(
             repeat()
         )),
         last()
@@ -40,7 +38,7 @@ const serverToPersonPart = videoPart(text().computerToPerson,
 
 const socialNetworkPart = videoPart(text().serviceToPerson,
     playSvg('socialNetworkStart', 'socialNetworkDataStart').pipe(
-        concatMap(() => playSvg('socialNetworkDataStart', 'socialNetworkDataEnd').pipe(
+        switchMap(() => playSvg('socialNetworkDataStart', 'socialNetworkDataEnd').pipe(
             repeat()
         )),
         last()
