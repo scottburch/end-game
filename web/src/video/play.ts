@@ -1,10 +1,11 @@
-import {first, Observable, of, switchMap, tap} from "rxjs";
+import {first, map, Observable, of, switchMap, tap} from "rxjs";
 
 // @ts-ignore
 import * as KeyshapeJS from 'keyshapejs'
 
 
-export const playSvg = <T extends string | number>(start: T, end: T) => of(KeyshapeJS.timelines()[0]).pipe(
+export const playSvg = <T extends string | number>(start: T, end: T) => of(true).pipe(
+    map(() => KeyshapeJS.timelines()[0]),
     tap(tl => tl.range(start, end)),
     tap(tl => tl.play()),
     switchMap(tl => new Observable(sub =>

@@ -93,12 +93,12 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection>}
     );
 }
 
-const videoPart = (audio: () => string, videoCmds: () => Observable<unknown>) => () => race(
-    getVoice(audio()).pipe(switchMap(speak)),
-    videoCmds()
+export const videoPart = (audio: string, videoCmds: Observable<unknown>) => () => race(
+    getVoice(audio).pipe(switchMap(speak)),
+    videoCmds
 )
 
-const serverToServerPart = videoPart(() => text.in_the_beginning, () =>
+const serverToServerPart = videoPart(text().in_the_beginning,
     playSvg('serverToServerStart', 'serverToServerData').pipe(
         concatMap(() => playSvg('serverToServerData', 'serverToServerDataEnd').pipe(
             repeat()
@@ -107,7 +107,7 @@ const serverToServerPart = videoPart(() => text.in_the_beginning, () =>
     )
 );
 
-const serverToPersonPart = videoPart(() => text.computerToPerson, () =>
+const serverToPersonPart = videoPart(text().computerToPerson,
     playSvg('serverToComputerStart', 'serverToComputerData').pipe(
         concatMap(() => playSvg('serverToComputerData', 'serverToComputerDataEnd').pipe(
             repeat()
@@ -116,7 +116,7 @@ const serverToPersonPart = videoPart(() => text.computerToPerson, () =>
     )
 );
 
-const socialNetworkPart = videoPart(() => text.serviceToPerson, () =>
+const socialNetworkPart = videoPart(text().serviceToPerson,
     playSvg('socialNetworkStart', 'socialNetworkDataStart').pipe(
         concatMap(() => playSvg('socialNetworkDataStart', 'socialNetworkDataEnd').pipe(
             repeat()
@@ -125,14 +125,15 @@ const socialNetworkPart = videoPart(() => text.serviceToPerson, () =>
     )
 );
 
-const endgamePart = videoPart(() => text.endgame, () =>
+const endgamePart = videoPart(text().endgame,
     playSvg('endgame', 'endgameEnd').pipe(
         repeat(),
         bufferCount(1000)
     ))
 
 
-const text = {
+function text() {
+    return {
     in_the_beginning: 'A brief history of the internet.  In the beginning, the internet was used for computer to ' +
         'computer communication',
     computerToPerson: 'Then came the Web, with computer-to-person communication. For this model to continue, the owner ' +
@@ -147,7 +148,8 @@ const text = {
         'data is shared and stored across the network by peers to ' +
         'ensure that data is available to peers on the network.  Using encryption, data is also secure. ' +
         'You, control who can see your data! '
-};
+}
+}
 
 
 
