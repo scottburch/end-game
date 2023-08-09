@@ -45,7 +45,11 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> 
             delay(1000),
             map(() => findNextSection()),
             tap(nextSection => nextSection ? setCurrentSection(nextSection) : stop())
-        ).subscribe()
+        ).subscribe();
+        if(state !== 'playing') {
+            window.speechSynthesis.pause();
+            KeyshapeJS.globalPause();
+        }
     }, [currentSection])
 
     useEffect(() => {
@@ -71,8 +75,6 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> 
 
         function pause() {
             setState('paused');
-            window.speechSynthesis.pause();
-            KeyshapeJS.globalPause();
         }
 
         function play() {
