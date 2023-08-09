@@ -23,6 +23,10 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> 
     const [state, setState] = useState<'stopped' | 'playing' | 'paused'>('stopped');
     const [currentSection, setCurrentSection] = useState<VideoSection>()
 
+    const findSection = (label: string) =>
+        sections.find(s => s.label === label);
+
+
     const findNextSection = () => {
         if (currentSection) {
             const idx = sections.findIndex(s => currentSection.label === s.label);
@@ -36,6 +40,7 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> 
     useEffect(svgJS, []);
 
     useEffect(() => {
+        window.speechSynthesis.cancel();
         currentSection?.part().pipe(
             delay(1000),
             map(() => findNextSection()),
@@ -52,12 +57,14 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> 
             window.speechSynthesis.pause();
             KeyshapeJS.globalPause()
         }
+        if(state === 'stopped') {
+            window.speechSynthesis.cancel();
+            setCurrentSection(undefined);
+        }
     }, [state])
 
-    const stop = () => {
-        setState('stopped');
-        setCurrentSection(undefined);
-    }
+    const stop = () => setState('stopped');
+
 
     const onBtnClick = () => {
         state === 'playing' ? pause() : play();
@@ -86,7 +93,6 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> 
                     display: state === 'playing' ? 'none' : 'block',
                     height: '100%',
                     width: '100%',
-                    border: '1px solid red'
                 }}>
                     <div style={{paddingTop: 100}}>
                         <Button onClick={onBtnClick}>Play video</Button>
@@ -102,10 +108,13 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> 
                         block
                         options={sections.map(section => section.label)}
                         value={currentSection?.label}
+                        onChange={label => setCurrentSection(findSection(label as string))}
                     />
                 </div>
             </div>
         </div>
 
     );
-}
+};
+
+
