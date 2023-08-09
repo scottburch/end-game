@@ -23,9 +23,24 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> 
     const [state, setState] = useState<'stopped' | 'playing' | 'paused'>('stopped');
     const [currentSection, setCurrentSection] = useState<VideoSection>()
 
+    const Player = {
+        play: () => {
+            currentSection || setCurrentSection(findNextSection());
+            window.speechSynthesis.resume();
+            KeyshapeJS.globalPlay();
+        },
+        pause: () => {
+            window.speechSynthesis.pause();
+            KeyshapeJS.globalPause()
+        },
+        stop: () => {
+            window.speechSynthesis.cancel();
+            setCurrentSection(undefined);
+        }
+    } as const;
+
     const findSection = (label: string) =>
         sections.find(s => s.label === label);
-
 
     const findNextSection = () => {
         if (currentSection) {
@@ -44,47 +59,21 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> 
         currentSection?.part().pipe(
             delay(1000),
             map(() => findNextSection()),
-            tap(nextSection => nextSection ? setCurrentSection(nextSection) : stop())
+            tap(nextSection => nextSection ? setCurrentSection(nextSection) : setState('stopped'))
         ).subscribe();
-        if(state !== 'playing') {
-            window.speechSynthesis.pause();
-            KeyshapeJS.globalPause();
-        }
+        state !== 'playing' && Player.pause();
     }, [currentSection])
 
+
     useEffect(() => {
-        if (state === 'playing') {
-            window.speechSynthesis.resume();
-            KeyshapeJS.globalPlay();
-        }
-        if(state === 'paused') {
-            window.speechSynthesis.pause();
-            KeyshapeJS.globalPause()
-        }
-        if(state === 'stopped') {
-            window.speechSynthesis.cancel();
-            setCurrentSection(undefined);
-        }
+        state === 'playing' && Player.play();
+        state === 'paused' && Player.pause();
+        state === 'stopped' && Player.stop();
     }, [state])
 
-    const stop = () => setState('stopped');
 
-
-    const onBtnClick = () => {
-        state === 'playing' ? pause() : play();
-
-        function pause() {
-            setState('paused');
-        }
-
-        function play() {
-            if (!currentSection) {
-                setCurrentSection(findNextSection());
-            }
-            setState('playing')
-
-        }
-    }
+    const onBtnClick = () =>
+        state === 'playing' ? setState('paused') : setState('playing');
 
     return (
         <div style={{border: '1px solid black', borderCollapse: 'collapse'}}>
