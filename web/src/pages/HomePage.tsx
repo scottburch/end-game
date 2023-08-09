@@ -18,7 +18,7 @@ export const HomePage: React.FC = () => {
                     'Distributed Trustless Graph'
                         .split(' ')
                         .map(item => (
-                                        <span>
+                                        <span key={item}>
                                             <span style={{color: 'blue', fontSize: '1.5em'}}>{item.slice(0, 1)}</span>
                                             {item.slice(1)}
                                         </span>
@@ -29,7 +29,7 @@ export const HomePage: React.FC = () => {
             <IntroVideo/>
             <h1>Endgame product stack</h1>
             <EndgamePyramid/>
-            <List style={{width: 'calc(100% - 40px)'}} dataSource={listData} renderItem={(item, idx) =>
+            <List style={{width: 'calc(100% - 40px)'}} dataSource={listData} renderItem={(item) =>
                 <List.Item>
                     <List.Item.Meta title={item.title} description={
                         <div style={{paddingLeft: 30}}>{item.description}</div>
@@ -61,6 +61,7 @@ const listData = [{
         '        register for updates\n' +
         '        in the shared graph.\n'
 }, {
+    key: 'payments',
     title: 'Payments',
     description: 'The payments layer allows for payments for products, data storage or services'
 }];
