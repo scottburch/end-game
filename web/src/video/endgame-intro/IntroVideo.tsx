@@ -1,8 +1,8 @@
 import React from 'react'
 import {last, repeat, switchMap} from "rxjs";
 import {svg} from "./introSvg.js";
-import {playSvg} from "../play.js";
-import {videoPart, VideoPlayer} from "../VideoPlayer.jsx";
+import {playSvg} from "../player/play.js";
+import {videoPart, VideoPlayer} from "../player/VideoPlayer.jsx";
 
 
 export const IntroVideo: React.FC = () => (

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {svgJS} from "./endgame-intro/introJS.js";
+import {svgJS} from "../endgame-intro/introJS.js";
 import {delay, map, Observable, race, switchMap, tap} from "rxjs";
 import {Button, Segmented} from "antd";
 import {CaretRightOutlined, PauseOutlined} from "@ant-design/icons";
