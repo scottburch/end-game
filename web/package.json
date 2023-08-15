@@ -23,9 +23,10 @@
   },
   "scripts": {
     "dev": "dtg-scripts dev",
-    "build": "dtg-scripts build",
+    "build": "rm -rf dist & dtg-scripts build",
     "serve": "dtg-scripts serve",
-    "test": "dtg-scripts test"
+    "test": "dtg-scripts test",
+    "zip": "cd dist; zip -r  web.zip *"
   },
   "engines": {
     "node": ">=19"

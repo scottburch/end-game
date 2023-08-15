@@ -18,7 +18,7 @@ export const IntroVideo: React.FC = () => (
 );
 
 
-const serverToServerPart = videoPart('/audio/in_the_beginning.mp3',
+const serverToServerPart = videoPart('/audio/endgame-intro/in_the_beginning.mp3',
     playSvg('serverToServerStart', 'serverToServerData').pipe(
         switchMap(() => playSvg('serverToServerData', 'serverToServerDataEnd').pipe(
             repeat()
@@ -27,7 +27,7 @@ const serverToServerPart = videoPart('/audio/in_the_beginning.mp3',
     )
 );
 
-const serverToPersonPart = videoPart('/audio/web.mp3',
+const serverToPersonPart = videoPart('/audio/endgame-intro/web.mp3',
     playSvg('serverToComputerStart', 'serverToComputerData').pipe(
         switchMap(() => playSvg('serverToComputerData', 'serverToComputerDataEnd').pipe(
             repeat()
@@ -36,7 +36,7 @@ const serverToPersonPart = videoPart('/audio/web.mp3',
     )
 );
 
-const socialNetworkPart = videoPart('/audio/social-media.mp3',
+const socialNetworkPart = videoPart('/audio/endgame-intro/social-media.mp3',
     playSvg('socialNetworkStart', 'socialNetworkDataStart').pipe(
         switchMap(() => playSvg('socialNetworkDataStart', 'socialNetworkDataEnd').pipe(
             repeat()
@@ -45,7 +45,7 @@ const socialNetworkPart = videoPart('/audio/social-media.mp3',
     )
 );
 
-const endgamePart = videoPart('/audio/endgame.mp3',
+const endgamePart = videoPart('/audio/endgame-intro/endgame.mp3',
     playSvg('endgame', 'endgameEnd').pipe(
         repeat(),
         last()
