@@ -45,7 +45,7 @@ const socialNetworkPart = videoPart('/audio/social-media.mp3',
     )
 );
 
-const endgamePart = videoPart(text().endgame,
+const endgamePart = videoPart('/audio/endgame.mp3',
     playSvg('endgame', 'endgameEnd').pipe(
         repeat(),
         last()
@@ -62,11 +62,13 @@ function text() {
             'creation of content to their users, guaranteeing a large amount of content, without the need to create it. ' +
             'This also allows a small group of people to decide what, and with whom, your content can be shared. ' +
             'This means that Social networking companies own and control your data, you, do not! ',
-        endgame: 'Now, you can!  Endgame is the first full-stack development platform to allow anyone to quickly ' +
-            'and easily write applications with distributed data. ' +
-            'data is shared and stored across the network by peers to ' +
-            'ensure that data is available to peers on the network.  Using encryption, data is also secure. ' +
-            'You, control who can see your data! '
+        endgame: '<speak>\n' +
+            '<emphasis level="strong"><prosody pitch="+5%">now</prosody></emphasis>, you can!  Endgame is the first full-stack development platform to allow anyone to quickly \n' +
+            '            and easily write applications with distributed data. \n' +
+            '            data is shared and stored across the network by peers to\n' +
+            '            ensure that it is available to everyone on the network.  Using encryption, data is also secure. \n' +
+            '          <prosody pitch="+5%">only<prosody rate="130%"><prosody pitch="+10%"> you</prosody></prosody></prosody>, control who can see your data! \n' +
+            ' </speak>'
     } as const;
 }
 
