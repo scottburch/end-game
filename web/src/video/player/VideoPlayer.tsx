@@ -5,7 +5,7 @@ import {Button, Segmented} from "antd";
 import {CaretRightOutlined, PauseOutlined} from "@ant-design/icons";
 // @ts-ignore
 import * as KeyshapeJS from 'keyshapejs'
-import {getVoice, speak} from "./speak.js";
+import {getSpeaker, speakerLoad, speakerPause, speakerPlay, speakerResume} from "./speak.js";
 
 
 export type VideoSection = {
@@ -13,8 +13,11 @@ export type VideoSection = {
     part: () => Observable<unknown>
 };
 
-export const videoPart = (audio: string, videoCmds: Observable<unknown>) => () => race(
-    getVoice(audio).pipe(switchMap(speak)),
+export const videoPart = (file: string, videoCmds: Observable<unknown>) => () => race(
+    getSpeaker().pipe(
+        switchMap(speaker => speakerLoad(speaker, file)),
+        switchMap(speakerPlay)
+    ),
     videoCmds
 );
 
@@ -26,15 +29,21 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> 
     const Player = {
         play: () => {
             currentSection || setCurrentSection(findNextSection());
-            window.speechSynthesis.resume();
+            getSpeaker().pipe(
+                switchMap(speakerResume)
+            ).subscribe()
             KeyshapeJS.globalPlay();
         },
         pause: () => {
-            window.speechSynthesis.pause();
+            getSpeaker().pipe(
+                switchMap(speakerPause)
+            ).subscribe()
             KeyshapeJS.globalPause()
         },
         stop: () => {
-            window.speechSynthesis.cancel();
+            getSpeaker().pipe(
+                switchMap(speakerPause)
+            ).subscribe()
             setCurrentSection(undefined);
         }
     } as const;
@@ -55,7 +64,7 @@ export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> 
     useEffect(svgJS, []);
 
     useEffect(() => {
-        window.speechSynthesis.cancel();
+        getSpeaker().pipe(tap(speakerPause)).subscribe();
         currentSection?.part().pipe(
             delay(1000),
             map(() => findNextSection()),

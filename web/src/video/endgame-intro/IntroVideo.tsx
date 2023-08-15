@@ -18,7 +18,7 @@ export const IntroVideo: React.FC = () => (
 );
 
 
-const serverToServerPart = videoPart(text().in_the_beginning,
+const serverToServerPart = videoPart('/audio/in_the_beginning.mp3',
     playSvg('serverToServerStart', 'serverToServerData').pipe(
         switchMap(() => playSvg('serverToServerData', 'serverToServerDataEnd').pipe(
             repeat()
@@ -27,7 +27,7 @@ const serverToServerPart = videoPart(text().in_the_beginning,
     )
 );
 
-const serverToPersonPart = videoPart(text().computerToPerson,
+const serverToPersonPart = videoPart('/audio/web.mp3',
     playSvg('serverToComputerStart', 'serverToComputerData').pipe(
         switchMap(() => playSvg('serverToComputerData', 'serverToComputerDataEnd').pipe(
             repeat()
@@ -36,7 +36,7 @@ const serverToPersonPart = videoPart(text().computerToPerson,
     )
 );
 
-const socialNetworkPart = videoPart(text().serviceToPerson,
+const socialNetworkPart = videoPart('/audio/social-media.mp3',
     playSvg('socialNetworkStart', 'socialNetworkDataStart').pipe(
         switchMap(() => playSvg('socialNetworkDataStart', 'socialNetworkDataEnd').pipe(
             repeat()

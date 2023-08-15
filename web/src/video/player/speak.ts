@@ -1,11 +1,46 @@
-import {first, Observable, of, switchMap, tap} from "rxjs";
+import {filter, map, Observable, of, switchMap, tap} from "rxjs";
 
-export const speak = (utterance: SpeechSynthesisUtterance) => of(utterance).pipe(
-    tap(uterance => window.speechSynthesis.speak(uterance)),
-    switchMap(uterance => new Observable(sub=>
-        uterance.onend = () => sub.next()
-    )),
-    first()
+
+
+export type Speaker = {
+    audio?: HTMLAudioElement
+};
+
+let speaker: Speaker | undefined = undefined;
+
+
+export const getSpeaker = () => of(undefined).pipe(
+    map(() => speaker || (speaker = {}))
 );
 
-export const getVoice = (text: string) => of(new SpeechSynthesisUtterance(text))
+export const speakerLoad = (speaker: Speaker, file: string) => of(undefined).pipe(
+    tap(() => speaker.audio?.pause()),
+    tap(() => speaker.audio = new Audio(file)) ,
+    map(() => speaker)
+);
+
+export const speakerResume = (speaker: Speaker) => of(speaker).pipe(
+    filter(() => !!speaker.audio),
+    tap(() => speaker.audio?.play())
+)
+
+export const speakerPlay = (speaker: Speaker) => of(speaker).pipe(
+    filter(() => !!speaker.audio),
+    switchMap(() => new Observable(sub => {
+        (speaker.audio as Required<Speaker>['audio']).onended = () => {
+            sub.next();
+            sub.complete();
+        };
+        speaker.audio?.play();
+    }))
+)
+
+
+
+
+
+export const speakerPause = (speaker: Speaker) => of(speaker).pipe(
+    tap(speaker => speaker.audio?.pause())
+);
+
+

@@ -13,19 +13,7 @@ export const HomePage: React.FC = () => {
             <h3>
                 Endgame products make developing P2P internet applications faster, easier and cheaper.
             </h3>
-            <Space>
-                {
-                    'Distributed Trustless Graph'
-                        .split(' ')
-                        .map(item => (
-                                        <span key={item}>
-                                            <span style={{color: 'blue', fontSize: '1.5em'}}>{item.slice(0, 1)}</span>
-                                            {item.slice(1)}
-                                        </span>
-
-                        ))
-                }
-            </Space>
+            <h2>Video introduction to the Distributed Trustless Graph</h2>
             <IntroVideo/>
             <h1>Endgame product stack</h1>
             <EndgamePyramid/>
