@@ -10,11 +10,11 @@ export const Videos: React.FC = () => {
 
     const videos: Record<string, JSX.Element> = {
         'intro': <IntroVideo/>,
-        'getting-started': <EmbeddedVideoPlayer id={'sometning'}/>
+        'getting-started': <EmbeddedVideoPlayer id={'v2qd6d0'}/>
     }
 
     return (
-        <div style={{display: 'flex'}}>
+        <div style={{display: 'flex', width: 700}}>
             <Menu items={getVideoItems()} onSelect={selectVideo} selectedKeys={[selectedVideo]}/>
             {videos[selectedVideo]}
         </div>

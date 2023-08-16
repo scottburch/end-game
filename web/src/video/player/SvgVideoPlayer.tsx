@@ -85,8 +85,8 @@ export const SvgVideoPlayer: React.FC<{ svg: string, sections: Array<VideoSectio
         state === 'playing' ? setState('paused') : setState('playing');
 
     return (
-        <div style={{border: '1px solid black', borderCollapse: 'collapse'}}>
-            <div style={{position: 'relative'}}>
+        <div style={{border: '1px solid black', borderCollapse: 'collapse', width: '100%', height: '100%'}}>
+            <div style={{display: 'flex', position: 'relative'}}>
                 <div style={{
                     textAlign: 'center',
                     position: 'absolute',
