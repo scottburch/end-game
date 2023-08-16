@@ -22,7 +22,7 @@ export const videoPart = (file: string, videoCmds: Observable<unknown>) => () =>
 );
 
 
-export const VideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> }> = ({svg, sections}) => {
+export const SvgVideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> }> = ({svg, sections}) => {
     const [state, setState] = useState<'stopped' | 'playing' | 'paused'>('stopped');
     const [currentSection, setCurrentSection] = useState<VideoSection>()
 

@@ -2,11 +2,11 @@ import React from 'react'
 import {last, repeat, switchMap} from "rxjs";
 import {svg} from "./introSvg.js";
 import {playSvg} from "../player/play.js";
-import {videoPart, VideoPlayer} from "../player/VideoPlayer.jsx";
+import {videoPart, SvgVideoPlayer} from "../player/SvgVideoPlayer.jsx";
 
 
 export const IntroVideo: React.FC = () => (
-    <VideoPlayer
+    <SvgVideoPlayer
         sections={[
             {label: 'in the beginning', part: serverToServerPart},
             {label: 'web', part: serverToPersonPart},

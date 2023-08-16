@@ -3,7 +3,7 @@ import {EndgamePyramid} from "../components/EndgamePyramid.jsx";
 import triangleImg from '../images/eg-triangle.svg'
 import {Svg} from "../components/Svg.jsx";
 import {List, Space} from "antd";
-import {IntroVideo} from "../video/endgame-intro/IntroVideo.jsx";
+import {Videos} from "../components/Videos.jsx";
 
 export const HomePage: React.FC = () => {
     return (
@@ -13,8 +13,9 @@ export const HomePage: React.FC = () => {
             <h3>
                 Endgame products make developing P2P internet applications faster, easier and cheaper.
             </h3>
-            <h2>Video introduction to the Distributed Trustless Graph</h2>
-            <IntroVideo/>
+
+            <Videos/>
+
             <h1>Endgame product stack</h1>
             <EndgamePyramid/>
             <List style={{width: 'calc(100% - 40px)'}} dataSource={listData} renderItem={(item) =>
