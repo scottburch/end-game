@@ -14,7 +14,7 @@ export const Videos: React.FC = () => {
     }
 
     return (
-        <div style={{display: 'flex', width: 700}}>
+        <div style={{display: 'flex', width: 700, height: 337}}>
             <Menu items={getVideoItems()} onSelect={selectVideo} selectedKeys={[selectedVideo]}/>
             {videos[selectedVideo]}
         </div>

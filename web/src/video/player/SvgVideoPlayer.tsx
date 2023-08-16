@@ -61,7 +61,16 @@ export const SvgVideoPlayer: React.FC<{ svg: string, sections: Array<VideoSectio
     }
 
 
-    useEffect(svgJS, []);
+    useEffect(() => {
+        svgJS();
+        return () => {
+            getSpeaker().pipe(
+                switchMap(speakerPause)
+            ).subscribe()
+            KeyshapeJS.removeAll();
+        };
+
+    }, []);
 
     useEffect(() => {
         getSpeaker().pipe(tap(speakerPause)).subscribe();
@@ -85,23 +94,16 @@ export const SvgVideoPlayer: React.FC<{ svg: string, sections: Array<VideoSectio
         state === 'playing' ? setState('paused') : setState('playing');
 
     return (
-        <div style={{border: '1px solid black', borderCollapse: 'collapse', width: '100%', height: '100%'}}>
-            <div style={{display: 'flex', position: 'relative'}}>
-                <div style={{
-                    textAlign: 'center',
-                    position: 'absolute',
-                    display: state === 'playing' ? 'none' : 'block',
-                    height: '100%',
-                    width: '100%',
-                }}>
-                    <div style={{paddingTop: 100}}>
-                        <Button onClick={onBtnClick}>Play video</Button>
-                    </div>
-                </div>
-                <div style={{height: 300, width: 'fit-content', textAlign: 'center', border: '1px solid black'}}
-                     dangerouslySetInnerHTML={{__html: svg}}/>
-            </div>
-            <div style={{display: 'flex'}}>
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            borderCollapse: 'collapse',
+            width: '100%',
+            height: '100%'
+        }}>
+            <div style={{flex: 1, textAlign: 'center', border: '1px solid black', borderCollapse: 'collapse'}}
+                 dangerouslySetInnerHTML={{__html: svg}}/>
+            <div style={{display: 'flex', border: '1px solid black'}}>
                 <Button onClick={onBtnClick}>{state === 'playing' ? <PauseOutlined/> : <CaretRightOutlined/>}</Button>
                 <div style={{flex: 1}}>
                     <Segmented
