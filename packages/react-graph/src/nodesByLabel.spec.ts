@@ -38,20 +38,26 @@ describe("nodesByLabel()", () => {
                 startTestNode(0, [], {graphId: 'testGraph', basePort: 11117})
             ])),
             map(([page, {host}]) => ({page, graph: host.graphs[0]})),
-            switchMap(({page, graph}) => page.click('#connect').then(() =>({page, graph}))),
             switchMap(({page, graph}) =>
                 of(undefined).pipe(
                     switchMap(() => graphNewAuth(graph, 'username', 'password')),
                     switchMap(({graph}) => graphAuth(graph, 'username', 'password')),
-                    switchMap(({graph}) => addThingNode(graph, 1, {})),
-                    switchMap(({graph}) => addThingNode(graph, 2, {})),
-                    switchMap(({graph}) => addThingNode(graph, 3, {})),
+                    switchMap(() => combineLatest([
+                        addThingNode(graph, 1, {}),
+                        addThingNode(graph, 2, {})
+                    ])),
+                    delay(1000),
+                    switchMap(() => page.click('#connect')),
+                    switchMap(() => addThingNode(graph, 3, {})),
+                    delay(1000),
+                    switchMap(({graph}) => addThingNode(graph, 4, {})),
                     map(() => page)
                 ),
             ),
             switchMap(page => page.waitForSelector('div:text("thing0001")').then(() => page)),
             switchMap(page => page.waitForSelector('div:text("thing0002")').then(() => page)),
             switchMap(page => page.waitForSelector('div:text("thing0003")').then(() => page)),
+            switchMap(page => page.waitForSelector('div:text("thing0004")').then(() => page)),
         ))
     )
 });
