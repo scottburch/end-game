@@ -16,25 +16,25 @@ export const getAGraph = (opts: GraphOpts = {graphId: asGraphId(newUid())}) => g
 export const startTestNet = (nodes: number[][]) =>
     findBasePort(11110).pipe(
         switchMap(basePort => from(nodes).pipe(
-            mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers, basePort)),
+            mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers, {basePort})),
             scan((nodes, {host}, idx) => ({...nodes, [`host${idx}`]: host}), {} as Record<`host${number}`, Host>),
             skip(nodes.length - 1),
         ))
     );
 
 
-export const startTestNode = (nodeNo: number, peers: number[] = [], basePort: number = 11110) =>
-    graphOpen({graphId: asGraphId('testnet'), logLevel: LogLevel.DEBUG}).pipe(
+export const startTestNode = (nodeNo: number, peers: number[] = [], opts: {basePort?: number, graphId?: string} = {}) =>
+    graphOpen({graphId: asGraphId(opts.graphId || 'testnet'), logLevel: LogLevel.DEBUG}).pipe(
         switchMap(graph => levelStoreHandlers(graph)),
         switchMap(graph => authHandlers(graph)),
         switchMap(graph => p2pHandlers(graph)),
         switchMap(graph => startServer(newHost({
             hostId: asPeerId(`host-${nodeNo}`),
             graphs: [graph],
-            listeningPort: basePort + nodeNo
+            listeningPort: (opts.basePort || 11110) + nodeNo
         }))),
         switchMap(host => peers.length ? from(peers).pipe(
-            mergeMap(peerNo => dialPeer(host, {url: `ws://localhost:${basePort + peerNo}`, redialInterval: 1})),
+            mergeMap(peerNo => dialPeer(host, {url: `ws://localhost:${(opts.basePort || 11110) + peerNo}`, redialInterval: 1})),
             skip(peers.length - 1),
             map(() => ({host}))
         ) : of({host}))

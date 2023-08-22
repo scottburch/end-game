@@ -69,7 +69,6 @@ export const SvgVideoPlayer: React.FC<{ svg: string, sections: Array<VideoSectio
             ).subscribe()
             KeyshapeJS.removeAll();
         };
-
     }, []);
 
     useEffect(() => {
