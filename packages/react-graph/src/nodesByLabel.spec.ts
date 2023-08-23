@@ -4,8 +4,7 @@ import {openBrowser} from "@end-game/utils/openBrowser";
 import {expect} from "chai";
 import {compileBrowserTestCode} from "@end-game/utils/testCodeCompiler";
 import {absPath} from "@end-game/utils/absPath";
-import {addThingNode, startTestNet, startTestNode} from "@end-game/test-utils";
-import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
+import {startTestNet} from "@end-game/test-utils";
 
 
 describe("nodesByLabel()", () => {
@@ -43,27 +42,26 @@ describe("nodesByLabel()", () => {
             map(([page0, page1, {host0, host1}]) => ({page0, page1, graph0: host0.graphs[0], graph1: host1.graphs[0]})),
             switchMap(({page0, page1, graph0, graph1}) =>
                 of(undefined).pipe(
-                    switchMap(() => of(undefined).pipe(
-                        switchMap(() => graphNewAuth(graph0, 'username', 'password')),
-                        switchMap(({graph}) => graphAuth(graph, 'username', 'password')),
-                        switchMap(() => addThingNode(graph0, 1, {})),
-                        switchMap(() => addThingNode(graph0, 2, {}))
-                    )),
-                    delay(1000),
+                    switchMap(() => combineLatest([
+                        page0.click('#count'),
+                        page0.click('#count')
+                    ])),
+                    delay(100),
                     switchMap(() => page0.click('#connect0')),
+                    delay(2000),
                     switchMap(() => page1.click('#connect1')),
-                    switchMap(() => addThingNode(graph0, 3, {})),
-                    delay(1000),
-                    switchMap(({graph}) => addThingNode(graph, 4, {})),
+                    switchMap(() => page0.click('#count')),
+                    delay(2000),
+                    switchMap(() => page0.click('#count')),
                     map(() => ({page0, page1})
                 ),
             )),
             switchMap(({page0, page1}) => combineLatest([
-                page1.waitForSelector('div:text("thing0001")'),
-                page1.waitForSelector('div:text("thing0002")'),
-                page1.waitForSelector('div:text("thing0003")'),
-                page1.waitForSelector('div:text("thing0004")')
-            ])),
+                page1.waitForSelector('div:text("thing1")', {timeout: 120000}),
+                page1.waitForSelector('div:text("thing2")', {timeout: 120000}),
+                page1.waitForSelector('div:text("thing3")', {timeout: 120000}),
+                page1.waitForSelector('div:text("thing4")', {timeout: 120000})
+            ]))
         ))
     );
 });

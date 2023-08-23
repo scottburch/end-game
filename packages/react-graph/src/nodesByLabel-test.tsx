@@ -27,14 +27,14 @@ renderApp(asGraphId('testGraph'), () => {
     const addThing = () => {
         graphPut('thing', asNodeId(`thing${count.current}`) , {name: 'thing' + count.current}).subscribe();
         count.current = count.current + 1;
-    }
+    };
 
-    const connect = (n: number) => () => {
+    const connect = (n: number) => () =>
         dial({
             url: `ws://localhost:${11117 + n}`,
             redialInterval: 1
-        }).subscribe()
-    }
+        }).subscribe();
+
 
     return (
         <>

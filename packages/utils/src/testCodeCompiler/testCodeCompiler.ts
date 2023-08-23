@@ -19,6 +19,7 @@ export const compileBrowserTestCode = (src: string, port: number = 1234) => new 
             entry: {
                 'index': src
             },
+            devtool: 'eval-cheap-source-map',
             module: {
                 rules: [
                     {

@@ -18,6 +18,7 @@ export const devCmd = (opts: {headless: boolean, port: number}) => {
         }, Webpack({
             target: 'web',
             mode: 'development',
+            devtool: 'eval-cheap-source-map',
             entry: {
                 'index': resolve('./src/index.tsx')
             },
