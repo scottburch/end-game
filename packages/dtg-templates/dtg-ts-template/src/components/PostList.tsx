@@ -12,8 +12,8 @@ export const PostList: React.FC<{posts: GraphNode<Post>[]}> = ({posts}) => {
 
 
     return (
-        <List bordered>
-            {Object.values(postList.current).map(post => (
+        <List bordered key={Object.keys(postList.current).length.toString()}>
+            {Object.values(postList.current).sort((a, b) => a.props.timestamp < b.props.timestamp ? 1 : -1).map(post => (
                 <div key={post.nodeId}>
                     <PostItem post={post}/>
                 </div>
