@@ -13,10 +13,10 @@ export const getAGraph = (opts: GraphOpts = {graphId: asGraphId(newUid())}) => g
 );
 
 
-export const startTestNet = (nodes: number[][]) =>
-    findBasePort(11110).pipe(
+export const startTestNet = (nodes: number[][], opts: {graphId?: string, basePort?: number} = {}) =>
+    findBasePort(opts.basePort || 11110).pipe(
         switchMap(basePort => from(nodes).pipe(
-            mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers, {basePort})),
+            mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers, {basePort, graphId: opts.graphId})),
             scan((nodes, {host}, idx) => ({...nodes, [`host${idx}`]: host}), {} as Record<`host${number}`, Host>),
             skip(nodes.length - 1),
         ))

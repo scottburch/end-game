@@ -29,9 +29,9 @@ renderApp(asGraphId('testGraph'), () => {
         count.current = count.current + 1;
     }
 
-    const connect = () => {
+    const connect = (n: number) => () => {
         dial({
-            url: 'ws://localhost:11117',
+            url: `ws://localhost:${11117 + n}`,
             redialInterval: 1
         }).subscribe()
     }
@@ -40,7 +40,8 @@ renderApp(asGraphId('testGraph'), () => {
         <>
             <Username/>
             <button id="count" onClick={addThing}>count</button>
-            <button id="connect" onClick={connect}>connect</button>
+            <button id="connect0" onClick={connect(0)}>connect0</button>
+            <button id="connect1" onClick={connect(1)}>connect1</button>
             {nodes.map((node) => <div key={node.nodeId} id={node.nodeId}>{node.props.name}</div>)}
         </>
     )
