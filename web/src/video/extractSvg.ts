@@ -1,9 +1,9 @@
 import {combineLatest, from, map, of, switchMap, tap, toArray} from "rxjs";
 import {readFile, writeFile} from 'node:fs/promises'
 
-const IN_FILE = 'endgame-intro/raw.svg';
-const OUT_JS = 'endgame-intro/introJS.ts';
-const OUT_SVG = 'endgame-intro/introSvg.ts';
+const IN_FILE = 'how-endgame-works/raw.svg';
+const OUT_JS = 'how-endgame-works/howEndgameWorksJS.ts';
+const OUT_SVG = 'how-endgame-works/howEndgameWorksSvg.ts';
 
 from(readFile(IN_FILE)).pipe(
     map(buf => buf.toString()),

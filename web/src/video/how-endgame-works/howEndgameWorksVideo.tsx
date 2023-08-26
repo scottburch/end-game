@@ -1,23 +1,24 @@
 import React from 'react'
 import {last, repeat, switchMap} from "rxjs";
-import {svg} from "./introSvg.js";
+import {svg} from "./howEndgameWorksSvg.js";
 import {playSvg} from "../player/play.js";
 import {videoPart, SvgVideoPlayer} from "../player/SvgVideoPlayer.jsx";
-import {svgJS} from './introJS.js'
+import {svgJS} from './howEndgameWorksJS.js'
 
-export const IntroVideo: React.FC = () => (
+export const HowEndgameWorksVideo: React.FC = () => (
     <SvgVideoPlayer
         sections={[
-            {label: 'in the beginning', part: serverToServerPart},
-            {label: 'web', part: serverToPersonPart},
-            {label: 'social', part: socialNetworkPart},
-            {label: 'endgame', part: endgamePart}
+            {label: 'how data is retrieved', part: howDataIsRetrievedPart},
+            // {label: 'web', part: serverToPersonPart},
+            // {label: 'social', part: socialNetworkPart},
+            // {label: 'endgame', part: endgamePart}
         ]}
         svg={svg()}
         svgJS={svgJS}
     />
 );
 
+const howDataIsRetrievedPart = videoPart('', playSvg('start', 'whoHasAlice'))
 
 const serverToServerPart = videoPart('/audio/endgame-intro/in_the_beginning.mp3',
     playSvg('serverToServerStart', 'serverToServerData').pipe(

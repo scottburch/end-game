@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import {svgJS} from "../endgame-intro/introJS.js";
 import {delay, map, Observable, race, switchMap, tap} from "rxjs";
 import {Button, Segmented} from "antd";
 import {CaretRightOutlined, PauseOutlined} from "@ant-design/icons";
@@ -22,7 +21,7 @@ export const videoPart = (file: string, videoCmds: Observable<unknown>) => () =>
 );
 
 
-export const SvgVideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection> }> = ({svg, sections}) => {
+export const SvgVideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection>, svgJS: () => void }> = ({svg, sections, svgJS}) => {
     const [state, setState] = useState<'stopped' | 'playing' | 'paused'>('stopped');
     const [currentSection, setCurrentSection] = useState<VideoSection>()
 

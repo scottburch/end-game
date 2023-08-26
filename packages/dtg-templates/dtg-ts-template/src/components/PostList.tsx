@@ -9,8 +9,6 @@ export const PostList: React.FC<{posts: GraphNode<Post>[]}> = ({posts}) => {
 
     posts.map(post => postList.current[post.nodeId] = post);
 
-
-
     return (
         <List bordered key={Object.keys(postList.current).length.toString()}>
             {Object.values(postList.current).sort((a, b) => a.props.timestamp < b.props.timestamp ? 1 : -1).map(post => (
