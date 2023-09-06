@@ -52,7 +52,7 @@
         <path id="connector3" d="M137.5,102L603.5,102" stroke="#000000" fill="none" fill-opacity="0.993671" stroke-width="3" transform="translate(-11.4225,185.719)"/>
         <path id="connector2" d="M406.256,-109.465L598.878,6.51774" stroke="#000000" fill="none" fill-opacity="0.993671" stroke-width="3" transform="translate(-11.4225,185.719)"/>
         <path id="connector" d="M173.5,27.5L284.5,-23.5" stroke="#000000" fill="none" fill-opacity="0.993671" stroke-width="3" transform="translate(-11.4225,185.719)"/>
-        <g id="Computer" filter="drop-shadow(3px 3px 2px rgba(0,0,0,0.50))" transform="translate(479.79,137.244) scale(1.35137,1.56516) translate(79.6716,35.1357)">
+        <g id="Computer" filter="drop-shadow(3px 3px 2px rgba(0,0,0,0.50))" transform="translate(479.79,137.244) scale(1.35137,1.56516) translate(79.6714,35.1356)">
             <g transform="translate(-26.9147,-3.09176)">
                 <path d="M3.8,0.4L0.65,0.45L8.21501,109.4L141.2,97.6485" stroke="#000000" fill="none" fill-opacity="0.993671" stroke-linecap="round" transform="translate(26.8,3.2)"/>
                 <path d="M0,0L131.4,2L138.4,94.8L7.6,106.6Z" stroke="#000000" fill="none" fill-opacity="0.993671" stroke-linecap="square" transform="translate(30.6,3.6)"/>
@@ -70,8 +70,8 @@
     </g>
     <g id="Who-has-alice-bubble" visibility="hidden" transform="translate(199.489,406.151) translate(-114.901,-81.616)">
         <use id="bubble-2" width="231.655" height="163.232" xlink:href="#Symbol-1" transform="translate(371.304,248.826) scale(0.992004,1) translate(-374.297,-248.826)"/>
-        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" letter-spacing="0" word-spacing="0" stroke="none" text-anchor="middle" text-decoration="" transform="translate(105.812,52.6759)" style="line-height: 35px;">Who has
-user &quot;alice&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" text-decoration="" letter-spacing="0" word-spacing="0" text-anchor="middle" stroke="none" transform="translate(105.812,94.2023)" style="line-height: 35px;">user &quot;alice&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" letter-spacing="0" word-spacing="0" stroke="none" text-anchor="middle" text-decoration="" transform="translate(105.812,52.6759)" style="line-height: 35px;">Who has</text>
     </g>
     <g id="I-do-bubble" visibility="hidden" transform="translate(1122.57,440.518) translate(-72.3944,-54.2694)">
         <g id="bubble-1" transform="translate(-89.154,165.453) scale(-0.193415,0.218102) translate(-1209.54,-758.606)">
@@ -97,13 +97,13 @@ user &quot;alice&quot;</text>
     </g>
     <g id="send-alice-bubble" visibility="hidden" transform="translate(217,410.5) translate(-103.594,-66.8756)">
         <use id="bubble-3" width="231.655" height="163.232" xlink:href="#Symbol-1" transform="translate(103.594,66.8756) scale(0.894383,0.819394) translate(-115.827,-81.616)"/>
-        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" letter-spacing="0" word-spacing="0" stroke="none" transform="translate(35.5942,44.3493)" style="line-height: 35px;">Send 
-&quot;alice&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" letter-spacing="0" word-spacing="0" stroke="none" transform="translate(24.7504,80.7428)" style="line-height: 35px;">&quot;Alice&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" letter-spacing="0" word-spacing="0" stroke="none" transform="translate(35.5942,44.3493)" style="line-height: 35px;">Send</text>
     </g>
     <g id="Who-has-alice-bubble-2" visibility="hidden" transform="translate(446.489,215.807) translate(-114.901,-81.616)" style="white-space: pre;">
         <use id="bubble-4" width="231.655" height="163.232" xlink:href="#Symbol-1" transform="translate(371.304,248.826) scale(0.992004,1) translate(-374.297,-248.826)"/>
-        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" letter-spacing="0" word-spacing="0" stroke="none" text-anchor="middle" text-decoration="" transform="translate(105.812,52.6759)" style="line-height: 35px;">Who has
-user &quot;alice&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-family="Arial" font-size="40" font-weight="400" letter-spacing="0" stroke="none" text-anchor="middle" text-decoration="" word-spacing="0" transform="translate(105.099,92.707)" style="line-height: 35px; white-space: pre;">user &quot;alice&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-family="Arial" font-size="40" font-weight="400" letter-spacing="0" stroke="none" text-anchor="middle" text-decoration="" word-spacing="0" transform="translate(97.0212,48.0195)" style="line-height: 35px; white-space: pre;">Who has</text>
     </g>
     <g id="I-do-bubble-2" visibility="hidden" transform="translate(216.727,442.854) translate(-72.3944,-54.2693)">
         <g id="bubble-5" transform="translate(233.943,165.453) scale(0.193415,0.218102) translate(-1209.54,-758.606)">
@@ -129,33 +129,47 @@ user &quot;alice&quot;</text>
     </g>
     <g id="additional-cell" visibility="hidden" transform="translate(965.262,412.894) translate(-169.762,-145.614)">
         <use id="-cellPhone-3" width="482.387" height="533.008" xlink:href="#Symbol-5" filter="drop-shadow(3px 3px 2px rgba(0,0,0,0.50))" transform="translate(190.326,-129.418) scale(0.342436,0.34791) translate(-46.6935,371.988)"/>
-        <path d="M0,0L197,-126.508" stroke="#000000" fill="none" fill-opacity="0.993671" stroke-width="3" stroke-linecap="square" transform="translate(0,291.227)"/>
+        <path id="connector-2" d="M0,0L197,-126.508" stroke="#000000" fill="none" fill-opacity="0.993671" stroke-width="3" stroke-linecap="square" transform="translate(0,291.227)"/>
     </g>
     <g id="Who-has-bob-bubble" visibility="hidden" transform="translate(877.598,255.384) translate(-114.901,-81.616)" style="white-space: pre;">
         <use id="bubble-6" width="231.655" height="163.232" xlink:href="#Symbol-1" transform="translate(371.304,248.826) scale(0.992004,1) translate(-374.297,-248.826)"/>
-        <text fill="#000000" fill-opacity="0.993671" font-family="Arial" font-size="40" font-weight="400" letter-spacing="0" stroke="none" text-anchor="middle" text-decoration="" word-spacing="0" transform="translate(105.812,52.6759)" style="line-height: 35px;">Who has
-user &quot;bob&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" text-decoration="" letter-spacing="0" word-spacing="0" text-anchor="middle" stroke="none" transform="translate(108.299,88.8868)" style="line-height: 35px;">user &quot;Bob&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-family="Arial" font-size="40" font-weight="400" letter-spacing="0" stroke="none" text-anchor="middle" text-decoration="" word-spacing="0" transform="translate(108.299,44.1993)" style="line-height: 35px;">Who has</text>
     </g>
     <g id="Who-has-bob-bubble-2" visibility="hidden" transform="translate(661.561,350.384) translate(-114.901,-81.616)" style="white-space: pre;">
         <use id="bubble-7" width="231.655" height="163.232" xlink:href="#Symbol-1" transform="translate(371.304,248.826) scale(0.992004,1) translate(-374.297,-248.826)"/>
-        <text fill="#000000" fill-opacity="0.993671" font-family="Arial" font-size="40" font-weight="400" letter-spacing="0" stroke="none" text-anchor="middle" text-decoration="" word-spacing="0" transform="translate(105.812,52.6759)" style="line-height: 35px;">Who has
-user &quot;bob&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" text-decoration="" letter-spacing="0" word-spacing="0" text-anchor="middle" stroke="none" transform="translate(105.812,95.4832)" style="line-height: 35px; white-space: pre;">user &quot;Bob&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-family="Arial" font-size="40" font-weight="400" letter-spacing="0" stroke="none" text-anchor="middle" text-decoration="" word-spacing="0" transform="translate(105.812,52.6759)" style="line-height: 35px;">Who has</text>
+    </g>
+    <g id="send-alice-bubble-2" visibility="hidden" transform="translate(940.858,201.067) translate(-103.594,-66.8756)" style="white-space: pre;">
+        <use id="bubble-9" width="231.655" height="163.232" xlink:href="#Symbol-1" transform="translate(103.594,66.8756) scale(0.894383,0.819394) translate(-115.827,-81.616)"/>
+        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" letter-spacing="0" word-spacing="0" stroke="none" transform="translate(36.0565,80.8984)" style="line-height: 35px;">&quot;Bob&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" letter-spacing="0" word-spacing="0" stroke="none" transform="translate(39.1346,36.2109)" style="line-height: 35px;">Send</text>
+    </g>
+    <g id="send-alice-bubble-3" visibility="hidden" transform="translate(640,360) translate(-103.594,-66.8756)" style="white-space: pre;">
+        <use id="bubble-10" width="231.655" height="163.232" xlink:href="#Symbol-1" transform="translate(103.594,66.8756) scale(0.894383,0.819394) translate(-115.827,-81.616)"/>
+        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" letter-spacing="0" word-spacing="0" stroke="none" transform="translate(32.5161,80.7428)" style="line-height: 35px;">&quot;Bob&quot;</text>
+        <text fill="#000000" fill-opacity="0.993671" font-size="40" font-family="Arial" font-weight="400" letter-spacing="0" word-spacing="0" stroke="none" transform="translate(35.5942,36.2109)" style="line-height: 35px;">Send</text>
     </g>
     <script xlink:href="keyshapejs-1.2.1.min.js"/>
     <script><![CDATA[if(KeyshapeJS.version.indexOf('1.')!=0)throw Error('Expected KeyshapeJS v1.*.*');window.ks=document.ks=KeyshapeJS;(function(ks){
 var tl=ks.animate("#devices",[{p:'mpath',t:[1200,2000],v:['0%','100%'],e:[[0],[0]],mp:"M673.843,466.389L426.843,462.389"}],
 "#connector3",[{p:'stroke',t:[0,300,1000],v:['#000000','#ff001c','#000000'],e:[[3,1],[3,1],[0]]}],
-"#Who-has-alice-bubble",[{p:'visibility',t:[0,100,300],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
+"#connector2",[{p:'stroke',t:[0,2400,2500],v:['#000000','#ff0000','#000000'],e:[[3,1],[0],[0]]}],
+"#Who-has-alice-bubble",[{p:'visibility',t:[100,300],v:['visible','hidden'],e:[[3,1],[3,1]],fill:[2,'hidden']}],
 "#I-do-bubble",[{p:'visibility',t:[100,200,300,1100,1200],v:['hidden','visible','hidden','visible','hidden'],e:[[3,1],[3,1],[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
-"#data",[{p:'mpath',t:[300,1000],v:['0%','100%'],e:[[0],[0]],mp:"M906.258,502.89L353.258,500.127"},{p:'visibility',t:[0,400,1000],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
+"#data",[{p:'mpath',t:[200,900,2500,3000,3100,3400],v:['0%','38.188647%','53.691274%','75.375538%','88.787234%','100%'],e:[[0],[3,1],[0],[3,1],[0],[0]],mp:"M906.258,502.89L353.258,500.127L382.742,277.579L647.242,446.816L832.361,505.552L970.122,419.609"},{p:'visibility',t:[0,400,900,2500,2600,3000,3100,3500],v:['hidden','visible','hidden','hidden','visible','hidden','visible','hidden'],e:[[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
 "#send-alice-bubble",[{p:'visibility',t:[0,300,1000],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
 "#Who-has-alice-bubble-2",[{p:'visibility',t:[0,1000,1200],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
 "#I-do-bubble-2",[{p:'visibility',t:[0,1000,1100,1200],v:['hidden','hidden','visible','hidden'],e:[[3,1],[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
-"#I-do-bubble-3",[{p:'visibility',t:[0,1000,2200],v:['hidden','hidden','visible'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
+"#I-do-bubble-3",[{p:'visibility',t:[0,1000,2200,2300],v:['hidden','hidden','visible','hidden'],e:[[3,1],[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
 "#additional-cell",[{p:'visibility',t:[0,1000,2000],v:['hidden','hidden','visible'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
-"#Who-has-bob-bubble",[{p:'visibility',t:[0,2000],v:['hidden','visible'],e:[[3,1],[3,1]],fill:[2,'hidden']}],
-"#Who-has-bob-bubble-2",[{p:'visibility',t:[0,2100],v:['hidden','visible'],e:[[3,1],[3,1]],fill:[2,'hidden']}],
-{autoremove:false,autoplay:false,markers:{"start":{time: 0},"whoHasAlice":{time: 100},"iDo1":{time: 200},"sendAlice":{time: 300},"whoHasAlice2":{time: 1000},"iDo2":{time: 1100},"whoHasBob":{time: 2000}}}).range(0,2200);
+"#connector-2",[{p:'stroke',t:[2200,2300,2500],v:['#000000','#ff0000','#000000'],e:[[3,1],[3,1],[0]]}],
+"#Who-has-bob-bubble",[{p:'visibility',t:[0,2000,2300],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
+"#Who-has-bob-bubble-2",[{p:'visibility',t:[0,2100,2300],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
+"#send-alice-bubble-2",[{p:'visibility',t:[0,2300,2500],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
+"#send-alice-bubble-3",[{p:'visibility',t:[0,2400,2500],v:['hidden','visible','hidden'],e:[[3,1],[3,1],[3,1]],fill:[2,'hidden']}],
+{autoremove:false,autoplay:false,markers:{"start":{time: 0},"whoHasAlice":{time: 100},"iDo1":{time: 200},"sendAlice":{time: 300},"sendAliceEnd":{time: 900},"whoHasAlice2":{time: 1000},"iDo2":{time: 1100},"whoHasBob":{time: 2000},"whoHasBob2":{time: 2100},"iDo3":{time: 2200},"sendBob":{time: 2300},"sendBob2":{time: 2400},"doSendBob":{time: 2500},"end":{time: 3500}}}).range(0,3500);
 if(document.location.search.substr(1).split('&').indexOf('global=paused')>=0)ks.globalPause();})(KeyshapeJS);
 ]]></script>
 </svg>

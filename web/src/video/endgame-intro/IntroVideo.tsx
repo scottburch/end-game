@@ -26,6 +26,10 @@ const serverToServerPart = videoPart('/audio/endgame-intro/in_the_beginning.mp3'
         )),
         last()
     )
+    /**
+     * A brief history of the internet.  In the beginning, the internet was used for computer to
+     * computer communication.*/
+
 );
 
 const serverToPersonPart = videoPart('/audio/endgame-intro/web.mp3',
@@ -35,6 +39,10 @@ const serverToPersonPart = videoPart('/audio/endgame-intro/web.mp3',
         )),
         last()
     )
+    /**
+    * Then came the Web, with computer-to-person communication. For this model to continue, the owner
+    * of the content provider must continually create new content to be consumed.  This is a very expensive and
+    *time-consuming prospect*/
 );
 
 const socialNetworkPart = videoPart('/audio/endgame-intro/social-media.mp3',
@@ -44,33 +52,28 @@ const socialNetworkPart = videoPart('/audio/endgame-intro/social-media.mp3',
         )),
         last()
     )
+    /**
+     To solve this problem, social networking was created.  This allowed providers to offload the
+     creation of content to their users, guaranteeing a large amount of content, without the need to create it.
+     This also allows a small group of people to decide what, and with whom, your content can be shared.
+     This means that Social networking companies own and control your data, you, do not!
+     */
 );
 
 const endgamePart = videoPart('/audio/endgame-intro/endgame.mp3',
     playSvg('endgame', 'endgameEnd').pipe(
         repeat(),
         last()
+        /**
+         <speak>
+         <emphasis level="strong"><prosody pitch="+5%">now</prosody></emphasis>, you can!  Endgame is the first full-stack development platform to allow anyone to quickly
+         and easily write applications with distributed data.
+         data is shared and stored across the network by peers to
+         ensure that it is available to everyone on the network.  Using encryption, data is also secure.
+         <prosody pitch="+5%">only<prosody rate="130%"><prosody pitch="+10%"> you</prosody></prosody></prosody>, control who can see your data!
+          </speak>
+         */
     ))
 
-function text() {
-    return {
-        in_the_beginning: 'A brief history of the internet.  In the beginning, the internet was used for computer to ' +
-            'computer communication',
-        computerToPerson: 'Then came the Web, with computer-to-person communication. For this model to continue, the owner ' +
-            'of the content provider must continually create new content to be consumed.  This is a very expensive and ' +
-            'time-consuming prospect',
-        serviceToPerson: 'To solve this problem, social networking was created.  This allowed providers to offload the ' +
-            'creation of content to their users, guaranteeing a large amount of content, without the need to create it. ' +
-            'This also allows a small group of people to decide what, and with whom, your content can be shared. ' +
-            'This means that Social networking companies own and control your data, you, do not! ',
-        endgame: '<speak>\n' +
-            '<emphasis level="strong"><prosody pitch="+5%">now</prosody></emphasis>, you can!  Endgame is the first full-stack development platform to allow anyone to quickly \n' +
-            '            and easily write applications with distributed data. \n' +
-            '            data is shared and stored across the network by peers to\n' +
-            '            ensure that it is available to everyone on the network.  Using encryption, data is also secure. \n' +
-            '          <prosody pitch="+5%">only<prosody rate="130%"><prosody pitch="+10%"> you</prosody></prosody></prosody>, control who can see your data! \n' +
-            ' </speak>'
-    } as const;
-}
 
 
