@@ -1,9 +1,10 @@
 import React from 'react'
-import {delay, last, repeat, switchMap} from "rxjs";
+import {delay, last, map, of, repeat, switchMap, timer} from "rxjs";
 import {svg} from "./howEndgameWorksSvg.js";
-import {playSvg} from "../player/play.js";
+import {playFile, playSvg} from "../player/play.js";
 import {videoPart, SvgVideoPlayer} from "../player/SvgVideoPlayer.jsx";
 import {svgJS} from './howEndgameWorksJS.js'
+import {getSpeaker, speakerLoad, speakerPlay} from "../player/speak.js";
 
 export const HowEndgameWorksVideo: React.FC = () => (
     <SvgVideoPlayer
@@ -17,26 +18,46 @@ export const HowEndgameWorksVideo: React.FC = () => (
     />
 );
 
-const howDataIsRetrievedPart = videoPart('',
-    playSvg('start', 'whoHasAlice').pipe(
-        delay(1000),
-        switchMap(() => playSvg('', 'iDo1')),
-        delay(1000),
-        switchMap(() => playSvg('', 'sendAlice')),
-        delay(1000),
-        switchMap(() => playSvg('', 'sendAliceEnd')),
-        delay(1000),
-        switchMap(() => playSvg('', 'whoHasAlice2')),
-        delay(1000),
-        switchMap(() => playSvg('', 'iDo2')),
-        delay(1000),
-        switchMap(() => playSvg('', 'whoHasBob')),
-        delay(1000),
-        switchMap(() => playSvg('', 'whoHasBob2')),
-        delay(1000),
-        switchMap(() => playSvg('', 'iDo3'))
-    )
-)
+/*
+    Endgame is a peer-to-peer network for data sharing.  When a node requires some piece of data, it will ask
+    the network for other nodes that have the data.
+ */
+
+
+const howDataIsRetrievedPart = () => of(undefined).pipe(
+    switchMap(videoPart('audio/how-endgame-works/intro.mp3', timer(5000))),
+    switchMap(videoPart('audio/how-endgame-works/who-has-alice.mp3', playSvg('start', 'whoHasAlice').pipe(delay(5000))))
+
+
+
+    // videoPart('audio/how-endgame-works/intro.mp3',
+    // playSvg('start', 'whoHasAlice').pipe(
+    //     delay(1000),
+    //     switchMap(() => playSvg('', 'iDo1')),
+    //     delay(1000),
+    //     switchMap(() => playSvg('', 'sendAlice')),
+    //     delay(1000),
+    //     switchMap(() => playSvg('', 'sendAliceEnd')),
+    //     delay(1000),
+    //     switchMap(() => playSvg('', 'whoHasAlice2')),
+    //     delay(1000),
+    //     switchMap(() => playSvg('', 'iDo2')),
+    //     delay(1000),
+    //     switchMap(() => playSvg('', 'whoHasBob')),
+    //     delay(1000),
+    //     switchMap(() => playSvg('', 'whoHasBob2')),
+    //     delay(1000),
+    //     switchMap(() => playSvg('', 'iDo3')),
+    //     delay(1000),
+    //     switchMap(() => playSvg('', 'sendBob')),
+    //     delay(1000),
+    //     switchMap(() => playSvg('', 'sendBob2')),
+    //     delay(1000),
+    //     switchMap(() => playSvg('', 'doSendBob')),
+    //     delay(300),
+    //     switchMap(() => playSvg('', 'end'))
+    // )
+);
 
 const serverToServerPart = videoPart('/audio/endgame-intro/in_the_beginning.mp3',
     playSvg('serverToServerStart', 'serverToServerData').pipe(

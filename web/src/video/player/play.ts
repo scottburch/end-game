@@ -2,6 +2,7 @@ import {first, map, Observable, of, switchMap, tap} from "rxjs";
 
 // @ts-ignore
 import * as KeyshapeJS from 'keyshapejs'
+import {getSpeaker, speakerLoad, speakerPlay} from "./speak.js";
 
 
 export const playSvg = <T extends string | number>(start: T, end: T) => of(true).pipe(
@@ -13,3 +14,9 @@ export const playSvg = <T extends string | number>(start: T, end: T) => of(true)
     )),
     first()
 );
+
+export const playFile = (filename: string) =>
+    getSpeaker().pipe(
+        switchMap(speaker => speakerLoad(speaker, filename)),
+        switchMap(speaker => speakerPlay(speaker))
+    );
