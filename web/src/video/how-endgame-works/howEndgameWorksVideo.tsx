@@ -25,38 +25,25 @@ export const HowEndgameWorksVideo: React.FC = () => (
 
 
 const howDataIsRetrievedPart = () => of(undefined).pipe(
+    // Endgame is a peer-to-peer network for data sharing.
     switchMap(videoPart('audio/how-endgame-works/intro.mp3', timer(5000))),
-    switchMap(videoPart('audio/how-endgame-works/who-has-alice.mp3', playSvg('start', 'whoHasAlice').pipe(delay(5000))))
+    // When a node requires some piece of data, it will ask the network for other nodes that have the data.
+    switchMap(videoPart('audio/how-endgame-works/who-has-alice.mp3', playSvg('start', 'whoHasAlice').pipe(delay(5000)))),
+    switchMap(videoPart('', playSvg('', 'iDo1'))),
+    switchMap(videoPart('', playSvg('', 'sendAlice'))),
+    switchMap(videoPart('', playSvg('', 'sendAliceEnd'))),
+    switchMap(videoPart('', playSvg('', 'whoHasAlice2'))),
+    switchMap(videoPart('', playSvg('', 'iDo2'))),
+    switchMap(videoPart('', playSvg('', 'whoHasBob'))),
+    switchMap(videoPart('', playSvg('', 'whoHasBob2'))),
+    switchMap(videoPart('', playSvg('', 'iDo3'))),
+    switchMap(videoPart('', playSvg('', 'sendBob'))),
+    switchMap(videoPart('', playSvg('', 'sendBob2'))),
+    switchMap(videoPart('', playSvg('', 'doSendBob'))),
+    switchMap(videoPart('', playSvg('', 'end')))
 
 
 
-    // videoPart('audio/how-endgame-works/intro.mp3',
-    // playSvg('start', 'whoHasAlice').pipe(
-    //     delay(1000),
-    //     switchMap(() => playSvg('', 'iDo1')),
-    //     delay(1000),
-    //     switchMap(() => playSvg('', 'sendAlice')),
-    //     delay(1000),
-    //     switchMap(() => playSvg('', 'sendAliceEnd')),
-    //     delay(1000),
-    //     switchMap(() => playSvg('', 'whoHasAlice2')),
-    //     delay(1000),
-    //     switchMap(() => playSvg('', 'iDo2')),
-    //     delay(1000),
-    //     switchMap(() => playSvg('', 'whoHasBob')),
-    //     delay(1000),
-    //     switchMap(() => playSvg('', 'whoHasBob2')),
-    //     delay(1000),
-    //     switchMap(() => playSvg('', 'iDo3')),
-    //     delay(1000),
-    //     switchMap(() => playSvg('', 'sendBob')),
-    //     delay(1000),
-    //     switchMap(() => playSvg('', 'sendBob2')),
-    //     delay(1000),
-    //     switchMap(() => playSvg('', 'doSendBob')),
-    //     delay(300),
-    //     switchMap(() => playSvg('', 'end'))
-    // )
 );
 
 const serverToServerPart = videoPart('/audio/endgame-intro/in_the_beginning.mp3',
