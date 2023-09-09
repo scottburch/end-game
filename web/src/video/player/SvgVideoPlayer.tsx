@@ -1,19 +1,19 @@
 import React, {useEffect, useState} from "react";
-import {delay, map, Observable, race, switchMap, tap} from "rxjs";
+import {delay, map, Observable, of, race, switchMap, tap} from "rxjs";
 import {Button, Segmented} from "antd";
 import {CaretRightOutlined, PauseOutlined} from "@ant-design/icons";
 // @ts-ignore
 import * as KeyshapeJS from 'keyshapejs'
-import {getSpeaker, speakerLoad, speakerPause, speakerPlay, speakerResume} from "./speak.js";
+import {Speaker, speakerLoad, speakerPause, speakerPlay, speakerResume} from "./speak.js";
 
 
 export type VideoSection = {
     label: string
-    part: () => Observable<unknown>
+    part: (speaker: Speaker) => Observable<unknown>
 };
 
-export const videoPart = (file: string, videoCmds: Observable<unknown>) => () => race(
-    getSpeaker().pipe(
+export const videoPart = (speaker: Speaker, file: string, videoCmds: Observable<unknown>) => () => race(
+    of(speaker).pipe(
         switchMap(speaker => speakerLoad(speaker, file)),
         switchMap(speakerPlay)
     ),
@@ -21,26 +21,26 @@ export const videoPart = (file: string, videoCmds: Observable<unknown>) => () =>
 );
 
 
-export const SvgVideoPlayer: React.FC<{ svg: string, sections: Array<VideoSection>, svgJS: () => void }> = ({svg, sections, svgJS}) => {
+export const SvgVideoPlayer: React.FC<{speaker: Speaker, svg: string, sections: Array<VideoSection>, svgJS: () => void }> = ({speaker, svg, sections, svgJS}) => {
     const [state, setState] = useState<'stopped' | 'playing' | 'paused'>('stopped');
     const [currentSection, setCurrentSection] = useState<VideoSection>()
 
     const Player = {
         play: () => {
             currentSection || setCurrentSection(findNextSection());
-            getSpeaker().pipe(
+            of(speaker).pipe(
                 switchMap(speakerResume)
             ).subscribe()
             KeyshapeJS.globalPlay();
         },
         pause: () => {
-            getSpeaker().pipe(
+            of(speaker).pipe(
                 switchMap(speakerPause)
             ).subscribe()
             KeyshapeJS.globalPause()
         },
         stop: () => {
-            getSpeaker().pipe(
+            of(speaker).pipe(
                 switchMap(speakerPause)
             ).subscribe()
             setCurrentSection(undefined);
@@ -63,7 +63,7 @@ export const SvgVideoPlayer: React.FC<{ svg: string, sections: Array<VideoSectio
     useEffect(() => {
         svgJS();
         return () => {
-            getSpeaker().pipe(
+            of(speaker).pipe(
                 switchMap(speakerPause)
             ).subscribe()
             KeyshapeJS.removeAll();
@@ -71,8 +71,8 @@ export const SvgVideoPlayer: React.FC<{ svg: string, sections: Array<VideoSectio
     }, []);
 
     useEffect(() => {
-        getSpeaker().pipe(tap(speakerPause)).subscribe();
-        currentSection?.part().pipe(
+        of(speaker).pipe(tap(speakerPause)).subscribe();
+        currentSection?.part(speaker).pipe(
             delay(1000),
             map(() => findNextSection()),
             tap(nextSection => nextSection ? setCurrentSection(nextSection) : setState('stopped'))

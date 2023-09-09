@@ -1,11 +1,15 @@
-import React from 'react'
-import {last, repeat, switchMap} from "rxjs";
+import React, {useMemo} from 'react'
+import {last, of, repeat, switchMap} from "rxjs";
 import {svg} from "./introSvg.js";
 import {playSvg} from "../player/play.js";
 import {videoPart, SvgVideoPlayer} from "../player/SvgVideoPlayer.jsx";
 import {svgJS} from './introJS.js'
+import {getSpeaker, Speaker} from "../player/speak.js";
 
-export const IntroVideo: React.FC = () => (
+export const IntroVideo: React.FC = () => {
+    const speaker = useMemo(() => getSpeaker(), [])
+
+    return (
     <SvgVideoPlayer
         sections={[
             {label: 'in the beginning', part: serverToServerPart},
@@ -15,43 +19,48 @@ export const IntroVideo: React.FC = () => (
         ]}
         svg={svg()}
         svgJS={svgJS}
+        speaker={speaker}
     />
-);
+)
+};
 
 
-const serverToServerPart = videoPart('/audio/endgame-intro/in_the_beginning.mp3',
+const serverToServerPart = (speaker: Speaker) => of(undefined).pipe(
+    switchMap(videoPart(speaker,'/audio/endgame-intro/in_the_beginning.mp3',
     playSvg('serverToServerStart', 'serverToServerData').pipe(
         switchMap(() => playSvg('serverToServerData', 'serverToServerDataEnd').pipe(
             repeat()
         )),
         last()
-    )
+    )))
     /**
      * A brief history of the internet.  In the beginning, the internet was used for computer to
      * computer communication.*/
 
 );
 
-const serverToPersonPart = videoPart('/audio/endgame-intro/web.mp3',
+const serverToPersonPart = (speaker: Speaker) => of(undefined).pipe(
+    switchMap(videoPart(speaker, '/audio/endgame-intro/web.mp3',
     playSvg('serverToComputerStart', 'serverToComputerData').pipe(
         switchMap(() => playSvg('serverToComputerData', 'serverToComputerDataEnd').pipe(
             repeat()
         )),
         last()
-    )
+    )))
     /**
     * Then came the Web, with computer-to-person communication. For this model to continue, the owner
     * of the content provider must continually create new content to be consumed.  This is a very expensive and
     *time-consuming prospect*/
 );
 
-const socialNetworkPart = videoPart('/audio/endgame-intro/social-media.mp3',
+const socialNetworkPart = (speaker: Speaker) => of(undefined).pipe(
+    switchMap(videoPart(speaker, '/audio/endgame-intro/social-media.mp3',
     playSvg('socialNetworkStart', 'socialNetworkDataStart').pipe(
         switchMap(() => playSvg('socialNetworkDataStart', 'socialNetworkDataEnd').pipe(
             repeat()
         )),
         last()
-    )
+    )))
     /**
      To solve this problem, social networking was created.  This allowed providers to offload the
      creation of content to their users, guaranteeing a large amount of content, without the need to create it.
@@ -60,7 +69,8 @@ const socialNetworkPart = videoPart('/audio/endgame-intro/social-media.mp3',
      */
 );
 
-const endgamePart = videoPart('/audio/endgame-intro/endgame.mp3',
+const endgamePart = (speaker: Speaker) => of(undefined).pipe(
+    switchMap(videoPart(speaker, '/audio/endgame-intro/endgame.mp3',
     playSvg('endgame', 'endgameEnd').pipe(
         repeat(),
         last()
@@ -73,7 +83,7 @@ const endgamePart = videoPart('/audio/endgame-intro/endgame.mp3',
          <prosody pitch="+5%">only<prosody rate="130%"><prosody pitch="+10%"> you</prosody></prosody></prosody>, control who can see your data!
           </speak>
          */
-    ))
+    ))))
 
 
 

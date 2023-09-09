@@ -6,12 +6,7 @@ export type Speaker = {
     audio?: HTMLAudioElement
 };
 
-let speaker: Speaker | undefined = undefined;
-
-
-export const getSpeaker = () => of(undefined).pipe(
-    map(() => speaker || (speaker = {}))
-);
+export const getSpeaker = () => ({});
 
 export const speakerLoad = (speaker: Speaker, file: string) => of(undefined).pipe(
     tap(() => speaker.audio?.pause()),
