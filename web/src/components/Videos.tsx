@@ -1,8 +1,6 @@
-import {IntroVideo} from "../video/endgame-intro/IntroVideo.jsx";
 import React, {useState} from 'react'
 import {Menu, MenuProps} from "antd";
 import {EmbeddedVideoPlayer} from "../video/player/EmbeddedVideoPlayer.jsx";
-import {HowEndgameWorksVideo} from "../video/how-endgame-works/howEndgameWorksVideo.jsx";
 
 export const Videos: React.FC = () => {
     const [selectedVideo, setSelectedVideo] = useState('intro');
@@ -10,9 +8,8 @@ export const Videos: React.FC = () => {
     const selectVideo: MenuProps['onSelect'] = (v) => setSelectedVideo(v.key);
 
     const videos: Record<string, JSX.Element> = {
-        'intro': <IntroVideo/>,
-        'getting-started': <EmbeddedVideoPlayer id={'v2qd6d0'}/>,
-        'how-endgame-works': <HowEndgameWorksVideo/>
+        'teaser': <EmbeddedVideoPlayer id={'v3gji4e'}/>,
+        'intro': <EmbeddedVideoPlayer id={'v3idbrk'}/>,
     }
 
     return (
@@ -25,15 +22,11 @@ export const Videos: React.FC = () => {
 
 export const getVideoItems = (): MenuProps['items'] => [
     {
+        key: 'teaser',
+        label: 'Endgame Teaser',
+    },
+    {
         key: 'intro',
-        label: 'Endgame DTG Introduction',
-    },
-    {
-        key: 'how-endgame-works',
-        label: 'How Endgame Works'
-    },
-    {
-        key: 'getting-started',
-        label: 'Getting started'
+        label: 'Endgame Introduction'
     }
 ]

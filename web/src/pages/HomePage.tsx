@@ -2,7 +2,7 @@ import React from 'react'
 import {EndgamePyramid} from "../components/EndgamePyramid.jsx";
 import triangleImg from '../images/eg-triangle.svg'
 import {Svg} from "../components/Svg.jsx";
-import {List, Space} from "antd";
+import {List} from "antd";
 import {Videos} from "../components/Videos.jsx";
 
 export const HomePage: React.FC = () => {
@@ -11,7 +11,7 @@ export const HomePage: React.FC = () => {
             <h2>Welcome to the new decentralized internet!</h2>
             <Svg src={triangleImg}/>
             <h3>
-                Endgame products make developing P2P internet applications faster, easier and cheaper.
+                Endgame products make developing distributed applications faster, easier and cheaper.
             </h3>
 
             <Videos/>
