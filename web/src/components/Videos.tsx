@@ -20,13 +20,11 @@ export const Videos: React.FC = () => {
     )
 };
 
-export const getVideoItems = (): MenuProps['items'] => [
-    {
+export const getVideoItems = (): MenuProps['items'] => [{
         key: 'teaser',
         label: 'Endgame Teaser',
     },
     {
         key: 'intro',
         label: 'Endgame Introduction'
-    }
-]
+    }];
