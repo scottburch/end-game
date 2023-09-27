@@ -3,7 +3,7 @@ import {Menu, MenuProps} from "antd";
 import {EmbeddedVideoPlayer} from "../video/player/EmbeddedVideoPlayer.jsx";
 
 export const Videos: React.FC = () => {
-    const [selectedVideo, setSelectedVideo] = useState('intro');
+    const [selectedVideo, setSelectedVideo] = useState('teaser');
 
     const selectVideo: MenuProps['onSelect'] = (v) => setSelectedVideo(v.key);
 
