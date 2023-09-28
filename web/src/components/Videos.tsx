@@ -10,7 +10,8 @@ export const Videos: React.FC = () => {
     const videos: Record<string, JSX.Element> = {
         'teaser': <EmbeddedVideoPlayer id={'v3gji4e'}/>,
         'intro': <EmbeddedVideoPlayer id={'v3idbrk'}/>,
-        'starterKitInstall': <EmbeddedVideoPlayer id="v3ikvob"/>
+        'starterKitInstall': <EmbeddedVideoPlayer id="v3ikvob"/>,
+        'demoBasic': <EmbeddedVideoPlayer id="v3iwjzi"/>
     }
 
     return (
@@ -30,4 +31,7 @@ export const getVideoItems = (): MenuProps['items'] => [{
     }, {
         key: 'starterKitInstall',
         label: 'Starter Kit Install'
-    }];
+    }, {
+        key: 'demoBasic',
+        label: 'Demo App - Basic Features'
+}];
