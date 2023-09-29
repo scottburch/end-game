@@ -11,7 +11,8 @@ export const Videos: React.FC = () => {
         'teaser': <EmbeddedVideoPlayer id={'v3gji4e'}/>,
         'intro': <EmbeddedVideoPlayer id={'v3idbrk'}/>,
         'starterKitInstall': <EmbeddedVideoPlayer id="v3ikvob"/>,
-        'demoBasic': <EmbeddedVideoPlayer id="v3iwjzi"/>
+        'demoBasic': <EmbeddedVideoPlayer id="v3iwjzi"/>,
+        'demoNetwork': <EmbeddedVideoPlayer id="v3j45fq"/>
     }
 
     return (
@@ -34,4 +35,7 @@ export const getVideoItems = (): MenuProps['items'] => [{
     }, {
         key: 'demoBasic',
         label: 'Demo App - Basic Features'
+}, {
+    key: 'demoNetwork',
+    label: 'Demo App - Network Features'
 }];
