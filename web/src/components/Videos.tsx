@@ -7,39 +7,40 @@ export const Videos: React.FC = () => {
 
     const selectVideo: MenuProps['onSelect'] = (v) => setSelectedVideo(v.key);
 
-    const videos: Record<string, JSX.Element> = {
-        'teaser': <EmbeddedVideoPlayer id={'v3gji4e'}/>,
-        'intro': <EmbeddedVideoPlayer id={'v3idbrk'}/>,
-        'starterKitInstall': <EmbeddedVideoPlayer id="v3ikvob"/>,
-        'demoBasic': <EmbeddedVideoPlayer id="v3iwjzi"/>,
-        'demoNetwork': <EmbeddedVideoPlayer id="v3j45fq"/>,
-        'security': <EmbeddedVideoPlayer id="v3jykp5"/>
-    }
 
     return (
         <div style={{display: 'flex', width: 700, height: 337}}>
-            <Menu items={getVideoItems()} onSelect={selectVideo} selectedKeys={[selectedVideo]}/>
-            {videos[selectedVideo]}
+            <Menu items={Object.values(getVideoItems())} onSelect={selectVideo} selectedKeys={[selectedVideo]}/>
+            {<EmbeddedVideoPlayer id={getRumbleId(selectedVideo)}/>}
         </div>
     )
 };
 
-export const getVideoItems = (): MenuProps['items'] => [{
+
+export const getRumbleId = (k: string) => getVideoItems().find(({key}) => k === key)?.rumbleId || '';
+
+export const getVideoItems = (): ((MenuProps['items'] extends (infer U)[] | undefined ? U : never) & { rumbleId: string})[] => [{
         key: 'teaser',
         label: 'Endgame Teaser',
+        rumbleId: 'v3gji4e',
     },{
         key: 'intro',
-        label: 'Endgame Introduction'
+        label: 'Endgame Introduction',
+        rumbleId: 'v3idbrk'
     }, {
         key: 'starterKitInstall',
-        label: 'Starter Kit Install'
-    }, {
+        label: 'Starter Kit Install',
+        rumbleId: 'v3ikvob'
+    },{
         key: 'demoBasic',
-        label: 'Demo App - Basic Features'
+        label:'Demo App - Basic Features',
+        rumbleId: "v3iwjzi"
+    },{
+        key: 'demoNetwork',
+        label:'Demo App - Network Features',
+        rumbleId: "v3j45fq"
 }, {
-    key: 'demoNetwork',
-    label: 'Demo App - Network Features'
-}, {
-    key: 'security',
-    label: 'Endgame Security'
+        key: 'security',
+        label:'Endgame Security',
+        rumbleId: "v3jykp5"
 }];
