@@ -10,10 +10,24 @@ export const HomePage: React.FC = () => {
         <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', padding: 30, paddingTop: 0}}>
             <h2>Welcome to the new decentralized internet!</h2>
             <Svg src={triangleImg}/>
+
+            <div>
             <h3>
-                Endgame products make developing distributed applications faster, easier and cheaper.
+                Endgame products make developing truly distributed applications faster, easier and cheaper.
             </h3>
 
+            <div style={{width: '100%', textAlign: 'left', marginBottom: 40}}>
+                Endgame is a development platform and a <strong>D</strong>istributed <strong>T</strong>rustless <strong>G</strong>raph.
+                Endgame is perfect for:
+                <ul style={{fontSize: '1.2em'}}>
+                    <li>Offline-first Development</li>
+                    <li>Rapid Prototyping</li>
+                    <li>Centralized or Decentralized applications</li>
+                    <li>Cloud service or Endgame networked applications</li>
+                    <li>Censorship Resistance</li>
+                </ul>
+            </div>
+            </div>
             <Videos/>
 
             <h1>Endgame product stack</h1>
