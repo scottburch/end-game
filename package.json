@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "buffer": "^5.7.1",
-    "lerna": "^6.0.1"
+    "lerna": "^7.3.0"
   },
   "mocha": {
     "require": "ts-node/register",
