@@ -1,5 +1,5 @@
 {
-  "name": "@end-game/pwd-auth",
+  "name": "@end-game/local-state",
   "version": "1.0.43",
   "license": "MIT",
   "type": "module",
@@ -11,19 +11,17 @@
     }
   },
   "dependencies": {
-    "@end-game/crypto": "^1.0.43",
-    "@end-game/graph": "^1.0.43",
-    "@end-game/utils": "^1.0.43",
+    "@end-game/graph": "*",
+    "@end-game/rxjs-chain": "*",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.15",
-    "ts-loader": "^9.4.2",
     "typescript": "^5.0.4",
     "webpack": "^5.80.0",
     "yarn": "^1.22.19"
   },
   "engines": {
-    "node": ">=19"
+    "node": ">=20"
   },
   "mocha": {
     "async-only": true,

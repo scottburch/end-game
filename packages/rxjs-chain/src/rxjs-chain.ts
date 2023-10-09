@@ -1,8 +1,9 @@
 import type {Subscriber} from 'rxjs'
-import {mergeMap, Observable, of, tap} from "rxjs";
+import {concatMap, defaultIfEmpty, from, last, map, mergeMap, Observable, of, switchMap, takeWhile, tap} from "rxjs";
 
 
 export type RxjsChainFn<T> = (v: T) => Observable<T>
+export type RxjsChainFilterFn<T> = (chain: RxjsChain<T>, handler: string, val: T) => Observable<boolean>
 
 export type RxjsChain<T> = Observable<T> & {
     name: string
@@ -10,6 +11,7 @@ export type RxjsChain<T> = Observable<T> & {
     subscribers: Set<Subscriber<T>>
     logger: (fnName: string, v: any) => void
     type: T
+    filters: RxjsChainFilterFn<T>[]
 };
 
 export type NewChainOpts<T> = {
@@ -30,18 +32,32 @@ export const insertHandlerAfter = <T>(chain: RxjsChain<T>, after: string, name: 
 };
 
 export const chainNext = <T>(chain: RxjsChain<T>, val: T) => {
-        // TODO - change this so that it runs only once per change to handlers
-        // maybe by sticking this in the chain itself.
-        const generateChain = () =>
-            chain.fns.reduce((o, [name, fn]) => o.pipe(
-                tap(v => chain.logger(name, v)),
-                mergeMap(fn)
-            ), of(val))
+    const runFilters = (chain: RxjsChain<T>, name: string, val: T) => {
+        let result: boolean = true;
+        return from(chain.filters).pipe(
+            concatMap(fn => fn(chain, name, val)),
+            tap(isPass => result = isPass),
+            takeWhile(result => result === true),
+            defaultIfEmpty({pass: result, val}),
+            last(),
+            map(() => ({pass: result, val}))
+        )
+    }
 
-        return generateChain().pipe(
-            tap(v => chain.logger('chain-out', v)),
-            tap(v => chain.subscribers.forEach(subscriber => subscriber.next(v)))
-        );
+    const generateChain = () =>
+        chain.fns.reduce((o, [name, fn]) => o.pipe(
+            tap(val => chain.logger(name, val)),
+            mergeMap(val => runFilters(chain, name, val).pipe(
+                switchMap(({val, pass}) =>
+                    pass ? fn(val) : of(val)
+                )
+            ))
+        ), of(val))
+
+    return generateChain().pipe(
+        tap(v => chain.logger('chain-out', v)),
+        tap(v => chain.subscribers.forEach(subscriber => subscriber.next(v)))
+    );
 };
 
 export const newRxjsChain = <T>(opts: NewChainOpts<T> = {}) => {
@@ -50,8 +66,17 @@ export const newRxjsChain = <T>(opts: NewChainOpts<T> = {}) => {
         return () => o.subscribers.delete(sub);
     }) as RxjsChain<T>;
 
-    o.logger = opts.logger || (() => {});
+    o.logger = opts.logger || (() => {
+    });
     o.subscribers = new Set<Subscriber<T>>();
     o.fns = [];
+    o.filters = [];
     return o;
 };
+
+export const addChainFilter = <T>(chain: RxjsChain<T>, fn: RxjsChainFilterFn<T>) => {
+    chain.filters.push(fn);
+    return chain;
+}
+
+

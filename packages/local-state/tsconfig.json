@@ -101,11 +101,5 @@
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
     "verbatimModuleSyntax": true
   },
-  "exclude": [ "lib",
-    "../../old/core/scripts", "bundle",
-    "src-old/**/*.spec.ts",
-    "src-old/react/react-test-functions.tsx",
-    "src-old/react/react-pistol.spec.ts"
-
-  ]
+  "exclude": [ "lib"]
 }

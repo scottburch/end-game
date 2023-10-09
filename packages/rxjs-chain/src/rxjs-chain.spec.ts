@@ -1,4 +1,11 @@
-import {appendHandler, chainNext, insertHandlerAfter, insertHandlerBefore, newRxjsChain} from "./rxjs-chain.js";
+import {
+    addChainFilter,
+    appendHandler,
+    chainNext,
+    insertHandlerAfter,
+    insertHandlerBefore,
+    newRxjsChain
+} from "./rxjs-chain.js";
 import {expect} from "chai";
 import {
     bufferCount,
@@ -6,7 +13,7 @@ import {
     filter,
     firstValueFrom,
     last,
-    map,
+    map, mergeMap,
     of,
     range,
     switchMap,
@@ -162,4 +169,22 @@ describe('rxjs chain', () => {
             switchMap(chain => chainNext(chain, 10))
         ))
     });
+
+    it('should be able to filter a chain based on handler name', (done) => {
+        const results: number[] = [];
+        firstValueFrom(of(newRxjsChain<number>()).pipe(
+            tap(chain => addChainFilter(chain, (chain, handlerName, val) =>
+                of(handlerName !== 'donotpass')
+            )),
+            tap(chain => appendHandler(chain, 'donotpass', (v) =>
+                throwError(() => `received value and should not have: ${v}`))
+            ),
+            tap(chain => appendHandler(chain, 'dopass', (v) => of(results.push(v)))),
+            switchMap(chain => range(1,6).pipe(map(n => ({n, chain})))),
+            mergeMap(({n, chain}) => chainNext(chain, n)),
+            last(),
+            tap(() => done(results.length === 6 ? undefined : 'does not pass all events')),
+            catchError(err => of(done(err)))
+        ))
+    })
 });
