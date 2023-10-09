@@ -1,6 +1,6 @@
 {
   "name": "@end-game/local-state",
-  "version": "1.0.44",
+  "version": "1.0.48",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -11,8 +11,8 @@
     }
   },
   "dependencies": {
-    "@end-game/graph": "*",
-    "@end-game/rxjs-chain": "*",
+    "@end-game/graph": "^1.0.48",
+    "@end-game/rxjs-chain": "^1.0.48",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.15",
