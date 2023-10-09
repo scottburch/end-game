@@ -30,6 +30,7 @@ import type {GraphWithP2p} from '@end-game/p2p'
 import {asPeerId, dialPeer, newHost, p2pHandlers} from "@end-game/p2p";
 import type {DialerOpts} from "@end-game/p2p";
 import type {GraphHandlerProps} from "@end-game/graph";
+import {localStateHandlers} from "@end-game/local-state";
 
 
 const GraphContext: React.Context<Graph> = createContext({} as Graph);
@@ -200,6 +201,7 @@ export const ReactGraph: React.FC<PropsWithChildren<ReactGraphProps>> = (props) 
             const sub = graphOpen({
                 graphId: asGraphId(props.graphId)
             }).pipe(
+                switchMap(graph => localStateHandlers(graph)),
                 switchMap(graph => levelStoreHandlers(graph, {dir: props.persistent ? 'endgame' : undefined})),
                 switchMap(graph => authHandlers(graph)),
                 switchMap(graph => p2pHandlers(graph)),
