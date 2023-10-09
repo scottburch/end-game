@@ -94,15 +94,15 @@ export const graphOpen = (opts: GraphOpts) => {
         ...opts,
         graphId: opts.graphId || asGraphId(newUid()),
         chains: {
-            log: opts.chains?.log || newRxjsChain(),
-            putNode: opts.chains?.putNode || newRxjsChain({logger: chainLogger('putNode')}),
-            getNode: opts.chains?.getNode || newRxjsChain({logger: chainLogger('getNode')}),
-            putEdge: opts.chains?.putEdge || newRxjsChain({logger: chainLogger('putEdge')}),
-            getEdge: opts.chains?.getEdge || newRxjsChain({logger: chainLogger('getEdge')}),
-            nodesByLabel: opts.chains?.nodesByLabel || newRxjsChain({logger: chainLogger('nodesByLabel')}),
-            nodesByProp: opts.chains?.nodesByProp || newRxjsChain({logger: chainLogger('nodesByProp')}),
-            getRelationships: opts.chains?.getRelationships || newRxjsChain({logger: chainLogger('getRelationships')}),
-            reloadGraph: opts.chains?.reloadGraph || newRxjsChain({logger: chainLogger('reloadGraph')})
+            log: opts.chains?.log || newRxjsChain({name: 'log'}),
+            putNode: opts.chains?.putNode || newRxjsChain({logger: chainLogger('putNode'), name: 'putNode'}),
+            getNode: opts.chains?.getNode || newRxjsChain({logger: chainLogger('getNode'), name: 'getNode'}),
+            putEdge: opts.chains?.putEdge || newRxjsChain({logger: chainLogger('putEdge'), name: 'putEdge'}),
+            getEdge: opts.chains?.getEdge || newRxjsChain({logger: chainLogger('getEdge'), name: 'getEdge'}),
+            nodesByLabel: opts.chains?.nodesByLabel || newRxjsChain({logger: chainLogger('nodesByLabel'), name: 'nodesByLabel'}),
+            nodesByProp: opts.chains?.nodesByProp || newRxjsChain({logger: chainLogger('nodesByProp'), name: 'nodesByProp'}),
+            getRelationships: opts.chains?.getRelationships || newRxjsChain({logger: chainLogger('getRelationships'), name: 'getRelationships'}),
+            reloadGraph: opts.chains?.reloadGraph || newRxjsChain({logger: chainLogger('reloadGraph'), name: 'reloadGraph'})
         },
         logLevel: opts.logLevel || LogLevel.INFO
     } satisfies Graph as Graph;

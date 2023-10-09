@@ -25,11 +25,11 @@ import {
 
 describe('rxjs chain', () => {
     it('should create a new chain', () => {
-        expect(newRxjsChain().fns).to.have.length(0);
+        expect(newRxjsChain({name: 'testing'}).fns).to.have.length(0);
     });
 
     it('should append a handler', () =>
-        firstValueFrom(of(newRxjsChain<string>()).pipe(
+        firstValueFrom(of(newRxjsChain<string>({name: 'testing'})).pipe(
             tap(chain => appendHandler(chain,'fn1', (v: string) => of(v + '1'))),
             tap(chain => appendHandler(chain,'fn2', (v: string) => of(v + '2'))),
             tap(chain => {
@@ -44,7 +44,7 @@ describe('rxjs chain', () => {
     );
 
     it('should insert a handler before', () =>
-        firstValueFrom(of(newRxjsChain<string>()).pipe(
+        firstValueFrom(of(newRxjsChain<string>({name: 'testing'})).pipe(
             tap(chain => appendHandler(chain,'fn1', (v: string) => of(v + '1'))),
             tap(chain => appendHandler(chain,'fn2', (v: string) => of(v + '2'))),
             tap(chain => appendHandler(chain, 'fn4', (v: string) => of(v + '4'))),
@@ -60,7 +60,7 @@ describe('rxjs chain', () => {
     );
 
     it('should insert a handler after', () =>
-        firstValueFrom(of(newRxjsChain<string>()).pipe(
+        firstValueFrom(of(newRxjsChain<string>({name: 'testing'})).pipe(
             tap(chain => appendHandler(chain,'fn1', (v: string) => of(v + '1'))),
             tap(chain => appendHandler(chain,'fn2', (v: string) => of(v + '2'))),
             tap(chain => appendHandler(chain,'fn4', (v: string) => of(v + '4'))),
@@ -76,13 +76,13 @@ describe('rxjs chain', () => {
     );
 
     it('should not error out if there are no listeners', () =>
-        firstValueFrom(of(newRxjsChain()).pipe(
+        firstValueFrom(of(newRxjsChain({name: 'testing'})).pipe(
             tap(chain => chainNext(chain, 'testing'))
         ))
     );
 
     it('should allow for multiple input events and chain listeners', () =>
-        firstValueFrom(of(newRxjsChain()).pipe(
+        firstValueFrom(of(newRxjsChain({name: 'testing'})).pipe(
             tap(chain => appendHandler(chain,'mine', (s) => of(s + 'xx'))),
             tap(chain => setTimeout(() => chainNext(chain, 'testing').subscribe())),
             tap(chain => setTimeout(() => chainNext(chain, 'testing2').subscribe(), 100)),
@@ -99,7 +99,7 @@ describe('rxjs chain', () => {
 
     it('should wait until the chain completes to return the chainNext()', (done) => {
         let called = ''
-        firstValueFrom(of(newRxjsChain<number>()).pipe(
+        firstValueFrom(of(newRxjsChain<number>({name: 'testing'})).pipe(
             tap(chain => appendHandler(chain, 'mine', n => of(n + 1))),
             tap(chain => setTimeout(() => chainNext(chain, 1).pipe(
                 tap(n => expect(n).to.equal(2)),
@@ -112,7 +112,7 @@ describe('rxjs chain', () => {
     });
 
     it('should allow a handler to emit multiple events', () =>
-        firstValueFrom(of(newRxjsChain<string>()).pipe(
+        firstValueFrom(of(newRxjsChain<string>({name: 'testing'})).pipe(
             tap(chain => appendHandler(chain,'mine1', (s: string) => of(s + '-a'))),
             tap(chain => appendHandler(chain,'mine2', (s) => range(1,3).pipe(
                 map(n => `${s}-${n}`)
@@ -139,7 +139,7 @@ describe('rxjs chain', () => {
     );
 
     it('should be able to only forward some messages', () =>
-        firstValueFrom(of(newRxjsChain<number>()).pipe(
+        firstValueFrom(of(newRxjsChain<number>({name: 'testing'})).pipe(
             tap(chain => appendHandler(chain, 'oddOnly',  n => of(n).pipe(
                 filter(n => !!(n % 2))
             ))),
@@ -156,7 +156,7 @@ describe('rxjs chain', () => {
     );
 
     it('should allow you to catch errors thrown in handlers', (done) => {
-        firstValueFrom(of(newRxjsChain<string>()).pipe(
+        firstValueFrom(of(newRxjsChain<string>({name: 'testing'})).pipe(
             tap(chain => appendHandler(chain, 'error', () => throwError(() => 'testError'))),
             switchMap(chain => chainNext(chain, 'testing')),
             catchError(err => err === 'testError' ? of(done()) : throwError('error should be "testError"'))
@@ -164,7 +164,7 @@ describe('rxjs chain', () => {
     });
 
     it('should notify the stream even without handlers', (done) => {
-        firstValueFrom(of(newRxjsChain<number>()).pipe(
+        firstValueFrom(of(newRxjsChain<number>({name: 'testing'})).pipe(
             tap(chain => chain.subscribe(v => v === 10 ? done() : done('event with wront value: ' + v))),
             switchMap(chain => chainNext(chain, 10))
         ))
@@ -172,7 +172,7 @@ describe('rxjs chain', () => {
 
     it('should be able to filter a chain based on handler name', (done) => {
         const results: number[] = [];
-        firstValueFrom(of(newRxjsChain<number>()).pipe(
+        firstValueFrom(of(newRxjsChain<number>({name: 'testing'})).pipe(
             tap(chain => addChainFilter(chain, (chain, handlerName, val) =>
                 of(handlerName !== 'donotpass')
             )),

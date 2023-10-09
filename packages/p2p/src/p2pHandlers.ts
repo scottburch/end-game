@@ -50,8 +50,8 @@ export const p2pHandlers = (graph: Graph) =>
 
 
 const addChainsToGraph = (graph: GraphWithP2p) => {
-    graph.chains.peerIn = graph.chains.peerIn || newRxjsChain({logger: chainLogger('peerIn')});
-    graph.chains.peersOut = graph.chains.peersOut || newRxjsChain({logger: chainLogger('peersOut')});
+    graph.chains.peerIn = graph.chains.peerIn || newRxjsChain({logger: chainLogger('peerIn'), name: 'peerIn'});
+    graph.chains.peersOut = graph.chains.peersOut || newRxjsChain({logger: chainLogger('peersOut'), name: 'peersOut'});
 
     function chainLogger(chainName: string) {
         return (fnName: string, v: any) =>

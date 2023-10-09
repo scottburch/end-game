@@ -15,6 +15,7 @@ export type RxjsChain<T> = Observable<T> & {
 };
 
 export type NewChainOpts<T> = {
+    name: string
     logger?: (fnName: string, fn: RxjsChainFn<T>) => void
 }
 
@@ -60,17 +61,17 @@ export const chainNext = <T>(chain: RxjsChain<T>, val: T) => {
     );
 };
 
-export const newRxjsChain = <T>(opts: NewChainOpts<T> = {}) => {
+export const newRxjsChain = <T>(opts: NewChainOpts<T>) => {
     const o = new Observable<T>(sub => {
         o.subscribers.add(sub);
         return () => o.subscribers.delete(sub);
     }) as RxjsChain<T>;
 
-    o.logger = opts.logger || (() => {
-    });
+    o.logger = opts.logger || (() => {});
     o.subscribers = new Set<Subscriber<T>>();
     o.fns = [];
     o.filters = [];
+    o.name = opts.name
     return o;
 };
 

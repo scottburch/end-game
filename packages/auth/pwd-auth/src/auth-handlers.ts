@@ -19,7 +19,7 @@ import {notLoggedInError, unauthorizedUserError, userAlreadyExistsError} from ".
 export const authHandlers = (graph: Graph) => of(graph).pipe(
     tap(graph => insertHandlerBefore(graph.chains.putNode, 'storage', 'auth', authPutAnteHandler)),
     tap(graph => insertHandlerBefore(graph.chains.putEdge, 'storage', 'auth', authPutEdgeAnteHandler)),
-    tap(graph => (asGraphWithAuth(graph)).chains.authChanged = (asGraphWithAuth(graph)).chains.authChanged || newRxjsChain())
+    tap(graph => (asGraphWithAuth(graph)).chains.authChanged = (asGraphWithAuth(graph)).chains.authChanged || newRxjsChain({name: 'authChanged'}))
 );
 
 const authPutAnteHandler: GraphHandler<'putNode'> = ({graph, node}) => {

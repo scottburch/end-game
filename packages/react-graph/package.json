@@ -16,7 +16,7 @@
   "dependencies": {
     "@end-game/graph": "^1.0.43",
     "@end-game/level-store": "^1.0.43",
-    "@end-game/local-state": "*",
+    "@end-game/local-state": "^1.0.44",
     "@end-game/p2p": "^1.0.43",
     "@end-game/pwd-auth": "^1.0.43",
     "@end-game/utils": "^1.0.43",
