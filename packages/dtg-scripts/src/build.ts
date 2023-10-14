@@ -32,6 +32,11 @@ export const buildCmd = () => {
                     test: /\.(png|svg|jpg|jpeg|gif)$/i,
                     type: 'asset/resource',
                 },
+                {
+                    test: /\.(html|txt)$/i,
+                    type: 'asset/source'
+                }
+
             ],
 
         },

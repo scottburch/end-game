@@ -43,6 +43,14 @@ export const devCmd = (opts: {headless: boolean, port: number}) => {
                         test: /\.(png|svg|jpg|jpeg|gif)$/i,
                         type: 'asset/resource',
                     },
+                    {
+                        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                        type: 'asset/resource',
+                    },
+                    {
+                        test: /\.(html|txt|json)$/i,
+                        type: 'asset/source'
+                    }
                 ],
 
             },
