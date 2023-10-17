@@ -1,10 +1,11 @@
 import {resolve} from 'node:path'
-import {Observable, of, switchMap, throwError} from "rxjs";
+import {map, Observable, of, switchMap, throwError} from "rxjs";
 import type {Configuration} from 'webpack'
 import Webpack from 'webpack'
 import {fs} from 'zx'
+import {WebpackMixinFn} from "./index.js";
 
-export const buildCmd = () => {
+export const buildCmd = (opts: {mixin?: WebpackMixinFn}) =>
     of({
         target: 'web',
         mode: 'development',
@@ -46,12 +47,18 @@ export const buildCmd = () => {
                 '.jsx': ['.tsx', '.jsx'],
                 '.js': ['.ts', '.js']
             },
-        }
-
+        },
+        plugins: [
+            new Webpack.DefinePlugin({
+                'process.env.NODE_ENV': JSON.stringify('production'),
+                'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
+            })
+        ],
     } satisfies Configuration).pipe(
+        map(config => opts.mixin?.(config) || config),
         switchMap(config => new Observable(subscriber => {
             Webpack.webpack(config, err => err ? throwError(() => err) : subscriber.next())
         })),
         switchMap(() => fs.copy(resolve('public'), resolve('dist'), {}))
-    ).subscribe()
-}
+    );
+

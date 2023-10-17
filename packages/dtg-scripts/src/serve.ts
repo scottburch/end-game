@@ -21,4 +21,5 @@ export const serveCmd = ({port}: {port?: number} = {}) => {
     server.listen(port || 1234, () => {
         console.log(`Running at http://localhost:${port || 1234}`);
     });
+    return Promise.resolve();
 };
