@@ -20,7 +20,7 @@ program
     .command('dev')
     .option('-h --headless', 'do not open a browser after build')
     .option('-p --port <port>', 'port to listen on')
-    .option('-m --mixin <tsFile>', 'webpack config mixin function')
+    .option('-m --mixin <jsFile>', 'webpack config mixin function')
     .action(opts =>
         firstValueFrom(of(opts).pipe(
             switchMap(opts => opts.mixin ? getWebpackConfigMixin(opts.mixin).pipe(

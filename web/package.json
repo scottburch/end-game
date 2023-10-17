@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@end-game/dtg-scripts": "^1.0.42",
+    "@end-game/dtg-scripts": "^1.0.49",
     "@end-game/react-graph": "^1.0.42",
     "@types/react": "^18.2.1",
     "@types/react-dom": "^18.2.2",

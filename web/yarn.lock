@@ -96,15 +96,17 @@
     bech32 "^2.0.0"
     typescript "^5.0.4"
 
-"@end-game/dtg-scripts@^1.0.42":
-  version "1.0.42"
-  resolved "https://registry.yarnpkg.com/@end-game/dtg-scripts/-/dtg-scripts-1.0.42.tgz#691a19bea73f20432850a87022e4490b3bf85c38"
-  integrity sha512-AGl/HLi3xf8L4Td1HE8KZmVVN/qmsTi5QcS1Cik0VabH1heVyG2f0GpQgXvpnZkYhd5pFMeL4LaO1vSiaoJOOg==
+"@end-game/dtg-scripts@^1.0.49":
+  version "1.0.49"
+  resolved "https://registry.yarnpkg.com/@end-game/dtg-scripts/-/dtg-scripts-1.0.49.tgz#da0a344d0143d585c15864ca07686dd96848b4b8"
+  integrity sha512-ejflrb/5Mvaaxp5L/PvZFdXgDlvVprPCUPZGzE1j/gmGc7UckkE/8VXun0qfSg6aGSH04DYrzRphURIXw1zhOg==
   dependencies:
     "@types/mime-types" "^2.1.1"
     commander "^10.0.1"
+    css-loader "^6.8.1"
     mime-types "^2.1.35"
     rxjs "^7.8.1"
+    style-loader "^3.3.3"
     webpack "^5.81.0"
     webpack-dev-server "^4.13.3"
     zx "^7.2.2"
