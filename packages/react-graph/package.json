@@ -1,6 +1,6 @@
 {
   "name": "@end-game/react-graph",
-  "version": "1.0.48",
+  "version": "1.0.49",
   "license": "MIT",
   "private": false,
   "type": "module",
@@ -16,7 +16,7 @@
   "dependencies": {
     "@end-game/graph": "^1.0.48",
     "@end-game/level-store": "^1.0.43",
-    "@end-game/local-state": "^1.0.48",
+    "@end-game/local-state": "^1.0.49",
     "@end-game/p2p": "^1.0.48",
     "@end-game/pwd-auth": "^1.0.48",
     "@end-game/utils": "^1.0.43",
