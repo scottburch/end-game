@@ -30,11 +30,7 @@ export const devCmd = (opts: {headless: boolean, port: number, mixin: WebpackMix
                     use: ['style-loader', 'css-loader'],
                 },
                 {
-                    test: /\.(png|svg|jpg|jpeg|gif)$/i,
-                    type: 'asset/resource',
-                },
-                {
-                    test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                    test: /\.(png|svg|jpg|jpeg|gif|mp3|mp4)$/i,
                     type: 'asset/resource',
                 },
                 {
@@ -50,8 +46,13 @@ export const devCmd = (opts: {headless: boolean, port: number, mixin: WebpackMix
                 '.jsx': ['.tsx', '.jsx'],
                 '.js': ['.ts', '.js']
             },
-        }
-
+        },
+        plugins: [
+            new Webpack.DefinePlugin({
+                'process.env.NODE_ENV': JSON.stringify('development'),
+                'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
+            })
+        ],
     } satisfies Webpack.Configuration).pipe(
         map(config => opts.mixin?.(config) || config),
         map(config => new WebpackDevServer({

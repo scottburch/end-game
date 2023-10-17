@@ -30,7 +30,7 @@ export const buildCmd = (opts: {mixin?: WebpackMixinFn}) =>
                     use: ['style-loader', 'css-loader'],
                 },
                 {
-                    test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                    test: /\.(png|svg|jpg|jpeg|gif|mp3|mp4)$/i,
                     type: 'asset/resource',
                 },
                 {
