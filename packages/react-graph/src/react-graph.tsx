@@ -32,8 +32,8 @@ import type {DialerOpts} from "@end-game/p2p";
 import type {GraphHandlerProps} from "@end-game/graph";
 
 
-type Graphs = {diskGraph: Graph, memGraph: Graph, localGraph: Graph};
-type GraphOpts = {graphName?: 'disk' | 'local' | 'mem'}
+type Graphs = {netGraph: Graph, memGraph: Graph, localGraph: Graph};
+type GraphOpts = {graphName?: 'net' | 'local' | 'mem'}
 
 const GraphsContext: React.Context<Graphs> = createContext({} as Graphs);
 
@@ -43,7 +43,7 @@ export const useGraphs = () => useContext(GraphsContext);
 export const useDialer = (hostId: string) => {
     const graphs = useGraphs();
     return (opts: DialerOpts) => dialPeer(newHost({
-        graphs: [graphs.diskGraph as GraphWithP2p],
+        graphs: [graphs.netGraph as GraphWithP2p],
         hostId: asPeerId(hostId),
         listeningPort: 0
     }), opts);
@@ -55,8 +55,8 @@ export const useAuth = () =>  {
 
 
     useEffect(() => {
-        setAuth({nodeId: (graphs.diskGraph as GraphWithAuth).user?.nodeId || '', username: (graphs.diskGraph as GraphWithAuth).user?.username || ''});
-        const authChangedSub = (graphs.diskGraph as GraphWithAuth).chains.authChanged.pipe(
+        setAuth({nodeId: (graphs.netGraph as GraphWithAuth).user?.nodeId || '', username: (graphs.netGraph as GraphWithAuth).user?.username || ''});
+        const authChangedSub = (graphs.netGraph as GraphWithAuth).chains.authChanged.pipe(
             tap(({graph}) => setAuth({nodeId: (graph as GraphWithAuth).user?.nodeId || '', username: (graph as GraphWithAuth).user?.username || ''}))
         ).subscribe()
 
@@ -67,7 +67,7 @@ export const useAuth = () =>  {
 }
 
 const whichGraph = (graphs: Graphs, graphName: GraphOpts['graphName']) =>
-    graphs[`${graphName || 'disk'}Graph`];
+    graphs[`${graphName || 'net'}Graph`];
 
 export const useGraphNodesByLabel = <T extends Props>(label: string, opts: RangeOpts & GraphOpts = {}) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
@@ -163,7 +163,7 @@ export const useNewAccount = () => {
     const graphs = useGraphs();
 
     return (username: string, password: string) => {
-        return graphNewAuth(graphs.diskGraph, username, password);
+        return graphNewAuth(graphs.netGraph, username, password);
     }
 }
 
@@ -171,13 +171,13 @@ export const useGraphLogin = () => {
     const graphs = useGraphs();
 
     return (username: string, password: string) =>
-        graphAuth(graphs.diskGraph, username, password);
+        graphAuth(graphs.netGraph, username, password);
 };
 
 export const useGraphLogout = () => {
     const graphs= useGraphs();
 
-    return () => graphUnauth(graphs.diskGraph);
+    return () => graphUnauth(graphs.netGraph);
 }
 
 
@@ -185,7 +185,7 @@ export const useGraphPutEdge = <T extends Props>() => {
     const graphs = useGraphs();
 
     return (rel: string, edgeId: EdgeId, from: NodeId, to: NodeId, props: T, opts: {memGraph?: boolean} = {}) => {
-        return putEdge(opts.memGraph ? graphs.memGraph : graphs.diskGraph, newEdge(edgeId, rel, from, to, props)).pipe(
+        return putEdge(opts.memGraph ? graphs.memGraph : graphs.netGraph, newEdge(edgeId, rel, from, to, props)).pipe(
             catchError(err => throwError(err.code || err))
         );
     }
@@ -206,7 +206,7 @@ export const ReactGraph: React.FC<PropsWithChildren<ReactGraphProps>> = (props) 
             createNewMemGraph(),
             createLocalGraph()
         ]).pipe(
-            tap(([diskGraph, memGraph, localGraph]) => setMyGraphs({memGraph, diskGraph, localGraph})),
+            tap(([netGraph, memGraph, localGraph]) => setMyGraphs({memGraph, netGraph, localGraph})),
         ).subscribe()
 
         function createLocalGraph() {
@@ -237,7 +237,7 @@ export const ReactGraph: React.FC<PropsWithChildren<ReactGraphProps>> = (props) 
         return () => sub.unsubscribe();
     }, [])
 
-    return myGraphs?.diskGraph.graphId ? (
+    return myGraphs?.netGraph.graphId ? (
         <GraphsContext.Provider value={myGraphs}>
             {props.children}
         </GraphsContext.Provider>
