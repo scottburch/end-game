@@ -1,13 +1,13 @@
 import React, {useEffect, useRef, useState} from "react";
 import {PostList} from "../components/PostList.jsx";
-import {useGraph} from "@end-game/react-graph";
+import {useGraphs} from "@end-game/react-graph";
 import {Post} from "../types/Post.js";
 import {debounceTime, Subscription, tap} from "rxjs";
 import {GraphNode, NodeId, nodesByLabel} from "@end-game/graph";
 import {Button} from "antd";
 
 export const PostsPage: React.FC = () => {
-    const graph = useGraph();
+    const graph = useGraphs();
     const postsSub = useRef<Subscription>();
     const [posts, setPosts] = useState<GraphNode<Post>[]>([]);
 

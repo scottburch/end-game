@@ -1,4 +1,4 @@
-import {useAuth, useGraph} from "@end-game/react-graph";
+import {useAuth, useGraphs} from "@end-game/react-graph";
 import {useEffect, useState} from "react";
 import {User} from "../types/User.js";
 import type {NodeId} from '@end-game/graph';
@@ -8,7 +8,7 @@ import {filter, map, tap} from "rxjs";
 export const useUser = () => {
     const auth = useAuth();
     const [user, setUser] = useState<User & {nodeId: NodeId}>({display: '', nickname: '', aboutMe: '', ownerId: asNodeId(''), nodeId: asNodeId('')});
-    const graph = useGraph();
+    const graph = useGraphs();
 
     useEffect(() => {
         auth.nodeId && nodesByProp<User>(graph, 'user', 'ownerId', auth.nodeId).pipe(

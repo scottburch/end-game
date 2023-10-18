@@ -1,4 +1,4 @@
-import {useAuth, useGraph, useGraphPut} from "@end-game/react-graph";
+import {useAuth, useGraphs, useGraphPut} from "@end-game/react-graph";
 import type {Post} from "../types/Post.js";
 import React, {useState} from 'react';
 import {asNodeId, nodesByProp} from "@end-game/graph";
@@ -12,7 +12,7 @@ import {MentionsOptionProps} from "antd/es/mentions/index.js";
 
 export const AddPostPage: React.FC = () => {
     const graphPut = useGraphPut<Post | {name: string}>();
-    const graph = useGraph();
+    const graph = useGraphs();
     const auth = useAuth();
 
     const [suggestions, setSuggestions] = useState<MentionsOptionProps[]>([]);

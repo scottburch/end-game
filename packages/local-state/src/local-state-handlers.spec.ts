@@ -10,7 +10,7 @@ import {expect} from 'chai'
 describe('local-state', () => {
     it('should not require auth to write to graph', () =>
         firstValueFrom(graphWithAuth().pipe(
-            switchMap(graph => putNode(graph, newNode('', 'local.mine', {mine: true}))),
+            switchMap(graph => putNode(graph, newNode('', 'local:mine', {mine: true}))),
             switchMap(({graph, nodeId}) => getNode(graph, nodeId, {})),
             tap(({node}) => expect(node.props.mine).to.be.true)
         ))
