@@ -35,6 +35,5 @@
     "experimental-specifier-resolution": "node",
     "bail": true,
     "async-only": true
-  },
-  "gitHead": "96053faf539cd321d88f4ffa16c7582603d585df"
+  }
 }

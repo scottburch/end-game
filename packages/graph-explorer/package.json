@@ -42,6 +42,5 @@
   },
   "scripts": {
     "build": "webpack"
-  },
-  "gitHead": "3470adef96888d1837eb174e2bf6745c51d0679f"
+  }
 }
