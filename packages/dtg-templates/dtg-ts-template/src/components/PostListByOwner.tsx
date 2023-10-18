@@ -13,7 +13,7 @@ export const PostsListByOwner: React.FC<{owner: NodeId}> = ({owner}) => {
 
     const loadPosts = (last: NodeId) => {
         postsSub.current && postsSub.current.unsubscribe();
-        postsSub.current = nodesByProp<Post>(graph, 'post', 'owner', owner, {reverse: true, limit: 5, lt: last}).pipe(
+        postsSub.current = nodesByProp<Post>(graph.diskGraph, 'post', 'owner', owner, {reverse: true, limit: 5, lt: last}).pipe(
             debounceTime(50),
             tap(({nodes}) => setPosts(nodes)),
         ).subscribe()

@@ -11,7 +11,7 @@ export const useUser = () => {
     const graph = useGraphs();
 
     useEffect(() => {
-        auth.nodeId && nodesByProp<User>(graph, 'user', 'ownerId', auth.nodeId).pipe(
+        auth.nodeId && nodesByProp<User>(graph.diskGraph, 'user', 'ownerId', auth.nodeId).pipe(
             map(({nodes}) => nodes[0]),
             filter(node => !!node?.props),
             tap(node => setUser({...node.props, nodeId: node.nodeId}))

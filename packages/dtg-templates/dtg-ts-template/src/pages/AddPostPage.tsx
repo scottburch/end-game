@@ -45,7 +45,7 @@ export const AddPostPage: React.FC = () => {
         }
 
         function lookupTags(text: string) {
-            nodesByProp(graph, 'tag', 'name', `${text}*`).pipe(
+            nodesByProp(graph.diskGraph, 'tag', 'name', `${text}*`).pipe(
                 switchMap(({nodes}) => from(nodes).pipe(
                     map(node => node.props.name),
                     map(key => ({key, label: key, value: key})),
@@ -56,7 +56,7 @@ export const AddPostPage: React.FC = () => {
             ).subscribe();
         }
         function lookupMentions(text: string){
-            nodesByProp(graph, 'user', 'nickname', `${text}*`).pipe(
+            nodesByProp(graph.diskGraph, 'user', 'nickname', `${text}*`).pipe(
                 switchMap(({nodes}) => from(nodes).pipe(
                     map(node => node.props.nickname),
                     map(key => ({key, label: key, value: key})),

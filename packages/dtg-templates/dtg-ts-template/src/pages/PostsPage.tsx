@@ -13,7 +13,7 @@ export const PostsPage: React.FC = () => {
 
     const loadPosts = (last: NodeId) => {
         postsSub.current && postsSub.current.unsubscribe();
-        postsSub.current = nodesByLabel<Post>(graph, 'post', {reverse: true, limit: 5, lt: last}).pipe(
+        postsSub.current = nodesByLabel<Post>(graph.diskGraph, 'post', {reverse: true, limit: 5, lt: last}).pipe(
             debounceTime(50),
             tap(({nodes}) => setPosts(nodes)),
         ).subscribe()
