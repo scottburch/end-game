@@ -7,7 +7,7 @@ import type {Host} from '@end-game/p2p'
 import {asPeerId, dialPeer, newHost, p2pHandlers, startServer} from "@end-game/p2p";
 import detect from 'detect-port'
 import ld from 'lodash'
-import {localStateHandlers} from "@end-game/local-state";
+
 
 export const getAGraph = (opts: GraphOpts = {graphId: asGraphId(newUid())}) => graphOpen(opts).pipe(
     switchMap(graph => levelStoreHandlers(graph)),

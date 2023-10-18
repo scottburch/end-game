@@ -30,10 +30,13 @@ import type {GraphWithP2p} from '@end-game/p2p'
 import {asPeerId, dialPeer, newHost, p2pHandlers} from "@end-game/p2p";
 import type {DialerOpts} from "@end-game/p2p";
 import type {GraphHandlerProps} from "@end-game/graph";
-import {localStateHandlers} from "@end-game/local-state";
 
-type Graphs = {diskGraph: Graph, memGraph: Graph};
+
+type Graphs = {diskGraph: Graph, memGraph: Graph, localGraph: Graph};
+type GraphOpts = {graphName?: 'disk' | 'local' | 'mem'}
+
 const GraphsContext: React.Context<Graphs> = createContext({} as Graphs);
+
 
 export const useGraphs = () => useContext(GraphsContext);
 
@@ -63,17 +66,17 @@ export const useAuth = () =>  {
     return auth;
 }
 
-const memOrDiskGraph = (graphs: Graphs, label: string) =>
-    /^mem:/.test(label) ? graphs.memGraph : graphs.diskGraph
+const whichGraph = (graphs: Graphs, graphName: GraphOpts['graphName']) =>
+    graphs[`${graphName || 'disk'}Graph`];
 
-export const useGraphNodesByLabel = <T extends Props>(label: string, opts: RangeOpts = {}) => {
+export const useGraphNodesByLabel = <T extends Props>(label: string, opts: RangeOpts & GraphOpts = {}) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
     const graphs = useGraphs();
 
     useEffect(() => {
         if (graphs) {
             const sub = of(undefined).pipe(
-                switchMap(() => nodesByLabel(memOrDiskGraph(graphs, label), label, opts)),
+                switchMap(() => nodesByLabel(whichGraph(graphs, opts.graphName), label, opts)),
                 tap(({nodes}) => setNodes(nodes as GraphNode<T>[]))
             ).subscribe();
             return () => {
@@ -84,14 +87,14 @@ export const useGraphNodesByLabel = <T extends Props>(label: string, opts: Range
     return nodes;
 }
 
-export const useGraphNodesByProp = <T extends Props>(label: string, key: keyof T & string, value: any, opts: RangeOpts = {}) => {
+export const useGraphNodesByProp = <T extends Props>(label: string, key: keyof T & string, value: any, opts: RangeOpts & GraphOpts = {}) => {
     const [nodes, setNodes] = useState<GraphNode<T>[]>([]);
     const graphs = useGraphs();
 
     useEffect(() => {
         if (graphs) {
             const sub = of(true).pipe(
-                switchMap(() => nodesByProp<T>(memOrDiskGraph(graphs, label), label, key, value, opts)),
+                switchMap(() => nodesByProp<T>(whichGraph(graphs, opts.graphName), label, key, value, opts)),
                 tap(({nodes}) => setNodes(nodes as GraphNode<T>[]))
             ).subscribe();
             return () => sub.unsubscribe();
@@ -100,14 +103,14 @@ export const useGraphNodesByProp = <T extends Props>(label: string, key: keyof T
     return nodes;
 }
 
-export const useGraphRelationships = (nodeId: NodeId, rel: string, opts: { reverse?: boolean, memGraph?: boolean }) => {
+export const useGraphRelationships = (nodeId: NodeId, rel: string, opts: { reverse?: boolean} & GraphOpts = {}) => {
     const [relationships, setRelationships] = useState<Relationship[]>([]);
     const graphs = useGraphs();
 
     useEffect(() => {
         if (graphs) {
             const sub = of(true).pipe(
-                switchMap(() => getRelationships(opts.memGraph ? graphs.memGraph : graphs.diskGraph, nodeId, rel, opts)),
+                switchMap(() => getRelationships(whichGraph(graphs, opts.graphName), nodeId, rel, opts)),
                 tap(({relationships}) => setRelationships(relationships))
             ).subscribe();
             return () => sub.unsubscribe();
@@ -117,14 +120,14 @@ export const useGraphRelationships = (nodeId: NodeId, rel: string, opts: { rever
 
 }
 
-export const useGraphNode = <T extends Props>(nodeId: NodeId, opts: {memGraph?: boolean} = {}) => {
+export const useGraphNode = <T extends Props>(nodeId: NodeId, opts: GraphOpts = {}) => {
     const [node, setNode] = useState<GraphNode<T>>();
     const graphs = useGraphs();
 
     useEffect(() => {
         !graphs && console.error('useGraphGet() called outside of a graph context');
         if (graphs && nodeId) {
-            const sub = getNode(opts.memGraph ? graphs.memGraph : graphs.diskGraph, nodeId, {}).pipe(
+            const sub = getNode(whichGraph(graphs, opts.graphName), nodeId, {}).pipe(
                 filter(({node}) => !!node?.nodeId),
                 tap(({node}) => setNode(node as GraphNode<T>))
             ).subscribe();
@@ -134,25 +137,25 @@ export const useGraphNode = <T extends Props>(nodeId: NodeId, opts: {memGraph?: 
     return node;
 };
 
-export const useGraphEdge = <T extends Props>(edgeId: EdgeId, opts: GraphHandlerProps<'getEdge'>['opts'] & {memGraph?: boolean}) => {
+export const useGraphEdge = <T extends Props>(edgeId: EdgeId, opts: GraphHandlerProps<'getEdge'>['opts'] & GraphOpts = {}) => {
     const [edge, setEdge] = useState<GraphEdge<T>>();
-    const graph = useGraphs();
+    const graphs = useGraphs();
 
     useEffect(() => {
-        if (graph && edgeId) {
-            const sub = getEdge(opts.memGraph ? graph.memGraph : graph.diskGraph, edgeId, opts).subscribe(({edge}) => setEdge(edge as GraphEdge<T>))
+        if (graphs && edgeId) {
+            const sub = getEdge(whichGraph(graphs, opts.graphName), edgeId, opts).subscribe(({edge}) => setEdge(edge as GraphEdge<T>))
             return () => sub.unsubscribe();
         }
-    }, [graph, edgeId]);
+    }, [graphs, edgeId]);
     return edge;
 }
 
 export const useGraphPut = <T extends Props>() => {
     const graphs = useGraphs();
 
-    return (label: string, nodeId: NodeId, props: T) =>
+    return (label: string, nodeId: NodeId, props: T, opts: GraphOpts = {}) =>
         of(newNode(nodeId, label, props)).pipe(
-            switchMap(node => putNode(memOrDiskGraph(graphs, label), node))
+            switchMap(node => putNode(whichGraph(graphs, opts.graphName), node))
         );
 };
 
@@ -198,12 +201,21 @@ export const ReactGraph: React.FC<PropsWithChildren<ReactGraphProps>> = (props) 
 
 
     useEffect(() => {
-        const sub = combineLatest<[Graph, Graph]>([
+        const sub = combineLatest<[Graph, Graph, Graph]>([
             createNewDiskGraph(),
-            createNewMemGraph()
+            createNewMemGraph(),
+            createLocalGraph()
         ]).pipe(
-            tap(([diskGraph, memGraph]) => setMyGraphs({memGraph, diskGraph})),
+            tap(([diskGraph, memGraph, localGraph]) => setMyGraphs({memGraph, diskGraph, localGraph})),
         ).subscribe()
+
+        function createLocalGraph() {
+            return graphOpen({
+                graphId: asGraphId(props.graphId + '-local')
+            }).pipe(
+                switchMap(graph => levelStoreHandlers(graph, {dir: props.graphId + '-local'}))
+            )
+        }
 
         function createNewMemGraph() {
             return graphOpen({
@@ -217,8 +229,7 @@ export const ReactGraph: React.FC<PropsWithChildren<ReactGraphProps>> = (props) 
             return graphOpen({
                 graphId: asGraphId(props.graphId)
             }).pipe(
-                switchMap(graph => localStateHandlers(graph)),
-                switchMap(graph => levelStoreHandlers(graph, {dir: props.persistent ? 'endgame' : undefined})),
+                switchMap(graph => levelStoreHandlers(graph, {dir: props.persistent ? props.graphId : undefined})),
                 switchMap(graph => authHandlers(graph)),
                 switchMap(graph => p2pHandlers(graph))
             )

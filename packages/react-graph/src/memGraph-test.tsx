@@ -1,19 +1,19 @@
 import * as React from 'react'
 import {useRef} from 'react'
-import {renderApp, Username} from "./test/reactTestUtils.jsx";
+import {renderApp} from "./test/reactTestUtils.jsx";
 import {useGraphNode, useGraphNodesByLabel, useGraphPut} from "./react-graph.jsx";
 import type {NodeId} from "@end-game/graph";
 import {asGraphId, asNodeId} from "@end-game/graph";
 
 
 renderApp(asGraphId('test-graph'),  () => {
-    const nodes = useGraphNodesByLabel('mem:person');
+    const nodes = useGraphNodesByLabel('person', {graphName: 'mem'});
     console.log('**', nodes);
     const graphPut = useGraphPut();
     const count = useRef(0);
 
     const addPerson = () => {
-        graphPut('mem:person', asNodeId(count.current.toString()) , {name: `person-${count.current}`}).subscribe();
+        graphPut('person', asNodeId(count.current.toString()) , {name: `person-${count.current}`}, {graphName: 'mem'}).subscribe();
         count.current = count.current + 1;
     }
 
@@ -26,7 +26,7 @@ renderApp(asGraphId('test-graph'),  () => {
 });
 
 const Person: React.FC<{nodeId: NodeId}> = ({nodeId}) => {
-    const node = useGraphNode(nodeId, {memGraph: true});
+    const node = useGraphNode(nodeId, {graphName: 'mem'});
     return (
         <div id={`node-${nodeId}`}>{nodeId}:{node?.nodeId}:{node?.props.name}</div>
     )
