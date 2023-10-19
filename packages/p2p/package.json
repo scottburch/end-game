@@ -1,6 +1,6 @@
 {
   "name": "@end-game/p2p",
-  "version": "1.0.48",
+  "version": "1.0.56",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -12,10 +12,10 @@
     }
   },
   "dependencies": {
-    "@end-game/graph": "^1.0.48",
-    "@end-game/pwd-auth": "^1.0.48",
-    "@end-game/rxjs-chain": "^1.0.48",
-    "@end-game/utils": "^1.0.43",
+    "@end-game/graph": "^1.0.56",
+    "@end-game/pwd-auth": "^1.0.56",
+    "@end-game/rxjs-chain": "^1.0.56",
+    "@end-game/utils": "^1.0.56",
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.1.5",

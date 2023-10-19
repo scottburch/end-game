@@ -1,6 +1,6 @@
 {
   "name": "@end-game/graph-explorer",
-  "version": "1.0.55",
+  "version": "1.0.56",
   "license": "MIT",
   "private": false,
   "type": "module",
@@ -13,9 +13,9 @@
     }
   },
   "dependencies": {
-    "@end-game/graph": "^1.0.48",
-    "@end-game/react-graph": "*",
-    "@end-game/utils": "^1.0.43",
+    "@end-game/graph": "^1.0.56",
+    "@end-game/react-graph": "^1.0.56",
+    "@end-game/utils": "^1.0.56",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "^6.11.1",
