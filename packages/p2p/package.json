@@ -1,6 +1,6 @@
 {
   "name": "@end-game/p2p",
-  "version": "1.0.56",
+  "version": "1.0.57",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@end-game/graph": "^1.0.56",
-    "@end-game/pwd-auth": "^1.0.56",
+    "@end-game/pwd-auth": "^1.0.57",
     "@end-game/rxjs-chain": "^1.0.56",
     "@end-game/utils": "^1.0.56",
     "@types/chai": "^4.3.5",
