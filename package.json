@@ -13,7 +13,7 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
-    "buffer": "^5.7.1",
+    "buffer": "^6.0.3",
     "lerna": "^7.3.0"
   },
   "mocha": {
