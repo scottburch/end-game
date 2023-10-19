@@ -1,6 +1,6 @@
-import type {PropsWithChildren} from "react";
-import * as React from 'react'
+import React from 'react'
 import {useState} from 'react'
+import type {ReactNode} from 'react'
 import {createPortal} from "react-dom";
 import {Main} from "./Main.jsx";
 import {filter, fromEvent, map, of, switchMap, tap} from "rxjs";
@@ -22,7 +22,7 @@ export const GraphExplorerBtn: React.FC = () => {
 
 let win: Window
 
-const NewWindow: React.FC<PropsWithChildren & { onWinClose: () => void }> = ({children, onWinClose}) => {
+const NewWindow: React.FC<{ onWinClose: () => void, children: ReactNode }> = ({children, onWinClose}) => {
     of(true).pipe(
         filter(() => !win || (win as any).openTime + 1000 < Date.now()),
         map(() =>
@@ -37,6 +37,6 @@ const NewWindow: React.FC<PropsWithChildren & { onWinClose: () => void }> = ({ch
         switchMap(() => fromEvent(win, 'unload')),
         tap(onWinClose)
     ).subscribe()
-
-    return createPortal(children, win.document.body as Element);
+    // TODO: the 'as any' and 'as ReactNode' are here because of a type problem in react - try to remove every once in a while
+    return createPortal(children as any, win.document.body as Element) as unknown as ReactNode;
 };

@@ -6,7 +6,6 @@
     <toRun name="graph---tests" type="mocha-javascript-test-runner" />
     <toRun name="graph-explorer---tests" type="mocha-javascript-test-runner" />
     <toRun name="level-store---tests" type="mocha-javascript-test-runner" />
-    <toRun name="local-state---tests" type="mocha-javascript-test-runner" />
     <toRun name="p2p---tests" type="mocha-javascript-test-runner" />
     <toRun name="react-graph---tests" type="mocha-javascript-test-runner" />
     <toRun name="rxjs-chain---tests" type="mocha-javascript-test-runner" />
