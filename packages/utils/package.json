@@ -13,7 +13,7 @@
     "./serializer": "./lib/serializer.js"
   },
   "dependencies": {
-    "@types/node": "^18.16.2",
+    "@types/node": "^20.8.7",
     "playwright": "^1.33.0",
     "rxjs": "^7.8.1",
     "ts-node": "^10.9.1",

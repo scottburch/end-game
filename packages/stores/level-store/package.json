@@ -14,7 +14,7 @@
     "@end-game/rxjs-chain": "^1.0.43",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.11.15",
+    "@types/node": "^20.8.7",
     "abstract-level": "^1.0.3",
     "level": "^8.0.0",
     "memory-level": "^1.0.0",

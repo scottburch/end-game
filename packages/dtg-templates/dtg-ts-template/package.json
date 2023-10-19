@@ -7,7 +7,7 @@
     "@ant-design/icons": "^5.1.4",
     "@end-game/dtg-scripts": "^1.0.50",
     "@end-game/graph-explorer": "^1.0.55",
-    "@end-game/react-graph": "^1.0.55",
+    "@end-game/react-graph": "*",
     "@end-game/test-utils": "^1.0.54",
     "antd": "^5.6.2",
     "date-fns": "^2.30.0",

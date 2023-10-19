@@ -16,7 +16,7 @@
     "@end-game/utils": "^1.0.43",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.11.15",
+    "@types/node": "^20.8.7",
     "ts-loader": "^9.4.2",
     "typescript": "^5.0.4",
     "webpack": "^5.80.0",
