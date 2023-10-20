@@ -23,7 +23,7 @@ renderApp(asGraphId('testGraph'), () => {
 
 
     const putNode = () => {
-        graphPut('person', asNodeId(count.toString()) , {name: 'scott' + count, group: 'first'}).subscribe();
+        graphPut('person', asNodeId(count.toString()) , {name: 'scott' + count, group: count % 2 ? 'first' : 'last'}).subscribe();
         setCount(count + 1);
     }
 

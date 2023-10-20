@@ -1,6 +1,6 @@
 import {compileBrowserTestCode} from "@end-game/utils/testCodeCompiler";
 import {absPath} from "@end-game/utils/absPath";
-import {concatMap, firstValueFrom, last, mergeMap, of, range, switchMap} from "rxjs";
+import {concatMap, filter, firstValueFrom, last, mergeMap, of, range, switchMap} from "rxjs";
 import {openBrowser} from "@end-game/utils/openBrowser";
 
 describe('nodesByProp()', () => {
@@ -14,7 +14,8 @@ describe('nodesByProp()', () => {
                     last()
                 )),
                 switchMap(() => range(0, 10).pipe(
-                    mergeMap(n => page.waitForSelector(`#node-${n}:text("scott${n}")`)),
+                    filter(n => !!(n%2)),
+                    mergeMap(n => page.waitForSelector(`:text("scott${n}")`)),
                     last()
                 ))
             ))

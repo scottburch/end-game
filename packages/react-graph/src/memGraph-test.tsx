@@ -8,7 +8,6 @@ import {asGraphId, asNodeId} from "@end-game/graph";
 
 renderApp(asGraphId('test-graph'),  () => {
     const nodes = useGraphNodesByLabel('person', {graphName: 'mem'});
-    console.log('**', nodes);
     const graphPut = useGraphPut();
     const count = useRef(0);
 
