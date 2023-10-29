@@ -10,7 +10,7 @@ import {
     of, range,
     scan,
     skipWhile,
-    switchMap,
+    switchMap, takeWhile,
     tap,
     toArray
 } from "rxjs";
@@ -240,7 +240,7 @@ describe('graph', () => {
     );
 
 
-    it('should update a graphGetNode() listener when node props is updated', () =>
+    it('should update a GetNode() listener when node props is updated', () =>
         firstValueFrom(getAGraph().pipe(
             tap(graph => putNode(graph, newNode(asNodeId('n1'), 'person', {name: 'scott'})).subscribe()),
             tap(graph => setTimeout(() => putNode(graph, newNode(asNodeId('n1'), 'person', {name: 'todd'})).subscribe(), 100)),
@@ -249,6 +249,26 @@ describe('graph', () => {
             scan((names, name) => names.add(name), new Set()),
             skipWhile(names => names.size < 2),
             tap(names => expect(names.has('scott') && names.has('todd')).to.be.true)
+        ))
+    );
+
+    it('should update a node with only a single notification', () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph => putNode(graph, newNode(asNodeId('thing'), 'thing', {foo: 1}))),
+            tap(({graph}) => of(undefined).pipe(
+                delay(100),
+                switchMap(() => putNode(graph, newNode(asNodeId('thing'), 'thing', {foo: 2}))),
+                delay(100),
+                switchMap(() => putNode(graph, newNode(asNodeId('thing'), 'thing', {foo: 3}))),
+                delay(100),
+                switchMap(() => putNode(graph, newNode(asNodeId('thing'), 'thing', {foo: 4}))),
+            ).subscribe()),
+            switchMap(({graph}) => getNode(graph, asNodeId('thing'), {})),
+            map(({node}) => node.props.foo),
+            tap(n => console.log(n)),
+            takeWhile(n => n !== 4),
+            toArray(),
+            tap(results => expect(results).to.deep.equal([1,2,3]))
         ))
     );
 
