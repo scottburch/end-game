@@ -17,5 +17,5 @@ describe('graphGet()', () => {
             delay(100),
             switchMap(page => page.textContent('#output:text(",1,2,3")'))
         ))
-    )
-})
+    );
+});

@@ -4,7 +4,7 @@ import {
     delay,
     first,
     firstValueFrom,
-    from, last,
+    last,
     map,
     merge, mergeMap,
     of, range,
@@ -26,6 +26,9 @@ import {
 import {expect} from "chai";
 import {addThingNode, getAGraph} from "@end-game/test-utils";
 import {newUid} from "./uid.js";
+import {levelStoreHandlers} from "@end-game/level-store";
+import {p2pHandlers} from "@end-game/p2p";
+import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 
 describe('graph', () => {
     it('should open a graph', () =>
@@ -253,8 +256,15 @@ describe('graph', () => {
     );
 
     it('should update a node with only a single notification', () =>
-        firstValueFrom(getAGraph().pipe(
-            switchMap(graph => putNode(graph, newNode(asNodeId('thing'), 'thing', {foo: 1}))),
+        firstValueFrom(graphOpen({graphId: asGraphId('testing')}).pipe(
+            switchMap(graph => levelStoreHandlers(graph)),
+            switchMap(graph => p2pHandlers(graph)),
+            switchMap(graph => authHandlers(graph)),
+
+            switchMap(graph => graphNewAuth(graph, 'scott', 'scott')),
+            switchMap(({graph}) => graphAuth(graph, 'scott', 'scott')),
+
+            switchMap(({graph}) => putNode(graph, newNode(asNodeId('thing'), 'thing', {foo: 1}))),
             tap(({graph}) => of(undefined).pipe(
                 delay(100),
                 switchMap(() => putNode(graph, newNode(asNodeId('thing'), 'thing', {foo: 2}))),

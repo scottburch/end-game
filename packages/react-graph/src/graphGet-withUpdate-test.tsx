@@ -1,11 +1,11 @@
 import * as React from 'react'
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useRef} from 'react'
 import {renderApp} from "./test/reactTestUtils.jsx";
 import {useAuth, useGraphLogin, useGraphPut, useGraphs, useNewAccount} from "./react-graph.jsx";
 import {switchMap, tap} from "rxjs";
 import {asGraphId, asNodeId, getNode} from "@end-game/graph";
 
-let outputCount = 0;
+
 let accountCreated = false;
 
 renderApp(asGraphId('test-graph'),  () => {
@@ -32,9 +32,9 @@ renderApp(asGraphId('test-graph'),  () => {
         ).subscribe();
     }
 
-
     const updateValue = () => {
         count.current = count.current + 1;
+//        putNode(graphs.netGraph, newNode(asNodeId('thing'), 'thing', new Number(count.current))).subscribe()
         graphPut('thing', asNodeId('thing'), new Number(count.current)).subscribe();
     }
 

@@ -10,7 +10,7 @@ import ld from 'lodash'
 
 
 export const getAGraph = (opts: GraphOpts = {graphId: asGraphId(newUid())}) => graphOpen(opts).pipe(
-    switchMap(graph => levelStoreHandlers(graph)),
+    switchMap(graph => levelStoreHandlers(graph))
 );
 
 

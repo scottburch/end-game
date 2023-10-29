@@ -1,6 +1,6 @@
-import {catchError, first, firstValueFrom, of, switchMap, tap} from "rxjs";
+import {catchError, delay, first, firstValueFrom, map, of, switchMap, takeWhile, tap, toArray} from "rxjs";
 import {graphWithAuth, graphWithUser} from "./test/testUtils.js";
-import {getNode, putEdge, putNode, newEdge, newNode, asNodeId, asEdgeId} from "@end-game/graph";
+import {asEdgeId, asNodeId, getNode, newEdge, newNode, putEdge, putNode} from "@end-game/graph";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "./user-auth.js";
 import type {NodeWithAuth} from "./auth-utils.js";
@@ -8,6 +8,28 @@ import {addThingNode} from "@end-game/test-utils";
 
 describe('auth handlers', function()  {
     this.timeout(60_000)
+
+    it('should update a node with only a single notification', () =>
+        firstValueFrom(graphWithUser().pipe(
+            switchMap(graph => addThingNode(graph, 1, {foo: 1})),
+            tap(({graph}) => of(undefined).pipe(
+                delay(100),
+                switchMap(() => addThingNode(graph, 1, {foo: 2})),
+                delay(100),
+                switchMap(() => addThingNode(graph, 1, {foo: 3})),
+                delay(100),
+                switchMap(() => addThingNode(graph, 1, {foo: 4})),
+            ).subscribe()),
+            switchMap(({graph}) => getNode(graph, asNodeId('thing0001'), {})),
+            map(({node}) => node.props.foo),
+            tap(n => console.log(n)),
+            takeWhile(n => n !== 4),
+            toArray(),
+            tap(results => expect(results).to.deep.equal([1,2,3]))
+        ))
+    );
+
+
 
     it('should fail to put a node if no auth and no signature', (done) =>
         firstValueFrom(graphWithAuth().pipe(
