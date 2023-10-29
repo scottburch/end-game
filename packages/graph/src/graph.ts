@@ -60,12 +60,19 @@ export type Graph = {
     chains: {
         log: RxjsChain<{ graph: Graph, item: GraphLogItem }>
         putNode: RxjsChain<{ graph: Graph, node: GraphNode }>
-        getNode: RxjsChain<{ graph: Graph, nodeId: NodeId, node: GraphNode, opts: {local?: boolean }}>
+        getNode: RxjsChain<{ graph: Graph, nodeId: NodeId, node: GraphNode, opts: { local?: boolean } }>
         putEdge: RxjsChain<{ graph: Graph, edge: GraphEdge }>
-        getEdge: RxjsChain<{ graph: Graph, edgeId: EdgeId, edge: GraphEdge, opts: {local?: boolean }}>
+        getEdge: RxjsChain<{ graph: Graph, edgeId: EdgeId, edge: GraphEdge, opts: { local?: boolean } }>
         reloadGraph: RxjsChain<{}>
         nodesByLabel: RxjsChain<{ graph: Graph, label: string, nodes?: GraphNode[], opts: RangeOpts }>
-        nodesByProp: RxjsChain<{ graph: Graph, label: string, key: string, value: string, nodes?: GraphNode[], opts: RangeOpts }>
+        nodesByProp: RxjsChain<{
+            graph: Graph,
+            label: string,
+            key: string,
+            value: string,
+            nodes?: GraphNode[],
+            opts: RangeOpts
+        }>
         getRelationships: RxjsChain<{
             graph: Graph,
             nodeId: NodeId,
@@ -81,9 +88,9 @@ export type Graph = {
 export type GraphOpts = Partial<Graph> & Pick<Graph, 'graphId'>
 
 
-export type NodeId = (string & {type: 'nodeId'}) | ''
-export type EdgeId = (string & {type: 'edgeId'}) | ''
-export type GraphId = (string & {type: 'graphId'}) | ''
+export type NodeId = (string & { type: 'nodeId' }) | ''
+export type EdgeId = (string & { type: 'edgeId' }) | ''
+export type GraphId = (string & { type: 'graphId' }) | ''
 
 export const asNodeId = (nodeId: string) => nodeId as NodeId;
 export const asEdgeId = (edgeId: string) => edgeId as EdgeId;
@@ -99,10 +106,22 @@ export const graphOpen = (opts: GraphOpts) => {
             getNode: opts.chains?.getNode || newRxjsChain({logger: chainLogger('getNode'), name: 'getNode'}),
             putEdge: opts.chains?.putEdge || newRxjsChain({logger: chainLogger('putEdge'), name: 'putEdge'}),
             getEdge: opts.chains?.getEdge || newRxjsChain({logger: chainLogger('getEdge'), name: 'getEdge'}),
-            nodesByLabel: opts.chains?.nodesByLabel || newRxjsChain({logger: chainLogger('nodesByLabel'), name: 'nodesByLabel'}),
-            nodesByProp: opts.chains?.nodesByProp || newRxjsChain({logger: chainLogger('nodesByProp'), name: 'nodesByProp'}),
-            getRelationships: opts.chains?.getRelationships || newRxjsChain({logger: chainLogger('getRelationships'), name: 'getRelationships'}),
-            reloadGraph: opts.chains?.reloadGraph || newRxjsChain({logger: chainLogger('reloadGraph'), name: 'reloadGraph'})
+            nodesByLabel: opts.chains?.nodesByLabel || newRxjsChain({
+                logger: chainLogger('nodesByLabel'),
+                name: 'nodesByLabel'
+            }),
+            nodesByProp: opts.chains?.nodesByProp || newRxjsChain({
+                logger: chainLogger('nodesByProp'),
+                name: 'nodesByProp'
+            }),
+            getRelationships: opts.chains?.getRelationships || newRxjsChain({
+                logger: chainLogger('getRelationships'),
+                name: 'getRelationships'
+            }),
+            reloadGraph: opts.chains?.reloadGraph || newRxjsChain({
+                logger: chainLogger('reloadGraph'),
+                name: 'reloadGraph'
+            })
         },
         logLevel: opts.logLevel || LogLevel.INFO
     } satisfies Graph as Graph;
@@ -176,13 +195,27 @@ export const getEdge = <T extends Props>(graph: Graph, edgeId: EdgeId, opts: Gra
 
 export const getNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts: GraphHandlerProps<'getEdge'>['opts']) =>
     new Observable<GraphHandlerProps<'getNode'>>(subscriber => {
+        let lastProps: string;
+
+// TODO: This is here to stop duplicate notifications for updated nodes due to the auth module getting a node again
+        // performance may be a concern here
+        const checkCache = (props: any) => {
+            const str = JSON.stringify(props);
+            const result = str !== lastProps;
+
+            lastProps = str;
+            return result;
+        }
+
         const putSub = graph.chains.putNode.pipe(
             filter(({node: n}) => n.nodeId === nodeId),
+            filter(({node}) => checkCache(node.props)),
             tap(({node}) => subscriber.next({graph, nodeId, node: node as GraphNode<T>, opts}))
         ).subscribe();
 
         const getSub = graph.chains.getNode.pipe(
             filter(({node}) => node === undefined || node.nodeId === nodeId),
+            filter(({node}) => checkCache(node.props)),
             map(({node}) => ({node: node as GraphNode<T>})),
             tap(({node}) => subscriber.next({graph, nodeId, node, opts}))
         ).subscribe();
