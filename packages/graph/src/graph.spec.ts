@@ -275,7 +275,6 @@ describe('graph', () => {
             ).subscribe()),
             switchMap(({graph}) => getNode(graph, asNodeId('thing'), {})),
             map(({node}) => node.props.foo),
-            tap(n => console.log(n)),
             takeWhile(n => n !== 4),
             toArray(),
             tap(results => expect(results).to.deep.equal([1,2,3]))
