@@ -1,6 +1,6 @@
 {
   "name": "@end-game/cli",
-  "version": "1.0.58",
+  "version": "1.0.59",
   "main": "lib/index.js",
   "license": "MIT",
   "type": "module",
@@ -9,9 +9,9 @@
     "endgame": "lib/index.js"
   },
   "dependencies": {
-    "@end-game/graph": "^1.0.58",
+    "@end-game/graph": "^1.0.59",
     "@end-game/level-store": "^1.0.56",
-    "@end-game/p2p": "^1.0.58",
+    "@end-game/p2p": "^1.0.59",
     "@end-game/test-utils": "^1.0.58",
     "@end-game/utils": "^1.0.56",
     "@types/node": "^20.8.7",
