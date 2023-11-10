@@ -192,9 +192,12 @@ export const getEdge = <T extends Props>(graph: Graph, edgeId: EdgeId, opts: Gra
         }
     });
 
+type GraphHandlerPropsWithNodeType<P extends keyof Graph['chains'], T extends Props> = Omit<GraphHandlerProps<P>, 'node'> & {node: GraphNode<T>}
 
-export const getNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts: GraphHandlerProps<'getEdge'>['opts']) =>
-    new Observable<GraphHandlerProps<'getNode'>>(subscriber => {
+
+
+export const getNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts: GraphHandlerProps<'getNode'>['opts']) =>
+    new Observable<GraphHandlerPropsWithNodeType<'getNode', T>>(subscriber => {
         let lastProps: string;
 
 // TODO: This is here to stop duplicate notifications for updated nodes due to the auth module getting a node again
