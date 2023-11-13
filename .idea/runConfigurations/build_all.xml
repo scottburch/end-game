@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="build-all" type="TypeScriptProgramRunner" factoryName="TypeScript">
     <module name="end-game" />
-    <option name="interpreterRef" value="project" />
+    <option name="interpreterRef" value="$USER_HOME$/.nvm/versions/node/v21.1.0/bin/node" />
     <option name="enabledTsNodeEsmLoader" value="true" />
     <option name="interpreterOptions" value="" />
     <option name="workingDirectory" value="$PROJECT_DIR$/scripts" />

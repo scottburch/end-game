@@ -50,8 +50,8 @@ export const useDialer = (hostId: string) => {
 }
 
 export const useAuth = () =>  {
-    const [auth, setAuth] = useState<{username: string, nodeId: NodeId}>({username: '', nodeId: ''});
     const graphs = useGraphs();
+    const [auth, setAuth] = useState<{username: string, nodeId: NodeId}>({nodeId: (graphs.netGraph as GraphWithAuth).user?.nodeId || '', username: (graphs.netGraph as GraphWithAuth).user?.username || ''});
 
 
     useEffect(() => {
