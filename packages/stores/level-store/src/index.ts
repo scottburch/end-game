@@ -89,17 +89,20 @@ const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode)
         last()
     ) : of(undefined);
 
-    function arrayPropIdx(label: string, key: string, propArr: any[]) {
-        return propArr.length ? from(propArr).pipe(
-            mergeMap(prop => standardPropIdx(label, key, prop)),
+    function arrayPropIdx(label: string, key: string, values: any[]) {
+        return values.length ? from(values).pipe(
+            mergeMap(val => standardPropIdx(label, key, val)),
             last()
         ) : of(undefined);
     }
 
-    function standardPropIdx(label: string, key: string, prop: any) {
-        return of([graph.graphId, IndexTypes.PROP, label, key, prop, node.nodeId].join('.')).pipe(
-            switchMap(key => store.put(key, ''))
-        )
+    function standardPropIdx(label: string, key: string, val: any) {
+        // don't create an index if the value is
+        return !val.length || val.length < 33 ? (
+            of([graph.graphId, IndexTypes.PROP, label, key, val, node.nodeId].join('.')).pipe(
+                switchMap(key => store.put(key, ''))
+            )
+        ) : of(undefined)
     }
 }
 
@@ -173,7 +176,7 @@ export const levelStoreNodesByPropHandler = (): GraphHandler<'nodesByProp'> =>
 
 
 const keySearchCriteria = (segments: string[], opts: RangeOpts = {}) => {
-    if(opts.gt && segments.indexOf('') !== -1) {
+    if (opts.gt && segments.indexOf('') !== -1) {
         opts.gt = opts.gt.slice(0, -1) + String.fromCharCode(opts.gt.slice(-1).charCodeAt(0) + 1)
     }
     return segments[segments.length - 1].includes('*') ? ({
