@@ -98,7 +98,7 @@ const createNodePropIndexes = (graph: Graph, store: LevelStore, node: GraphNode)
 
     function standardPropIdx(label: string, key: string, val: any) {
         // don't create an index if the value is
-        return !val.length || val.length < 33 ? (
+        return val !== undefined && (!val.length || val.length < 33) ? (
             of([graph.graphId, IndexTypes.PROP, label, key, val, node.nodeId].join('.')).pipe(
                 switchMap(key => store.put(key, ''))
             )
@@ -157,7 +157,7 @@ export const levelStoreNodesByLabelHandler = (): GraphHandler<'nodesByLabel'> =>
 
 export const levelStoreNodesByPropHandler = (): GraphHandler<'nodesByProp'> =>
     ({graph, label, key, value, opts}) => getStore(graph).pipe(
-        switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, value.toString()], opts))),
+        switchMap(store => storeIterator(store, keySearchCriteria([graph.graphId, IndexTypes.PROP, label, key, value?.toString() || ''], opts))),
         switchMap(iterator => range(1, 1000).pipe(
             concatMap(() => iterator.next()),
             takeWhile(pair => !!pair?.[0]),

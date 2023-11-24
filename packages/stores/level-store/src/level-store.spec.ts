@@ -66,4 +66,18 @@ describe('level-store', () => {
             switchMap(({graph}) => (graph as GraphWithLevel).levelStore.close())
         ))
     );
+
+    it('should not create an index for properties that are undefined', () =>
+        firstValueFrom(from(rm('test-store', {force: true, recursive: true})).pipe(
+            switchMap(() => graphOpen({graphId: asGraphId('g1')})),
+            switchMap(graph => levelStoreHandlers(graph, {dir: 'test-store'})),
+            switchMap(graph => putNode(graph, newNode(asNodeId('n1'), 'thing', {foo: 10, bar: undefined}))),
+            switchMap(({graph}) => nodesByProp(graph, 'thing', 'foo', 10)),
+            tap(({nodes}) => expect(nodes[0].props.foo).to.equal(10)),
+            switchMap(({graph}) => nodesByProp(graph, 'thing', 'bar', undefined)),
+            tap(({nodes}) => expect(nodes).to.have.length(0)),
+            switchMap(({graph}) => (graph as GraphWithLevel).levelStore.close())
+        ))
+    );
+
 });
