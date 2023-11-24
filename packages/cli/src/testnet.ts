@@ -1,5 +1,5 @@
 import {startTestNet} from "@end-game/test-utils";
-import {delay, filter, map, merge, of, switchMap, tap} from "rxjs";
+import {catchError, delay, filter, map, merge, of, switchMap, tap} from "rxjs";
 import {LogLevel} from "@end-game/graph";
 import {Host} from "@end-game/p2p";
 
@@ -14,7 +14,8 @@ export const testnet = ({log}: TestnetOpts) =>
         tap(() => console.log('testnet started...')),
         switchMap(hosts => !!log ? logger(log, Object.values(hosts)) : of(undefined)),
         map(() => {}),
-        delay(Math.pow(2, 24))
+        delay(Math.pow(2, 24)),
+                   catchError(err => !!log ? logger(log, err.code) : of(undefined))
     );
 
         const logger = (level: string, hosts: Host[]) =>

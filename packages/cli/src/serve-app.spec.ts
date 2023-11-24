@@ -4,7 +4,7 @@ import {$} from "zx";
 import {openBrowser} from "@end-game/utils/openBrowser";
 
 
-describe.skip('serve app', () => {
+describe('serve app', () => {
     it('should serve a built app', () =>
         firstValueFrom(createApp().pipe(
             switchMap(() => $`yarn build`),
@@ -12,7 +12,7 @@ describe.skip('serve app', () => {
             delay(1000),
             switchMap(proc => of(proc).pipe(
                 switchMap(() => openBrowser({url: 'http://localhost:1235'})),
-                switchMap(page => page.waitForSelector('text=Task:')),
+                switchMap(page => page.waitForSelector('text=Reach')),
                 switchMap(() => proc.kill())
             ))
         ))
@@ -24,9 +24,9 @@ describe.skip('serve app', () => {
             map(() => $`yarn serve --port 1235`),
             delay(1000),
             switchMap(proc => of(proc).pipe(
-                switchMap(() => openBrowser({port: 1235})),
+                switchMap(() => openBrowser({url: 'http://localhost:1235'})),
                 switchMap(page => page.goto('http://localhost:1235/somewhere').then(() => page)),
-                switchMap(page => page.waitForSelector('text=Task:')),
+                switchMap(page => page.waitForSelector('text=Reach')),
                 switchMap(() => proc.kill())
             ))
         ))
@@ -38,9 +38,9 @@ describe.skip('serve app', () => {
             map(() => $`yarn serve --port 1235`),
             delay(1000),
             switchMap(proc => of(proc).pipe(
-                switchMap(() => openBrowser({port: 1235})),
+                switchMap(() => openBrowser({url: 'http://localhost:1235'})),
                 switchMap(page => page.goto('http://localhost:1235/somewhere?with.Query').then(() => page)),
-                switchMap(page => page.waitForSelector('text=Task:')),
+                switchMap(page => page.waitForSelector('text=Reach')),
                 switchMap(() => proc.kill())
             ))
         ))
@@ -52,9 +52,9 @@ describe.skip('serve app', () => {
             map(() => $`yarn serve --port 1235`),
             delay(1000),
             switchMap(proc => of(proc).pipe(
-                switchMap(() => openBrowser({port: 1235})),
+                switchMap(() => openBrowser({url: 'http://localhost:1235'})),
                 switchMap(page => page.goto('http://localhost:1235/somewhere#with.Hash').then(() => page)),
-                switchMap(page => page.waitForSelector('text=Task:')),
+                switchMap(page => page.waitForSelector('text=Reach')),
                 switchMap(() => proc.kill())
             ))
         ))

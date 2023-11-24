@@ -2,7 +2,7 @@
 import {Command} from 'commander';
 import {createAppCmd} from "./create-app.js";
 import {testnet} from "./testnet.js";
-import {firstValueFrom} from "rxjs";
+import {firstValueFrom, map} from "rxjs";
 const program = new Command();
 
 program
@@ -15,6 +15,8 @@ program
     .command('testnet')
     .description('Start a 2 node testnet')
     .option('-l, --log <level>', 'log level (info, warning, error, debug)')
-    .action(opts => firstValueFrom(testnet(opts)))
+    .option('-g, --graphs <graphs>', 'A comma delimited list of graphs')
+    .option('-d --dir <dir>', 'directory to put db files')
+    .action(opts => firstValueFrom(testnet(opts).pipe(map(() => undefined))))
 
 program.parse()
