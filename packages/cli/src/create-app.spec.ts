@@ -9,7 +9,7 @@ import {openBrowser} from "@end-game/utils/openBrowser";
         firstValueFrom(createApp().pipe(
             map(() => $`yarn run dev --headless --port 1235`),
             delay(3000),
-            switchMap(proc => of(proc).pipe(
+            switchMap(proc => of(undefined).pipe(
                 // test app starts
                 switchMap(() => openBrowser({url: 'http://localhost:1235'})),
                 switchMap(page => page.waitForSelector('text=Reach')),
