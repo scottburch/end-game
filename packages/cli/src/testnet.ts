@@ -5,13 +5,15 @@ import {Host} from "@end-game/p2p";
 
 type TestnetOpts = {
     log: string
+    graphs: string,
+    dir: string
 }
 
 const logLevels = Object.values(LogLevel);
 
-export const testnet = ({log}: TestnetOpts) =>
-    startTestNet([[1], []]).pipe(
-        tap(() => console.log('testnet started...')),
+export const testnet = ({log, graphs}: TestnetOpts) =>
+    startTestNet([[1], []], {graphId: graphs.split(',')[0]}).pipe(
+        tap(() => console.log('testnet started...', `[graphs: ${graphs}]`)),
         switchMap(hosts => !!log ? logger(log, Object.values(hosts)) : of(undefined)),
         map(() => {}),
         delay(Math.pow(2, 24)),
