@@ -1,6 +1,6 @@
 import {delay, firstValueFrom, map, of, switchMap, tap} from "rxjs";
 import {installCli} from "./test/testUtils.js";
-import {$} from "zx";
+import {$, fs} from "zx";
 import {addThingNode, startTestNode} from "@end-game/test-utils";
 import {expect} from "chai";
 import {asPeerId} from "@end-game/p2p";
@@ -28,7 +28,6 @@ describe('testnet command', function () {
         firstValueFrom(installCli().pipe(
             map(() => $`endgame testnet -g testnet`),
             delay(3000),
-            delay(3000),
             switchMap(proc => of(undefined).pipe(
                 switchMap(() => startTestNode(2, [0])),
                 delay(1000),
@@ -43,4 +42,28 @@ describe('testnet command', function () {
             ))
         ))
     );
+
+    it('should allow a directory to be set to store the db', () =>
+        firstValueFrom(installCli().pipe(
+            switchMap(() => $`rm -rf test-store`),
+            map(() => $`endgame testnet -g testnet -d test-store`),
+            delay(3000),
+            switchMap(proc => of(undefined).pipe(
+                switchMap(() => startTestNode(2, [0])),
+                delay(1000),
+                switchMap(({host}) => graphNewAuth(host.graphs[0], 'scott', 'scott')),
+                switchMap(({graph}) => graphAuth(graph, 'scott', 'scott')),
+                switchMap(({graph}) => addThingNode(graph, 0)),
+                switchMap(() => startTestNode(3, [1])),
+                delay(1000),
+                switchMap(({host}) => getNode(host.graphs[0], asNodeId('thing0000'), {})),
+                tap(({node}) => expect(node.props.name).to.equal('thing0000')),
+                switchMap(() => fs.pathExists('test-store/node-0')),
+                tap(exists => expect(exists).to.be.true),
+                switchMap(() => fs.pathExists('test-store/node-1')),
+                tap(exists => expect(exists).to.be.true),
+                switchMap(() => proc.kill())
+            ))
+        ))
+    )
 });

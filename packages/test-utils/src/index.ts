@@ -14,19 +14,19 @@ export const getAGraph = (opts: GraphOpts = {graphId: asGraphId(newUid())}) => g
 );
 
 
-export const startTestNet = (nodes: number[][], opts: {graphId?: string, basePort?: number} = {}) =>
+export const startTestNet = (nodes: number[][], opts: {graphId?: string, basePort?: number, dir?: string} = {}) =>
     findBasePort(opts.basePort || 11110).pipe(
         switchMap(basePort => from(nodes).pipe(
-            mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers, {basePort, graphId: opts.graphId})),
+            mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers, {basePort, graphId: opts.graphId, dir: opts.dir ? opts.dir + `/node-${nodeNo}` : undefined})),
             scan((nodes, {host}, idx) => ({...nodes, [`host${idx}`]: host}), {} as Record<`host${number}`, Host>),
             skip(nodes.length - 1),
         ))
     );
 
 
-export const startTestNode = (nodeNo: number, peers: number[] = [], opts: {basePort?: number, graphId?: string} = {}) =>
+export const startTestNode = (nodeNo: number, peers: number[] = [], opts: {basePort?: number, graphId?: string, dir?: string} = {}) =>
     graphOpen({graphId: asGraphId(opts.graphId || 'testnet'), logLevel: LogLevel.DEBUG}).pipe(
-        switchMap(graph => levelStoreHandlers(graph)),
+        switchMap(graph => levelStoreHandlers(graph, {dir: opts.dir})),
         switchMap(graph => authHandlers(graph)),
         switchMap(graph => p2pHandlers(graph)),
         switchMap(graph => startServer(newHost({
