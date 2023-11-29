@@ -130,9 +130,15 @@ export const verifyEdgeSig = <T extends Props>(graph: Graph, edge: EdgeWithSig<T
                 tap(() => chainNext(graph.chains.log, {
                     graph,
                     item: {
+                        module: 'auth-utils',
                         code: 'EDGE_SIG_VERIFY_ERROR',
                         level: LogLevel.INFO,
-                        text: 'Unable to verify edge signature, no auth object: ' + edge.edgeId + ':' + edge.from + '-' + edge.to
+                        data: {
+                            reason: 'no auth object',
+                            edgeId: edge.edgeId,
+                            from: edge.from,
+                            to: edge.to
+                        }
                     }
 
                 }))
@@ -159,9 +165,13 @@ export const verifyNodeSig = <T extends Props>(graph: Graph, node: NodeWithAuth<
                 tap(() => chainNext(graph.chains.log, {
                     graph,
                     item: {
+                        module: 'auth-utils',
                         code: 'NODE_SIG_VERIFY_ERROR',
                         level: LogLevel.INFO,
-                        text: 'Unable to verify node signature, no auth object: ' + node.nodeId
+                        data: {
+                            reason: 'no auth object',
+                            nodeId: node.nodeId
+                        }
                     }
 
                 }))

@@ -264,4 +264,22 @@ describe('p2p handlers', () => {
             });
         });
     });
+
+    it('should prevent another node from causing an error in my node', (done) => {
+        firstValueFrom(startTestNode(0).pipe(
+            map(({host}) => host.graphs[0]),
+            tap(graph => graph.chains.log.pipe(
+                tap(({item}) => item.code === 'USERNAME_ALREADY_EXISTS' && done()),
+            ).subscribe()),
+
+            switchMap(graph => graphNewAuth(graph, 'scott', 'scott2')),
+
+            switchMap(() => startTestNode(1, [0])),
+            map(({host}) => host.graphs[0]),
+
+            delay(1000),
+            switchMap(graph => graphNewAuth(graph, 'scott', 'scott2')),
+            delay(1000),
+        ))
+    });
 });

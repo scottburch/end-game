@@ -40,10 +40,11 @@ export type GraphHandlerProps<T extends keyof Graph['chains']> = Graph['chains']
 
 export enum LogLevel {INFO, WARNING, ERROR, DEBUG}
 
-export type GraphLogItem = {
+export type GraphLogItem<T extends Object> = {
+    module: string,
     code: string,
-    text: string,
-    level: LogLevel
+    level: LogLevel,
+    data: T
 }
 
 export type RangeOpts = {
@@ -58,7 +59,7 @@ export type RangeOpts = {
 export type Graph = {
     graphId: GraphId
     chains: {
-        log: RxjsChain<{ graph: Graph, item: GraphLogItem }>
+        log: RxjsChain<{ graph: Graph, item: GraphLogItem<Object> }>
         putNode: RxjsChain<{ graph: Graph, node: GraphNode }>
         getNode: RxjsChain<{ graph: Graph, nodeId: NodeId, node: GraphNode, opts: { local?: boolean } }>
         putEdge: RxjsChain<{ graph: Graph, edge: GraphEdge }>
@@ -129,12 +130,17 @@ export const graphOpen = (opts: GraphOpts) => {
     return of(graph);
 
     function chainLogger(chainName: string) {
-        return (fnName: string, v: any) =>
+        return (module: string, v: any) =>
             chainNext(graph.chains.log, {
                 graph, item: {
+                    module,
                     code: 'CHAIN',
                     level: LogLevel.DEBUG,
-                    text: `${graph.graphId}: ${chainName} - ${fnName}, ${serializer(ld.omit(v, 'graph'))}`
+                    data: {
+                        graphId: graph.graphId,
+                        chainName: chainName,
+                        value: ld.omit(v, 'graph')
+                    }
                 }
             }).subscribe()
     }

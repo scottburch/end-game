@@ -1,21 +1,23 @@
-import type {EdgeId, Graph, GraphEdge,  GraphNode, NodeId, RangeOpts} from "@end-game/graph";
+import type {EdgeId, Graph, GraphEdge, GraphNode, NodeId, RangeOpts} from "@end-game/graph";
+import {
+    getEdge,
+    getNode,
+    getRelationships,
+    LogLevel,
+    nodesByLabel,
+    nodesByProp,
+    putEdge,
+    putNode
+} from "@end-game/graph";
 
-import {from, map, of, switchMap, tap} from "rxjs";
+import {catchError, from, map, of, switchMap, tap} from "rxjs";
 import type {RxjsChain} from "@end-game/rxjs-chain";
 import {appendHandler, chainNext, newRxjsChain, RxjsChainFn} from "@end-game/rxjs-chain";
-import {
-    getNode,
-    getEdge,
-    getRelationships,
-    putEdge,
-    putNode,
-    nodesByLabel, nodesByProp, LogLevel
-} from "@end-game/graph";
 
 import ld from "lodash";
 import {P2pMsg} from "./dialer.js";
 
-export type PeerId = string & {type: 'peerId'};
+export type PeerId = string & { type: 'peerId' };
 
 export const asPeerId = (peerId: string) => peerId as PeerId;
 
@@ -54,12 +56,17 @@ const addChainsToGraph = (graph: GraphWithP2p) => {
     graph.chains.peersOut = graph.chains.peersOut || newRxjsChain({logger: chainLogger('peersOut'), name: 'peersOut'});
 
     function chainLogger(chainName: string) {
-        return (fnName: string, v: any) =>
+        return (module: string, v: any) =>
             chainNext(graph.chains.log, {
                 graph, item: {
+                    module,
                     code: 'CHAIN',
                     level: LogLevel.DEBUG,
-                    text: `${graph.graphId}: ${chainName} - ${fnName}, ${JSON.stringify(ld.omit(v, 'graph'))}`
+                    data: {
+                        graphId: graph.graphId,
+                        chainName: chainName,
+                        value: ld.omit(v, 'graph')
+                    }
                 }
             }).subscribe()
     }
@@ -83,7 +90,7 @@ const putEdgeHandler: GraphP2pHandler<'putEdge'> = ({graph, edge}) => {
     return of({graph, edge});
 };
 
-const getNodeHandler: GraphP2pHandler<'getNode'> = ({graph, nodeId, node,opts}) => {
+const getNodeHandler: GraphP2pHandler<'getNode'> = ({graph, nodeId, node, opts}) => {
     opts.local || chainNext((graph as GraphWithP2p).chains.peersOut, {
         graph,
         msg: {cmd: 'getNode', data: nodeId}
@@ -141,7 +148,17 @@ const peerInHandler: GraphP2pHandler<'peerIn'> = ({graph, msg}) =>
 
 const doPutNodeIn = (graph: Graph, msg: P2pMsg) =>
     of(msg as P2pMsg<'putNode', GraphNode>).pipe(
-        switchMap(msg => putNode(graph, msg.data))
+        switchMap(msg => putNode(graph, msg.data)),
+        catchError(err => chainNext(graph.chains.log, {
+                graph,
+                item: {
+                    module: 'p2p-handlers',
+                    code: err.code,
+                    level: LogLevel.ERROR,
+                    data: err
+                }
+            })
+        )
     );
 
 const doPutEdgeIn = (graph: Graph, msg: P2pMsg) =>
@@ -178,7 +195,7 @@ const doGetRelationshipsIn = (graph: Graph, msg: P2pMsg) =>
     );
 
 const doGetNodesByLabel = (graph: Graph, msg: P2pMsg) =>
-    of(msg as P2pMsg<'nodesByLabel', {label: string, opts: RangeOpts}>).pipe(
+    of(msg as P2pMsg<'nodesByLabel', { label: string, opts: RangeOpts }>).pipe(
         switchMap(msg => nodesByLabel(graph, msg.data.label, msg.data.opts)),
         switchMap(({nodes}) => from(nodes)),
         switchMap(node => chainNext((graph as GraphWithP2p).chains.peersOut, {
@@ -188,14 +205,13 @@ const doGetNodesByLabel = (graph: Graph, msg: P2pMsg) =>
     );
 
 const doGetNodesByProp = (graph: Graph, msg: P2pMsg) =>
-    of(msg as P2pMsg<'nodesByProp', {label: string, key: string, value: string}>).pipe(
+    of(msg as P2pMsg<'nodesByProp', { label: string, key: string, value: string }>).pipe(
         switchMap(msg => nodesByProp(graph, msg.data.label, msg.data.key, msg.data.value)),
         switchMap(({nodes}) => from(nodes)),
         switchMap(node => chainNext((graph as GraphWithP2p).chains.peersOut, {
             graph,
             msg: {cmd: 'putNode', data: node}
         })),
-
     )
 
 const doGetEdgeIn = (graph: Graph, msg: P2pMsg) =>
