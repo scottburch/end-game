@@ -152,7 +152,7 @@ const doPutNodeIn = (graph: Graph, msg: P2pMsg) =>
         catchError(err => chainNext(graph.chains.log, {
                 graph,
                 item: {
-                    module: 'p2p-handlers',
+                    module: 'p2p-handlers-put-node-in',
                     code: err.code,
                     level: LogLevel.ERROR,
                     data: err
@@ -165,6 +165,16 @@ const doPutEdgeIn = (graph: Graph, msg: P2pMsg) =>
     of(msg as P2pMsg<'putEdge', GraphEdge>).pipe(
         switchMap(msg =>
             putEdge(graph, msg.data)
+        ),
+        catchError(err => chainNext(graph.chains.log, {
+                graph,
+                item: {
+                    module: 'p2p-handlers-put-edge-in',
+                    code: err.code,
+                    level: LogLevel.ERROR,
+                    data: err
+                }
+            })
         )
     );
 

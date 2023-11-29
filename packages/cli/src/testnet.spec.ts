@@ -65,5 +65,22 @@ describe('testnet command', function () {
                 switchMap(() => proc.kill())
             ))
         ))
-    )
+    );
+
+    it("should not error out the testnet command on an error, should log instead", (done) => {
+        firstValueFrom(installCli().pipe(
+            map(() => $`endgame testnet -g testnet -l debug`),
+            delay(1000),
+            switchMap(proc => of(undefined).pipe(
+                tap(() => proc.stdout.on('data', out =>
+                    /USERNAME_ALREADY_EXISTS/.test(out) && proc.kill().then(() => done())
+                )),
+                switchMap(() => startTestNode(2, [0])),
+                switchMap(({host}) => graphNewAuth(host.graphs[0], 'scott', 'scott')),
+                delay(1000),
+                switchMap(() => startTestNode(3, [1])),
+                switchMap(({host}) => graphNewAuth(host.graphs[0], 'scott', 'scott')),
+            )),
+        ))
+    });
 });
