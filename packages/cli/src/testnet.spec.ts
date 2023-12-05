@@ -9,7 +9,7 @@ import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 
 describe('testnet command', function () {
     this.timeout(60_000);
-    it('should start a testnet with two nodes', () =>
+    it('should start a testnet with two nodes by default', () =>
         firstValueFrom(installCli().pipe(
             map(() => $`endgame testnet`),
             delay(3000),
@@ -23,6 +23,24 @@ describe('testnet command', function () {
             ))
         ))
     );
+
+    it('should start a testnet with the named number of nodes', () =>
+        firstValueFrom(installCli().pipe(
+            map(() => $`endgame testnet -c 3`),
+            delay(3000),
+            switchMap(proc => of(undefined).pipe(
+                switchMap(() => startTestNode(3, [0, 1, 2])),
+                delay(1000),
+                tap(({host}) => expect(host.peerConnections).to.have.length(3)),
+                tap(({host}) => expect(host.peerConnections.has(asPeerId('host-0'))).to.be.true),
+                tap(({host}) => expect(host.peerConnections.has(asPeerId('host-1'))).to.be.true),
+                tap(({host}) => expect(host.peerConnections.has(asPeerId('host-2'))).to.be.true),
+                tap(x => x),
+                switchMap(() => proc.kill())
+            ))
+        ))
+    );
+
 
     it('should start a testnet allowing you to pass graphs', () =>
         firstValueFrom(installCli().pipe(
