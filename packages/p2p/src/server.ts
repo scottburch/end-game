@@ -2,6 +2,7 @@ import {fromEvent, map, mergeMap, Observable, of, switchMap} from "rxjs";
 import WS from "isomorphic-ws";
 import {socketManager} from "./socketManager.js";
 import {Host} from "./host.js";
+import {newDupMsgCache} from "./dupMsgCache.js";
 
 
 export const startServer = (host: Host) => new Observable<Host>(subscriber => {
@@ -12,7 +13,8 @@ export const startServer = (host: Host) => new Observable<Host>(subscriber => {
             map(x => (x as [WS.WebSocket])[0]),
             mergeMap(conn => socketManager(host, {
                 socket: conn,
-                close: () => {}
+                close: () => {},
+                dupCache: newDupMsgCache()
             }))
         )),
     ).subscribe();

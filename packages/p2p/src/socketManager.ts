@@ -1,22 +1,23 @@
 import {GraphWithP2p, PeerId} from "./p2pHandlers.js";
 import WebSocket from "isomorphic-ws";
-import {delay, filter, first, fromEvent, map, mergeMap, of, skipWhile, takeUntil, tap} from "rxjs";
+import {filter, first, fromEvent, map, mergeMap, skipWhile, takeUntil, tap} from "rxjs";
 import {deserializer, serializer} from "@end-game/utils/serializer";
 import {chainNext} from "@end-game/rxjs-chain";
 import {GraphId, LogLevel} from "@end-game/graph";
 import {DialerMsg, P2pMsg} from "./dialer.js";
 import {Host} from "./host.js";
+import {DupMsgCache, isDupMsg} from "./dupMsgCache.js";
 
 
 export type PeerConn = {
-    socket: WebSocket,
+    socket: WebSocket
     close: () => void
+    dupCache: DupMsgCache
 }
 
 type AnnounceMsg = P2pMsg<'announce', { hostId: PeerId}>
 
 export const socketManager = (host: Host, peerConn: PeerConn) => {
-    const isDup = dupMsgCache();
     let connOk = false;
 
     const graphTable = host.graphs.reduce((table, graph) => ({
@@ -42,7 +43,7 @@ export const socketManager = (host: Host, peerConn: PeerConn) => {
                 graphId: graph.graphId,
                 msg
             } satisfies DialerMsg)),
-            filter(msg => !isDup(msg)),
+            filter(msg => !isDupMsg(peerConn.dupCache, msg)),
             tap(msg => peerConn.socket.send(msg))
         ).subscribe()
     )
@@ -50,8 +51,8 @@ export const socketManager = (host: Host, peerConn: PeerConn) => {
     return fromEvent<MessageEvent>(peerConn.socket, 'message').pipe(
         takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
         map(ev => ev.data),
-        filter(msg => !isDup(msg)),
-        map(msg => deserializer<DialerMsg<P2pMsg>>(msg)),
+        filter(msg => !isDupMsg(peerConn.dupCache, msg)),
+        map(msg => deserializer<DialerMsg>(msg)),
         tap(msg => msg.msg.cmd === 'announce' && checkDupConn(msg.msg as AnnounceMsg)),
         skipWhile(() => !connOk),
         filter(msg => !!graphTable[msg.graphId]),
@@ -83,20 +84,5 @@ export const socketManager = (host: Host, peerConn: PeerConn) => {
         }
     }
 }
-
-const dupMsgCache = (timeout: number = 5000) => {
-    const cache = new Set<string>();
-
-    return (key: string) => {
-        const exists = cache.has(key);
-        exists || cache.add(key);
-        exists || of(key).pipe(
-            delay(timeout),
-            tap(() => cache.delete(key))
-        ).subscribe()
-        return exists;
-    }
-}
-
 
 

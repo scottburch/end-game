@@ -3,6 +3,7 @@ import {first, fromEvent, Observable, switchMap, tap} from "rxjs";
 import WebSocket from "isomorphic-ws";
 import {PeerConn, socketManager} from "./socketManager.js";
 import {Host} from "./host.js";
+import {newDupMsgCache} from "./dupMsgCache.js";
 
 export type DialerOpts = {
     url: string
@@ -32,7 +33,9 @@ export const dialPeer = (host: Host, opts: DialerOpts) =>
                 close: () => {
                     stopping = true;
                     peerConn.socket?.close();
-                }};
+                },
+                dupCache: newDupMsgCache()
+            };
 
             const openSub = fromEvent<WebSocket.Event>(peerConn.socket, 'open').pipe(
                 switchMap(() => socketManager(host, peerConn))
