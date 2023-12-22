@@ -9,7 +9,9 @@ describe('graph-explorer', () => {
         firstValueFrom(compileBrowserTestCode(absPath(import.meta.url, 'graph-explorer-test.tsx'), 1236).pipe(
             switchMap(() => openBrowser({url: 'http://localhost:1236'})),
             switchMap(page => page.waitForSelector('div:text("scott")').then(() => page)),
-            switchMap(page => page.click('button:text("Graph Explorer")').then(() => page)),
+            switchMap(page => page.evaluate(() => {
+                document.dispatchEvent(new KeyboardEvent('keypress', {ctrlKey: true, key: 'G'}))
+            }).then(() => page)),
             map(page => page.context().pages()),
             switchMap(pages => pages[1].fill('input', 'person').then(() => pages)),
             delay(4000),
@@ -24,7 +26,9 @@ describe('graph-explorer', () => {
             switchMap(() => openBrowser({url: 'http://localhost:1236'})),
             switchMap(page => page.waitForSelector('div:text("scott")').then(() => page)),
             delay(4000),
-            switchMap(page => page.click('button:text("Graph Explorer")').then(() => page)),
+            switchMap(page => page.evaluate(() => {
+                document.dispatchEvent(new KeyboardEvent('keypress', {ctrlKey: true, key: 'G'}))
+            }).then(() => page)),
             map(page => page.context().pages()),
             switchMap(pages => pages[1].fill('input', 'person').then(() => pages)),
             switchMap(pages => pages[1].click('button:text("By Node Label")').then(() => pages)),

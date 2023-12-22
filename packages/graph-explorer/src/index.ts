@@ -1,1 +1,1 @@
-export {GraphExplorerBtn} from './GraphExplorerBtn.jsx'
+export {GraphExplorer} from './GraphExplorer.jsx'

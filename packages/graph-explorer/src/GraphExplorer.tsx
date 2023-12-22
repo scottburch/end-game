@@ -1,23 +1,28 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {useState} from 'react'
 import type {ReactNode} from 'react'
 import {createPortal} from "react-dom";
 import {Main} from "./Main.jsx";
 import {filter, fromEvent, map, of, switchMap, tap} from "rxjs";
 
-export const GraphExplorerBtn: React.FC = () => {
+export const GraphExplorer: React.FC = () => {
     const [open, setOpen] = useState(false);
 
-    return (
-        <>
-            <button onClick={() => setOpen(true)}>Graph Explorer</button>
-            {open ? (
-                <NewWindow onWinClose={() => setOpen(false)}>
-                    <Main/>
-                </NewWindow>
-            ) : null}
-        </>
-    )
+    const checkKeyPress = (ev: KeyboardEvent) => {
+        console.log(ev)
+        ev.key === 'G' && ev.ctrlKey && setOpen(!open);
+    }
+
+    useEffect(() => {
+        document.addEventListener('keypress', checkKeyPress);
+        return () => document.removeEventListener('keypress', checkKeyPress);
+    })
+
+    return open ? (
+        <NewWindow onWinClose={() => setOpen(false)}>
+            <Main/>
+        </NewWindow>
+    ) : null;
 }
 
 let win: Window

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {Main} from './Main.jsx';
 import {ReactGraph} from "@end-game/react-graph";
-import {GraphExplorerBtn} from "@end-game/graph-explorer";
+import {GraphExplorer} from "@end-game/graph-explorer";
 import {BrowserRouter} from "react-router-dom";
 
 
@@ -16,7 +16,7 @@ const renderIt = () => {
         <ReactGraph graphId="testnet" persistent={!window.location.href.includes('localhost')}>
             <React.StrictMode>
                 <BrowserRouter>
-                    <GraphExplorerBtn/>
+                    <GraphExplorer/>
                     <Main/>
                 </BrowserRouter>
             </React.StrictMode>

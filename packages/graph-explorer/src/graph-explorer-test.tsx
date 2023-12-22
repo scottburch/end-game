@@ -1,7 +1,7 @@
 import {default as React, useEffect} from 'react'
 import {useGraphLogin, useGraphPut, useGraphPutEdge, useNewAccount} from "@end-game/react-graph";
 import {renderApp, Username} from "./test/reactTestUtils.jsx";
-import {GraphExplorerBtn} from "./GraphExplorerBtn.jsx";
+import {GraphExplorer} from "./GraphExplorer.jsx";
 import {switchMap, of, tap} from "rxjs";
 import {asEdgeId, asGraphId, asNodeId} from "@end-game/graph";
 
@@ -33,7 +33,7 @@ renderApp(asGraphId('test-graph'), () => {
         <>
             <React.StrictMode>
                 <Username/>
-                <GraphExplorerBtn/>
+                <GraphExplorer/>
             </React.StrictMode>
         </>
     )
