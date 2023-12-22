@@ -62,9 +62,9 @@ export type Graph = {
         putNode: RxjsChain<{ graph: Graph, node: GraphNode }>
         getNode: RxjsChain<{ graph: Graph, nodeId: NodeId, node: GraphNode, opts: { local?: boolean, since?: string } }>
         putEdge: RxjsChain<{ graph: Graph, edge: GraphEdge }>
-        getEdge: RxjsChain<{ graph: Graph, edgeId: EdgeId, edge: GraphEdge, opts: { local?: boolean, since?: string } }>
+        getEdge: RxjsChain<{ graph: Graph, edgeId: EdgeId, edge: GraphEdge, opts: { local?: boolean} }>
         reloadGraph: RxjsChain<{}>
-        nodesByLabel: RxjsChain<{ graph: Graph, label: string, nodes?: GraphNode[], opts: RangeOpts & {since?: string} }>
+        nodesByLabel: RxjsChain<{ graph: Graph, label: string, nodes?: GraphNode[], opts: RangeOpts }>
         nodesByProp: RxjsChain<{
             graph: Graph,
             label: string,
