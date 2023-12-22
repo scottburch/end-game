@@ -1,5 +1,5 @@
 import {
-    bufferCount,
+    bufferCount, catchError,
     combineLatest,
     delay,
     first,
@@ -11,7 +11,7 @@ import {
     scan,
     skipWhile,
     switchMap, takeWhile,
-    tap,
+    tap, throwError, timeout,
     toArray
 } from "rxjs";
 import {
@@ -252,6 +252,18 @@ describe('graph', () => {
             scan((names, name) => names.add(name), new Set()),
             skipWhile(names => names.size < 2),
             tap(names => expect(names.has('scott') && names.has('todd')).to.be.true)
+        ))
+    );
+
+    it('should get a node only if it is newer than the passed node version', () =>
+        firstValueFrom(getAGraph().pipe(
+            switchMap(graph => addThingNode(graph, 0, {})),
+            switchMap(({graph}) => getNode(graph, asNodeId('thing0000'), {since: (Date.now() + 1).toString()})),
+            switchMap(() => throwError(() => 'older node sent when "since" option set')),
+            timeout({each: 100}),
+            catchError(err =>
+                /Timeout/.test(err) ? of(err) : throwError(() => err)
+            )
         ))
     );
 

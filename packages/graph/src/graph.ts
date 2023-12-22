@@ -6,7 +6,6 @@ import type {Relationship} from "./relationship.js";
 import type {RxjsChain} from "@end-game/rxjs-chain";
 import type {RxjsChainFn} from '@end-game/rxjs-chain';
 import {chainNext, newRxjsChain} from "@end-game/rxjs-chain";
-import {serializer} from "@end-game/utils/serializer";
 
 
 export type Props = Record<string, any>;
@@ -61,11 +60,11 @@ export type Graph = {
     chains: {
         log: RxjsChain<{ graph: Graph, item: GraphLogItem<Object> }>
         putNode: RxjsChain<{ graph: Graph, node: GraphNode }>
-        getNode: RxjsChain<{ graph: Graph, nodeId: NodeId, node: GraphNode, opts: { local?: boolean } }>
+        getNode: RxjsChain<{ graph: Graph, nodeId: NodeId, node: GraphNode, opts: { local?: boolean, since?: string } }>
         putEdge: RxjsChain<{ graph: Graph, edge: GraphEdge }>
-        getEdge: RxjsChain<{ graph: Graph, edgeId: EdgeId, edge: GraphEdge, opts: { local?: boolean } }>
+        getEdge: RxjsChain<{ graph: Graph, edgeId: EdgeId, edge: GraphEdge, opts: { local?: boolean, since?: string } }>
         reloadGraph: RxjsChain<{}>
-        nodesByLabel: RxjsChain<{ graph: Graph, label: string, nodes?: GraphNode[], opts: RangeOpts }>
+        nodesByLabel: RxjsChain<{ graph: Graph, label: string, nodes?: GraphNode[], opts: RangeOpts & {since?: string} }>
         nodesByProp: RxjsChain<{
             graph: Graph,
             label: string,
@@ -225,6 +224,7 @@ export const getNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts: Gra
         const getSub = graph.chains.getNode.pipe(
             filter(({node}) => node === undefined || node.nodeId === nodeId),
             filter(({node}) => checkCache(node.props)),
+            filter(({node}) => opts.since ? node.state > opts.since : true),
             map(({node}) => ({node: node as GraphNode<T>})),
             tap(({node}) => subscriber.next({graph, nodeId, node, opts}))
         ).subscribe();
