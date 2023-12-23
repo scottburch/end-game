@@ -131,9 +131,11 @@ export const useGraphNode = <T extends Props>(nodeId: NodeId, opts: GraphOpts = 
                 filter(({node}) => !!node?.nodeId),
                 tap(({node}) => setNode(node as GraphNode<T>))
             ).subscribe();
-            return () => sub.unsubscribe();
+            return () => {
+                sub.unsubscribe()
+            };
         }
-    }, []);
+    }, [nodeId]);
     return node;
 };
 
