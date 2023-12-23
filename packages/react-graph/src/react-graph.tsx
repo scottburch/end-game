@@ -99,7 +99,7 @@ export const useGraphNodesByProp = <T extends Props>(label: string, key: keyof T
             ).subscribe();
             return () => sub.unsubscribe();
         }
-    }, [graphs]);
+    }, [graphs, label, key, value]);
     return nodes;
 }
 

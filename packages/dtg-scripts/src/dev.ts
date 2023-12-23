@@ -1,5 +1,5 @@
 import {resolve} from 'node:path'
-import {map, of, switchMap, tap} from "rxjs";
+import {map, of, switchMap} from "rxjs";
 import WebpackDevServer from 'webpack-dev-server'
 import Webpack from 'webpack'
 import {WebpackMixinFn} from "./index.js";

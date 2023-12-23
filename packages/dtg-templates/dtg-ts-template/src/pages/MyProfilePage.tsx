@@ -15,7 +15,7 @@ export const MyProfilePage: React.FC = () => {
 
     const updateProfile = (values: any) => {
         setUpdating(true);
-        put('user', user.nodeId, {ownerId: user.ownerId, ...values}).pipe(
+        user && put('user', user.nodeId, {ownerId: user.ownerId, ...values}).pipe(
             tap(() => navigate('/'))
         ).subscribe();
     }
@@ -24,7 +24,7 @@ export const MyProfilePage: React.FC = () => {
     return (
             <Form
                 disabled={updating}
-                key={user.display || 'empty'}
+                key={user?.display || 'empty'}
                 name="my-profile"
                 labelCol={{span: 8}}
                 wrapperCol={{span: 16}}
@@ -40,7 +40,7 @@ export const MyProfilePage: React.FC = () => {
                     rules={[
                         {required: true, message: 'Please enter a display name'}
                     ]}
-                    initialValue={user.display}
+                    initialValue={user?.display}
                 >
                     <Input/>
                 </Form.Item>
@@ -52,7 +52,7 @@ export const MyProfilePage: React.FC = () => {
                         {required: true, message: 'Please enter a nickname'},
                         {pattern: /^[a-z1-9]*$/, message: 'Lower case and numbers only'}
                     ]}
-                    initialValue={user.nickname}>
+                    initialValue={user?.nickname}>
                     <Input/>
                 </Form.Item>
 
@@ -60,7 +60,7 @@ export const MyProfilePage: React.FC = () => {
                 <Form.Item
                     label="About Me"
                     name="aboutMe"
-                    initialValue={user.aboutMe}
+                    initialValue={user?.aboutMe}
                 >
                     <Input.TextArea />
                 </Form.Item>
