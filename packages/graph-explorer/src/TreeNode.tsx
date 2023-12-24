@@ -88,7 +88,7 @@ const Props: React.FC<{ props: Props }> = ({props = {}}) => (
         {Object.keys(props).map(key => (
             <div key={key} style={{display: 'flex'}}>
                 <div>{key}:</div>
-                <div>{props[key]}</div>
+                <div>{Array.isArray(props[key]) ? JSON.stringify(props[key]) : props[key]}</div>
             </div>
         ))}
     </div>
