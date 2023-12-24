@@ -30,4 +30,3 @@ const logger = (level: string, hosts: Host[]) =>
         filter(({item}) => item.level <= logLevels.indexOf(level.toUpperCase())),
         tap(({item}) => console.log(JSON.stringify(item))),
     );
-

@@ -15,8 +15,8 @@ const renderIt = () => {
     root.render(
         <ReactGraph graphId="testnet" persistent={!window.location.href.includes('localhost')}>
             <React.StrictMode>
+                <GraphExplorer/>
                 <BrowserRouter>
-                    <GraphExplorer/>
                     <Main/>
                 </BrowserRouter>
             </React.StrictMode>
