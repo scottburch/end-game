@@ -12,6 +12,7 @@ export const Header: React.FC = () => {
             <input onBlur={ev => setQuery(ev.target.value)}/>
             <button onClick={() => navigate(`/by-node-label/${query}`)}>By Node Label</button>
             <button onClick={() => navigate(`/by-node-prop/${query}`)}>By Node Prop</button>
+            <button onClick={() => navigate(`/by-node-id/${query}`)}>By Node Id</button>
         </div>
     )
 }
