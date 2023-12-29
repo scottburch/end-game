@@ -9,7 +9,6 @@ export const GraphExplorer: React.FC = () => {
     const [open, setOpen] = useState(false);
 
     const checkKeyPress = (ev: KeyboardEvent) => {
-        console.log(ev)
         ev.key === 'G' && ev.ctrlKey && setOpen(!open);
     }
 
