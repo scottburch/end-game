@@ -1,6 +1,6 @@
 import {GraphWithP2p, PeerId} from "./p2pHandlers.js";
 import WebSocket from "isomorphic-ws";
-import {filter, first, fromEvent, map, mergeMap, skipWhile, takeUntil, tap} from "rxjs";
+import {filter, first, fromEvent, interval, map, mergeMap, skipWhile, switchMap, takeUntil, tap} from "rxjs";
 import {deserializer, serializer} from "@end-game/utils/serializer";
 import {chainNext} from "@end-game/rxjs-chain";
 import {GraphId, LogLevel} from "@end-game/graph";
@@ -33,7 +33,12 @@ export const socketManager = (host: Host, peerConn: PeerConn) => {
                 hostId: host.hostId
             }
         }
-    } satisfies DialerMsg<AnnounceMsg>))
+    } satisfies DialerMsg<AnnounceMsg>));
+
+    host.graphs.forEach(graph => interval(30_000).pipe(
+        takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
+        switchMap(n => chainNext(graph.chains.peersOut, {graph: graph, msg: {cmd: 'ping', data: {count: n}}}))
+    ).subscribe());
 
     host.graphs.forEach(graph =>
         graph.chains.peersOut.pipe(
@@ -46,7 +51,7 @@ export const socketManager = (host: Host, peerConn: PeerConn) => {
             filter(msg => !isDupMsg(peerConn.dupCache, msg)),
             tap(msg => peerConn.socket.send(msg))
         ).subscribe()
-    )
+    );
 
     return fromEvent<MessageEvent>(peerConn.socket, 'message').pipe(
         takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),

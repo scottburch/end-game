@@ -19,7 +19,7 @@ export const startTestNet = (nodes: number[][], opts: {graphId?: string, basePor
         switchMap(basePort => from(nodes).pipe(
             mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers, {basePort, graphId: opts.graphId, dir: opts.dir ? opts.dir + `/node-${nodeNo}` : undefined})),
             scan((nodes, {host}, idx) => ({...nodes, [`host${idx}`]: host}), {} as Record<`host${number}`, Host>),
-            skip(nodes.length - 1),
+            skip(nodes.length - 1)
         ))
     );
 
