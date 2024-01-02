@@ -134,6 +134,8 @@ export const useGraphNode = <T extends Props>(nodeId: NodeId, opts: GraphOpts = 
             return () => {
                 sub.unsubscribe()
             };
+        } else {
+            setNode(undefined);
         }
     }, [nodeId]);
     return node;

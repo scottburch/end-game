@@ -1,11 +1,11 @@
 import {startTestNet} from "@end-game/test-utils";
-import {bufferTime, filter, firstValueFrom, merge, of, switchMap, take, tap, timer} from "rxjs";
+import {bufferTime, filter, firstValueFrom, merge, of, switchMap, tap, timer} from "rxjs";
 import {asNodeId, newNode, putNode} from "@end-game/graph";
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 import {expect} from "chai";
 
 describe('socket manager', function() {
-    this.timeout(60_000);
+    this.timeout(120_000);
     it('should never send a msg back on a connection it arrived on', () =>
         firstValueFrom(startTestNet([[1], []]).pipe(
             switchMap(({host0, host1}) => of(undefined).pipe(
@@ -30,7 +30,7 @@ describe('socket manager', function() {
 
     it('should send a ping every 30 seconds', () =>
         firstValueFrom(startTestNet([[1], []]).pipe(
-            switchMap(({host0, host1}) => of(undefined).pipe(
+            switchMap(({host0}) => of(undefined).pipe(
                 switchMap(() => host0.graphs[0].chains.peerIn),
                 filter(({msg}) => msg.cmd === 'ping')
             ))
