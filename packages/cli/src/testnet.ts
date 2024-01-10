@@ -29,4 +29,5 @@ const logger = (level: string, hosts: Host[]) =>
         mergeMap(host => host.graphs[0].chains.log),
         filter(({item}) => item.level <= logLevels.indexOf(level.toUpperCase())),
         tap(({item}) => console.log(JSON.stringify(item))),
-    );
+    )
+
