@@ -12,7 +12,7 @@ import {MentionsOptionProps} from "antd/es/mentions/index.js";
 
 export const AddPostPage: React.FC = () => {
     const graphPut = useGraphPut<Post | {name: string}>();
-    const graph = useGraphs();
+    const {netGraph} = useGraphs();
     const auth = useAuth();
 
     const [suggestions, setSuggestions] = useState<MentionsOptionProps[]>([]);
@@ -45,7 +45,7 @@ export const AddPostPage: React.FC = () => {
         }
 
         function lookupTags(text: string) {
-            nodesByProp(graph.netGraph, 'tag', 'name', `${text}*`).pipe(
+            nodesByProp(netGraph, 'tag', 'name', `${text}*`).pipe(
                 switchMap(({nodes}) => from(nodes).pipe(
                     map(node => node.props.name),
                     map(key => ({key, label: key, value: key})),
@@ -56,7 +56,7 @@ export const AddPostPage: React.FC = () => {
             ).subscribe();
         }
         function lookupMentions(text: string){
-            nodesByProp(graph.netGraph, 'user', 'nickname', `${text}*`).pipe(
+            nodesByProp(netGraph, 'user', 'nickname', `${text}*`).pipe(
                 switchMap(({nodes}) => from(nodes).pipe(
                     map(node => node.props.nickname),
                     map(key => ({key, label: key, value: key})),

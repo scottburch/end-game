@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
-import {GraphNode, NodeId, nodesByLabel, nodesByProp} from "@end-game/graph";
-import {useGraphs, useGraphNodesByProp} from "@end-game/react-graph";
+import {GraphNode, NodeId, nodesByProp} from "@end-game/graph";
+import {useGraphs} from "@end-game/react-graph";
 import {Post} from "../types/Post.js";
 import {PostList} from "./PostList.jsx";
 import {debounceTime, Subscription, tap} from "rxjs";

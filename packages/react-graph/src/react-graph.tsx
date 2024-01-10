@@ -83,7 +83,7 @@ export const useGraphNodesByLabel = <T extends Props>(label: string, opts: Range
                 sub.unsubscribe()
             };
         }
-    }, [graphs]);
+    }, [graphs, JSON.stringify(opts)]);
     return nodes;
 }
 
