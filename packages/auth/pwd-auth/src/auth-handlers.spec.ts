@@ -20,7 +20,7 @@ describe('auth handlers', function()  {
                 delay(100),
                 switchMap(() => addThingNode(graph, 1, {foo: 4})),
             ).subscribe()),
-            switchMap(({graph}) => getNode(graph, asNodeId('thing0001'), {})),
+            switchMap(({graph}) => getNode(graph, asNodeId('thing0001'), {subscribe: {props: ['foo']}})),
             map(({node}) => node.props.foo),
             takeWhile(n => n !== 4),
             toArray(),

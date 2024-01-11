@@ -1,2 +1,2 @@
 export type {KeyBundle, EncryptedKeyBundle} from './crypto.js'
-export {generateNewAccount, serializeKeys, deserializeKeys, deserializePubKey, encrypt, decrypt, sign, verify, serializePubKey} from './crypto.js'
+export {hashData, generateNewAccount, serializeKeys, deserializeKeys, deserializePubKey, encrypt, decrypt, sign, verify, serializePubKey} from './crypto.js'

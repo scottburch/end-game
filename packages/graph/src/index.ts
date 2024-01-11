@@ -1,4 +1,4 @@
-export type {Graph, GraphNode, GraphEdge, GraphOpts, NodeId, EdgeId, Props, GraphHandler, GraphId, GraphHandlerProps, RangeOpts} from './graph.js'
+export type {SubscriptionOpts, Graph, GraphNode, GraphEdge, GraphOpts, NodeId, EdgeId, Props, GraphHandler, GraphId, GraphHandlerProps, RangeOpts} from './graph.js'
 export type {Relationship} from './relationship.js'
 export {asGraphId, asNodeId, asEdgeId, IndexTypes, LogLevel, newNode, newEdge, getNode, graphOpen, putNode, nodesByLabel, nodesByProp, getEdge, getRelationships, putEdge} from './graph.js'
 export {newUid, timestampFromUid} from './uid.js'

@@ -1,4 +1,4 @@
-import {combineLatest, from, map, of, switchMap} from "rxjs";
+import {combineLatest, from, map, of, switchMap, tap} from "rxjs";
 import {bytesToHex, hexToBytes, textToBytes} from "@end-game/utils/byteUtils";
 import {default as Base64} from 'base-64'
 import {bech32} from 'bech32'
@@ -20,6 +20,11 @@ export type EncryptedKeyBundle = {
     enc: string
     salt: string
 }
+
+export const hashData = (data: Uint8Array) =>
+    from(subtle.digest('SHA-1', data)).pipe(
+        map(x => new Uint8Array(x)),
+    )
 
 const passwdToKey = (passwd: string, salt: Uint8Array) =>
     of(passwd).pipe(

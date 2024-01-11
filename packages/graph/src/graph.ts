@@ -1,4 +1,4 @@
-import {filter, map, mergeMap, Observable, of, switchMap, tap} from "rxjs";
+import {filter, map, mergeMap, Observable, of, switchMap, takeWhile, tap} from "rxjs";
 import {newUid} from "./uid.js";
 import ld from 'lodash'
 
@@ -55,12 +55,16 @@ export type RangeOpts = {
     limit?: number
 }
 
+export type SubscriptionOpts = {
+    props: string[]
+}
+
 export type Graph = {
     graphId: GraphId
     chains: {
         log: RxjsChain<{ graph: Graph, item: GraphLogItem<Object> }>
         putNode: RxjsChain<{ graph: Graph, node: GraphNode }>
-        getNode: RxjsChain<{ graph: Graph, nodeId: NodeId, node: GraphNode, opts: { local?: boolean, since?: string } }>
+        getNode: RxjsChain<{ graph: Graph, nodeId: NodeId, node: GraphNode, opts: { local?: boolean, since?: string, subscribe?: SubscriptionOpts}}>
         putEdge: RxjsChain<{ graph: Graph, edge: GraphEdge }>
         getEdge: RxjsChain<{ graph: Graph, edgeId: EdgeId, edge: GraphEdge, opts: { local?: boolean} }>
         reloadGraph: RxjsChain<{}>
@@ -205,8 +209,7 @@ export const getNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts: Gra
     new Observable<GraphHandlerPropsWithNodeType<'getNode', T>>(subscriber => {
         let lastProps: string;
 
-// TODO: This is here to stop duplicate notifications for updated nodes due to the auth module getting a node again
-        // performance may be a concern here
+        // TODO: This is here to stop duplicate notifications for updated nodes due to the auth module getting a node again
         const checkCache = (props: any) => {
             const str = JSON.stringify(props);
             const result = str !== lastProps;
@@ -218,16 +221,20 @@ export const getNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts: Gra
         const putSub = graph.chains.putNode.pipe(
             filter(({node: n}) => n.nodeId === nodeId),
             filter(({node}) => checkCache(node.props)),
-            tap(({node}) => subscriber.next({graph, nodeId, node: node as GraphNode<T>, opts}))
-        ).subscribe();
+            tap(({node}) => subscriber.next({graph, nodeId, node: node as GraphNode<T>, opts})),
+            takeWhile(() => !!opts.subscribe)
+        ).subscribe({
+            complete: () => subscriber.complete()
+        });
 
         const getSub = graph.chains.getNode.pipe(
             filter(({node}) => node === undefined || node.nodeId === nodeId),
             filter(({node}) => checkCache(node.props)),
             filter(({node}) => opts.since ? node.state > opts.since : true),
             map(({node}) => ({node: node as GraphNode<T>})),
-            tap(({node}) => subscriber.next({graph, nodeId, node, opts}))
-        ).subscribe();
+            tap(({node}) => subscriber.next({graph, nodeId, node, opts})),
+            takeWhile(() => !!opts.subscribe)
+        ).subscribe(({node}) => node.nodeId && !opts.subscribe && subscriber.complete());
 
         const reloadSub = graph.chains.reloadGraph.pipe(
             switchMap(() => chainNext(graph.chains.getNode, {graph, nodeId, node: {} as GraphNode<T>, opts}))
@@ -236,7 +243,8 @@ export const getNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts: Gra
         chainNext(graph.chains.getNode, {graph, nodeId, node: {} as GraphNode<T>, opts}).subscribe();
 
         return () => {
-            putSub.unsubscribe();
+
+            putSub?.unsubscribe();
             getSub.unsubscribe();
             reloadSub.unsubscribe();
         }

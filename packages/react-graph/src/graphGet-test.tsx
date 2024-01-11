@@ -15,7 +15,7 @@ renderApp(asGraphId('test-graph'),  () => {
     const login = useGraphLogin();
     const count = useRef<number>(0);
     const [id, setId] = useState(asNodeId(''));
-    const node = useGraphNode(id)
+    const node = useGraphNode(id, {subscribe: {props: ['']}})
 
     useEffect(() => {
         accountCreated || newAccount('scott', 'pass').pipe(

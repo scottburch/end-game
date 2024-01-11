@@ -4,23 +4,32 @@ import {
     deserializePubKey,
     encrypt,
     generateNewAccount,
-    getId,
+    getId, hashData,
     serializeKeys,
     serializePubKey,
     sign,
     subtle,
     verify
 } from "./crypto.js";
-import {combineLatest, firstValueFrom, map, switchMap, tap} from "rxjs";
+import {combineLatest, firstValueFrom, map, of, switchMap, tap} from "rxjs";
 import {expect} from 'chai';
-import {bytesToText, textToBytes} from "@end-game/utils/byteUtils";
+import {bytesToHex, bytesToText, textToBytes} from "@end-game/utils/byteUtils";
 
 
 describe('crypto', function () {
     this.timeout(20_000);
 
+    describe('hashData()', () => {
+       it('should hash a piece of data', () =>
+        firstValueFrom(of(new TextEncoder().encode('somestring'.repeat(50))).pipe(
+            switchMap(hashData),
+            map(bytesToHex),
+            tap(hex => expect(hex).to.equal('042efe4df8aa2c84704844ce888ea27d3d5b1623'))
 
-    describe('new tests', () => {
+        ))
+       )
+    });
+
         describe('generateNewAccounts()', () => {
             it('should generate new keys and salt for each call', () =>
                 firstValueFrom(combineLatest([
@@ -131,6 +140,5 @@ describe('crypto', function () {
                 ))
             )
         })
-    });
 });
 

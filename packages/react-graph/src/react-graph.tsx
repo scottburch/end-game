@@ -29,7 +29,7 @@ import {levelStoreHandlers} from "@end-game/level-store";
 import type {GraphWithP2p} from '@end-game/p2p'
 import {asPeerId, dialPeer, newHost, p2pHandlers} from "@end-game/p2p";
 import type {DialerOpts} from "@end-game/p2p";
-import type {GraphHandlerProps} from "@end-game/graph";
+import type {GraphHandlerProps, SubscriptionOpts} from "@end-game/graph";
 
 
 type Graphs = {netGraph: Graph, memGraph: Graph, localGraph: Graph};
@@ -120,14 +120,14 @@ export const useGraphRelationships = (nodeId: NodeId, rel: string, opts: { rever
 
 }
 
-export const useGraphNode = <T extends Props>(nodeId: NodeId, opts: GraphOpts = {}) => {
+export const useGraphNode = <T extends Props>(nodeId: NodeId, opts: GraphOpts & {subscribe?: SubscriptionOpts} = {}) => {
     const [node, setNode] = useState<GraphNode<T>>();
     const graphs = useGraphs();
 
     useEffect(() => {
         !graphs && console.error('useGraphGet() called outside of a graph context');
         if (graphs && nodeId) {
-            const sub = getNode(whichGraph(graphs, opts.graphName), nodeId, {}).pipe(
+            const sub = getNode(whichGraph(graphs, opts.graphName), nodeId, {subscribe: opts.subscribe}).pipe(
                 filter(({node}) => !!node?.nodeId),
                 tap(({node}) => setNode(node as GraphNode<T>))
             ).subscribe();
