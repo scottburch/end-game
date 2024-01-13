@@ -6,6 +6,7 @@ import type {Relationship} from "./relationship.js";
 import type {RxjsChain} from "@end-game/rxjs-chain";
 import type {RxjsChainFn} from '@end-game/rxjs-chain';
 import {chainNext, newRxjsChain} from "@end-game/rxjs-chain";
+import type {Seconds} from "@end-game/utils/types";
 
 
 export type Props = Record<string, any>;
@@ -55,6 +56,10 @@ export type RangeOpts = {
     limit?: number
 }
 
+export type GraphSettings = {
+    subscriptionTimeout: Seconds
+}
+
 export type Graph = {
     graphId: GraphId
     chains: {
@@ -81,7 +86,8 @@ export type Graph = {
             reverse: boolean
         }>
     }
-    logLevel: LogLevel
+    logLevel: LogLevel,
+    settings: GraphSettings
 }
 
 
@@ -123,7 +129,12 @@ export const graphOpen = (opts: GraphOpts) => {
                 name: 'reloadGraph'
             })
         },
-        logLevel: opts.logLevel || LogLevel.INFO
+        logLevel: opts.logLevel || LogLevel.INFO,
+        settings: {
+            subscriptionTimeout: 300,
+            ...opts.settings
+        }
+
     } satisfies Graph as Graph;
 
     return of(graph);

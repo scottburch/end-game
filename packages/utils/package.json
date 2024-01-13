@@ -10,7 +10,8 @@
     "./testCodeCompiler": "./lib/testCodeCompiler/testCodeCompiler.js",
     "./dirs": "./lib/dirs.js",
     "./byteUtils": "./lib/byteUtils.js",
-    "./serializer": "./lib/serializer.js"
+    "./serializer": "./lib/serializer.js",
+    "./types": "./lib/types.js"
   },
   "dependencies": {
     "@types/node": "^20.8.7",
