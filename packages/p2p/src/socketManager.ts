@@ -27,6 +27,7 @@ export const socketManager = (host: Host, peerConn: PeerConn) => {
 
     peerConn.socket.send(serializer({
         graphId: '',
+        peerId: host.hostId,
         msg: {
             cmd: 'announce',
             data: {
@@ -44,24 +45,24 @@ export const socketManager = (host: Host, peerConn: PeerConn) => {
         graph.chains.peersOut.pipe(
             skipWhile(() => !connOk),
             takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
-            map(({msg}) => serializer({
+            filter(({msg}) => !isDupMsg(peerConn.dupCache, {graphId: graph.graphId, msg})),
+            tap(({msg}) => peerConn.socket.send(serializer({
                 graphId: graph.graphId,
-                msg
-            } satisfies DialerMsg)),
-            filter(msg => !isDupMsg(peerConn.dupCache, msg)),
-            tap(msg => peerConn.socket.send(msg))
+                msg,
+                peerId: host.hostId
+            } satisfies DialerMsg)))
         ).subscribe()
     );
 
     return fromEvent<MessageEvent>(peerConn.socket, 'message').pipe(
         takeUntil(fromEvent(peerConn.socket, 'close').pipe(first())),
         map(ev => ev.data),
-        filter(msg => !isDupMsg(peerConn.dupCache, msg)),
         map(msg => deserializer<DialerMsg>(msg)),
+        filter(({graphId, msg}) => !isDupMsg(peerConn.dupCache, {graphId: graphId, msg: msg})),
         tap(msg => msg.msg.cmd === 'announce' && checkDupConn(msg.msg as AnnounceMsg)),
         skipWhile(() => !connOk),
         filter(msg => !!graphTable[msg.graphId]),
-        mergeMap(msg => chainNext(graphTable[msg.graphId].chains.peerIn, {graph: graphTable[msg.graphId], msg: msg.msg})),
+        mergeMap(msg => chainNext(graphTable[msg.graphId].chains.peerIn, {graph: graphTable[msg.graphId], msg: msg.msg, peerId: host.hostId})),
     );
 
     function checkDupConn(msg: AnnounceMsg) {

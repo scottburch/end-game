@@ -1,4 +1,7 @@
 import {delay, of, tap} from "rxjs";
+import {P2pMsg} from "./dialer.js";
+import {GraphId} from "@end-game/graph";
+import {serializer} from "@end-game/utils/serializer";
 
 export type DupMsgCache = {
     timeout: number
@@ -11,12 +14,13 @@ export const newDupMsgCache = (timeout: number = 5000) => ({
     cache: new Set<string>()
 } satisfies DupMsgCache as DupMsgCache);
 
-export const isDupMsg = (dupCache: DupMsgCache, msg: string) => {
-    const exists = dupCache.cache.has(msg);
-    exists || dupCache.cache.add(msg);
+export const isDupMsg = (dupCache: DupMsgCache, msg: {graphId: GraphId, msg: P2pMsg}) => {
+    const strMsg = serializer(msg)
+    const exists = dupCache.cache.has(strMsg);
+    exists || dupCache.cache.add(strMsg);
     exists || of(msg).pipe(
         delay(dupCache.timeout),
-        tap(() => dupCache.cache.delete(msg))
+        tap(() => dupCache.cache.delete(strMsg))
     ).subscribe()
     return exists;
 }

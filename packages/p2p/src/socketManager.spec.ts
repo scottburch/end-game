@@ -21,7 +21,6 @@ describe('socket manager', function() {
                 )),
                 filter(({msg}) => (msg.data as any).label !== 'auth'),
                 filter(({msg}) => msg.cmd === 'putNode'),
-
                 bufferTime(5000),
                 tap(arr => expect(arr.length).to.equal(1))
             ))

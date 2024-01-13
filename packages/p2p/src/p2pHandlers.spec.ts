@@ -22,7 +22,7 @@ import {
     tap, timeout,
     timer, toArray
 } from "rxjs";
-import {GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
+import {asPeerId, GraphWithP2p, p2pHandlers} from "./p2pHandlers.js";
 import {chainNext} from "@end-game/rxjs-chain";
 import {expect} from "chai";
 import {graphAuth, graphNewAuth} from "@end-game/pwd-auth";
@@ -35,7 +35,7 @@ describe('p2p handlers', () => {
                 switchMap(graph => p2pHandlers(graph)),
                 map(graph => graph as GraphWithP2p),
                 tap(graph => timer(1).pipe(
-                    switchMap(() => chainNext(graph.chains.peerIn, {graph, msg: {cmd: 'peer-in', data: {}}})),
+                    switchMap(() => chainNext(graph.chains.peerIn, {graph, msg: {cmd: 'peer-in', data: {}}, peerId: asPeerId('remote-peer')})),
                     switchMap(() => chainNext(graph.chains.peersOut, {graph, msg: {cmd: 'peers-out', data: {}}})),
                 ).subscribe()),
                 switchMap(graph => combineLatest([
