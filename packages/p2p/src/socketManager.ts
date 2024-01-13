@@ -62,7 +62,7 @@ export const socketManager = (host: Host, peerConn: PeerConn) => {
         tap(msg => msg.msg.cmd === 'announce' && checkDupConn(msg.msg as AnnounceMsg)),
         skipWhile(() => !connOk),
         filter(msg => !!graphTable[msg.graphId]),
-        mergeMap(msg => chainNext(graphTable[msg.graphId].chains.peerIn, {graph: graphTable[msg.graphId], msg: msg.msg, peerId: host.hostId})),
+        mergeMap(msg => chainNext(graphTable[msg.graphId].chains.peerIn, {graph: graphTable[msg.graphId], msg: msg.msg, peerId: msg.peerId})),
     );
 
     function checkDupConn(msg: AnnounceMsg) {
