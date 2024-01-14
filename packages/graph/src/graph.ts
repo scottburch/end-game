@@ -250,6 +250,7 @@ export const getNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts: Gra
             putSub.unsubscribe();
             getSub.unsubscribe();
             reloadSub.unsubscribe();
+            subscriber.complete();
         }
     });
 

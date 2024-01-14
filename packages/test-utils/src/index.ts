@@ -14,12 +14,12 @@ export const getAGraph = (opts: GraphOpts = {graphId: asGraphId(newUid())}) => g
 );
 
 
-export const startTestNet = (nodes: number[][], opts: {graphId?: string, basePort?: number, dir?: string} = {}) =>
+export const startTestNet = (hosts: number[][], opts: {graphId?: string, basePort?: number, dir?: string} = {}) =>
     findBasePort(opts.basePort || 11110).pipe(
-        switchMap(basePort => from(nodes).pipe(
-            mergeMap((peers, nodeNo) => startTestNode(nodeNo, peers, {basePort, graphId: opts.graphId, dir: opts.dir ? opts.dir + `/node-${nodeNo}` : undefined})),
-            scan((nodes, {host}, idx) => ({...nodes, [`host${idx}`]: host}), {} as Record<`host${number}`, Host>),
-            skip(nodes.length - 1)
+        switchMap(basePort => from(hosts).pipe(
+            mergeMap((peers, hostNo) => startTestNode(hostNo, peers, {basePort, graphId: opts.graphId, dir: opts.dir ? opts.dir + `/node-${hostNo}` : undefined})),
+            scan((hosts, {host}, idx) => ({...hosts, [`host${idx}`]: host}), {} as Record<`host${number}`, Host>),
+            skip(hosts.length - 1)
         ))
     );
 

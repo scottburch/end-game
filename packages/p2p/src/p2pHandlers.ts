@@ -10,7 +10,7 @@ import {
     putNode
 } from "@end-game/graph";
 
-import {catchError, from, map, of, switchMap, tap} from "rxjs";
+import {catchError, from, map, of, Subject, switchMap, takeUntil, tap} from "rxjs";
 import type {RxjsChain} from "@end-game/rxjs-chain";
 import {appendHandler, chainNext, newRxjsChain, RxjsChainFn} from "@end-game/rxjs-chain";
 
@@ -178,14 +178,40 @@ const doPutEdgeIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) =>
         )
     );
 
-const doGetNodeIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) =>
-    of(msg as P2pMsg<'getNode', NodeId>).pipe(
-        switchMap(msg => getNode(graph, msg.data, {})),
-        tap(({node}) => node?.nodeId && chainNext((graph as GraphWithP2p).chains.peersOut, {
-            graph,
-            msg: {cmd: 'putNode', data: node}
-        }).subscribe())
-    );
+
+const subscriptionTimeouts = new Map<string, {timeout: NodeJS.Timeout, timeoutSubj: Subject<number>}>() ;
+
+const doGetNodeIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) => {
+
+    const subscriptionTimeoutsKey = `${graph.graphId}${msg.data}${peerId}`;
+    let {timeout, timeoutSubj} = subscriptionTimeouts.get(subscriptionTimeoutsKey) || {timeout: undefined, timeoutSubj: undefined};
+
+    const alreadySetup = !!timeoutSubj
+
+    timeout && clearTimeout(timeout);
+    timeoutSubj = !!timeoutSubj ? timeoutSubj :  new Subject<number>();
+
+
+    timeout = setTimeout(() => {
+        timeoutSubj?.next(1);
+        subscriptionTimeouts.delete(subscriptionTimeoutsKey);
+    }, graph.settings.subscriptionTimeout * 1000)
+
+    subscriptionTimeouts.set(subscriptionTimeoutsKey, {timeout, timeoutSubj});
+
+    return alreadySetup ? of(undefined) : (
+        of(msg as P2pMsg<'getNode', NodeId>).pipe(
+            switchMap(msg => getNode(graph, msg.data, {})),
+            takeUntil(timeoutSubj),
+            tap(({node}) => graph.settings.subscriptionTimeout < 100 && console.log("***************", node.props)),
+            tap(({node}) => node?.nodeId && chainNext((graph as GraphWithP2p).chains.peersOut, {
+                graph,
+                msg: {cmd: 'putNode', data: node}
+            }).subscribe()),
+            map(() => undefined)
+        )
+    )
+};
 
 const doGetRelationshipsIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) =>
     of(msg as P2pMsg<'getRelationships', { nodeId: NodeId, rel: string, reverse: boolean, relationships: [] }>).pipe(
