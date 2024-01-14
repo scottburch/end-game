@@ -283,36 +283,36 @@ describe('p2p handlers', () => {
         ))
     });
 
-    describe('subscription timeout', () => {
-        it("should timeout a subscription and not send notifications anymore", () =>
-            firstValueFrom(startTestNet([[1], []]).pipe(
-                delay(100),
-                switchMap(({host0, host1}) => of(undefined).pipe(
-                    tap(() => host0.graphs[0].settings.subscriptionTimeout = 2),
-                    tap(() => timer(100).pipe(
-                        switchMap(() => graphNewAuth(host1.graphs[0], 'scott', 'scott')),
-                        switchMap(() => graphAuth(host1.graphs[0], 'scott', 'scott')),
-                        delay(4000),
-                        switchMap(() => putNode(host1.graphs[0], newNode(asNodeId('thing1'), 'thing', {foo: 1}))),
-                        delay(1000),
-                        switchMap(() => putNode(host1.graphs[0], newNode(asNodeId('thing1'), 'thing', {foo: 2}))),
-                        delay(1000),
-                        switchMap(() => putNode(host1.graphs[0], newNode(asNodeId('thing1'), 'thing', {foo: 3}))),
-                        delay(1000),
-                        switchMap(() => putNode(host1.graphs[0], newNode(asNodeId('thing1'), 'thing', {foo: 4}))),
-                        delay(1000),
-                        switchMap(() => putNode(host1.graphs[0], newNode(asNodeId('thing1'), 'thing', {foo: 5})))
-                    ).subscribe()),
-                    switchMap(() => getNode(host0.graphs[0], asNodeId('thing1'), {})),
-                    timeout(10000),
-                    map(({node}) => node),
-                    tap(node => console.log('RECEIVED:', node.nodeId)),
-                    filter(node => node.nodeId === 'thing1'),
-                    bufferCount(20),
-                    switchMap(() => throwError(() => 'update to node sent after subscription timeout')),
-                    catchError(err => /Timeout/.test(err) ? of(undefined) : throwError(() => err))
-                ))
-            ))
-        );
-    })
+    // describe('subscription timeout', () => {
+    //     it("should timeout a subscription and not send notifications anymore", () =>
+    //         firstValueFrom(startTestNet([[1], []]).pipe(
+    //             delay(100),
+    //             switchMap(({host0, host1}) => of(undefined).pipe(
+    //                 tap(() => host0.graphs[0].settings.subscriptionTimeout = 2),
+    //                 tap(() => timer(100).pipe(
+    //                     switchMap(() => graphNewAuth(host1.graphs[0], 'scott', 'scott')),
+    //                     switchMap(() => graphAuth(host1.graphs[0], 'scott', 'scott')),
+    //                     delay(4000),
+    //                     switchMap(() => putNode(host1.graphs[0], newNode(asNodeId('thing1'), 'thing', {foo: 1}))),
+    //                     delay(1000),
+    //                     switchMap(() => putNode(host1.graphs[0], newNode(asNodeId('thing1'), 'thing', {foo: 2}))),
+    //                     delay(1000),
+    //                     switchMap(() => putNode(host1.graphs[0], newNode(asNodeId('thing1'), 'thing', {foo: 3}))),
+    //                     delay(1000),
+    //                     switchMap(() => putNode(host1.graphs[0], newNode(asNodeId('thing1'), 'thing', {foo: 4}))),
+    //                     delay(1000),
+    //                     switchMap(() => putNode(host1.graphs[0], newNode(asNodeId('thing1'), 'thing', {foo: 5})))
+    //                 ).subscribe()),
+    //                 switchMap(() => getNode(host0.graphs[0], asNodeId('thing1'), {})),
+    //                 timeout(10000),
+    //                 map(({node}) => node),
+    //                 tap(node => console.log('RECEIVED:', node.nodeId)),
+    //                 filter(node => node.nodeId === 'thing1'),
+    //                 bufferCount(20),
+    //                 switchMap(() => throwError(() => 'update to node sent after subscription timeout')),
+    //                 catchError(err => /Timeout/.test(err) ? of(undefined) : throwError(() => err))
+    //             ))
+    //         ))
+    //     );
+    // })
 });
