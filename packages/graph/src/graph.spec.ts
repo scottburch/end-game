@@ -15,7 +15,6 @@ import {
     toArray
 } from "rxjs";
 import {
-    getNode,
     getEdge,
     getRelationships,
     graphOpen,
@@ -23,6 +22,7 @@ import {
     putEdge,
     nodesByProp, newNode, newEdge, nodesByLabel, asNodeId, asEdgeId, asGraphId
 } from "./graph.js";
+import {getNode} from './api.js'
 import {expect} from "chai";
 import {addThingNode, getAGraph} from "@end-game/test-utils";
 import {newUid} from "./uid.js";
@@ -31,6 +31,7 @@ import {p2pHandlers} from "@end-game/p2p";
 import {authHandlers, graphAuth, graphNewAuth} from "@end-game/pwd-auth";
 
 describe('graph', () => {
+
     it('should open a graph', () =>
         firstValueFrom(graphOpen({graphId: asGraphId(newUid())}).pipe(
             tap(graph => expect(graph).not.to.be.undefined)

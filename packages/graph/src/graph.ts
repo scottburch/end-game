@@ -208,11 +208,11 @@ export const getEdge = <T extends Props>(graph: Graph, edgeId: EdgeId, opts: Gra
         }
     });
 
-type GraphHandlerPropsWithNodeType<P extends keyof Graph['chains'], T extends Props> = Omit<GraphHandlerProps<P>, 'node'> & {node: GraphNode<T>}
+export type GraphHandlerPropsWithNodeType<P extends keyof Graph['chains'], T extends Props> = Omit<GraphHandlerProps<P>, 'node'> & {node: GraphNode<T>}
 
 
 
-export const getNode = <T extends Props>(graph: Graph, nodeId: NodeId, opts: GraphHandlerProps<'getNode'>['opts']) =>
+export const getNodeInternal = <T extends Props>(graph: Graph, nodeId: NodeId, opts: GraphHandlerProps<'getNode'>['opts']) =>
     new Observable<GraphHandlerPropsWithNodeType<'getNode', T>>(subscriber => {
         let lastProps: string;
 

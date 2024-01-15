@@ -1,7 +1,6 @@
 import type {EdgeId, Graph, GraphEdge, GraphNode, NodeId, RangeOpts} from "@end-game/graph";
 import {
     getEdge,
-    getNode,
     getRelationships,
     LogLevel,
     nodesByLabel,
@@ -16,6 +15,7 @@ import {appendHandler, chainNext, newRxjsChain, RxjsChainFn} from "@end-game/rxj
 
 import ld from "lodash";
 import {P2pMsg} from "./dialer.js";
+import {getNodeInternal} from "@end-game/graph/internal";
 
 export type PeerId = string & { type: 'peerId' };
 
@@ -217,7 +217,7 @@ const doGetNodeIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) => {
         msg,
         subscriptionTimeoutsKey: `${graph.graphId}${msg.data}${peerId}`,
         setupFn: (graph, msg, timeoutSubj) =>  of(msg as P2pMsg<'getNode', NodeId>).pipe(
-            switchMap(msg => getNode(graph, msg.data, {})),
+            switchMap(msg => getNodeInternal(graph, msg.data, {})),
             takeUntil(timeoutSubj),
             tap(({node}) => node?.nodeId && chainNext((graph as GraphWithP2p).chains.peersOut, {
                 graph,

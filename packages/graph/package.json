@@ -8,7 +8,9 @@
   "exports": {
     ".": {
       "default": "./lib/index.js"
-    }
+    },
+    "./internal": "./lib/internal.js"
+
   },
   "dependencies": {
     "@end-game/rxjs-chain": "^1.1.14",

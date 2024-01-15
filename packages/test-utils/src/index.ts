@@ -1,6 +1,6 @@
 import type {Graph, GraphOpts, Props} from "@end-game/graph";
 import {asGraphId, asNodeId, graphOpen, LogLevel, newNode, newUid, putNode} from "@end-game/graph";
-import {from, map, mergeMap, Observable, of, scan, skip, switchMap, timer} from "rxjs";
+import {from, map, mergeMap, Observable, of, scan, skip, switchMap, tap, timer} from "rxjs";
 import {levelStoreHandlers} from "@end-game/level-store";
 import {authHandlers} from "@end-game/pwd-auth";
 import type {Host} from '@end-game/p2p'
@@ -10,7 +10,8 @@ import ld from 'lodash'
 
 
 export const getAGraph = (opts: GraphOpts = {graphId: asGraphId(newUid())}) => graphOpen(opts).pipe(
-    switchMap(graph => levelStoreHandlers(graph))
+    switchMap(graph => levelStoreHandlers(graph)),
+    tap(graph => graph.settings.subscriptionTimeout = 60)
 );
 
 

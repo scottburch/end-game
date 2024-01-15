@@ -1,7 +1,7 @@
 import {bufferCount, firstValueFrom, map, switchMap, tap} from "rxjs";
 import {
     getEdge,
-    getNode,
+    getNodeInternal,
     getRelationships,
     graphOpen,
     asNodeId,
@@ -16,7 +16,7 @@ import {expect} from "chai";
 describe('reloadGraph chain', () => {
     it('should cause getNode to fire again', () =>
         firstValueFrom(graphOpen({graphId: asGraphId('my-graph')}).pipe(
-            tap(graph => setTimeout(() => getNode(graph, asNodeId('my-node') , {}).subscribe())),
+            tap(graph => setTimeout(() => getNodeInternal(graph, asNodeId('my-node') , {}).subscribe())),
             tap(graph => setTimeout(() => chainNext(graph.chains.reloadGraph, '').subscribe())),
             switchMap(graph => graph.chains.getNode),
             map(({nodeId}) => nodeId),

@@ -1,6 +1,6 @@
 import {catchError, combineLatest, filter, first, map, of, switchMap, tap, timeout} from "rxjs";
 import type {Graph, GraphEdge, GraphNode, NodeId, Props} from '@end-game/graph'
-import {getNode, LogLevel, nodesByProp} from "@end-game/graph";
+import {LogLevel, nodesByProp} from "@end-game/graph";
 import type {EncryptedKeyBundle, KeyBundle} from '@end-game/crypto'
 import {deserializePubKey, sign, verify} from '@end-game/crypto'
 import {serializer} from "@end-game/utils/serializer";
@@ -8,6 +8,7 @@ import type {RxjsChain} from "@end-game/rxjs-chain";
 import {chainNext} from "@end-game/rxjs-chain";
 import {unauthorizedUserError} from "./auth-errors.js";
 import {textToBytes} from "@end-game/utils/byteUtils";
+import {getNodeInternal} from "@end-game/graph/internal";
 
 
 export type UserPass = {
@@ -72,7 +73,7 @@ export const isUserNodeOwner = (graph: GraphWithAuth, node: NodeWithAuth<any>) =
     return node.sig ? checkNodeOwner(TIMEOUT) : checkNodeOwner(100)
 
     function checkNodeOwner(maxWait: number) {
-        return getNode(graph, node.nodeId, {}).pipe(
+        return getNodeInternal(graph, node.nodeId, {}).pipe(
             filter(({node}) => !!node),
             switchMap(({node}) => getNodeSignData(node).pipe(
                 switchMap(bytes => verify(bytes, (node as NodeWithAuth).sig, graph.user?.auth.pubKey as CryptoKey))
@@ -97,7 +98,7 @@ export const getEdgeSignData = (edge: GraphEdge<any>) =>
 
 
 const getNodeOnce = (graph: Graph, nodeId: NodeId) =>
-    getNode(graph, nodeId, {}).pipe(
+    getNodeInternal(graph, nodeId, {}).pipe(
         tap(x => x),
         filter(({node}) => !!node?.nodeId),
         first(),
@@ -105,10 +106,10 @@ const getNodeOnce = (graph: Graph, nodeId: NodeId) =>
     );
 
 export const graphGetOwnerNode = (graph: Graph, nodeId: NodeId) =>
-    getNode(graph, nodeId, {}).pipe(
+    getNodeInternal(graph, nodeId, {}).pipe(
         filter(({node}) => !!node?.nodeId),
         first(),
-        switchMap(({node}) => getNode(graph, (node as NodeWithAuth).owner, {}).pipe(
+        switchMap(({node}) => getNodeInternal(graph, (node as NodeWithAuth).owner, {}).pipe(
             filter(({node}) => !!node?.nodeId)
         )),
         timeout({first: TIMEOUT * 1.2, with: () => of({graph, nodeId: '', node: {} as AuthNode})}),

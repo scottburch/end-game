@@ -1,3 +1,11 @@
 import {webpackBase} from "../webpack.config.base.mjs";
 
-export default webpackBase(import.meta.url)
+const base = webpackBase(import.meta.url);
+
+export default {
+    ...base,
+    entry: {
+        ...base.entry,
+        "internal": './src/internal.ts'
+    }
+}

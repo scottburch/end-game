@@ -41,6 +41,7 @@ export const socketManager = (host: Host, peerConn: PeerConn) => {
         switchMap(n => chainNext(graph.chains.peersOut, {graph: graph, msg: {cmd: 'ping', data: {count: n}}}))
     ).subscribe());
 
+    // Listen and broadcast messages from peersOut
     host.graphs.forEach(graph =>
         graph.chains.peersOut.pipe(
             skipWhile(() => !connOk),
