@@ -1,6 +1,6 @@
 {
   "name": "@end-game/graph",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "license": "MIT",
   "type": "module",
   "private": false,
@@ -10,7 +10,6 @@
       "default": "./lib/index.js"
     },
     "./internal": "./lib/internal.js"
-
   },
   "dependencies": {
     "@end-game/rxjs-chain": "^1.1.14",
