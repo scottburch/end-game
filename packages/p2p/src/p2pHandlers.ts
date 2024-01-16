@@ -141,7 +141,7 @@ const peerInHandler: GraphP2pHandler<'peerIn'> = ({graph, msg, peerId}) =>
         tap(() => msg.cmd === 'getNode' && doGetNodeIn(graph, msg, peerId).subscribe()),
         tap(() => msg.cmd === 'getRelationships' && doGetRelationshipsIn(graph, msg, peerId).subscribe()),
         tap(() => msg.cmd === 'getEdge' && doGetEdgeIn(graph, msg, peerId).subscribe()),
-        tap(() => msg.cmd === 'nodesByLabel' && doGetNodesByLabelIn(graph, msg).subscribe()),
+        tap(() => msg.cmd === 'nodesByLabel' && doGetNodesByLabelIn(graph, msg, peerId).subscribe()),
         tap(() => msg.cmd === 'nodesByProp' && doGetNodesByPropIn(graph, msg, peerId).subscribe())
     )
 
@@ -181,17 +181,18 @@ const doPutEdgeIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) =>
 
 
 type RegisterSubscriptionProps = {
-    graph: Graph
+    graph: GraphWithSubscriptionTimeouts
     peerId: PeerId
     msg: P2pMsg
     subscriptionTimeoutsKey: string
     setupFn: (graph: Graph, msg: P2pMsg, timeoutSubject: Subject<number>) => Observable<undefined>
 };
 
-const subscriptionTimeouts = new Map<string, {timeout: NodeJS.Timeout, timeoutSubj: Subject<number>}>();
+type GraphWithSubscriptionTimeouts = Graph & {subscriptionTimeouts: Map<string, {timeout: NodeJS.Timeout, timeoutSubj: Subject<number>}>};
 
-const registerSubscription = ({graph, peerId, msg, subscriptionTimeoutsKey, setupFn}: RegisterSubscriptionProps) => {
-    let {timeout, timeoutSubj} = subscriptionTimeouts.get(subscriptionTimeoutsKey) || {timeout: undefined, timeoutSubj: undefined};
+const registerSubscription = ({graph, msg, subscriptionTimeoutsKey, setupFn}: RegisterSubscriptionProps) => {
+    graph.subscriptionTimeouts = graph.subscriptionTimeouts ||  new Map();
+    let {timeout, timeoutSubj} = graph.subscriptionTimeouts.get(subscriptionTimeoutsKey) || {timeout: undefined, timeoutSubj: undefined};
 
     const alreadySetup = !!timeoutSubj
 
@@ -201,18 +202,18 @@ const registerSubscription = ({graph, peerId, msg, subscriptionTimeoutsKey, setu
 
     timeout = setTimeout(() => {
         timeoutSubj?.next(1);
-        subscriptionTimeouts.delete(subscriptionTimeoutsKey);
+        graph.subscriptionTimeouts.delete(subscriptionTimeoutsKey);
     }, graph.settings.subscriptionTimeout * 1000)
 
-    subscriptionTimeouts.set(subscriptionTimeoutsKey, {timeout, timeoutSubj});
+    graph.subscriptionTimeouts.set(subscriptionTimeoutsKey, {timeout, timeoutSubj});
 
     return alreadySetup ? of(undefined) : setupFn(graph, msg, timeoutSubj);
 }
 
 
-const doGetNodeIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) => {
-    return registerSubscription({
-        graph,
+const doGetNodeIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) =>
+    registerSubscription({
+        graph: graph as GraphWithSubscriptionTimeouts,
         peerId,
         msg,
         subscriptionTimeoutsKey: `${graph.graphId}${msg.data}${peerId}`,
@@ -225,8 +226,8 @@ const doGetNodeIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) => {
             }).subscribe()),
             map(() => undefined)
         )
-    })
-};
+    });
+
 
 const doGetRelationshipsIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) =>
     of(msg as P2pMsg<'getRelationships', { nodeId: NodeId, rel: string, reverse: boolean, relationships: [] }>).pipe(
@@ -245,38 +246,55 @@ const doGetRelationshipsIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) =>
         ))
     );
 
-const doGetNodesByLabelIn = (graph: Graph, msg: P2pMsg) =>
-    of(msg as P2pMsg<'nodesByLabel', { label: string, opts: RangeOpts }>).pipe(
-        switchMap(msg => nodesByLabel(graph, msg.data.label, msg.data.opts)),
-        switchMap(({nodes}) => from(nodes)),
-        switchMap(node => chainNext((graph as GraphWithP2p).chains.peersOut, {
-            graph,
-            msg: {cmd: 'putNode', data: node}
-        })),
-    );
+const doGetNodesByLabelIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) =>
+    registerSubscription({
+        graph: graph as GraphWithSubscriptionTimeouts,
+        peerId,
+        msg,
+        subscriptionTimeoutsKey: `${graph.graphId}${msg.data}${peerId}`,
+        setupFn: (graph, msg) =>  of(msg as P2pMsg<'nodesByLabel', { label: string, opts: RangeOpts }>).pipe(
+            switchMap(msg => nodesByLabel(graph, msg.data.label, msg.data.opts)),
+            switchMap(({nodes}) => from(nodes)),
+            switchMap(node => chainNext((graph as GraphWithP2p).chains.peersOut, {
+                graph,
+                msg: {cmd: 'putNode', data: node}
+            })),
+            map(() => undefined)
+        )
+    });
+
 
 const doGetNodesByPropIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) =>
-    of(msg as P2pMsg<'nodesByProp', { label: string, key: string, value: string }>).pipe(
-        switchMap(msg => nodesByProp(graph, msg.data.label, msg.data.key, msg.data.value)),
-        switchMap(({nodes}) => from(nodes)),
-        switchMap(node => chainNext((graph as GraphWithP2p).chains.peersOut, {
-            graph,
-            msg: {cmd: 'putNode', data: node}
-        })),
-    )
+    registerSubscription({
+        graph: graph as GraphWithSubscriptionTimeouts,
+        peerId,
+        msg,
+        subscriptionTimeoutsKey: `${graph.graphId}${msg.data}${peerId}`,
+        setupFn: (graph, msg) =>  of(msg as P2pMsg<'nodesByProp', { label: string, key: string, value: string }>).pipe(
+            switchMap(msg => nodesByProp(graph, msg.data.label, msg.data.key, msg.data.value)),
+            switchMap(({nodes}) => from(nodes)),
+            switchMap(node => chainNext((graph as GraphWithP2p).chains.peersOut, {
+                graph,
+                msg: {cmd: 'putNode', data: node}
+            })),
+            map(() => undefined)
+        )
+    });
+
+
 
 const doGetEdgeIn = (graph: Graph, msg: P2pMsg, peerId: PeerId) =>
-    of(msg as P2pMsg<'getEdge', EdgeId>).pipe(
-        switchMap(msg => getEdge(graph, msg.data, {})),
-        tap(({edge}) => edge?.edgeId && chainNext((graph as GraphWithP2p).chains.peersOut, {
-            graph,
-            msg: {cmd: 'putNode', data: edge}
-        }).subscribe())
-    )
-
-
-
-
-
-
-
+    registerSubscription({
+        graph: graph as GraphWithSubscriptionTimeouts,
+        peerId,
+        msg,
+        subscriptionTimeoutsKey: `${graph.graphId}${msg.data}${peerId}`,
+        setupFn: (graph, msg) =>  of(msg as P2pMsg<'getEdge', EdgeId>).pipe(
+            switchMap(msg => getEdge(graph, msg.data, {})),
+            tap(({edge}) => edge?.edgeId && chainNext((graph as GraphWithP2p).chains.peersOut, {
+                graph,
+                msg: {cmd: 'putNode', data: edge}
+            }).subscribe()),
+            map(() => undefined)
+        )
+    });

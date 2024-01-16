@@ -53,15 +53,15 @@ describe('end-to-end testing', () => {
         let peer1Sub: Subscription;
 
         return firstValueFrom(startTestNet([[], [], []]).pipe(
-            switchMap(({host0, host1}) => of(undefined).pipe(
+            switchMap(({host0, host1, host2}) => of(undefined).pipe(
                 switchMap(() => graphNewAuth(host0.graphs[0], 'scott', 'pass')),
                 switchMap(() => graphAuth(host0.graphs[0], 'scott', 'pass')),
                 switchMap(() => graphNewAuth(host1.graphs[0], 'todd', 'pass')),
                 switchMap(() => graphAuth(host1.graphs[0], 'todd', 'pass')),
                 switchMap(() => addThingNode(host0.graphs[0], 1)),
                 tap(() => setTimeout(() => {
-                    peer0Sub = dialPeer(host0, {url: 'ws://localhost:11112'}).subscribe();
-                    peer1Sub = dialPeer(host1, {url: 'ws://localhost:11112'}).subscribe();
+                    peer0Sub = dialPeer(host0, {url: `ws://localhost:${host2.listeningPort}`}).subscribe();
+                    peer1Sub = dialPeer(host1, {url: `ws://localhost:${host2.listeningPort}`}).subscribe();
                 })),
                 switchMap(() => nodesByLabel(host1.graphs[0], 'thing')),
                 map(({nodes}) => nodes),
@@ -81,15 +81,15 @@ describe('end-to-end testing', () => {
         let peer0Sub: Subscription;
         let peer1Sub: Subscription;
         return firstValueFrom(startTestNet([[], [], []]).pipe(
-            switchMap(({host0, host1}) => of(undefined).pipe(
+            switchMap(({host0, host1, host2}) => of(undefined).pipe(
                 switchMap(() => graphNewAuth(host0.graphs[0], 'scott', 'pass')),
                 switchMap(() => graphAuth(host0.graphs[0], 'scott', 'pass')),
                 switchMap(() => graphNewAuth(host1.graphs[0], 'todd', 'pass')),
                 switchMap(() => graphAuth(host1.graphs[0], 'todd', 'pass')),
                 switchMap(() => addThingNode(host0.graphs[0], 1)),
                 tap(() => setTimeout(() => {
-                    peer0Sub = dialPeer(host0, {url: 'ws://localhost:11112'}).subscribe();
-                    peer1Sub = dialPeer(host1, {url: 'ws://localhost:11112'}).subscribe();
+                    peer0Sub = dialPeer(host0, {url: `ws://localhost:${host2.listeningPort}`}).subscribe();
+                    peer1Sub = dialPeer(host1, {url: `ws://localhost:${host2.listeningPort}`}).subscribe();
                 })),
                 switchMap(() => nodesByProp(host1.graphs[0], 'thing', 'name', 'thing0001')),
                 map(({nodes}) => nodes),
